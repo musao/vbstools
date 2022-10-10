@@ -1,20 +1,37 @@
 '***************************************************************************************************
-'FILENAME                    :VbsBasicLibCommon.vbs
-'Generato                    :2022/09/27
-'Descrition                  :共通機能
-' パラメータ（引数）:
-'     PATH         :ファイルのパス
+'FILENAME                    : VbsBasicLibCommon.vbs
+'Overview                    : 共通関数ライブラリ
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     なし
 '---------------------------------------------------------------------------------------------------
-'Modification Histroy
-'
+'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2022/09/27         EXA Y.Fujii              Initial Release
+'2022/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
+
 
 'オフィス全般
 
-'文書の保護を解除する
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_OfficeUnprotect()
+'Overview                    : 文書の保護を解除する
+'Detailed Description        : エラーは無視する
+'                              引数のパスワードを指定しない場合は、呼び出し側でvbNullStringを設定すること
+'Argument
+'     aoOffice               : オフィスのインスタンス、エクセルの場合はワークブック
+'     asPassword             : パスワード
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Sub sub_CM_OfficeUnprotect( _
     byRef aoOffice _
     , byVal asPassword _
@@ -26,9 +43,26 @@ Private Sub sub_CM_OfficeUnprotect( _
     End If
 End Sub
 
+
+
 'エクセル系
 
-'エクセルファイルを別名で保存して閉じる
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_ExcelSaveAs()
+'Overview                    : エクセルファイルを別名で保存して閉じる
+'Detailed Description        : 工事中
+'Argument
+'     aoWorkBook             : エクセルのワークブック
+'     asPath                 : 保存するファイルのフルパス
+'     alFileformat           : XlFileFormat 列挙体（デフォルトはxlOpenXMLWorkbook 51 Excelブック）
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Sub sub_CM_ExcelSaveAs( _
     byRef aoWorkBook _
     , byVal asPath _
@@ -47,7 +81,21 @@ Private Sub sub_CM_ExcelSaveAs( _
     Call aoWorkBook.Close(False)
 End Sub
 
-'エクセルファイルを開いて（読み取り専用／ダイアログなし）ワークブックオブジェクトを返す
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ExcelOpenFile()
+'Overview                    : エクセルファイルを読み取り専用／ダイアログなしで開く
+'Detailed Description        : 工事中
+'Argument
+'     aoExcel                : エクセル
+'     asPath                 : エクセルファイルのフルパス
+'Return Value
+'     開いたエクセルのワークブック
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Function func_CM_ExcelOpenFile( _
     byRef aoExcel _
     , byVal asPath _
@@ -61,7 +109,20 @@ Private Function func_CM_ExcelOpenFile( _
                                                         )
 End Function
 
-'エクセルのオートシェイプのテキストを取り出す
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ExcelGetTextFromAutoshape()
+'Overview                    : エクセルのオートシェイプのテキストを取り出す
+'Detailed Description        : エラーは無視する
+'Argument
+'     aoAutoshape            : オートシェイプ
+'Return Value
+'     オートシェイプのテキスト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Function func_CM_ExcelGetTextFromAutoshape( _
     byRef aoAutoshape _
     )
@@ -72,89 +133,204 @@ Private Function func_CM_ExcelGetTextFromAutoshape( _
     End If
 End Function
 
+
 'ファイル操作系
 
-'ファイルを削除する
-Private Function func_CM_DeleteFile( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsDeleteFile()
+'Overview                    : ファイルを削除する
+'Detailed Description        : FileSystemObjectのDeleteFile()と同等
+'Argument
+'     asPath                 : 削除するファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsDeleteFile( _
     byVal asPath _
     ) 
     On Error Resume Next
     CreateObject("Scripting.FileSystemObject").DeleteFile(asPath)
-    func_CM_DeleteFile = True
+    func_CM_FsDeleteFile = True
     If Err.Number Then
-        func_CM_DeleteFile = False
+        Err.Clear
+        func_CM_FsDeleteFile = False
     End If
 End Function
 
-'親フォルダパスの取得
-Private Function func_CM_GetParentFolderPath( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetParentFolderPath()
+'Overview                    : 親フォルダパスの取得
+'Detailed Description        : FileSystemObjectのGetParentFolderName()と同等
+'Argument
+'     asPath                 : ファイルのパス
+'Return Value
+'     親フォルダパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetParentFolderPath( _
     byVal asPath _
     ) 
-    func_CM_GetParentFolderPath = CreateObject("Scripting.FileSystemObject").GetParentFolderName(asPath)
+    func_CM_FsGetParentFolderPath = CreateObject("Scripting.FileSystemObject").GetParentFolderName(asPath)
 End Function
 
-'ファイルパスの結合の作成
-Private Function func_CM_BuildPath( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsBuildPath()
+'Overview                    : ファイルパスの連結
+'Detailed Description        : FileSystemObjectのBuildPath()と同等
+'Argument
+'     asFolderPath           : パス
+'     asItemName             : asFolderPathに連結するフォルダ名またはファイル名
+'Return Value
+'     連結したファイルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsBuildPath( _
     byVal asFolderPath _
     , byVal asItemName _
     ) 
-    func_CM_BuildPath = CreateObject("Scripting.FileSystemObject").BuildPath(asFolderPath, asItemName)
+    func_CM_FsBuildPath = CreateObject("Scripting.FileSystemObject").BuildPath(asFolderPath, asItemName)
 End Function
 
-'ファイルの存在確認
-Private Function func_CM_FileExists( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsFileExists()
+'Overview                    : ファイルの存在確認
+'Detailed Description        : FileSystemObjectのFileExists()と同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     結果 True:存在する / False:存在しない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsFileExists( _
     byVal asPath _
     ) 
-    func_CM_FileExists = CreateObject("Scripting.FileSystemObject").FileExists(asPath)
+    func_CM_FsFileExists = CreateObject("Scripting.FileSystemObject").FileExists(asPath)
 End Function
 
-'ファイルオブジェクトの取得
-Private Function func_CM_GetFile( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFile()
+'Overview                    : ファイルオブジェクトの取得
+'Detailed Description        : FileSystemObjectのGetFile()と同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     ファイルオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFile( _
     byVal asPath _
     ) 
-    Set func_CM_GetFile = CreateObject("Scripting.FileSystemObject").GetFile(asPath)
+    Set func_CM_FsGetFile = CreateObject("Scripting.FileSystemObject").GetFile(asPath)
 End Function
 
-'一時ファイル名の作成
-Private Function func_CM_GetTempFileName()
-    func_CM_GetTempFileName = CreateObject("Scripting.FileSystemObject").GetTempName()
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetTempFileName()
+'Overview                    : ランダムに生成された一時ファイルまたはフォルダーの名前の取得
+'Detailed Description        : FileSystemObjectのGetTempName()と同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     一時ファイルまたはフォルダーの名前
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetTempFileName()
+    func_CM_FsGetTempFileName = CreateObject("Scripting.FileSystemObject").GetTempName()
 End Function
 
 
 '一般
 
-'Min関数
-Private Function func_CM_Min( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_MathMin()
+'Overview                    : 最小値を求める
+'Detailed Description        : 工事中
+'Argument
+'     al1                    : 数値1
+'     al2                    : 数値2
+'Return Value
+'     al1とal2の値が小さい方
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_MathMin( _
     byVal al1 _ 
     , byVal al2 _
     )
-    Dim lReturnValue
-    If al1 < al2 Then
-        lReturnValue = al1
-    Else
-        lReturnValue = al2
-    End If
-    func_CM_Min = lReturnValue
+    Dim lRet
+    If al1 < al2 Then lRet = al1 Else lRet = al2
+    func_CM_MathMin = lRet
 End Function
 
-'Max関数
-Private Function func_CM_Max( _
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_MathMax()
+'Overview                    : 最大値を求める
+'Detailed Description        : 工事中
+'Argument
+'     al1                    : 数値1
+'     al2                    : 数値2
+'Return Value
+'     al1とal2の値が大きい方
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_MathMax( _
     byVal al1 _ 
     , byVal al2 _
     )
-    Dim lReturnValue
-    If al1 > al2 Then
-        lReturnValue = al1
-    Else
-        lReturnValue = al2
-    End If
-    func_CM_Max = lReturnValue
+    Dim lRet
+    If al1 > al2 Then lRet = al1 Else lRet = al2
+    func_CM_MathMax = lRet
 End Function
 
 
 'これ何系かな
 
-'コレクションから指定した名前のメンバーを取得する
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_GetObjectByIdFromCollection()
+'Overview                    : コレクションから指定したIDのメンバーを取得する
+'Detailed Description        : エラーは無視する
+'Argument
+'     aoClloection           : コレクション
+'     asId                   : ID
+'Return Value
+'     該当するメンバー
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Function func_CM_GetObjectByIdFromCollection( _
     byRef aoClloection _
     , byVal asId _

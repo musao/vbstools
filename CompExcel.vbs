@@ -40,8 +40,8 @@ Wscript.Quit
 
 
 '***************************************************************************************************
+'Processing Order            : 0
 'Function/Sub Name           : Main()
-'Herarchy Level              : 0
 'Overview                    : メイン関数
 'Detailed Description        : 工事中
 'Argument
@@ -79,10 +79,15 @@ Sub Main()
 End Sub
 
 '***************************************************************************************************
+'Processing Order            : 1
 'Function/Sub Name           : sub_CmpExcelGetParameters()
-'Herarchy Level              : 1
 'Overview                    : 当スクリプトの引数取得
-'Detailed Description        : 工事中
+'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
+'                              パラメータ格納用ハッシュマップの構成
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              Seq(1,2)                 比較するエクセルファイルのパス
+'                              引数があり存在するファイルパスのみ取得する
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
 'Return Value
@@ -96,12 +101,12 @@ End Sub
 Private Sub sub_CmpExcelGetParameters( _
     byRef aoParams _
     )
-    'パラメータ格納用haハッシュマップ
+    'パラメータ格納用ハッシュマップ
     Dim oParameter : Set oParameter = CreateObject("Scripting.Dictionary")
     Dim lCnt : lCnt = 0
     Dim sParam
     For Each sParam In WScript.Arguments
-        If func_CM_FileExists(sParam) Then
+        If func_CM_FsFileExists(sParam) Then
         'ファイルが存在する場合パラメータを取得
             lCnt = lCnt + 1
             Call oParameter.Add(lCnt, sParam)
@@ -112,10 +117,15 @@ Private Sub sub_CmpExcelGetParameters( _
 End Sub
 
 '***************************************************************************************************
+'Processing Order            : 2
 'Function/Sub Name           : sub_CmpExcelDispInputFiles()
-'Herarchy Level              : 2
 'Overview                    : 比較対象ファイル入力画面の表示と取得
-'Detailed Description        : 工事中
+'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
+'                              パラメータ格納用ハッシュマップの構成
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              Seq(1,2)                 比較するエクセルファイルのパス
+'                              比較するエクセルファイルのパスが2つ未満の場合に不足分を取得格納する
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
 'Return Value
@@ -149,7 +159,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
             'ファイル選択キャンセルの場合は当スクリプトを終了する
                 Wscript.Quit
             End If
-            If func_CM_FileExists(sPath) Then
+            If func_CM_FsFileExists(sPath) Then
             'ファイルが存在する場合パラメータを取得
                 Call oParameter.Add(oParameter.Count+1, sPath)
             End If
@@ -164,10 +174,10 @@ Private Sub sub_CmpExcelDispInputFiles( _
 End Sub
 
 '***************************************************************************************************
+'Processing Order            : 3
 'Function/Sub Name           : sub_CmpExcelCompareFiles()
-'Herarchy Level              : 3
 'Overview                    : エクセルファイルを比較する
-'Detailed Description        : 工事中
+'Detailed Description        : エラーは無視する
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
 'Return Value
@@ -198,7 +208,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     '3-2 比較対象ファイルの全シートを比較結果用ワークブックにコピーする
     Call sub_CmpExcelCopyAllSheetsToWorkbookForResults(aoParams, oWorkbookForResults)
     
-    '③－３．エクセルファイルを比較する
+    '3-3 エクセルファイルを比較する
     Call sub_CmpExcelCompare(aoParams, oWorkbookForResults)
 
     oWorkbookForResults.parent.ScreenUpdating = true
@@ -211,8 +221,8 @@ Private Sub sub_CmpExcelCompareFiles( _
 End Sub
 
 '***************************************************************************************************
+'Processing Order            : 3-1
 'Function/Sub Name           : sub_CmpExcelSortByDateLastModified()
-'Herarchy Level              : 3-1
 'Overview                    : 比較するファイルを古い順（最終更新日昇順）に並べ替える
 'Detailed Description        : 工事中
 'Argument
@@ -231,9 +241,9 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
     'パラメータ格納用汎用ハッシュマップ
     Dim oParameter : Set oParameter = aoParams.Item("Parameter")
     
-    If func_CM_GetFile(oParameter.Item(1)).DateLastModified _
+    If func_CM_FsGetFile(oParameter.Item(1)).DateLastModified _
         <= _
-        func_CM_GetFile(oParameter.Item(2)).DateLastModified _
+        func_CM_FsGetFile(oParameter.Item(2)).DateLastModified _
         Then
     '最初のファイルの方が古い（最終更新日が小さい）場合、処理を抜ける
         Exit Sub
@@ -256,10 +266,15 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
 End Sub
 
 '***************************************************************************************************
+'Processing Order            : 3-2
 'Function/Sub Name           : sub_CmpExcelCopyAllSheetsToWorkbookForResults()
-'Herarchy Level              : 3-2
 'Overview                    : 比較対象ファイルの全シートを比較結果用ワークブックにコピーする
-'Detailed Description        : 工事中
+'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="WorkSheetRenameInfos"で格納する
+'                              ワークシートのリネーム情報のハッシュマップの構成
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              "From"                   比較元のワークシートのリネーム情報のハッシュマップ
+'                              "To"                     比較先のワークシートのリネーム情報のハッシュマップ
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
 '     aoWorkbookForResults   : 比較結果用のワークブック
@@ -291,7 +306,7 @@ Private Sub sub_CmpExcelCopyAllSheetsToWorkbookForResults( _
     Call oWorkSheetRenameInfos.Add(sFromToString, _
         func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(aoWorkbookForResults, sPath, sFromToString))
     
-    'ワークシートごとのシート名リネーム情報を格納
+    'ワークシートごとのシート名リネーム情報格納用ハッシュマップをパラメータ格納用汎用ハッシュマップに格納
     Call aoParams.Add("WorkSheetRenameInfos", oWorkSheetRenameInfos)
 
     'オブジェクトを開放
@@ -300,10 +315,13 @@ Private Sub sub_CmpExcelCopyAllSheetsToWorkbookForResults( _
 End Sub
 
 '***************************************************************************************************
+'Processing Order            : 3-2-1
 'Function/Sub Name           : func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail()
-'Herarchy Level              : 3-2-1
 'Overview                    : 比較対象ファイルの全シートを比較結果用ワークブックにコピーする
-'Detailed Description        : 工事中
+'Detailed Description        : ワークシートのリネーム情報のハッシュマップの構成
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              Seq(1,2,3…)              変更前後のワークシート名格納用ハッシュマップ
 'Argument
 '     aoWorkbookForResults   : 比較結果用のワークブック
 '     asPath                 : 比較対象ファイルのパス
@@ -390,7 +408,7 @@ Private Function func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail( _
     
     If Len(sTempPath) Then
     'マクロありの場合に別名で保存したファイルがあったら削除する
-        Call func_CM_DeleteFile(sTempPath)
+        Call func_CM_FsDeleteFile(sTempPath)
     End If
 
     'サマリーシートのカラム位置変換用ハッシュマップ定義
@@ -427,29 +445,8 @@ Private Function func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CmpExcelGetTempFilePath()
-'Herarchy Level              : -
-'Overview                    : 一時ファイルのフルパスを取得
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     一時ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2017/04/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CmpExcelGetTempFilePath()
-    Dim sParentFolderPath : sParentFolderPath = func_CM_GetParentFolderPath(WScript.ScriptFullName)
-    Dim sFolderPath : sFolderPath = func_CM_BuildPath(sParentFolderPath, Cs_FOLDER_TEMP)
-    func_CmpExcelGetTempFilePath = func_CM_BuildPath(sFolderPath, func_CM_GetTempFileName())
-End Function
-
-'***************************************************************************************************
+'Processing Order            : 3-2-1
 'Function/Sub Name           : func_CmpExcelMakeSheetName()
-'Herarchy Level              : -
 'Overview                    : シート名作成
 'Detailed Description        : 工事中
 'Argument
@@ -470,12 +467,15 @@ Private Function func_CmpExcelMakeSheetName( _
     func_CmpExcelMakeSheetName = "【" & asFromToString & "_" & CStr(alCnt) & "シート目】"
 End Function
 
-'③－２－１ー３．変更前後のワークシート名格納用ハッシュマップ作成
 '***************************************************************************************************
+'Processing Order            : 3-2-1
 'Function/Sub Name           : func_CmpExcelGetMapWorkSheetRenameInfo()
-'Herarchy Level              : -
 'Overview                    : 変更前後のワークシート名格納用ハッシュマップ作成
-'Detailed Description        : 工事中
+'Detailed Description        : 変更前後のワークシート名格納用ハッシュマップの構成
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              "Before"                 変更前のシート名
+'                              "After"                  変更後のシート名
 'Argument
 '     asBefore               : 変更前のシート名
 '     asAfter                : 変更後のシート名
@@ -498,7 +498,22 @@ Private Function func_CmpExcelGetMapWorkSheetRenameInfo( _
     Set oTemp = Nothing
 End Function
 
-'③－３．比較する
+'***************************************************************************************************
+'Processing Order            : 4
+'Function/Sub Name           : sub_CmpExcelCompare()
+'Overview                    : エクセルファイルを比較する
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoWorkbookForResults   : 比較結果用のワークブック
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2017/04/26         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Sub sub_CmpExcelCompare( _
     byRef aoParams _
     , byRef aoWorkbookForResults _
@@ -509,12 +524,12 @@ Private Sub sub_CmpExcelCompare( _
     Dim oTo : Set oTo = oWorkSheetRenameInfos.Item("To")
 
     Dim lCnt
-    For lCnt = 1 To func_CM_Min(oFrom.Count, oTo.Count)
+    For lCnt = 1 To func_CM_MathMin(oFrom.Count, oTo.Count)
     '比較元先の各シートに差分が分かる書式設定をする
-        '比較元（To）のシートに対し比較先（From）との差分が分かるようにする
+        '4-1 比較元（To）のシートに対し比較先（From）との差分が分かるようにする
         Call sub_CmpExcelSetFormatToUnderstandDifference(_
                 aoWorkbookForResults, oFrom.Item(lCnt).Item("After"), oTo.Item(lCnt).Item("After"))        
-        '比較先（From）のシートに対し比較元（To）との差分が分かるようにする
+        '4-1 比較先（From）のシートに対し比較元（To）との差分が分かるようにする
         Call sub_CmpExcelSetFormatToUnderstandDifference( _
                 aoWorkbookForResults, oTo.Item(lCnt).Item("After"), oFrom.Item(lCnt).Item("After"))        
     Next
@@ -526,7 +541,23 @@ Private Sub sub_CmpExcelCompare( _
 
 End Sub
 
-'③－３ー１．asSheetNameAのシートにasSheetNameBシートとの差分が分かる書式設定をする
+'***************************************************************************************************
+'Processing Order            : 4-1
+'Function/Sub Name           : sub_CmpExcelSetFormatToUnderstandDifference()
+'Overview                    : asSheetNameAのシートにasSheetNameBシートとの差分が分かる書式設定をする
+'Detailed Description        : 工事中
+'Argument
+'     aoWorkbookForResults   : 比較結果用のワークブック
+'     asSheetNameA           : 比較元のシート名
+'     asSheetNameA           : 比較先のシート名
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2017/04/26         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Sub sub_CmpExcelSetFormatToUnderstandDifference( _
     byRef aoWorkbookForResults _
     , byVal asSheetNameA _
@@ -578,7 +609,21 @@ Private Sub sub_CmpExcelSetFormatToUnderstandDifference( _
     Set oExcel = Nothing
 End Sub
 
-'③－３ー１ー１．オートシェイプの色を灰色にする
+'***************************************************************************************************
+'Processing Order            : 4-1
+'Function/Sub Name           : sub_CmpExcelSetAutoshapeColor()
+'Overview                    : オートシェイプの色を灰色にする
+'Detailed Description        : エラーは無視する
+'Argument
+'     aoAutoshape            : オートシェイプ
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2017/04/26         Y.Fujii                  First edition
+'***************************************************************************************************
 Private Sub sub_CmpExcelSetAutoshapeColor( _
     byRef aoAutoshape _
     )
@@ -595,3 +640,24 @@ Private Sub sub_CmpExcelSetAutoshapeColor( _
         Err.Clear
     End If
 End Sub
+
+'***************************************************************************************************
+'Processing Order            : -
+'Function/Sub Name           : func_CmpExcelGetTempFilePath()
+'Overview                    : 一時ファイルのフルパスを取得
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     一時ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2017/04/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CmpExcelGetTempFilePath()
+    Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(WScript.ScriptFullName)
+    Dim sFolderPath : sFolderPath = func_CM_FsBuildPath(sParentFolderPath, Cs_FOLDER_TEMP)
+    func_CmpExcelGetTempFilePath = func_CM_FsBuildPath(sFolderPath, func_CM_FsGetTempFileName())
+End Function
