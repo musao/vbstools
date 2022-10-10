@@ -210,11 +210,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     
     '3-3 エクセルファイルを比較する
     Call sub_CmpExcelCompare(aoParams, oWorkbookForResults)
-
-    oWorkbookForResults.parent.ScreenUpdating = true
-    oWorkbookForResults.parent.visible = true
-    stop
-
+    
     'オブジェクトを開放
     Set oWorkbookForResults = Nothing
 
@@ -499,7 +495,7 @@ Private Function func_CmpExcelGetMapWorkSheetRenameInfo( _
 End Function
 
 '***************************************************************************************************
-'Processing Order            : 4
+'Processing Order            : 3-3
 'Function/Sub Name           : sub_CmpExcelCompare()
 'Overview                    : エクセルファイルを比較する
 'Detailed Description        : 工事中
@@ -526,15 +522,38 @@ Private Sub sub_CmpExcelCompare( _
     Dim lCnt
     For lCnt = 1 To func_CM_MathMin(oFrom.Count, oTo.Count)
     '比較元先の各シートに差分が分かる書式設定をする
-        '4-1 比較元（To）のシートに対し比較先（From）との差分が分かるようにする
+        '3-3-1 比較元（To）のシートに対し比較先（From）との差分が分かるようにする
         Call sub_CmpExcelSetFormatToUnderstandDifference(_
                 aoWorkbookForResults, oFrom.Item(lCnt).Item("After"), oTo.Item(lCnt).Item("After"))        
-        '4-1 比較先（From）のシートに対し比較元（To）との差分が分かるようにする
+        '3-3-1 比較先（From）のシートに対し比較元（To）との差分が分かるようにする
         Call sub_CmpExcelSetFormatToUnderstandDifference( _
                 aoWorkbookForResults, oTo.Item(lCnt).Item("After"), oFrom.Item(lCnt).Item("After"))        
     Next
 
+    '同じブックの新しいウィンドウを開く
+    aoWorkbookForResults.Worksheets(oFrom.Item(1).Item("After")).Activate
+    With aoWorkbookForResults.Windows(1).NewWindow
+        Dim sCaption : sCaption = .Caption
+        Dim oWorksheet
+        For Each oWorksheet In .Parent.Worksheets
+            oWorksheet.Activate
+            .Zoom = 25
+        Next
+    End With
+    aoWorkbookForResults.Worksheets(oTo.Item(1).Item("After")).Activate
+    '並べて比較
+    aoWorkbookForResults.Activate
+    With aoWorkbookForResults.Parent
+        .Windows.CompareSideBySideWith(sCaption)
+        Call .Windows.Arrange(-4166, True)               'xlVertical = -4166
+        .DisplayAlerts = True
+        .ScreenUpdating = True
+        .AutomationSecurity = 2                     'msoAutomationSecurityByUI = 2 [ セキュリティ] ダイアログ ボックスで指定されたセキュリティ設定を使用
+        .Visible = True
+    End With
+
     'オブジェクトを開放
+    Set oWorksheet = Nothing
     Set oTo = Nothing
     Set oFrom = Nothing
     Set oWorkSheetRenameInfos = Nothing
@@ -542,7 +561,7 @@ Private Sub sub_CmpExcelCompare( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 4-1
+'Processing Order            : 3-3-1
 'Function/Sub Name           : sub_CmpExcelSetFormatToUnderstandDifference()
 'Overview                    : asSheetNameAのシートにasSheetNameBシートとの差分が分かる書式設定をする
 'Detailed Description        : 工事中
@@ -610,7 +629,7 @@ Private Sub sub_CmpExcelSetFormatToUnderstandDifference( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 4-1
+'Processing Order            : 3-3-1
 'Function/Sub Name           : sub_CmpExcelSetAutoshapeColor()
 'Overview                    : オートシェイプの色を灰色にする
 'Detailed Description        : エラーは無視する
