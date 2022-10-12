@@ -23,24 +23,25 @@ Private Const Cs_FOLDER_TEMP = "tmp"
 Sub sub_Include( _
     byVal asIncludeFileName _
     )
-    Dim oFso : Set oFso = CreateObject("Scripting.FileSystemObject")
-    Dim sParentFolderName : sParentFolderName = oFso.GetParentFolderName(WScript.ScriptFullName)
-    Dim sIncludeFilePath
-    sIncludeFilePath = oFso.BuildPath(sParentFolderName, Cs_FOLDER_INCLUDE)
-    sIncludeFilePath = oFso.BuildPath(sIncludeFilePath, asIncludeFileName)
-    ExecuteGlobal oFso.OpenTextfile(sIncludeFilePath).ReadAll
-    Set oFso = Nothing
+    With CreateObject("Scripting.FileSystemObject")
+        Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
+        Dim sIncludeFilePath
+        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_INCLUDE)
+        sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
+        ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
+    End With
 End Sub
 'Include
 Call sub_Include("VbsBasicLibCommon.vbs")
 
-Main
 
+'ÉÅÉCÉìä÷êîé¿çs
+Call Main()
 Wscript.Quit
 
 
 '***************************************************************************************************
-'Processing Order            : 0
+'Processing Order            : First
 'Function/Sub Name           : Main()
 'Overview                    : ÉÅÉCÉìä÷êî
 'Detailed Description        : çHéñíÜ
