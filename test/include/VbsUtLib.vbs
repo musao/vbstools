@@ -14,6 +14,36 @@
 '***************************************************************************************************
 
 '***************************************************************************************************
+'Function/Sub Name           : sub_UtResultOutput()
+'Overview                    : UT結果を出力する
+'Detailed Description        : 工事中
+'Argument
+'     aoUtAssistant
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/13         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_UtResultOutput(_
+    byRef aoUtAssistant _
+    )
+    
+    With aoUtAssistant
+        'ログファイル出力
+        Call sub_UtWriteFile(func_UtGetThisLogFilePath(), .OutputReportInTsvFormat())
+        
+        '結果をメッセージで出力
+        Dim sMsg : sMsg = "NGがあります、ログを確認ください"
+        If .isAllOk Then sMsg = "全ケースOKです！"
+        Call Msgbox(sMsg)
+    End With
+    
+End sub
+
+'***************************************************************************************************
 'Function/Sub Name           : func_UtGetThisWorkFolderPath()
 'Overview                    : UT対象のソースファイル用のワークディレクトリのフルパスを取得
 'Detailed Description        : ディレクトリがない場合は作成する
@@ -81,7 +111,7 @@ Private Function func_UtGetThisLogFilePath()
         func_UtGetThisLogFilePath = .BuildPath( _
                                         func_UtGetThisWorkFolderPath() _
                                         , .GetBaseName(WScript.ScriptFullName) _
-                                            & "_" & func_UtGetGetDateInYyyymmddhhmmssFormat() _
+                                            & "_" & func_UtGetGetDateInYyyymmddhhmmssFormat(Now()) _
                                             & ".log" _
                                         )
     End With
@@ -89,10 +119,10 @@ End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_UtGetGetDateInYyyymmddhhmmssFormat()
-'Overview                    : 日付をYYYYMMDD_HHMMSS形式で取得する
+'Overview                    : 日時をYYYYMMDD_HHMMSS形式で取得する
 'Detailed Description        : 工事中
 'Argument
-'     なし
+'     adtDate                : 日時
 'Return Value
 '     YYYYMMDD_HHMMSS形式の文字列
 '---------------------------------------------------------------------------------------------------
@@ -101,8 +131,10 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/10/12         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_UtGetGetDateInYyyymmddhhmmssFormat()
-    Dim dtNow : dtNow = Now()
+Private Function func_UtGetGetDateInYyyymmddhhmmssFormat(_
+    byVal adtDate _
+    )
+    Dim dtNow : dtNow = adtDate
     Dim sCont : sCont = Year(dtNow)
     sCont = sCont & Right("0" & Month(dtNow) , 2)
     sCont = sCont & Right("0" & Day(dtNow) , 2)
@@ -110,7 +142,7 @@ Private Function func_UtGetGetDateInYyyymmddhhmmssFormat()
     sCont = sCont & Right("0" & Hour(dtNow) , 2)
     sCont = sCont & Right("0" & Minute(dtNow) , 2)
     sCont = sCont & Right("0" & Second(dtNow) , 2)
-    func_UtGetGetDateInYyyymmddhhmmssFormat = sCont    
+    func_UtGetGetDateInYyyymmddhhmmssFormat = sCont
 End Function
 
 '***************************************************************************************************
@@ -118,6 +150,8 @@ End Function
 'Overview                    : ファイル出力する
 'Detailed Description        : エラーは無視する
 'Argument
+'     asPath                 : 出力先のフルパス
+'     asCont                 : 出力する内容
 '     なし
 'Return Value
 '     なし

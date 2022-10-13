@@ -58,13 +58,8 @@ Sub Main()
     'func_CM_FsGetParentFolderPath()のテスト
     Call func_CM_FsGetParentFolderPathTest(oUtAssistant)
     
-    'UTレポートの出力
-    Call sub_OutputReport(oUtAssistant)
-    
-    '結果をメッセージで出力
-    Dim sMsg : sMsg = "NGがあります、ログを確認ください"
-    If oUtAssistant.isAllOk Then sMsg = "全ケースOKです！"
-    Call Msgbox(sMsg)
+    '結果出力
+    Call sub_UtResultOutput(oUtAssistant)
     
     Set oUtAssistant = Nothing
     
