@@ -2,10 +2,6 @@
 'FILENAME                    : VbsBasicLibCommon.vbs
 'Overview                    : ‹¤’ÊŠÖ”ƒ‰ƒCƒuƒ‰ƒŠ
 'Detailed Description        : H–’†
-'Argument
-'     ‚È‚µ
-'Return Value
-'     ‚È‚µ
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes

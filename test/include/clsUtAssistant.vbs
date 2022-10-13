@@ -2,10 +2,6 @@
 'FILENAME                    : clsUtAssistant.vbs
 'Overview                    : 単体テスト用アシスタントクラス
 'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     なし
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -14,6 +10,7 @@
 '***************************************************************************************************
 Class clsUtAssistant
 '    'クラス内変数
+    Private PdtNow
     Private PdtDate
     Private PdtStart
     Private PdtEnd
@@ -24,7 +21,8 @@ Class clsUtAssistant
     'コンストラクタ
     Private Sub Class_Initialize()
         '開始日時の取得
-        PdtDate = Date()
+        PdtNow = Now
+        PdtDate = Date
         PdtStart = Timer
         '結果サマリーのタイトル定義
         Set PoRecSumTitles = CreateObject("Scripting.Dictionary")
@@ -127,6 +125,24 @@ Class clsUtAssistant
     '***************************************************************************************************
     Public Property Get StartTime()
         StartTime = func_GetDateInMilliseconds(PdtDate, PdtStart)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get ProcDate()
+    'Overview                    : 単体テストの実施日時を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     単体テストの実施日時
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2022/10/13         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get ProcDate()
+        ProcDate = PdtNow
     End Property
     
     '***************************************************************************************************

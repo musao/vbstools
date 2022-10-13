@@ -2,10 +2,6 @@
 'FILENAME                    : VbsUrLib.vbs
 'Overview                    : 単体テスト用ライブラリ
 'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     なし
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -18,7 +14,7 @@
 'Overview                    : UT結果を出力する
 'Detailed Description        : 工事中
 'Argument
-'     aoUtAssistant
+'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -33,7 +29,7 @@ Private Sub sub_UtResultOutput(_
     
     With aoUtAssistant
         'ログファイル出力
-        Call sub_UtWriteFile(func_UtGetThisLogFilePath(), .OutputReportInTsvFormat())
+        Call sub_UtWriteFile(func_UtGetThisLogFilePath(aoUtAssistant), .OutputReportInTsvFormat())
         
         '結果をメッセージで出力
         Dim sMsg : sMsg = "NGがあります、ログを確認ください"
@@ -97,7 +93,7 @@ End Function
 'Overview                    : ログファイルのフルパスを取得
 'Detailed Description        : 工事中
 'Argument
-'     なし
+'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
 '     ログファイルのフルパス
 '---------------------------------------------------------------------------------------------------
@@ -106,12 +102,14 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/10/12         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_UtGetThisLogFilePath()
+Private Function func_UtGetThisLogFilePath(_
+    byRef aoUtAssistant _
+    )
     With CreateObject("Scripting.FileSystemObject")
         func_UtGetThisLogFilePath = .BuildPath( _
                                         func_UtGetThisWorkFolderPath() _
                                         , .GetBaseName(WScript.ScriptFullName) _
-                                            & "_" & func_UtGetGetDateInYyyymmddhhmmssFormat(Now()) _
+                                            & "_" & func_UtGetGetDateInYyyymmddhhmmssFormat(aoUtAssistant.ProcDate()) _
                                             & ".log" _
                                         )
     End With

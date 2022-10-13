@@ -209,7 +209,7 @@ Private Sub func_CM_FsGetParentFolderPathTest( _
     byRef aoUtAssistant _
     )
     
-    '2-1 親フォルダがある場合
+    '2-1 正常
     Call aoUtAssistant.Run("func_CM_FsGetParentFolderPathTestNormal")
 '    '1-2 削除失敗
 '    Call aoUtAssistant.Run("func_CM_FsDeleteFileTestFailure")
@@ -220,7 +220,7 @@ End Sub
 'Processing Order            : 2-1
 'Function/Sub Name           : func_CM_FsGetParentFolderPathTestNormal()
 'Overview                    : func_CM_FsGetParentFolderPath()のテスト
-'Detailed Description        : 親フォルダがある場合
+'Detailed Description        : 工事中
 'Argument
 '     なし
 'Return Value
@@ -235,19 +235,22 @@ Private Function func_CM_FsGetParentFolderPathTestNormal( _
     )
     func_CM_FsGetParentFolderPathTestNormal = False
     
-    '一時ファイルのフルパスを取得
-    Dim sPath : sPath = func_UtGetThisTempFilePath()
-    
-    With CreateObject("Scripting.FileSystemObject")
-        '親フォルダのフルパスを取得
-        Dim sExpect : sExpect = .GetParentFolderName(sPath)
+    Dim oParams : Set oParams = CreateObject("Scripting.Dictionary")
+    With oParams               '入力値、期待値
+        Call .Add("c:\a\b", "c:\a")
+        Call .Add("C:\A\", "C:\")
+        Call .Add("C:\a", "C:\")
+        Call .Add("c:\", "")
+        Call .Add("C:", "")
         
-        'テスト対象実行
-        Dim sResult : sResult = func_CM_FsGetParentFolderPath(sPath)
-        
-        '期待値と比較する
-        func_CM_FsGetParentFolderPathTestNormal = (sExpect = sResult)
-        
+        Dim sKey
+        For Each sKey In .Keys
+            If StrComp(.Item(sKey), func_CM_FsGetParentFolderPath(sKey)) Then Exit Function
+        Next
     End With
+    
+    func_CM_FsGetParentFolderPathTestNormal = True
+    
+    Set oParams = Nothing
     
 End Function
