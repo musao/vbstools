@@ -221,6 +221,26 @@ Private Function func_CM_FsFileExists( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsFolderExists()
+'Overview                    : フォルダの存在確認
+'Detailed Description        : FileSystemObjectのFolderExists()と同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     結果 True:存在する / False:存在しない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/16         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsFolderExists( _
+    byVal asPath _
+    ) 
+    func_CM_FsFolderExists = CreateObject("Scripting.FileSystemObject").FolderExists(asPath)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetFile()
 'Overview                    : ファイルオブジェクトの取得
 'Detailed Description        : FileSystemObjectのGetFile()と同等
@@ -258,8 +278,59 @@ Private Function func_CM_FsGetTempFileName()
     func_CM_FsGetTempFileName = CreateObject("Scripting.FileSystemObject").GetTempName()
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsCreateFolder()
+'Overview                    : ランダムに生成された一時ファイルまたはフォルダーの名前の取得
+'Detailed Description        : FileSystemObjectのCreateFolder()と同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     作成したフォルダの絶対パス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsCreateFolder( _
+    byVal asPath _
+    )
+    func_CM_FsCreateFolder = CreateObject("Scripting.FileSystemObject").CreateFolder(asPath)
+End Function
 
-'一般
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_FsWriteFile()
+'Overview                    : ファイル出力する
+'Detailed Description        : エラーは無視する
+'Argument
+'     asPath                 : 出力先のフルパス
+'     asCont                 : 出力する内容
+'     なし
+'Return Value
+'     作成したフォルダの絶対パス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/16         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_FsWriteFile( _
+    byVal asPath _
+    , byVal asCont _
+    )
+    On Error Resume Next
+    'ファイルを開く（存在しない場合は作成する）
+    With CreateObject("Scripting.FileSystemObject").OpenTextFile(asPath, 2, True)
+        Call .WriteLine(asCont)
+        Call .Close
+    End With
+    If Err.Number Then
+        Err.Clear
+    End If
+End Sub
+
+
+'数学系
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_MathMin()
@@ -344,4 +415,41 @@ Private Function func_CM_GetObjectByIdFromCollection( _
         Err.Clear
     End If
     Set oItem = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_GetDateInMilliseconds()
+'Overview                    : 日時をミリ秒で取得する
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_GetDateInMilliseconds( _
+    byVal adtDate _
+    , byVal adtTimer _
+    )
+    Dim dtNowTime        '現在時刻
+    Dim lHour            '時
+    Dim lngMinute        '分
+    Dim lngSecond        '秒
+    Dim lngMilliSecond   'ミリ秒
+
+    dtNowTime = adtTimer
+    lMilliSecond = dtNowTime - Fix(dtNowTime)
+    lMilliSecond = Right("000" & Fix(lMilliSecond * 1000), 3)
+    dtNowTime = Fix(dtNowTime)
+    lSecond = Right("0" & dtNowTime Mod 60, 2)
+    dtNowTime = dtNowTime \ 60
+    lMinute = Right("0" & dtNowTime Mod 60, 2)
+    dtNowTime = dtNowTime \ 60
+    lHour = Right("0" & dtNowTime, 2)
+
+    func_CM_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
 End Function
