@@ -179,6 +179,46 @@ Private Function func_CM_FsGetParentFolderPath( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetGetBaseName()
+'Overview                    : ファイル名（拡張子を除く）の取得
+'Detailed Description        : FileSystemObjectのGetBaseName()と同等
+'Argument
+'     asPath                 : ファイルのパス
+'Return Value
+'     ファイル名（拡張子を除く）
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetGetBaseName( _
+    byVal asPath _
+    ) 
+    func_CM_FsGetGetBaseName = CreateObject("Scripting.FileSystemObject").GetBaseName(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetGetExtensionName()
+'Overview                    : ファイルの拡張子の取得
+'Detailed Description        : FileSystemObjectのGetExtensionName()と同等
+'Argument
+'     asPath                 : ファイルのパス
+'Return Value
+'     ファイルの拡張子
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetGetExtensionName( _
+    byVal asPath _
+    ) 
+    func_CM_FsGetGetExtensionName = CreateObject("Scripting.FileSystemObject").GetExtensionName(asPath)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsBuildPath()
 'Overview                    : ファイルパスの連結
 'Detailed Description        : FileSystemObjectのBuildPath()と同等
@@ -247,7 +287,7 @@ End Function
 'Argument
 '     asPath                 : パス
 'Return Value
-'     ファイルオブジェクト
+'     Fileオブジェクト
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -258,6 +298,66 @@ Private Function func_CM_FsGetFile( _
     byVal asPath _
     ) 
     Set func_CM_FsGetFile = CreateObject("Scripting.FileSystemObject").GetFile(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFolder()
+'Overview                    : フォルダオブジェクトの取得
+'Detailed Description        : FileSystemObjectのGetFolder()と同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     Fileオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFolder( _
+    byVal asPath _
+    ) 
+    Set func_CM_FsGetFolder = CreateObject("Scripting.FileSystemObject").GetFolder(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFiles()
+'Overview                    : 指定したフォルダ以下のFilesコレクションを取得する
+'Detailed Description        : FileSystemObjectのFolderオブジェクトのFilesコレクションと同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     Filesコレクション
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFiles( _
+    byVal asPath _
+    ) 
+    Set func_CM_FsGetFiles = CreateObject("Scripting.FileSystemObject").GetFolder(asPath).Files
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFolders()
+'Overview                    : 指定したフォルダ以下のFoldersコレクションを取得する
+'Detailed Description        : FileSystemObjectのFolderオブジェクトのSubFoldersコレクションと同等
+'Argument
+'     asPath                 : パス
+'Return Value
+'     Foldersコレクション
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFolders( _
+    byVal asPath _
+    ) 
+    Set func_CM_FsGetFolders = CreateObject("Scripting.FileSystemObject").GetFolder(asPath).SubFolders
 End Function
 
 '***************************************************************************************************
@@ -285,7 +385,7 @@ End Function
 'Argument
 '     asPath                 : パス
 'Return Value
-'     作成したフォルダの絶対パス
+'     作成したフォルダのフルパス
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -307,7 +407,7 @@ End Function
 '     asCont                 : 出力する内容
 '     なし
 'Return Value
-'     作成したフォルダの絶対パス
+'     作成したフォルダのフルパス
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes

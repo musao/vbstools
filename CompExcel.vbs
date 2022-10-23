@@ -115,6 +115,9 @@ Private Sub sub_CmpExcelGetParameters( _
     Next
     
     Call aoParams.Add("Parameter", oParameter)
+    
+    'オブジェクトを開放
+    Set oParameter = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -150,8 +153,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
         Exit Sub
     End If
     
-    Dim oExcel : Set oExcel = CreateObject("Excel.Application")
-    With oExcel
+    With CreateObject("Excel.Application")
         Dim sPath
         Do Until oParameter.Count > 1
             
@@ -170,7 +172,6 @@ Private Sub sub_CmpExcelDispInputFiles( _
     End With
     
     'オブジェクトを開放
-    Set oExcel = Nothing
     Set oParameter = Nothing
 End Sub
 

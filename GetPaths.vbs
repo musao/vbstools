@@ -1,7 +1,7 @@
 '***************************************************************************************************
-'FILENAME                    : GetPath.vbs
+'FILENAME                    : GetPaths.vbs
 'Overview                    : 引数のファイルパスをクリップボードにコピーする
-'Detailed Description        : Sendtoからファイルパスを取得するのに使用する
+'Detailed Description        : Sendtoから使用する
 'Argument
 '     PATH1,2...             : ファイルのパス1,2,...
 'Return Value
