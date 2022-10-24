@@ -159,6 +159,34 @@ Private Function func_CM_FsDeleteFile( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsCopyFile ()
+'Overview                    : ファイルをコピーする
+'Detailed Description        : FileSystemObjectのCopyFile ()と同等
+'Argument
+'     asPathFrom             : コピー元ファイルのフルパス
+'     asPathTo               : コピー先ファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsCopyFile( _
+    byVal asPathFrom _
+    , byVal asPathTo _
+    ) 
+    On Error Resume Next
+    Call CreateObject("Scripting.FileSystemObject").CopyFile(asPathFrom, asPathTo)
+    func_CM_FsCopyFile = True
+    If Err.Number Then
+        Err.Clear
+        func_CM_FsCopyFile = False
+    End If
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetParentFolderPath()
 'Overview                    : 親フォルダパスの取得
 'Detailed Description        : FileSystemObjectのGetParentFolderName()と同等
@@ -380,7 +408,7 @@ End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsCreateFolder()
-'Overview                    : ランダムに生成された一時ファイルまたはフォルダーの名前の取得
+'Overview                    : フォルダーを作成する
 'Detailed Description        : FileSystemObjectのCreateFolder()と同等
 'Argument
 '     asPath                 : パス
@@ -522,9 +550,10 @@ End Function
 'Overview                    : 日時をミリ秒で取得する
 'Detailed Description        : 工事中
 'Argument
-'     なし
+'     adtDate                : 日付
+'     adtTimer               : タイマー
 'Return Value
-'     なし
+'     yyyymmdd hh:mm:ss.nnnn形式の日付
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -552,4 +581,24 @@ Private Function func_CM_GetDateInMilliseconds( _
     lHour = Right("0" & dtNowTime, 2)
 
     func_CM_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_GetDateAsYYYYMMDD()
+'Overview                    : 日時をYYYYMMDD形式で取得する
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     yyyymmdd形式の日付
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_GetDateAsYYYYMMDD( _
+    byVal adtDate _
+    )
+    func_CM_GetDateAsYYYYMMDD = Replace(Left(adtDate,10), "/", "")
 End Function

@@ -2,6 +2,7 @@
 'FILENAME                    : BackupFiles.vbs
 'Overview                    : 引数で受け取ったファイルをバックアップする
 'Detailed Description        : Sendtoから使用する
+'                              フォルダを指定した場合はそのフォルダ以下全てのファイルをバックアップする
 'Argument
 '     PATH1,2...             : ファイルのパス1,2,...
 'Return Value
@@ -174,7 +175,7 @@ Private Sub sub_BackupFilesBackup( _
     
     Dim lKey
     For lKey=1 To oParameter.Count
-    'ファイルごとに処理する
+    'パラメータごとのバックアップ処理
         Call sub_BackupFileBackupDetail(aoParams, oParameter.Item(lKey))
     Next
     
@@ -185,7 +186,7 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 2-1
 'Function/Sub Name           : sub_BackupFileBackupDetail()
-'Overview                    : ファイルごとのバックアップ処理
+'Overview                    : パラメータごとのバックアップ処理
 'Detailed Description        : 工事中
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
@@ -203,40 +204,134 @@ Private Sub sub_BackupFileBackupDetail( _
     , byRef aoParameter _
     )
     
-    '前バージョンのファイルを探して情報を取得する
-    Call sub_BackupFileFindPreviousFile(aoParams, aoParameter)
-    
-    Call Msgbox("OutputFolderPath : " & aoParams.Item("OutputFolderPath"))
-    Call Msgbox("Path : " & aoParams.Item("LatestHistoryInfo").Item("Path"))
-    Call Msgbox("Date : " & aoParams.Item("LatestHistoryInfo").Item("Date"))
-    Call Msgbox("Sequence : " & aoParams.Item("LatestHistoryInfo").Item("Sequence"))
-    'バックアップ要否判断
-    
-    'バックアップ実施
-     'バックアップファイル名の確定
-     'コピー実施
+    If aoParameter.Item("isFile") Then
+    'ファイルの場合
+        Call sub_BackupFileProcForOneFile(aoParams, aoParameter.Item("Path"))
+    Else
+    'フォルダの場合
+        Call sub_BackupFileProcForFolder(aoParams, aoParameter.Item("Path"))
+    End If
     
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2-1-1
+'Function/Sub Name           : sub_BackupFileProcForFolder()
+'Overview                    : フォルダのバックアップ処理
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     asPath                 : バックアップ対象フォルダのフルパス
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2016/09/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_BackupFileProcForFolder( _
+    byRef aoParams _
+    , byVal asPath _
+    )
+    
+    Dim oItem
+    For Each oItem In func_CM_FsGetFolders(asPath)
+    'フォルダ内のサブフォルダの処理
+        Call sub_BackupFileProcForFolder(aoParams, oItem.Path)
+    Next
+    For Each oItem In func_CM_FsGetFiles(asPath)
+    'フォルダ内のファイルの処理
+        Call sub_BackupFileProcForOneFile(aoParams, oItem.Path)
+    Next
+    
+    Set oItem = Nothing
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 2-1-2
+'Function/Sub Name           : sub_BackupFileProcForOneFile()
+'Overview                    : ファイルごとのバックアップ処理
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     asPath                 : バックアップ対象ファイルのフルパス
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2016/09/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_BackupFileProcForOneFile( _
+    byRef aoParams _
+    , byVal asPath _
+    )
+    
+    '前バージョンのファイルを探して情報を取得する
+    Call sub_BackupFileFindPreviousFile(aoParams, asPath)
+    
+    With aoParams.Item(asPath).Item("LatestHistoryInfo")
+        '最新履歴がない または 最終更新日時が不一致 の場合はバックアップする
+        Dim boDoBackup : boDoBackup = False
+        If Not(.Item("Exists")) Then
+            boDoBackup = True
+        ElseIf .Item("DateLastModified") <> (func_CM_FsGetFile(asPath)).DateLastModified Then
+            boDoBackup = True
+        End If
+        
+        If Not(boDoBackup) Then
+        'バックアップしない場合は関数を抜ける
+            Exit Sub
+        End If
+        
+        'バックアップファイル名の作成
+        Dim sNewDate : sNewDate = func_CM_GetDateAsYYYYMMDD(Now())
+        Dim sNewSeq : sNewSeq = ""
+        If (StrComp(sNewDate, .Item("BackupDate"), vbBinaryCompare)=0) Then
+            sNewDate = .Item("BackupDate")
+            sNewSeq = Cstr(.Item("Sequence")+1)
+        End If
+        Dim sNewFileName
+        sNewFileName = func_CM_FsGetGetBaseName(asPath) & "_"& Right(sNewDate,6)
+        If (Len(sNewSeq)>0) Then sNewFileName = sNewFileName & "_" & sNewSeq
+        sNewFileName = sNewFileName & "." & func_CM_FsGetGetExtensionName(asPath)
+        
+    End With
+    
+    'コピー実施
+    Dim sNewFilePath : sNewFilePath = func_CM_FsBuildPath(aoParams.Item(asPath).Item("OutputFolderPath"), sNewFileName)
+    Call func_CM_FsCopyFile(asPath, sNewFilePath)
+    
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 2-1-2-1
 'Function/Sub Name           : sub_BackupFileFindPreviousFile()
 'Overview                    : 前バージョンのファイルを探して情報を取得する
 'Detailed Description        : パラメータ格納用汎用ハッシュマップに下記を格納する
 '                              Key                      Value
 '                              -------------------      --------------------------------------------
-'                              OutputFolderPath         バックアップ出力先のパス
+'                              asPathの値               バックアップ処理情報格納用ハッシュマップ
 '                              
-'                              パラメータ格納用汎用ハッシュマップにKey="LatestHistoryInfo"で格納する
+'                              バックアップ処理情報格納用ハッシュマップの構成
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              OutputFolderPath         バックアップ出力先
+'                              LatestHistoryInfo        最新バックアップ履歴格納用ハッシュマップ
+'                              
 '                              最新バックアップ履歴格納用ハッシュマップの構成
 '                              Key                      Value
 '                              -------------------      --------------------------------------------
-'                              Path                     パス
-'                              Date                     履歴取得日（YYYYMMDD形式）
-'                              Sequence                 連番（1,2,3,...）
+'                              Exists                   True:最新履歴がある / False:最新履歴がない
+'                              DateLastModified         最終更新日時
+'                              Size                     サイズ
+'                              BackupDate               履歴取得日（YYYYMMDD形式）
+'                              Sequence                 履歴取得日が同日の場合の連番（1,2,3,...）
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
-'     aoParameter            : 個別パラメータ格納用ハッシュマップ
+'     asPath                 : バックアップ対象ファイルのフルパス
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -247,7 +342,7 @@ End Sub
 '***************************************************************************************************
 Private Sub sub_BackupFileFindPreviousFile( _
     byRef aoParams _
-    , byRef aoParameter _
+    , byVal asPath _
     )
     
     'バックアップ先フォルダを探す
@@ -258,8 +353,8 @@ Private Sub sub_BackupFileFindPreviousFile( _
         Call .Add(3, "old")
     End With
     
-    Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(aoParameter.Item("Path"))
-    Dim sTargetFolder : sTargetFolder = sParentFolderPath
+    Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(asPath)
+    Dim sTargetFolder : sTargetFolder = ""
     Dim sTemp : Dim lKey
     For Each lKey In oFolders.Keys
         sTemp = func_CM_FsBuildPath(sParentFolderPath, oFolders.Item(lKey))
@@ -268,10 +363,14 @@ Private Sub sub_BackupFileFindPreviousFile( _
             Exit For
         End If
     Next
+    If (Len(sTargetFolder)=0) Then
+        sTargetFolder = func_CM_FsBuildPath(sParentFolderPath, oFolders.Item(1))
+        Call func_CM_FsCreateFolder(sTargetFolder)
+    End If
     
     'バックアップ対象ファイルのファイル名と拡張子からバックアップ履歴ファイル抽出用の正規表現を作成
-    Dim sBasename : sBasename = func_CM_FsGetGetBaseName(aoParameter.Item("Path"))
-    Dim sExtensionName : sExtensionName = func_CM_FsGetGetExtensionName(aoParameter.Item("Path"))
+    Dim sBasename : sBasename = func_CM_FsGetGetBaseName(asPath)
+    Dim sExtensionName : sExtensionName = func_CM_FsGetGetExtensionName(asPath)
     Dim sPattern
     sPattern = sBasename & "_" & "(20)?(\d{2}[01]\d[0123]\d)" & "((_)(\d+))?"
     If (Len(sExtensionName)) Then sPattern = sPattern & "." & sExtensionName
@@ -287,7 +386,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
         Dim sDate : sDate = "00010101"
         Dim lSeq : lSeq = 1
         Dim oItem : Dim sItemName : Dim sDateToComp : Dim sSeqToComp
-        For Each oItem In func_BackupFilesGetTargetList(aoParameter, sTargetFolder)
+        For Each oItem In func_CM_FsGetFiles(sTargetFolder)
             sItemName = oItem.Name
             If .Test(sItemName) Then
             'バックアップ履歴の場合
@@ -299,7 +398,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
                 
                 If (sDateToComp > sDate) _
                     Or ((sDateToComp = sDate) And ( Clng(sSeqToComp) > lSeq )) _
-                    Or Not(Len(sTargetPath)) Then
+                    Or (Len(sTargetPath)=0) Then
                 '保持している情報より新しい場合、最新のバックアップ履歴として情報を取得
                     sTargetPath = oItem.Path
                     sDate = sDateToComp
@@ -308,51 +407,33 @@ Private Sub sub_BackupFileFindPreviousFile( _
             End If
         Next
     End With
+    Dim boExistsTargetFile : boExistsTargetFile = False
+    If (Len(sTargetPath)>0) Then boExistsTargetFile = True
+    Dim oTargetFile : Set oTargetFile = Nothing
+    If (Len(sTargetPath)>0) Then Set oTargetFile = func_CM_FsGetFile(sTargetPath)
     
     'パラメータ格納用汎用ハッシュマップに格納する
-    Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
-    With oTemp
-        Call .Add("Path", sTargetPath)
-        Call .Add("Date", sDate)
-        Call .Add("Sequence", lSeq)
+    Dim oTempHistory : Set oTempHistory = CreateObject("Scripting.Dictionary")
+    With oTempHistory
+        Call .Add("Exists", boExistsTargetFile)
+        If boExistsTargetFile Then
+            Call .Add("DateLastModified", oTargetFile.DateLastModified)
+            Call .Add("BackupDate", sDate)
+            Call .Add("Sequence", lSeq)
+        End If
+    End With
+    Dim oTempProc : Set oTempProc = CreateObject("Scripting.Dictionary")
+    With oTempProc
+        Call .Add("OutputFolderPath", sTargetFolder)
+        Call .Add("LatestHistoryInfo", oTempHistory)
     End With
     With aoParams
-        Call .Add("OutputFolderPath", sTargetFolder)
-        Call .Add("LatestHistoryInfo", oTemp)
+        Call .Add(asPath, oTempProc)
     End With
     
     Set oFolders = Nothing
     Set oItem = Nothing
-    Set oTemp = Nothing
+    Set oTargetFile = Nothing
+    Set oTempHistory = Nothing
+    Set oTempProc = Nothing
 End Sub
-
-'***************************************************************************************************
-'Processing Order            : 2-1-1-1
-'Function/Sub Name           : func_BackupFilesGetTargetList()
-'Overview                    : バックアップ先フォルダのファイルまたはフォルダのリストを取得
-'Detailed Description        : 工事中
-'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'     aoParameter            : 個別パラメータ格納用ハッシュマップ
-'Return Value
-'     FilesまたはFoldersコレクション
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2016/09/21         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_BackupFilesGetTargetList( _
-    byRef aoParameter _
-    , byVal asTargetFolder _
-    )
-    Set func_BackupFilesGetTargetList = Nothing
-    
-    'バックアップファイルから直近のファイル/フォルダを探す
-    If aoParameter.Item("isFile") Then
-        Set func_BackupFilesGetTargetList = func_CM_FsGetFiles(asTargetFolder)
-    Else
-        Set func_BackupFilesGetTargetList = func_CM_FsGetFolders(asTargetFolder)
-    End If
-    
-End Function
