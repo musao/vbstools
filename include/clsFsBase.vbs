@@ -10,23 +10,11 @@
 '***************************************************************************************************
 Class clsFsBase
     'クラス内変数、定数
-    Private PoFso                              'FileSystemObjectオブジェクト
-    Private PboUseCache                        'キャッシュ使用可否（最新を取得するかどうか）
-    Private PdbMostRecentReference             'キャッシュ情報取得時間（Timer関数の値）
-    Private PdbValidPeriod                     'キャッシュ有効期間（秒数）
-    
-    Private PlAttributes                       '属性
-    Private PdtDateCreated                     '作成された日付と時刻
-    Private PdtDateLastAccessed                '最後にアクセスした日付と時刻
-    Private PdtDateLastModified                '最終更新日時
-    Private PsDrive                            'ファイルまたはフォルダーがあるドライブのドライブ文字
-    Private PsName                             '名前
-    Private PoParentFolder                     '親のフォルダーオブジェクト
-    Private PsPath                             'パス
-    Private PsShortName                        '短い名前(8.3 名前付け規則)
-    Private PsShortPath                        '短いパス(8.3 名前付け規則)
-    Private PlSize                             'サイズ（バイト単位）
-    Private PsType                             '種類
+    Private PoFso                                          'FileSystemObjectオブジェクト
+    Private PoProp                                         '属性格納用ハッシュマップ
+    Private PboUseCache                                    'キャッシュ使用可否（最新を取得するかどうか）
+    Private PdbMostRecentReference                         'キャッシュ情報取得時間（Timer関数の値）
+    Private PdbValidPeriod                                 'キャッシュ有効期間（秒数）
     
     'コンストラクタ
     Private Sub Class_Initialize()
@@ -36,198 +24,27 @@ Class clsFsBase
         PdbMostRecentReference = 0
         PdbValidPeriod = 1
         
-        PlAttributes = vbNullString
-        PdtDateCreated = vbNullString
-        PdtDateLastAccessed = vbNullString
-        PdtDateLastModified = vbNullString
-        PsDrive = vbNullString
-        PsName = vbNullString
-        PoParentFolder = vbNullString
-        PsPath = vbNullString
-        PsShortName = vbNullString
-        PsShortPath = vbNullString
-        PlSize = vbNullString
-        PsType = vbNullString
+        Set PoProp = CreateObject("Scripting.Dictionary")
+        With PoProp
+            .Add "Attributes", vbNullString                '属性
+            .Add "DateCreated", vbNullString               '作成された日付と時刻
+            .Add "DateLastAccessed", vbNullString          '最後にアクセスした日付と時刻
+            .Add "DateLastModified", vbNullString          '最終更新日時
+            .Add "Drive", vbNullString                     'ファイルまたはフォルダーがあるドライブのドライブ文字
+            .Add "Name", vbNullString                      '名前
+            .Add "ParentFolder", vbNullString              '親のフォルダーオブジェクト
+            .Add "Path", vbNullString                      'パス
+            .Add "ShortName", vbNullString                 '短い名前(8.3 名前付け規則)
+            .Add "ShortPath", vbNullString                 '短いパス(8.3 名前付け規則)
+            .Add "Size", vbNullString                      'サイズ（バイト単位）
+            .Add "Type", vbNullString                      '種類
+        End With
     End Sub
     'デストラクタ
     Private Sub Class_Terminate()
         Set PoFso = Nothing
-        Set PoParentFolder = Nothing
+        Set PoProp = Nothing
     End Sub
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get Attributes()
-    'Overview                    : 属性を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     属性
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get Attributes( _
-        )
-        If func_FsBaseIsGetObjectValue(PlAttributes) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PlAttributes = oObject.Attributes
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        Attributes = PlAttributes
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get DateCreated()
-    'Overview                    : 作成された日付と時刻を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     作成された日付と時刻
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get DateCreated( _
-        )
-        If func_FsBaseIsGetObjectValue(PdtDateCreated) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PdtDateCreated = oObject.DateCreated
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        DateCreated = PdtDateCreated
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get DateLastAccessed()
-    'Overview                    : 最後にアクセスした日付と時刻を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     最後にアクセスした日付と時刻
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get DateLastAccessed( _
-        )
-        If func_FsBaseIsGetObjectValue(PdtDateLastAccessed) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PdtDateLastAccessed = oObject.DateLastAccessed
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        DateLastAccessed = PdtDateLastAccessed
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get DateLastModified()
-    'Overview                    : 最終更新日時を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     最終更新日時
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get DateLastModified( _
-        )
-        If func_FsBaseIsGetObjectValue(PdtDateLastModified) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        DateLastModified = PdtDateLastModified
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get Drive()
-    'Overview                    : ファイルまたはフォルダーがあるドライブのドライブ文字を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     ファイルまたはフォルダーがあるドライブのドライブ文字
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get Drive( _
-        )
-        If func_FsBaseIsGetObjectValue(PsDrive) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PsDrive = oObject.Drive
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        Drive = PsDrive
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get Name()
-    'Overview                    : 名前を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     名前
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get Name( _
-        )
-        If func_FsBaseIsGetObjectValue(PsName) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PsName = oObject.Name
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        Name = PsName
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get ParentFolder()
-    'Overview                    : 親のフォルダーオブジェクトを返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     親のフォルダーオブジェクト
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get ParentFolder( _
-        )
-        If func_FsBaseIsGetObjectValue(PoParentFolder) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            Set PoParentFolder = oObject.ParentFolder
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        Set ParentFolder = PoParentFolder
-    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Let Patha()
@@ -246,132 +63,7 @@ Class clsFsBase
     Public Property Let Path( _
         byVal asPath _
         )
-        PsPath = asPath
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get Path()
-    'Overview                    : パスを返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     パス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get Path( _
-        )
-        If func_FsBaseIsGetObjectValue(PsPath) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PsPath = oObject.Path
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        Path = PsPath
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get ShortName()
-    'Overview                    : 短い名前(8.3 名前付け規則)を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     短い名前(8.3 名前付け規則)
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get ShortName( _
-        )
-        If func_FsBaseIsGetObjectValue(PsShortName) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PsShortName = oObject.ShortName
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        ShortName = PsShortName
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get ShortPath()
-    'Overview                    : 短いパス(8.3 名前付け規則)を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     短いパス(8.3 名前付け規則)
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get ShortPath( _
-        )
-        If func_FsBaseIsGetObjectValue(PsShortPath) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PsShortPath = oObject.ShortPath
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        ShortPath = PsShortPath
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get Size()
-    'Overview                    : サイズ（バイト単位）を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     サイズ（バイト単位）
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get Size( _
-        )
-        If func_FsBaseIsGetObjectValue(PlSize) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PlSize = oObject.Size
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        Size = PlSize
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get FileFolderType()
-    'Overview                    : 種類を返す
-    'Detailed Description        : File/Folderオブジェクトの同名プロパティと同様
-    'Argument
-    '     なし
-    'Return Value
-    '     種類
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get FileFolderType( _
-        )
-        If func_FsBaseIsGetObjectValue(PsType) Then
-            Dim oObject : Set oObject = func_FsBaseGetObject()
-            PsType = oObject.Type
-            Call sub_FsBaseRecordCacheAcquisition(oObject)
-            Set oObject = Nothing
-        End If
-        FileFolderType = PsType
+        PoProp.Item("Path") = asPath
     End Property
     
     '***************************************************************************************************
@@ -488,7 +180,80 @@ Class clsFsBase
        MostRecentReference = PdbMostRecentReference
     End Property
     
-    
+    '***************************************************************************************************
+    'Function/Sub Name           : Prop()
+    'Overview                    : File/Folderの属性を返す
+    'Detailed Description        : 引数で指定した属性の値を返却する
+    '                               "Attributes"        属性
+    '                               "DateCreated"       作成された日付と時刻
+    '                               "DateLastAccessed"  最後にアクセスした日付と時刻
+    '                               "DateLastModified"  最終更新日時
+    '                               "Drive"             ファイルまたはフォルダーがあるドライブのドライブ文字
+    '                               "Name"              名前
+    '                               "ParentFolder"      親のフォルダーオブジェクト
+    '                               "Path"              パス
+    '                               "ShortName"         短い名前(8.3 名前付け規則)
+    '                               "ShortPath"         短いパス(8.3 名前付け規則)
+    '                               "Size"              サイズ（バイト単位）
+    '                               "Type"              種類
+    'Argument
+    '     asKey                  : 属性を指定するキー
+    'Return Value
+    '     引数で指定した属性の値
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2022/11/05         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function Prop( _
+        byVal asKey _
+        )
+        With PoProp
+            If Not(.Exists(asKey)) Then Exit Function
+            
+            If func_FsBaseIsGetObjectValue(.Item(asKey)) Then
+                Dim oObject : Set oObject = func_FsBaseGetObject()
+                Select Case asKey
+                Case "Attributes"                          '属性
+                    .Item(asKey) = oObject.Attributes
+                Case "DateCreated"                         '作成された日付と時刻
+                    .Item(asKey) = oObject.DateCreated
+                Case "DateLastAccessed"                    '最後にアクセスした日付と時刻
+                    .Item(asKey) = oObject.DateLastAccessed
+                Case "DateLastModified"                    '最終更新日時
+                    '最終更新日は常に設定するため、ここでは何もしない
+                Case "Drive"                               'ファイルまたはフォルダーがあるドライブのドライブ文字
+                    Set .Item(asKey) = oObject.Drive
+                Case "Name"                                '名前
+                    .Item(asKey) = oObject.Name
+                Case "ParentFolder"                        '親のフォルダーオブジェクト
+                    Set .Item(asKey) = oObject.ParentFolder
+                Case "Path"                                'パス
+                    .Item(asKey) = oObject.Path
+                Case "ShortName"                           '短い名前(8.3 名前付け規則)
+                    .Item(asKey) = oObject.ShortName
+                Case "ShortPath"                           '短いパス(8.3 名前付け規則)
+                    .Item(asKey) = oObject.ShortPath
+                Case "Size"                                'サイズ（バイト単位）
+                    .Item(asKey) = oObject.Size
+                Case "Type"                                '種類
+                    .Item(asKey) = oObject.Type
+                End Select
+                '最終更新日時 と キャッシュ情報取得時間（Timer関数の値） の設定
+                .Item("DateLastModified") = oObject.DateLastModified
+                PdbMostRecentReference = Timer()
+                Set oObject = Nothing
+            End If
+            
+            '値を返却
+            If IsObject(.Item(asKey)) Then
+                Set Prop = .Item(asKey)
+            Else
+                Prop = .Item(asKey)
+            End If
+        End With
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : func_FsBaseIsGetObjectValue()
@@ -514,35 +279,10 @@ Class clsFsBase
         If avSomeValue = vbNullString Then Exit Function
         If Not(PboUseCache) Then Exit Function
         If Abs(Timer() - PdbMostRecentReference) > PdbValidPeriod Then
-            If PdtDateLastModified <> func_FsBaseGetObject().DateLastModified Then Exit Function
+            If PoProp.Item("DateLastModified") <> func_FsBaseGetObject().DateLastModified Then Exit Function
         End If
         func_FsBaseIsGetObjectValue = False
     End Function
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : sub_FsBaseRecordCacheAcquisition()
-    'Overview                    : キャッシュ取得時の情報を記録する
-    'Detailed Description        : 下記を記録する
-    '                              ・最終更新日時
-    '                              ・キャッシュ情報取得時間（Timer関数の値）
-    'Argument
-    '     aoSomeObject           : File/Folderオブジェクト
-    'Return Value
-    '     なし
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Sub sub_FsBaseRecordCacheAcquisition( _
-        byRef aoSomeObject _
-        )
-        With func_FsBaseGetObject()
-            PdtDateLastModified = .DateLastModified
-            PdbMostRecentReference = Timer()
-        End With
-    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : func_FsBaseGetObject()
@@ -561,9 +301,10 @@ Class clsFsBase
     Private Function func_FsBaseGetObject( _
         )
         Set func_FsBaseGetObject = Nothing
+        Dim sPath : sPath = PoProp.Item("Path")
         With func_FsBaseGetFso()
-            If .FileExists(PsPath) Then Set func_FsBaseGetObject = .GetFile(PsPath)
-            If .FolderExists(PsPath) Then Set func_FsBaseGetObject = .GetFolder(PsPath)
+            If .FileExists(sPath) Then Set func_FsBaseGetObject = .GetFile(sPath)
+            If .FolderExists(sPath) Then Set func_FsBaseGetObject = .GetFolder(sPath)
         End With
     End Function
     

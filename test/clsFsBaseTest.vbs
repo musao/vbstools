@@ -1,5 +1,5 @@
 '***************************************************************************************************
-'FILENAME                    : clsFsBaseText.vbs
+'FILENAME                    : clsFsBaseTest.vbs
 'Overview                    : ファイル・フォルダ共通クラスのテスト
 'Detailed Description        : 工事中
 'Argument
@@ -58,7 +58,7 @@ Sub Main()
     Dim oUtAssistant : Set oUtAssistant = New clsUtAssistant
     
     'ノーマルケースのテスト
-    Call func_clsFsBaseText_1(oUtAssistant)
+    Call func_clsFsBaseTest_1(oUtAssistant)
     
     '結果出力
     Call sub_UtResultOutput(oUtAssistant)
@@ -91,7 +91,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : func_clsFsBaseText_1()
+'Function/Sub Name           : func_clsFsBaseTest_1()
 'Overview                    : ノーマルケースのテスト
 'Detailed Description        : 工事中
 'Argument
@@ -104,22 +104,29 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub func_clsFsBaseText_1( _
+Private Sub func_clsFsBaseTest_1( _
     byRef aoUtAssistant _
     )
     
-    Call aoUtAssistant.Run("func_clsFsBaseText_1_1")
-    Call aoUtAssistant.Run("func_clsFsBaseText_1_2")
-    Call aoUtAssistant.Run("func_clsFsBaseText_1_3")
-    Call aoUtAssistant.Run("func_clsFsBaseText_1_4")
+    Call aoUtAssistant.Run("func_clsFsBaseTest_1_1")
+    Call aoUtAssistant.Run("func_clsFsBaseTest_1_2")
+    Call aoUtAssistant.Run("func_clsFsBaseTest_1_3")
+    Call aoUtAssistant.Run("func_clsFsBaseTest_1_4")
     
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1-1
-'Function/Sub Name           : func_clsFsBaseText_1_1()
-'Overview                    : 各プロパティの値の取得の正当性（初回キャッシュなし）
-'Detailed Description        : 工事中
+'Function/Sub Name           : func_clsFsBaseTest_1_1()
+'Overview                    : 各プロパティの値の取得の正当性（1回目）
+'Detailed Description        : 実施条件
+'                              ・キャッシュ使用可否は可
+'                              ・キャッシュ有効期間は3600秒
+'                              ・全プロパティの値を1回取得
+'                              期待値
+'                              ・全プロパティの値が正しいこと
+'                              ・キャッシュ使用可否、同有効期間が変わらないこと
+'                              ・キャッシュ使用なし（キャッシュ情報取得時間が初期値でないこと）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -130,49 +137,58 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseText_1_1( _
+Private Function func_clsFsBaseTest_1_1( _
     )
-    Dim boFlg : boFlg = True
+    Dim boResult : boResult = True
     
-    '一時ファイルを作成
-    Dim sPath : sPath = func_UtGetThisTempFilePath()
-    Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
-    If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+    '実施条件
+    Dim boUseCache : boUseCache = True
+    Dim dbValidPeriod : dbValidPeriod = 3600
     
-    '期待値を取得
-    Dim oExpect : Set oExpect = func_clsFsBaseTextGetExpectedValue(func_CM_FsGetFile(sPath))
-    
-    'テスト対象実行
+    'テスト対象
     Dim oSut : Set oSut = New clsFsBase
-    
     With oSut
-        'キャッシュ使用で実行
-        .UseCache = True
-        .ValidPeriod = 3600
+        '一時ファイル作成、期待値取得
+        Dim sPath : sPath = func_UtGetThisTempFilePath()
+        Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+        If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+        Dim oExpect : Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+        
+        'テスト対象クラスに条件を指定
+        .UseCache = boUseCache
+        .ValidPeriod = dbValidPeriod
         .Path = sPath
         
+        '全プロパティの値を取得（1回目）
+        boResult = func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        
         '検証
-        boFlg = func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        If .UseCache <> True Then boFlg = False
-        If .ValidPeriod <> 3600 Then boFlg = False
-        If .MostRecentReference = 0 Then boFlg = False
+        If .UseCache <> boUseCache Then boResult = False
+        If .ValidPeriod <> dbValidPeriod Then boResult = False
+        If .MostRecentReference = 0 Then boResult = False
+        
+        '一時ファイル削除
+        Call func_CM_FsDeleteFile(sPath)
     End With
     
-    '一時ファイルの削除
-    Call func_CM_FsDeleteFile(sPath)
-    
-    func_clsFsBaseText_1_1 = boFlg
-    
+    '実施結果
+    func_clsFsBaseTest_1_1 = boResult
     Set oExpect = Nothing
     Set oSut = Nothing
-    
 End Function
 
 '***************************************************************************************************
 'Processing Order            : 1-2
-'Function/Sub Name           : func_clsFsBaseText_1_2()
-'Overview                    : 各プロパティの値の取得の正当性（2回目キャッシュ使用期限内）
-'Detailed Description        : 工事中
+'Function/Sub Name           : func_clsFsBaseTest_1_2()
+'Overview                    : 各プロパティの値の取得の正当性（2回目、キャッシュ無効）
+'Detailed Description        : 実施条件
+'                              ・キャッシュ使用可否は否
+'                              ・キャッシュ有効期間は3600秒
+'                              ・全プロパティの値を2回取得
+'                              期待値
+'                              ・2回目に取得した全プロパティの値が正しいこと
+'                              ・キャッシュ使用可否、同有効期間が変わらないこと
+'                              ・キャッシュ使用なし（キャッシュ情報取得時間が1回目取得後から変わっていること）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -183,50 +199,66 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseText_1_2( _
+Private Function func_clsFsBaseTest_1_2( _
     )
-    Dim boFlg : boFlg = True
+    Dim boResult : boResult = True
     
-    '一時ファイルを作成
-    Dim sPath : sPath = func_UtGetThisTempFilePath()
-    Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
-    If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+    '実施条件
+    Dim boUseCache : boUseCache = False
+    Dim dbValidPeriod : dbValidPeriod = 3600
     
-    '期待値を取得
-    Dim oExpect : Set oExpect = func_clsFsBaseTextGetExpectedValue(func_CM_FsGetFile(sPath))
-    
-    'テスト対象実行
+    'テスト対象
     Dim oSut : Set oSut = New clsFsBase
-    
     With oSut
-        'キャッシュ使用で実行
-        .UseCache = True
-        .ValidPeriod = 3600
+        '一時ファイル作成、期待値取得
+        Dim sPath : sPath = func_UtGetThisTempFilePath()
+        Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+        If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+        Dim oExpect : Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+        
+        'テスト対象クラスに条件を指定
+        .UseCache = boUseCache
+        .ValidPeriod = dbValidPeriod
         .Path = sPath
         
+        '全プロパティの値を取得（1回目）
+        Call func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        Dim lMostRecentReference : lMostRecentReference = .MostRecentReference
+        
+        '10msスリープ
+        WScript.Sleep 10
+        
+        '全プロパティの値を取得（2回目）
+        boResult = func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        
         '検証
-        Call func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        boFlg = func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        If .UseCache <> True Then boFlg = False
-        If .ValidPeriod <> 3600 Then boFlg = False
-        If .MostRecentReference = 0 Then boFlg = False
+        If .UseCache <> boUseCache Then boResult = False
+        If .ValidPeriod <> dbValidPeriod Then boResult = False
+        If .MostRecentReference = lMostRecentReference Then boResult = False
+        
+        '一時ファイル削除
+        Call func_CM_FsDeleteFile(sPath)
     End With
     
-    '一時ファイルの削除
-    Call func_CM_FsDeleteFile(sPath)
-    
-    func_clsFsBaseText_1_2 = boFlg
-    
+    '実施結果
+    func_clsFsBaseTest_1_2 = boResult
     Set oExpect = Nothing
     Set oSut = Nothing
-    
 End Function
 
 '***************************************************************************************************
 'Processing Order            : 1-3
-'Function/Sub Name           : func_clsFsBaseText_1_3()
-'Overview                    : 各プロパティの値の取得の正当性（2回目キャッシュ使用期限切れ）
-'Detailed Description        : 工事中
+'Function/Sub Name           : func_clsFsBaseTest_1_3()
+'Overview                    : 各プロパティの値の取得の正当性（2回目、キャッシュ有効期間超過かつファイル更新なし）
+'Detailed Description        : 実施条件
+'                              ・キャッシュ使用可否は可
+'                              ・キャッシュ有効期間は0秒
+'                              ・全プロパティの値を2回取得
+'                              ・1回目と2回目でファイルの最終更新日が変わっていない
+'                              期待値
+'                              ・2回目に取得した全プロパティの値が正しいこと
+'                              ・キャッシュ使用可否、同有効期間が変わらないこと
+'                              ・キャッシュ使用あり（キャッシュ情報取得時間が1回目取得後から変わっていないこと）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -237,50 +269,66 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseText_1_3( _
+Private Function func_clsFsBaseTest_1_3( _
     )
-    Dim boFlg : boFlg = True
+    Dim boResult : boResult = True
     
-    '一時ファイルを作成
-    Dim sPath : sPath = func_UtGetThisTempFilePath()
-    Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
-    If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+    '実施条件
+    Dim boUseCache : boUseCache = True
+    Dim dbValidPeriod : dbValidPeriod = 0
     
-    '期待値を取得
-    Dim oExpect : Set oExpect = func_clsFsBaseTextGetExpectedValue(func_CM_FsGetFile(sPath))
-    
-    'テスト対象実行
+    'テスト対象
     Dim oSut : Set oSut = New clsFsBase
-    
     With oSut
-        'キャッシュ使用で実行
-        .UseCache = True
-        .ValidPeriod = 0
+        '一時ファイル作成、期待値取得
+        Dim sPath : sPath = func_UtGetThisTempFilePath()
+        Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+        If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+        Dim oExpect : Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+        
+        'テスト対象クラスに条件を指定
+        .UseCache = boUseCache
+        .ValidPeriod = dbValidPeriod
         .Path = sPath
         
+        '全プロパティの値を取得（1回目）
+        Call func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        Dim lMostRecentReference : lMostRecentReference = .MostRecentReference
+        
+        '10msスリープ
+        WScript.Sleep 10
+        
+        '全プロパティの値を取得（2回目）
+        boResult = func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        
         '検証
-        Call func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        boFlg = func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        If .UseCache <> True Then boFlg = False
-        If .ValidPeriod <> 0 Then boFlg = False
-        If .MostRecentReference = 0 Then boFlg = False
+        If .UseCache <> boUseCache Then boResult = False
+        If .ValidPeriod <> dbValidPeriod Then boResult = False
+        If .MostRecentReference <> lMostRecentReference Then boResult = False
+        
+        '一時ファイル削除
+        Call func_CM_FsDeleteFile(sPath)
     End With
     
-    '一時ファイルの削除
-    Call func_CM_FsDeleteFile(sPath)
-    
-    func_clsFsBaseText_1_3 = boFlg
-    
+    '実施結果
+    func_clsFsBaseTest_1_3 = boResult
     Set oExpect = Nothing
     Set oSut = Nothing
-    
 End Function
 
 '***************************************************************************************************
 'Processing Order            : 1-4
-'Function/Sub Name           : func_clsFsBaseText_1_4()
-'Overview                    : 各プロパティの値の取得の正当性（2回目キャッシュ無効）
-'Detailed Description        : 工事中
+'Function/Sub Name           : func_clsFsBaseTest_1_4()
+'Overview                    : 各プロパティの値の取得の正当性（2回目、キャッシュ有効期間超過かつファイル更新あり）
+'Detailed Description        : 実施条件
+'                              ・キャッシュ使用可否は可
+'                              ・キャッシュ有効期間は0秒
+'                              ・全プロパティの値を2回取得
+'                              ・1回目と2回目でファイルの最終更新日が変わっていない
+'                              期待値
+'                              ・2回目に取得した全プロパティの値が正しいこと
+'                              ・キャッシュ使用可否、同有効期間が変わらないこと
+'                              ・キャッシュ使用なし（キャッシュ情報取得時間が1回目取得後から変わっていること）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -291,48 +339,63 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseText_1_4( _
+Private Function func_clsFsBaseTest_1_4( _
     )
-    Dim boFlg : boFlg = True
+    Dim boResult : boResult = True
     
-    '一時ファイルを作成
-    Dim sPath : sPath = func_UtGetThisTempFilePath()
-    Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
-    If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+    '実施条件
+    Dim boUseCache : boUseCache = True
+    Dim dbValidPeriod : dbValidPeriod = 0
     
-    '期待値を取得
-    Dim oExpect : Set oExpect = func_clsFsBaseTextGetExpectedValue(func_CM_FsGetFile(sPath))
-    
-    'テスト対象実行
+    'テスト対象
     Dim oSut : Set oSut = New clsFsBase
-    
     With oSut
-        'キャッシュ使用で実行
-        .UseCache = False
-        .ValidPeriod = 3600
+        '一時ファイル作成、期待値取得
+        Dim sPath : sPath = func_UtGetThisTempFilePath()
+        Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+        If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+        Dim oExpect : Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+        
+        'テスト対象クラスに条件を指定
+        .UseCache = boUseCache
+        .ValidPeriod = dbValidPeriod
         .Path = sPath
         
+        '全プロパティの値を取得（1回目）
+        Call func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        Dim lMostRecentReference : lMostRecentReference = .MostRecentReference
+        
+        '10msスリープ
+        WScript.Sleep 10
+        
+        '一時ファイル削除＆再作成、期待値の取得
+        Call func_CM_FsDeleteFile(sPath)
+        Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+        If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+        oExpect.RemoveAll
+        Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+        
+        '全プロパティの値を取得（2回目）
+        boResult = func_clsFsBaseTestValidateAllItems(oSut, oExpect)
+        
         '検証
-        Call func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        boFlg = func_clsFsBaseTextValidateAllItems(oSut, oExpect)
-        If .UseCache <> False Then boFlg = False
-        If .ValidPeriod <> 3600 Then boFlg = False
-        If .MostRecentReference = 0 Then boFlg = False
+        If .UseCache <> boUseCache Then boResult = False
+        If .ValidPeriod <> dbValidPeriod Then boResult = False
+        If .MostRecentReference = lMostRecentReference Then boResult = False
+        
+        '一時ファイル削除
+        Call func_CM_FsDeleteFile(sPath)
     End With
     
-    '一時ファイルの削除
-    Call func_CM_FsDeleteFile(sPath)
-    
-    func_clsFsBaseText_1_4 = boFlg
-    
+    '実施結果
+    func_clsFsBaseTest_1_4 = boResult
     Set oExpect = Nothing
     Set oSut = Nothing
-    
 End Function
 
 '***************************************************************************************************
 'Processing Order            : none
-'Function/Sub Name           : func_clsFsBaseTextGetExpectedValue()
+'Function/Sub Name           : func_clsFsBaseTestGetExpectedValue()
 'Overview                    : 期待値の取得
 'Detailed Description        : 工事中
 'Argument
@@ -345,34 +408,34 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseTextGetExpectedValue( _
+Private Function func_clsFsBaseTestGetExpectedValue( _
     byRef aoSomeObject _
     )
     
     Dim oExpect : Set oExpect = CreateObject("Scripting.Dictionary")
     With aoSomeObject
-        Call oExpect.Add("Attributes", .Attributes)
-        Call oExpect.Add("DateCreated", .DateCreated)
-        Call oExpect.Add("DateLastAccessed", .DateLastAccessed)
-        Call oExpect.Add("DateLastModified", .DateLastModified)
-        Call oExpect.Add("Drive", .Drive)
-        Call oExpect.Add("Name", .Name)
-        Call oExpect.Add("ParentFolder", .ParentFolder)
-        Call oExpect.Add("Path", .Path)
-        Call oExpect.Add("ShortName", .ShortName)
-        Call oExpect.Add("ShortPath", .ShortPath)
-        Call oExpect.Add("Size", .Size)
-        Call oExpect.Add("Type", .Type)
+        oExpect.Add "Attributes", .Attributes
+        oExpect.Add "DateCreated", .DateCreated
+        oExpect.Add "DateLastAccessed", .DateLastAccessed
+        oExpect.Add "DateLastModified", .DateLastModified
+        oExpect.Add "Drive", .Drive
+        oExpect.Add "Name", .Name
+        oExpect.Add "ParentFolder", .ParentFolder
+        oExpect.Add "Path", .Path
+        oExpect.Add "ShortName", .ShortName
+        oExpect.Add "ShortPath", .ShortPath
+        oExpect.Add "Size", .Size
+        oExpect.Add "Type", .Type
     End With
     
-    Set func_clsFsBaseTextGetExpectedValue = oExpect
+    Set func_clsFsBaseTestGetExpectedValue = oExpect
     Set oExpect = Nothing
     
 End Function
 
 '***************************************************************************************************
 'Processing Order            : none
-'Function/Sub Name           : func_clsFsBaseTextValidateAllItems()
+'Function/Sub Name           : func_clsFsBaseTestValidateAllItems()
 'Overview                    : 全項目の検証を行う
 'Detailed Description        : 工事中
 'Argument
@@ -386,28 +449,24 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseTextValidateAllItems( _
+Private Function func_clsFsBaseTestValidateAllItems( _
     byRef aoSut _
     , byRef aoExpect _
     )
     Dim boFlg : boFlg = True
     
-    With aoSut
-        If .Attributes <> aoExpect.Item("Attributes") Then boFlg = False
-        If .DateCreated <> aoExpect.Item("DateCreated") Then boFlg = False
-        If .DateLastAccessed <> aoExpect.Item("DateLastAccessed") Then boFlg = False
-        If .DateLastModified <> aoExpect.Item("DateLastModified") Then boFlg = False
-        If .Drive <> aoExpect.Item("Drive") Then boFlg = False
-        If .Name <> aoExpect.Item("Name") Then boFlg = False
-        If Not (.ParentFolder Is aoExpect.Item("ParentFolder")) Then boFlg = False
-        If .Path <> aoExpect.Item("Path") Then boFlg = False
-        If .ShortName <> aoExpect.Item("ShortName") Then boFlg = False
-        If .ShortPath <> aoExpect.Item("ShortPath") Then boFlg = False
-        If .Size <> aoExpect.Item("Size") Then boFlg = False
-        If .FileFolderType <> aoExpect.Item("Type") Then boFlg = False
+    With aoExpect
+        Dim sKey
+        For Each sKey In .Keys
+            If IsObject(.Item(sKey)) Then
+                If Not (aoSut.Prop(sKey) Is .Item(sKey)) Then boFlg = False
+            Else
+                If aoSut.Prop(sKey) <> .Item(sKey) Then boFlg = False
+            End If
+        Next
     End With
     
-    func_clsFsBaseTextValidateAllItems = boFlg
+    func_clsFsBaseTestValidateAllItems = boFlg
     
 End Function
 
