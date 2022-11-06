@@ -126,7 +126,8 @@ End Sub
 '                              期待値
 '                              ・全プロパティの値が正しいこと
 '                              ・キャッシュ使用可否、同有効期間が変わらないこと
-'                              ・キャッシュ使用なし（キャッシュ情報取得時間が初期値でないこと）
+'                              ・キャッシュ確認あり（最終キャッシュ確認時間が初期値でないこと）
+'                              ・キャッシュ使用なし（最終キャッシュ更新時間が初期値でないこと）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -165,7 +166,8 @@ Private Function func_clsFsBaseTest_1_1( _
         '検証
         If .UseCache <> boUseCache Then boResult = False
         If .ValidPeriod <> dbValidPeriod Then boResult = False
-        If .MostRecentReference = 0 Then boResult = False
+        If .LastCacheConfirmationTime = 0 Then boResult = False
+        If .LastCacheUpdateTime = 0 Then boResult = False
         
         '一時ファイル削除
         Call func_CM_FsDeleteFile(sPath)
@@ -188,7 +190,8 @@ End Function
 '                              期待値
 '                              ・2回目に取得した全プロパティの値が正しいこと
 '                              ・キャッシュ使用可否、同有効期間が変わらないこと
-'                              ・キャッシュ使用なし（キャッシュ情報取得時間が1回目取得後から変わっていること）
+'                              ・キャッシュ確認なし（最終キャッシュ確認時間が1回目取得後から変わっていないこと）
+'                              ・キャッシュ使用なし（最終キャッシュ更新時間が1回目取得後から変わっていること）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -223,7 +226,8 @@ Private Function func_clsFsBaseTest_1_2( _
         
         '全プロパティの値を取得（1回目）
         Call func_clsFsBaseTestValidateAllItems(oSut, oExpect)
-        Dim lMostRecentReference : lMostRecentReference = .MostRecentReference
+        Dim lLastCacheConfirmationTime : lLastCacheConfirmationTime = .LastCacheConfirmationTime
+        Dim lLastCacheUpdateTime : lLastCacheUpdateTime = .LastCacheUpdateTime
         
         '10msスリープ
         WScript.Sleep 10
@@ -234,7 +238,8 @@ Private Function func_clsFsBaseTest_1_2( _
         '検証
         If .UseCache <> boUseCache Then boResult = False
         If .ValidPeriod <> dbValidPeriod Then boResult = False
-        If .MostRecentReference = lMostRecentReference Then boResult = False
+        If .LastCacheConfirmationTime <> lLastCacheConfirmationTime Then boResult = False
+        If .LastCacheUpdateTime = lLastCacheUpdateTime Then boResult = False
         
         '一時ファイル削除
         Call func_CM_FsDeleteFile(sPath)
@@ -258,7 +263,8 @@ End Function
 '                              期待値
 '                              ・2回目に取得した全プロパティの値が正しいこと
 '                              ・キャッシュ使用可否、同有効期間が変わらないこと
-'                              ・キャッシュ使用あり（キャッシュ情報取得時間が1回目取得後から変わっていないこと）
+'                              ・キャッシュ確認あり（最終キャッシュ確認時間が1回目取得後から変わっていること）
+'                              ・キャッシュ使用あり（最終キャッシュ更新時間が1回目取得後から変わっていないこと）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -293,7 +299,8 @@ Private Function func_clsFsBaseTest_1_3( _
         
         '全プロパティの値を取得（1回目）
         Call func_clsFsBaseTestValidateAllItems(oSut, oExpect)
-        Dim lMostRecentReference : lMostRecentReference = .MostRecentReference
+        Dim lLastCacheConfirmationTime : lLastCacheConfirmationTime = .LastCacheConfirmationTime
+        Dim lLastCacheUpdateTime : lLastCacheUpdateTime = .LastCacheUpdateTime
         
         '10msスリープ
         WScript.Sleep 10
@@ -304,7 +311,8 @@ Private Function func_clsFsBaseTest_1_3( _
         '検証
         If .UseCache <> boUseCache Then boResult = False
         If .ValidPeriod <> dbValidPeriod Then boResult = False
-        If .MostRecentReference <> lMostRecentReference Then boResult = False
+        If .LastCacheConfirmationTime = lLastCacheConfirmationTime Then boResult = False
+        If .LastCacheUpdateTime <> lLastCacheUpdateTime Then boResult = False
         
         '一時ファイル削除
         Call func_CM_FsDeleteFile(sPath)
@@ -328,7 +336,8 @@ End Function
 '                              期待値
 '                              ・2回目に取得した全プロパティの値が正しいこと
 '                              ・キャッシュ使用可否、同有効期間が変わらないこと
-'                              ・キャッシュ使用なし（キャッシュ情報取得時間が1回目取得後から変わっていること）
+'                              ・キャッシュ確認あり（最終キャッシュ確認時間が1回目取得後から変わっていること）
+'                              ・キャッシュ使用なし（最終キャッシュ更新時間が1回目取得後から変わっていること）
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -363,7 +372,8 @@ Private Function func_clsFsBaseTest_1_4( _
         
         '全プロパティの値を取得（1回目）
         Call func_clsFsBaseTestValidateAllItems(oSut, oExpect)
-        Dim lMostRecentReference : lMostRecentReference = .MostRecentReference
+        Dim lLastCacheConfirmationTime : lLastCacheConfirmationTime = .LastCacheConfirmationTime
+        Dim lLastCacheUpdateTime : lLastCacheUpdateTime = .LastCacheUpdateTime
         
         '10msスリープ
         WScript.Sleep 10
@@ -381,7 +391,8 @@ Private Function func_clsFsBaseTest_1_4( _
         '検証
         If .UseCache <> boUseCache Then boResult = False
         If .ValidPeriod <> dbValidPeriod Then boResult = False
-        If .MostRecentReference = lMostRecentReference Then boResult = False
+        If .LastCacheConfirmationTime = lLastCacheConfirmationTime Then boResult = False
+        If .LastCacheUpdateTime = lLastCacheUpdateTime Then boResult = False
         
         '一時ファイル削除
         Call func_CM_FsDeleteFile(sPath)

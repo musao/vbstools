@@ -13,15 +13,17 @@ Class clsFsBase
     Private PoFso                                          'FileSystemObjectオブジェクト
     Private PoProp                                         '属性格納用ハッシュマップ
     Private PboUseCache                                    'キャッシュ使用可否（最新を取得するかどうか）
-    Private PdbMostRecentReference                         'キャッシュ情報取得時間（Timer関数の値）
-    Private PdbValidPeriod                                 'キャッシュ有効期間（秒数）
+    Private PdbLastCacheConfirmationTime                   '最終キャッシュ確認時間（Timer関数の値）
+    Private PdbLastCacheUpdateTime                         '最終キャッシュ更新時間（Timer関数の値）
+    Private PdbValidPeriod                                 'キャッシュ有効期間（秒数）、最終キャッシュ確認時間からの経過時間
     
     'コンストラクタ
     Private Sub Class_Initialize()
         '初期化
         Set PoFso = Nothing
         PboUseCache = True
-        PdbMostRecentReference = 0
+        PdbLastCacheConfirmationTime = 0
+        PdbLastCacheUpdateTime = 0
         PdbValidPeriod = 1
         
         Set PoProp = CreateObject("Scripting.Dictionary")
@@ -163,21 +165,39 @@ Class clsFsBase
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get MostRecentReference()
-    'Overview                    : キャッシュ情報取得時間（Timer関数の値）を返す
+    'Function/Sub Name           : Property Get LastCacheUpdateTime()
+    'Overview                    : 最終キャッシュ確認時間（Timer関数の値）を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     キャッシュ情報取得時間（Timer関数の値）
+    '     最終キャッシュ確認時間（Timer関数の値）
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2022/11/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get MostRecentReference()
-       MostRecentReference = PdbMostRecentReference
+    Public Property Get LastCacheConfirmationTime()
+       LastCacheConfirmationTime = PdbLastCacheConfirmationTime
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get LastCacheUpdateTime()
+    'Overview                    : 最終キャッシュ更新時間（Timer関数の値）を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     最終キャッシュ更新時間（Timer関数の値）
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2022/11/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get LastCacheUpdateTime()
+       LastCacheUpdateTime = PdbLastCacheUpdateTime
     End Property
     
     '***************************************************************************************************
@@ -209,50 +229,44 @@ Class clsFsBase
     Public Function Prop( _
         byVal asKey _
         )
-        With PoProp
-            If Not(.Exists(asKey)) Then Exit Function
-            
-            If func_FsBaseIsGetObjectValue(.Item(asKey)) Then
-                Dim oObject : Set oObject = func_FsBaseGetObject()
+        If Not(PoProp.Exists(asKey)) Then Exit Function
+        
+        If func_FsBaseIsGetObjectValue(PoProp.Item(asKey)) Then
+            With func_FsBaseGetObject()
                 Select Case asKey
                 Case "Attributes"                          '属性
-                    .Item(asKey) = oObject.Attributes
+                    Call sub_CM_TransferToCollection(.Attributes, PoProp, asKey)
                 Case "DateCreated"                         '作成された日付と時刻
-                    .Item(asKey) = oObject.DateCreated
+                    Call sub_CM_TransferToCollection(.DateCreated, PoProp, asKey)
                 Case "DateLastAccessed"                    '最後にアクセスした日付と時刻
-                    .Item(asKey) = oObject.DateLastAccessed
+                    Call sub_CM_TransferToCollection(.DateLastAccessed, PoProp, asKey)
                 Case "DateLastModified"                    '最終更新日時
                     '最終更新日は常に設定するため、ここでは何もしない
                 Case "Drive"                               'ファイルまたはフォルダーがあるドライブのドライブ文字
-                    Set .Item(asKey) = oObject.Drive
+                    Call sub_CM_TransferToCollection(.Drive, PoProp, asKey)
                 Case "Name"                                '名前
-                    .Item(asKey) = oObject.Name
+                    Call sub_CM_TransferToCollection(.Name, PoProp, asKey)
                 Case "ParentFolder"                        '親のフォルダーオブジェクト
-                    Set .Item(asKey) = oObject.ParentFolder
+                    Call sub_CM_TransferToCollection(.ParentFolder, PoProp, asKey)
                 Case "Path"                                'パス
-                    .Item(asKey) = oObject.Path
+                    Call sub_CM_TransferToCollection(.Path, PoProp, asKey)
                 Case "ShortName"                           '短い名前(8.3 名前付け規則)
-                    .Item(asKey) = oObject.ShortName
+                    Call sub_CM_TransferToCollection(.ShortName, PoProp, asKey)
                 Case "ShortPath"                           '短いパス(8.3 名前付け規則)
-                    .Item(asKey) = oObject.ShortPath
+                    Call sub_CM_TransferToCollection(.ShortPath, PoProp, asKey)
                 Case "Size"                                'サイズ（バイト単位）
-                    .Item(asKey) = oObject.Size
+                    Call sub_CM_TransferToCollection(.Size, PoProp, asKey)
                 Case "Type"                                '種類
-                    .Item(asKey) = oObject.Type
+                    Call sub_CM_TransferToCollection(.Type, PoProp, asKey)
                 End Select
-                '最終更新日時 と キャッシュ情報取得時間（Timer関数の値） の設定
-                .Item("DateLastModified") = oObject.DateLastModified
-                PdbMostRecentReference = Timer()
-                Set oObject = Nothing
-            End If
-            
-            '値を返却
-            If IsObject(.Item(asKey)) Then
-                Set Prop = .Item(asKey)
-            Else
-                Prop = .Item(asKey)
-            End If
-        End With
+                '最終更新日時 と 最終キャッシュ更新時間（Timer関数の値） の更新
+                Call sub_CM_TransferToCollection(.DateLastModified, PoProp, "DateLastModified")
+                PdbLastCacheUpdateTime = Timer()
+            End With
+        End If
+        
+        '値を返却
+        Call sub_CM_TransferBetweenVariables(PoProp.Item(asKey), Prop)
     End Function
     
     '***************************************************************************************************
@@ -278,7 +292,8 @@ Class clsFsBase
         func_FsBaseIsGetObjectValue = True
         If avSomeValue = vbNullString Then Exit Function
         If Not(PboUseCache) Then Exit Function
-        If Abs(Timer() - PdbMostRecentReference) > PdbValidPeriod Then
+        If Abs(Timer() - PdbLastCacheConfirmationTime) > PdbValidPeriod Then
+            PdbLastCacheConfirmationTime = Timer()                   '最終キャッシュ確認時間（Timer関数の値）の更新
             If PoProp.Item("DateLastModified") <> func_FsBaseGetObject().DateLastModified Then Exit Function
         End If
         func_FsBaseIsGetObjectValue = False

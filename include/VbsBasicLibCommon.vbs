@@ -602,3 +602,52 @@ Private Function func_CM_GetDateAsYYYYMMDD( _
     )
     func_CM_GetDateAsYYYYMMDD = Replace(Left(adtDate,10), "/", "")
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_TransferBetweenVariables()
+'Overview                    : 変数間の項目移送
+'Detailed Description        : 移送元がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'                              移送先がコレクションのメンバーの場合は動作しない
+'                              移送先が変数の場合に使用できる
+'Argument
+'     avFrom                 : 移送元の変数
+'     avTo                   : 移送先の変数
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_TransferBetweenVariables( _
+    byRef avFrom _
+    , byRef avTo _
+    )
+    If IsObject(avFrom) Then Set avTo = avFrom Else avTo = avFrom
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_TransferBetweenVariables()
+'Overview                    : 変数間の項目移送
+'Detailed Description        : 移送元がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'                              移送先がコレクションの場合は当関数を使用する
+'Argument
+'     avFrom                 : 移送元の変数
+'     aoCollection           : 移送先のコレクション
+'     asKey                  : 移送先のコレクションのキー
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_TransferToCollection( _
+    byRef avFrom _
+    , byRef aoCollection _
+    , byVal asKey _
+    )
+    If IsObject(avFrom) Then Set aoCollection.Item(asKey) = avFrom Else aoCollection.Item(asKey) = avFrom
+End Sub
