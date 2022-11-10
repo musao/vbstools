@@ -184,18 +184,8 @@ Class clsUtAssistant
     '***************************************************************************************************
     'Function/Sub Name           : Run()
     'Overview                    : テスト実施
-    'Detailed Description        : 結果格納用ハッシュマップの構成
-    '                              Key                      Value
-    '                              -------------------      --------------------------------------------
-    '                              Seq(1,2,3…)              結果詳細ハッシュマップ
-    '                              
-    '                              結果詳細ハッシュマップの構成
-    '                              Key                      Value
-    '                              -------------------      --------------------------------------------
-    '                              "CaseName"                実行するケース名（関数名）
-    '                              "Result"                  結果 True,Flase
-    '                              "Start"                   開始時刻
-    '                              "End"                     終了時刻
+    'Detailed Description        : テストを実行し結果を結果格納用ハッシュマップに格納する
+    '                              実施はsub_RunOneCase()に委譲する。
     'Argument
     '     asCaseName             : 実行するケース名（関数名）
     'Return Value
@@ -209,31 +199,39 @@ Class clsUtAssistant
     Public Sub Run( _
         byVal asCaseName _
         )
-        '実施
-        Dim dtDate : dtDate = Date()
-        Dim dtStart : dtStart = Timer
-        On Error Resume Next
-        Dim boResult : boResult = GetRef(asCaseName)
-        Dim dtEnd : dtEnd = Timer
-        If Err.Number Or Not(boResult) Then boResult = False
-        
-        '結果を記録
-        Dim lSeq : lSeq = PoRecDetail.Count+1
-        Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
-        With PoRecDetailTitles
-            Call oTemp.Add(.Item(1), lSeq)
-            Call oTemp.Add(.Item(2), asCaseName)
-            Call oTemp.Add(.Item(3), boResult)
-            Call oTemp.Add(.Item(4), func_GetDateInMilliseconds(dtDate, dtStart))
-            Call oTemp.Add(.Item(5), func_GetDateInMilliseconds(dtDate, dtEnd))
-            Call oTemp.Add(.Item(6), dtEnd-dtStart)
-        End With
-        Call PoRecDetail.Add(lSeq, oTemp)
-        
-        '終了時間の取得
-        PdtEnd = dtEnd
-        
-        Set oTemp = Nothing
+        Call sub_RunOneCase(asCaseName, vbNullString, Nothing)
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : RunWithMultiplePatterns()
+    'Overview                    : テスト実施
+    'Detailed Description        : パターンごとにテストを実行し結果を結果格納用ハッシュマップに格納する
+    '                              実施はsub_RunOneCase()に委譲する。
+    '                              
+    '                              ケースパターン情報格納用ハッシュマップの構成
+    '                              Key                      Value
+    '                              -------------------      --------------------------------------------
+    '                              "SomeString"             引数情報（ハッシュでも変数でもよい）
+    '                              (means pattern)          ケースの関数が引数で受け取る情報
+    'Argument
+    '     asCaseName             : 実行するケース名（関数名）
+    '     aoPatterns             : ケースパターン情報格納用ハッシュマップ
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2022/11/10         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Sub RunWithMultiplePatterns( _
+        byVal asCaseName _
+        , byRef aoPatterns _
+        )
+        Dim sPattern
+        For Each sPattern In aoPatterns.Keys
+            Call sub_RunOneCase(asCaseName, sPattern, aoPatterns.Item(sPattern))
+        Next
     End Sub
     
     '***************************************************************************************************
@@ -354,6 +352,78 @@ Class clsUtAssistant
 
         func_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
     End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_RunOneCase()
+    'Overview                    : テスト実施
+    'Detailed Description        : テストを実行し結果を結果格納用ハッシュマップに格納する
+    '                              結果格納用ハッシュマップの構成
+    '                              Key                      Value
+    '                              -------------------      --------------------------------------------
+    '                              Seq(1,2,3…)              結果詳細ハッシュマップ
+    '                              
+    '                              結果詳細ハッシュマップの構成
+    '                              Key                      Value
+    '                              -------------------      --------------------------------------------
+    '                              "CaseName"                実行するケース名（関数名）
+    '                              "Result"                  結果 True,Flase
+    '                              "Start"                   開始時刻
+    '                              "End"                     終了時刻
+    'Argument
+    '     asCaseName             : 実行するケース名（関数名）
+    '     asPattern              : パターン名
+    '     aoArgument             : ケース名（関数名）に渡す引数
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2022/11/10         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_RunOneCase( _
+        byVal asCaseName _
+        , byVal asPattern _
+        , byRef aoArgument _
+        )
+        
+        Dim oTestTarget : Set oTestTarget = GetRef(asCaseName)
+        Dim sCaseName : sCaseName = asCaseName
+        Dim boResult
+        
+        Dim dtDate : dtDate = Date()
+        Dim dtStart : dtStart = Timer
+        
+        On Error Resume Next
+        
+        If asPattern = vbNullString Then
+            boResult = oTestTarget()
+        Else
+            boResult = oTestTarget(aoArgument)
+            sCaseName = asCaseName & asPattern
+        End If
+        
+        Dim dtEnd : dtEnd = Timer
+        If Err.Number Or Not(boResult) Then boResult = False
+        
+        '結果を記録
+        Dim lSeq : lSeq = PoRecDetail.Count+1
+        Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
+        With PoRecDetailTitles
+            Call oTemp.Add(.Item(1), lSeq)
+            Call oTemp.Add(.Item(2), sCaseName)
+            Call oTemp.Add(.Item(3), boResult)
+            Call oTemp.Add(.Item(4), func_GetDateInMilliseconds(dtDate, dtStart))
+            Call oTemp.Add(.Item(5), func_GetDateInMilliseconds(dtDate, dtEnd))
+            Call oTemp.Add(.Item(6), dtEnd-dtStart)
+        End With
+        Call PoRecDetail.Add(lSeq, oTemp)
+        
+        '終了時間の取得
+        PdtEnd = dtEnd
+        
+        Set oTemp = Nothing
+    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : func_CountCaseAs()

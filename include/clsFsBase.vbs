@@ -165,7 +165,7 @@ Class clsFsBase
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get LastCacheUpdateTime()
+    'Function/Sub Name           : Property Get LastCacheConfirmationTime()
     'Overview                    : 最終キャッシュ確認時間（Timer関数の値）を返す
     'Detailed Description        : 工事中
     'Argument
