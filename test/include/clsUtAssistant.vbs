@@ -228,9 +228,11 @@ Class clsUtAssistant
         byVal asCaseName _
         , byRef aoPatterns _
         )
+        Dim lNum : lNum = 0
         Dim sPattern
         For Each sPattern In aoPatterns.Keys
-            Call sub_RunOneCase(asCaseName, sPattern, aoPatterns.Item(sPattern))
+            lNum = lNum + 1
+            Call sub_RunOneCase(asCaseName, Cstr(lNum) & "_" & sPattern, aoPatterns.Item(sPattern))
         Next
     End Sub
     

@@ -119,16 +119,14 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 1-1
 'Function/Sub Name           : func_clsFsBaseTest_1_1()
-'Overview                    : 各プロパティの値の取得の正当性（1回目）
+'Overview                    : 各属性の取得の正当性を確認する
 'Detailed Description        : 実施条件
-'                              ・キャッシュ使用可否は可
-'                              ・キャッシュ有効期間は3600秒
-'                              ・全プロパティの値を1回取得
+'                              ・ファイルについて検証する
+'                              ・キャッシュ使用可否は否
+'                              ・キャッシュ有効期間は0秒
+'                              ・全属性の値を1回取得
 '                              期待値
-'                              ・全プロパティの値が正しいこと
-'                              ・キャッシュ使用可否、同有効期間が変わらないこと
-'                              ・キャッシュ確認あり（最終キャッシュ確認時間が初期値でないこと）
-'                              ・キャッシュ使用なし（最終キャッシュ更新時間が初期値でないこと）
+'                              ・全属性の値が正しいこと
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -143,21 +141,20 @@ Private Sub func_clsFsBaseTest_1_1( _
     byRef aoUtAssistant _
     )
     Dim oPatterns : Set oPatterns = CreateObject("Scripting.Dictionary")
-    Dim lNum : lNum = 0
     Dim sPropName
     
-    lNum = lNum + 1 : sPropName = "Attributes" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "DateCreated" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "DateLastAccessed" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "DateLastModified" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "Drive" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "Name" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "ParentFolder" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "Path" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "ShortName" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "ShortPath" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "Size" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
-    lNum = lNum + 1 : sPropName = "Type" : oPatterns.Add lNum & "_" & sPropName, func_clsFsBaseTest_1_1_CreateArgument(sPropName)
+    sPropName = "Attributes" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "DateCreated" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "DateLastAccessed" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "DateLastModified" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "Drive" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "Name" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "ParentFolder" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "Path" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "ShortName" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "ShortPath" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "Size" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
+    sPropName = "Type" : oPatterns.Add sPropName, func_clsFsBaseTestCreateArgumentFor_1_1(sPropName)
     
     Call aoUtAssistant.RunWithMultiplePatterns("func_clsFsBaseTest_1_1_", oPatterns)
     
@@ -166,17 +163,9 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1-1
-'Function/Sub Name           : func_clsFsBaseTest_1_1()
-'Overview                    : 各プロパティの値の取得の正当性（1回目）
-'Detailed Description        : 実施条件
-'                              ・キャッシュ使用可否は可
-'                              ・キャッシュ有効期間は3600秒
-'                              ・全プロパティの値を1回取得
-'                              期待値
-'                              ・全プロパティの値が正しいこと
-'                              ・キャッシュ使用可否、同有効期間が変わらないこと
-'                              ・キャッシュ確認あり（最終キャッシュ確認時間が初期値でないこと）
-'                              ・キャッシュ使用なし（最終キャッシュ更新時間が初期値でないこと）
+'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_1()
+'Overview                    : func_clsFsBaseTest_1_1()用の引数情報ハッシュマップを作成
+'Detailed Description        : func_clsFsBaseTestCreateArgument()を参照
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -187,48 +176,44 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_clsFsBaseTest_1_1_CreateArgument( _
+Private Function func_clsFsBaseTestCreateArgumentFor_1_1( _
     byVal asPropName _
     )
-    Dim oArgument : Set oArgument = CreateObject("Scripting.Dictionary")
-    Dim oConditions : Set oConditions = CreateObject("Scripting.Dictionary")
-    Dim oInspections : Set oInspections = CreateObject("Scripting.Dictionary")
-    
-    oConditions.Add "UseCache", False
-    oConditions.Add "ValidPeriod", 0
-    
-    oInspections.Add "PropName", asPropName
-    
-    oArgument.Add "Conditions", oConditions
-    oArgument.Add "Inspections", oInspections
-    
-    Set func_clsFsBaseTest_1_1_CreateArgument = oArgument
-    
-    Set oInspections = Nothing
-    Set oConditions = Nothing
-    Set oArgument = Nothing
+    Set func_clsFsBaseTestCreateArgumentFor_1_1 = _
+        func_clsFsBaseTestCreateArgument( _
+            True _
+            , False _
+            , 0 _
+            , False _
+            , False _
+            , False _
+            , 0 _
+            , asPropName _
+            , vbNullString _
+            , False _
+            , False _
+            , vbNullString _
+            , vbNullString _
+            )
 End Function
 
 '***************************************************************************************************
 'Processing Order            : 1-1-x
 'Function/Sub Name           : func_clsFsBaseTest_1_1_()
-'Overview                    : 引数で指定した属性の値の正当性を確認する
-'Detailed Description        : 引数情報のハッシュマップの内容
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              "Conditions"             実施条件のハッシュマップ
-'                              "Inspections"            検証内容のハッシュマップ
-'
+'Overview                    : 属性の値の正当性を確認する
+'Detailed Description        : 引数情報ハッシュマップの構成はfunc_clsFsBaseTestCreateArgument()を参照
+'                              本関数で使用する項目に限定して記載する
 '                              実施条件のハッシュマップの内容
 '                              Key                      Value
 '                              -------------------      --------------------------------------------
+'                              "TargetIsFile"           対象はファイルか否か
 '                              "UseCache"               キャッシュ使用可否
 '                              "ValidPeriod"            キャッシュ有効期間（秒数）
 '
 '                              検証内容のハッシュマップの内容
 '                              Key                      Value
 '                              -------------------      --------------------------------------------
-'                              "PropName"               検証対象の属性名
+'                              "PropName1"              検証対象の属性名
 '
 'Argument
 '     aoArgument             : 引数情報のハッシュマップ
@@ -246,21 +231,28 @@ Private Function func_clsFsBaseTest_1_1_( _
     '引数情報の取得
     With aoArgument.Item("Conditions")
     '実施条件
+        Dim boTargetIsFile : boTargetIsFile = .Item("TargetIsFile")
         Dim boUseCache : boUseCache = .Item("UseCache")
         Dim dbValidPeriod : dbValidPeriod = .Item("ValidPeriod")
     End With
     With aoArgument.Item("Inspections")
     '検証内容
-        Dim sPropName : sPropName = .Item("PropName")
+        Dim sPropName : sPropName = .Item("PropName1")
     End With
     
+    '前処理 一時ファイル/フォルダ作成、期待値取得
+    Dim oExpect
     Dim boResult : boResult = True
-    
-    '一時ファイル作成、期待値取得
     Dim sPath : sPath = func_UtGetThisTempFilePath()
-    Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
-    If Not(func_CM_FsFileExists(sPath)) Then Exit Function
-    Dim oExpect : Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+    If boTargetIsFile Then
+        Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+        If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+        Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+    Else
+        Call func_CM_FsCreateFolder(sPath)
+        If Not(func_CM_FsFolderExists(sPath)) Then Exit Function
+        Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFolder(sPath))
+    End If
     
     With New clsFsBase
         'テスト対象クラスに条件を指定
@@ -276,12 +268,111 @@ Private Function func_clsFsBaseTest_1_1_( _
         End If
     End With
     
-    '一時ファイル削除
-    Call func_CM_FsDeleteFile(sPath)
-    
-    '実施結果
-    func_clsFsBaseTest_1_1_ = boResult
+    '後処理 一時ファイル/フォルダ削除
+    If boTargetIsFile Then Call func_CM_FsDeleteFile(sPath) Else Call func_CM_FsDeleteFolder(sPath)
     Set oExpect = Nothing
+    
+    '結果返却
+    func_clsFsBaseTest_1_1_ = boResult
+End Function
+
+'***************************************************************************************************
+'Processing Order            : none
+'Function/Sub Name           : func_clsFsBaseTestCreateArgument()
+'Overview                    : ケースパターン情報格納用ハッシュマップに登録する引数情報ハッシュマップを作成する
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              "Conditions"             実施条件のハッシュマップ
+'                              "Inspections"            検証内容のハッシュマップ
+'
+'                              実施条件のハッシュマップの内容
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              "TargetIsFile"           対象はファイルか否か
+'                              "UseCache"               キャッシュ使用可否
+'                              "ValidPeriod"            キャッシュ有効期間（秒数）
+'                              "SetFsoFlg"              FileSystemObjectオブジェクトの設定要否
+'                              "DoItTwice"              属性取得を2回するか否か
+'                              "IsRecreate"             2回目の属性取得の直前に対象ファイル/フォルダを再作成するか否か
+'                              "SleepMSecond"           1回目の属性取得の直後にスリープする時間（ミリ秒）
+'
+'                              検証内容のハッシュマップの内容
+'                              Key                      Value
+'                              -------------------      --------------------------------------------
+'                              "PropName1"              1回目に取得する属性名（2回目がない場合は値を検証する）
+'                              "PropName2"              2回目に取得する属性名、値を検証する
+'                              "DontChgUc"              最後にキャッシュ使用可否が変わっていないことを検証するか否か
+'                              "DontChgVp"              最後にキャッシュ有効期間（秒数）が変わっていないことを検証するか否か
+'                              "IsUpdLcct"              最終キャッシュ確認時間が最後の属性取得の直前から変わっているか否か
+'                              "IsUpdLcut"              最終キャッシュ更新時間が最後の属性取得の直前から変わっているか否か
+'Argument
+'     aboTargetIsFile        : 実施条件のハッシュマップの"TargetIsFile"と同じ
+'     aboUseCache            : 実施条件のハッシュマップの"UseCache"と同じ
+'     alValidPeriod          : 実施条件のハッシュマップの"ValidPeriod"と同じ
+'     aboSetFsoFlg           : 実施条件のハッシュマップの"SetFsoFlg"と同じ
+'     aboDoItTwice           : 実施条件のハッシュマップの"DoItTwice"と同じ
+'     aboIsRecreate          : 実施条件のハッシュマップの"IsRecreate"と同じ
+'     alSleepMSecond         : 実施条件のハッシュマップの"SleepMSecond"と同じ
+'     asPropName1            : 検証内容のハッシュマップの"PropName1"と同じ
+'     asPropName2            : 検証内容のハッシュマップの"PropName2"と同じ
+'     aboDontChgUc           : 検証内容のハッシュマップの"DontChgUc"と同じ
+'     aboDontChgVp           : 検証内容のハッシュマップの"DontChgVp"と同じ
+'     aboIsUpdLcct           : 検証内容のハッシュマップの"IsUpdLcct"と同じ
+'     aboIsUpdLcut           : 検証内容のハッシュマップの"IsUpdLcut"と同じ
+'Return Value
+'     引数情報ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCreateArgument( _
+    byVal aboTargetIsFile _
+    , byVal aboUseCache _
+    , byVal alValidPeriod _
+    , byVal aboSetFsoFlg _
+    , byVal aboDoItTwice _
+    , byVal aboIsRecreate _
+    , byVal alSleepMSecond _
+    , byVal asPropName1 _
+    , byVal asPropName2 _
+    , byVal aboDontChgUc _
+    , byVal aboDontChgVp _
+    , byVal aboIsUpdLcct _
+    , byVal aboIsUpdLcut _
+    )
+    Dim oConditions : Set oConditions = CreateObject("Scripting.Dictionary")
+    With oConditions
+        .Add "TargetIsFile", aboTargetIsFile
+        .Add "UseCache", aboUseCache
+        .Add "ValidPeriod", alValidPeriod
+        .Add "SetFsoFlg", aboSetFsoFlg
+        .Add "DoItTwice", aboDoItTwice
+        .Add "IsRecreate", aboIsRecreate
+        .Add "SleepMSecond", alSleepMSecond
+    End With
+    
+    Dim oInspections : Set oInspections = CreateObject("Scripting.Dictionary")
+    With oInspections
+        .Add "PropName1", asPropName1
+        .Add "PropName2", asPropName2
+        .Add "DontChgUc", aboDontChgUc
+        .Add "DontChgVp", aboDontChgVp
+        .Add "IsUpdLcct", aboIsUpdLcct
+        .Add "IsUpdLcut", aboIsUpdLcut
+    End With
+    
+    Dim oArgument : Set oArgument = CreateObject("Scripting.Dictionary")
+    With oArgument
+        .Add "Conditions", oConditions
+        .Add "Inspections", oInspections
+    End With
+    
+    Set func_clsFsBaseTestCreateArgument = oArgument
+    Set oInspections = Nothing
+    Set oConditions = Nothing
+    Set oArgument = Nothing
 End Function
 
 ''***************************************************************************************************

@@ -159,6 +159,32 @@ Private Function func_CM_FsDeleteFile( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsDeleteFolder()
+'Overview                    : ファイルを削除する
+'Detailed Description        : FileSystemObjectのDeleteFolder()と同等
+'Argument
+'     asPath                 : 削除するフォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsDeleteFolder( _
+    byVal asPath _
+    ) 
+    On Error Resume Next
+    CreateObject("Scripting.FileSystemObject").DeleteFolder(asPath)
+    func_CM_FsDeleteFolder = True
+    If Err.Number Then
+        Err.Clear
+        func_CM_FsDeleteFolder = False
+    End If
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsCopyFile ()
 'Overview                    : ファイルをコピーする
 'Detailed Description        : FileSystemObjectのCopyFile ()と同等
