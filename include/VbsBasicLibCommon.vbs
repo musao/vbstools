@@ -535,6 +535,37 @@ Private Function func_CM_MathMax( _
 End Function
 
 
+'”z—ñŒn
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ArrayGetDimensionNumber()
+'Overview                    : ”z—ñ‚ÌŸŒ³”‚ğ‹‚ß‚é
+'Detailed Description        : H–’†
+'Argument
+'     aArray                 : ”z—ñ
+'Return Value
+'     ”z—ñ‚ÌŸŒ³”
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ArrayGetDimensionNumber( _
+    byRef aArray _ 
+    )
+   If Not IsArray(aArray) Then Exit Function
+   On Error Resume Next
+   Dim lNum : lNum = 0
+   Dim lTemp
+   Do
+       lNum = lNum + 1
+       lTemp = UBound(aArray, lNum)
+   Loop Until Err.Number <> 0
+   Err.Clear
+   func_CM_ArrayGetDimensionNumber = lNum - 1
+End Function
+
 '‚±‚ê‰½Œn‚©‚È
 
 '***************************************************************************************************
