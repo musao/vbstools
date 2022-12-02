@@ -350,7 +350,7 @@ Class clsUtAssistant
     'Overview                    : 階層化した複数パターンのテスト実施
     'Detailed Description        : 階層構造（配列の入れ子）のケースパターン情報格納用ハッシュマップを
     '                              解析して複数ケース実行する
-    '                              実施はsub_RunMultipleCases()に委譲する。
+    '                              実施はsub_RunOneCase()に委譲する。
     'Argument
     '     asCaseName             : 実行するケース名（関数名）
     '     asHierarchyLocation    : ケースの階層の場所（1-2-5 など）
@@ -381,44 +381,6 @@ Class clsUtAssistant
             Call sub_RunOneCase(asCaseName, asHierarchyLocation, aoHierarchicalPatterns)
         End If
     End Sub
-    
-'    '***************************************************************************************************
-'    'Function/Sub Name           : sub_RunMultipleCases()
-'    'Overview                    : 複数パターンのテスト実施
-'    'Detailed Description        : パターンごとにテストを実行し結果を結果格納用ハッシュマップに格納する
-'    '                              実施はsub_RunOneCase()に委譲する。
-'    '                              
-'    '                              ケースパターン情報格納用ハッシュマップの構成
-'    '                              Key                      Value
-'    '                              -------------------      --------------------------------------------
-'    '                              "SomeString"             引数情報（ハッシュでも変数でもよい）
-'    '                              (means pattern)          ケースの関数が引数で受け取る情報
-'    'Argument
-'    '     asCaseName             : 実行するケース名（関数名）
-'    '     asHierarchyLocation    : ケースの階層の場所
-'    '     aoPatterns             : ケースパターン情報格納用ハッシュマップ
-'    'Return Value
-'    '     なし
-'    '---------------------------------------------------------------------------------------------------
-'    'Histroy
-'    'Date               Name                     Reason for Changes
-'    '----------         ----------------------   -------------------------------------------------------
-'    '2022/11/23         Y.Fujii                  First edition
-'    '***************************************************************************************************
-'    Private Sub sub_RunMultipleCases( _
-'        byVal asCaseName _
-'        , byRef asHierarchyLocation _
-'        , byRef aoPatterns _
-'        )
-'        Dim lNum : lNum = 0
-'        Dim sKey : Dim sPattern
-'        For Each sKey In aoPatterns.Keys
-'            lNum = lNum + 1
-'            sPattern = Cstr(lNum) & "_" & sKey
-'            If Len(asHierarchyLocation)>0 Then sPattern = asHierarchyLocation & "-" & sPattern
-'            Call sub_RunOneCase(asCaseName, sPattern, aoPatterns.Item(sKey))
-'        Next
-'    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : sub_RunOneCase()
