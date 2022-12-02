@@ -585,10 +585,16 @@ Private Sub sub_CM_ArrayAddItem( _
     byRef avArray _ 
     , byRef avItem _ 
     )
-   If Not IsArray(avArray) Then Exit Sub
-   Redim Preserve avArray(Ubound(avArray)+1)
-   Call sub_CM_TransferBetweenVariables(avItem, avArray(Ubound(avArray)+1)
-Sub Sub
+    On Error Resume Next
+    If Ubound(avArray)>=0 Then
+        Redim Preserve avArray(Ubound(avArray)+1)
+    End If
+    If Err.Number Then
+        Redim avArray(0)
+        Err.Clear
+    End If
+    Call sub_CM_TransferBetweenVariables(avItem, avArray(Ubound(avArray)))
+End Sub
 
 '‚±‚ê‰½Œn‚©‚È
 

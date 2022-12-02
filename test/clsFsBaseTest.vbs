@@ -131,8 +131,8 @@ Private Sub sub_clsFsBaseTest_1_1( _
     )
     
     Call sub_clsFsBaseTest_1_1_1(aoUtAssistant)
-    Call sub_clsFsBaseTest_1_1_2(aoUtAssistant)
-    Call sub_clsFsBaseTest_1_1_3(aoUtAssistant)
+'    Call sub_clsFsBaseTest_1_1_2(aoUtAssistant)
+'    Call sub_clsFsBaseTest_1_1_3(aoUtAssistant)
     
 End Sub
 
@@ -141,6 +141,7 @@ End Sub
 'Function/Sub Name           : sub_clsFsBaseTest_1_1_1()
 'Overview                    : 各属性の取得の正当性を確認する
 'Detailed Description        : 実施条件
+'                              ・FileSystemObjectオブジェクトの設定有無それぞれについて検証する
 '                              ・ファイル/フォルダそれぞれについて検証する
 '                              ・キャッシュ使用可否は否
 '                              ・キャッシュ有効期間は0秒
@@ -160,28 +161,32 @@ End Sub
 Private Sub sub_clsFsBaseTest_1_1_1( _
     byRef aoUtAssistant _
     )
+    'FileSystemObjectオブジェクトの設定有無パターン
+    Dim boSetFsoFlg : Dim boSetFsoFlgs
+    boSetFsoFlgs = Array(True, False)
     'ファイル/フォルダのパターン
-    Dim boTargetIsFile : Dim boTargetIsFiles(1)
-    boTargetIsFiles(0) = True : boTargetIsFiles(1) = False
+    Dim boTargetIsFile : Dim boTargetIsFiles
+    boTargetIsFiles = Array(True, False)
     '各属性のパターン
-    Dim sPropNames
+    Dim sPropName : Dim sPropNames
     sPropNames = Array("Attributes", "DateCreated", "DateLastAccessed", "DateLastModified", "Drive", _
         "Name", "ParentFolder", "Path", "ShortName", "ShortPath", "Size", "Type")
     
-    Dim oPatterns : Set oPatterns = CreateObject("Scripting.Dictionary")
-    Dim lCntOut : Dim lCntIn : Dim sPropName
-    
-    'ファイル/フォルダそれぞれについて
-    Dim oVariationTargetIsFile()
-    For lCntOut=0 To Ubound(boTargetIsFiles)
-        boTargetIsFile = boTargetIsFiles(lCntOut)
-        
-        Call sub_CM_ArrayAddItem(oVariationTargetIsFile, func_clsFsBaseTest_1_1_1_C(sPropName, boTargetIsFile, sPropNames))
-        
+    Dim vArray1 : Dim vArray2 : Dim vArray3
+    For Each boSetFsoFlg In boSetFsoFlgs
+        If IsArray(vArray2) Then Erase vArray2
+        For Each boTargetIsFile In boTargetIsFiles
+            If IsArray(vArray3) Then Erase vArray3
+            For Each sPropName In sPropNames
+                Call sub_CM_ArrayAddItem(vArray3, func_clsFsBaseTest_1_1_1_C(boSetFsoFlg&boTargetIsFile&sPropName, boSetFsoFlg, boTargetIsFile, sPropName))
+            Next
+            Call sub_CM_ArrayAddItem(vArray2, vArray3)
+        Next
+        Call sub_CM_ArrayAddItem(vArray1, vArray2)
     Next
-    Call aoUtAssistant.RunWithMultiplePatterns("func_clsFsBaseTest_1_1_1_", oVariationTargetIsFile)
     
-    Set oPatterns = Nothing
+    Call aoUtAssistant.RunWithMultiplePatterns("func_clsFsBaseTest_1_1_1_", vArray1)
+    
 End Sub
 
 '***************************************************************************************************
@@ -206,12 +211,13 @@ End Sub
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_clsFsBaseTest_1_1_1_C( _
-    byVal asSubName _
+    byVal asSubTitle _
+    , byVal aboSetFsoFlg _
     , byVal aboTargetIsFile _
     , byVal asPropName _
     )
     Set func_clsFsBaseTest_1_1_1_C = _
-        func_clsFsBaseTestCreateArgumentFor_1_1_x(asSubName, aboTargetIsFile, False, 0, asPropName, False, False)
+        func_clsFsBaseTestCreateArgumentFor_1_1_x(asSubTitle, aboTargetIsFile, False, 0, aboSetFsoFlg, asPropName, False, False)
 End Function
 '***************************************************************************************************
 'Processing Order            : 1-1-2
@@ -319,10 +325,11 @@ End Sub
 'Overview                    : func_clsFsBaseTest_1_1()用の引数情報ハッシュマップを作成
 'Detailed Description        : func_clsFsBaseTestCreateArgument()を参照
 'Argument
-'     asSubName              : ケースのサブ名称
+'     asSubTitle             : ケースのサブ名称
 '     aboTargetIsFile        : 対象はファイルか否か
 '     aboUseCache            : キャッシュ使用可否
 '     alValidPeriod          : キャッシュ有効期間（秒数）
+'     boSetFsoFlg            : FileSystemObjectオブジェクトの設定有無
 '     asPropName1            : 1回目に取得する属性名（2回目がない場合は値を検証する）
 '     aboDontChgUc           : 最後にキャッシュ使用可否が変わっていないことを検証するか否か
 '     aboDontChgVp           : 最後にキャッシュ有効期間（秒数）が変わっていないことを検証するか否か
@@ -335,21 +342,22 @@ End Sub
 '2022/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_clsFsBaseTestCreateArgumentFor_1_1_x( _
-    byVal asSubName _
+    byVal asSubTitle _
     , byVal aboTargetIsFile _
     , byVal aboUseCache _
     , byVal alValidPeriod _
+    , byVal boSetFsoFlg _
     , byVal asPropName1 _
     , byVal aboDontChgUc _
     , byVal aboDontChgVp _
     )
     Set func_clsFsBaseTestCreateArgumentFor_1_1_x = _
         func_clsFsBaseTestCreateArgument( _
-            asSubName _
+            asSubTitle _
             , aboTargetIsFile _
             , aboUseCache _
             , alValidPeriod _
-            , False _
+            , boSetFsoFlg _
             , False _
             , False _
             , 0 _
@@ -377,7 +385,7 @@ End Function
 '                              "TargetIsFile"           対象はファイルか否か
 '                              "UseCache"               キャッシュ使用可否
 '                              "ValidPeriod"            キャッシュ有効期間（秒数）
-'                              "SetFsoFlg"              FileSystemObjectオブジェクトの設定要否
+'                              "SetFsoFlg"              FileSystemObjectオブジェクトの設定有無
 '                              "DoItTwice"              属性取得を2回するか否か
 '                              "IsRecreate"             2回目の属性取得の直前に対象ファイル/フォルダを再作成するか否か
 '                              "SleepMSecond"           1回目の属性取得の直後にスリープする時間（ミリ秒）
@@ -392,7 +400,7 @@ End Function
 '                              "IsUpdLcct"              最終キャッシュ確認時間が最後の属性取得の直前から変わっているか否か
 '                              "IsUpdLcut"              最終キャッシュ更新時間が最後の属性取得の直前から変わっているか否か
 'Argument
-'     asSubName              : ケースのサブ名称
+'     asSubTitle             : ケースのサブ名称
 '     aboTargetIsFile        : 実施条件のハッシュマップの"TargetIsFile"と同じ
 '     aboUseCache            : 実施条件のハッシュマップの"UseCache"と同じ
 '     alValidPeriod          : 実施条件のハッシュマップの"ValidPeriod"と同じ
@@ -415,7 +423,7 @@ End Function
 '2022/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_clsFsBaseTestCreateArgument( _
-    byVal asSubName _
+    byVal asSubTitle _
     , byVal aboTargetIsFile _
     , byVal aboUseCache _
     , byVal alValidPeriod _
@@ -453,7 +461,7 @@ Private Function func_clsFsBaseTestCreateArgument( _
     
     Dim oArgument : Set oArgument = CreateObject("Scripting.Dictionary")
     With oArgument
-        .Add "SubName", asSubName
+        .Add "SubTitle", asSubTitle
         .Add "Conditions", oConditions
         .Add "Inspections", oInspections
     End With

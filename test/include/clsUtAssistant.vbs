@@ -367,12 +367,13 @@ Class clsUtAssistant
         , byRef aoHierarchicalPatterns _
         )
         If IsArray(aoHierarchicalPatterns) Then
-            Dim lCnt : Dim sHierarchyLocation
+            Dim lCnt : Dim lCntPlus : Dim sHierarchyLocation
             For lCnt=Lbound(aoHierarchicalPatterns) To Ubound(aoHierarchicalPatterns)
+                lCntPlus = lCnt+1
                 If Len(asHierarchyLocation)=0 Then
-                    sHierarchyLocation = Cstr(lCnt)
+                    sHierarchyLocation = Cstr(lCntPlus)
                 Else
-                    sHierarchyLocation = asHierarchyLocation & "_" & Cstr(lCnt)
+                    sHierarchyLocation = asHierarchyLocation & "_" & Cstr(lCntPlus)
                 End If
                 Call sub_RunHierarchicalCases(asCaseName, sHierarchyLocation, aoHierarchicalPatterns(lCnt))
             Next
@@ -480,7 +481,7 @@ Class clsUtAssistant
         Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
         With PoRecDetailTitles
             Call oTemp.Add(.Item(1), lSeq)
-            Call oTemp.Add(.Item(2), func_GetCaseName(aoArgument, sCaseName))
+            Call oTemp.Add(.Item(2), func_GetCasesSubTitle(aoArgument, sCaseName))
             Call oTemp.Add(.Item(3), boResult)
             Call oTemp.Add(.Item(4), func_GetDateInMilliseconds(dtDate, dtStart))
             Call oTemp.Add(.Item(5), func_GetDateInMilliseconds(dtDate, dtEnd))
@@ -495,7 +496,7 @@ Class clsUtAssistant
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_GetCaseName()
+    'Function/Sub Name           : func_GetCasesSubTitle()
     'Overview                    : ケースのサブ名称があればケース名の末尾に追加する
     'Detailed Description        : 工事中
     'Argument
@@ -509,16 +510,16 @@ Class clsUtAssistant
     '----------         ----------------------   -------------------------------------------------------
     '2022/11/23         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_GetCaseName( _
+    Private Function func_GetCasesSubTitle( _
         byRef aoArgument _
         , byVal asCaseName _
         )
         Dim sReturn : sReturn = asCaseName
-        Dim sSubName : sSubName = ""
+        Dim sSubTitle : sSubTitle = ""
         On Error Resume Next
-        sSubName = aoArgument.Item("SubName")
-        If Len(sName)>0 Then sReturn = sReturn & "-" & sSubName
-        func_GetCaseName = sReturn
+        sSubTitle = aoArgument.Item("SubTitle")
+        If Len(sSubTitle)>0 Then sReturn = sReturn & "-" & sSubTitle
+        func_GetCasesSubTitle = sReturn
         If Err.Number Then Err.Clear
     End Function
     
