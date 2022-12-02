@@ -372,52 +372,52 @@ Class clsUtAssistant
                 If Len(asHierarchyLocation)=0 Then
                     sHierarchyLocation = Cstr(lCnt)
                 Else
-                    sHierarchyLocation = asHierarchyLocation & "-" & Cstr(lCnt)
+                    sHierarchyLocation = asHierarchyLocation & "_" & Cstr(lCnt)
                 End If
                 Call sub_RunHierarchicalCases(asCaseName, sHierarchyLocation, aoHierarchicalPatterns(lCnt))
             Next
         Else
-            Call sub_RunMultipleCases(asCaseName, asHierarchyLocation, aoHierarchicalPatterns)
+            Call sub_RunOneCase(asCaseName, asHierarchyLocation, aoHierarchicalPatterns)
         End If
     End Sub
     
-    '***************************************************************************************************
-    'Function/Sub Name           : sub_RunMultipleCases()
-    'Overview                    : 複数パターンのテスト実施
-    'Detailed Description        : パターンごとにテストを実行し結果を結果格納用ハッシュマップに格納する
-    '                              実施はsub_RunOneCase()に委譲する。
-    '                              
-    '                              ケースパターン情報格納用ハッシュマップの構成
-    '                              Key                      Value
-    '                              -------------------      --------------------------------------------
-    '                              "SomeString"             引数情報（ハッシュでも変数でもよい）
-    '                              (means pattern)          ケースの関数が引数で受け取る情報
-    'Argument
-    '     asCaseName             : 実行するケース名（関数名）
-    '     asHierarchyLocation    : ケースの階層の場所
-    '     aoPatterns             : ケースパターン情報格納用ハッシュマップ
-    'Return Value
-    '     なし
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/11/23         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Sub sub_RunMultipleCases( _
-        byVal asCaseName _
-        , byRef asHierarchyLocation _
-        , byRef aoPatterns _
-        )
-        Dim lNum : lNum = 0
-        Dim sKey : Dim sPattern
-        For Each sKey In aoPatterns.Keys
-            lNum = lNum + 1
-            sPattern = Cstr(lNum) & "_" & sKey
-            If Len(asHierarchyLocation)>0 Then sPattern = asHierarchyLocation & "-" & sPattern
-            Call sub_RunOneCase(asCaseName, sPattern, aoPatterns.Item(sKey))
-        Next
-    End Sub
+'    '***************************************************************************************************
+'    'Function/Sub Name           : sub_RunMultipleCases()
+'    'Overview                    : 複数パターンのテスト実施
+'    'Detailed Description        : パターンごとにテストを実行し結果を結果格納用ハッシュマップに格納する
+'    '                              実施はsub_RunOneCase()に委譲する。
+'    '                              
+'    '                              ケースパターン情報格納用ハッシュマップの構成
+'    '                              Key                      Value
+'    '                              -------------------      --------------------------------------------
+'    '                              "SomeString"             引数情報（ハッシュでも変数でもよい）
+'    '                              (means pattern)          ケースの関数が引数で受け取る情報
+'    'Argument
+'    '     asCaseName             : 実行するケース名（関数名）
+'    '     asHierarchyLocation    : ケースの階層の場所
+'    '     aoPatterns             : ケースパターン情報格納用ハッシュマップ
+'    'Return Value
+'    '     なし
+'    '---------------------------------------------------------------------------------------------------
+'    'Histroy
+'    'Date               Name                     Reason for Changes
+'    '----------         ----------------------   -------------------------------------------------------
+'    '2022/11/23         Y.Fujii                  First edition
+'    '***************************************************************************************************
+'    Private Sub sub_RunMultipleCases( _
+'        byVal asCaseName _
+'        , byRef asHierarchyLocation _
+'        , byRef aoPatterns _
+'        )
+'        Dim lNum : lNum = 0
+'        Dim sKey : Dim sPattern
+'        For Each sKey In aoPatterns.Keys
+'            lNum = lNum + 1
+'            sPattern = Cstr(lNum) & "_" & sKey
+'            If Len(asHierarchyLocation)>0 Then sPattern = asHierarchyLocation & "-" & sPattern
+'            Call sub_RunOneCase(asCaseName, sPattern, aoPatterns.Item(sKey))
+'        Next
+'    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : sub_RunOneCase()
@@ -437,7 +437,7 @@ Class clsUtAssistant
     '                              "End"                     終了時刻
     'Argument
     '     asCaseName             : 実行するケース名（関数名）
-    '     asPattern              : パターン名
+    '     asLocation             : ケースの階層の場所（1-2-5 など）
     '     aoArgument             : ケース名（関数名）に渡す引数
     'Return Value
     '     なし
@@ -449,7 +449,7 @@ Class clsUtAssistant
     '***************************************************************************************************
     Private Sub sub_RunOneCase( _
         byVal asCaseName _
-        , byVal asPattern _
+        , byVal asLocation _
         , byRef aoArgument _
         )
         
@@ -462,11 +462,14 @@ Class clsUtAssistant
         
         On Error Resume Next
         
-        If asPattern = vbNullString Then
+        If aoArgument Is Nothing Then
             boResult = oTestTarget()
         Else
             boResult = oTestTarget(aoArgument)
-            sCaseName = asCaseName & asPattern
+        End If
+        
+        If Len(asLocation)>0 Then
+            sCaseName = asCaseName & asLocation
         End If
         
         Dim dtEnd : dtEnd = Timer
@@ -477,7 +480,7 @@ Class clsUtAssistant
         Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
         With PoRecDetailTitles
             Call oTemp.Add(.Item(1), lSeq)
-            Call oTemp.Add(.Item(2), sCaseName)
+            Call oTemp.Add(.Item(2), func_GetCaseName(aoArgument, sCaseName))
             Call oTemp.Add(.Item(3), boResult)
             Call oTemp.Add(.Item(4), func_GetDateInMilliseconds(dtDate, dtStart))
             Call oTemp.Add(.Item(5), func_GetDateInMilliseconds(dtDate, dtEnd))
@@ -490,6 +493,34 @@ Class clsUtAssistant
         
         Set oTemp = Nothing
     End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : func_GetCaseName()
+    'Overview                    : ケースのサブ名称があればケース名の末尾に追加する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoArgument             : ケース名（関数名）に渡す引数
+    '     asCaseName             : ケース名
+    'Return Value
+    '     ケースの名称
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2022/11/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_GetCaseName( _
+        byRef aoArgument _
+        , byVal asCaseName _
+        )
+        Dim sReturn : sReturn = asCaseName
+        Dim sSubName : sSubName = ""
+        On Error Resume Next
+        sSubName = aoArgument.Item("SubName")
+        If Len(sName)>0 Then sReturn = sReturn & "-" & sSubName
+        func_GetCaseName = sReturn
+        If Err.Number Then Err.Clear
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : func_CountCaseAs()

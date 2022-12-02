@@ -542,7 +542,7 @@ End Function
 'Overview                    : 配列の次元数を求める
 'Detailed Description        : 工事中
 'Argument
-'     aArray                 : 配列
+'     avArray                : 配列
 'Return Value
 '     配列の次元数
 '---------------------------------------------------------------------------------------------------
@@ -552,19 +552,43 @@ End Function
 '2022/11/19         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_ArrayGetDimensionNumber( _
-    byRef aArray _ 
+    byRef avArray _ 
     )
-   If Not IsArray(aArray) Then Exit Function
+   If Not IsArray(avArray) Then Exit Function
    On Error Resume Next
    Dim lNum : lNum = 0
    Dim lTemp
    Do
        lNum = lNum + 1
-       lTemp = UBound(aArray, lNum)
+       lTemp = UBound(avArray, lNum)
    Loop Until Err.Number <> 0
    Err.Clear
    func_CM_ArrayGetDimensionNumber = lNum - 1
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_ArrayAddItem()
+'Overview                    : 配列に要素を追加する
+'Detailed Description        : 工事中
+'Argument
+'     avArray                : 配列
+'     avItem                 : 追加する要素
+'Return Value
+'     配列の次元数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_ArrayAddItem( _
+    byRef avArray _ 
+    , byRef avItem _ 
+    )
+   If Not IsArray(avArray) Then Exit Sub
+   Redim Preserve avArray(Ubound(avArray)+1)
+   Call sub_CM_TransferBetweenVariables(avItem, avArray(Ubound(avArray)+1)
+Sub Sub
 
 'これ何系かな
 
