@@ -92,7 +92,9 @@ End Sub
 'Processing Order            : 1
 'Function/Sub Name           : func_clsFsBaseTest_1()
 'Overview                    : ノーマルケースのテスト
-'Detailed Description        : 工事中
+'Detailed Description        : 下記を汎用パターンとして指定する
+'                              ・FileSystemObjectオブジェクトの設定有無それぞれについて検証する
+'                              ・ファイル/フォルダそれぞれについて検証する
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
 'Return Value
@@ -106,18 +108,24 @@ End Sub
 Private Sub sub_clsFsBaseTest_1( _
     byRef aoUtAssistant _
     )
+    'FileSystemObjectオブジェクトの設定有無パターン
+    Dim boSetFsoFlgs : boSetFsoFlgs = Array(True, False)
+    'ファイル/フォルダのパターン
+    Dim boTargetIsFiles : boTargetIsFiles = Array(True, False)
     
-    Call sub_clsFsBaseTest_1_1(aoUtAssistant)
+    Call sub_clsFsBaseTest_1_1(aoUtAssistant, Array(boSetFsoFlgs, boTargetIsFiles))
+    Call sub_clsFsBaseTest_1_2(aoUtAssistant, Array(boSetFsoFlgs, boTargetIsFiles))
     
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1-1
 'Function/Sub Name           : sub_clsFsBaseTest_1_1()
-'Overview                    : clsFsBaseの全属性の確からしさを確認する
-'Detailed Description        : 工事中
+'Overview                    : clsFsBaseの全属性、取得項目の確からしさを確認する
+'Detailed Description        : 上位から指定されたケースの汎用パターン分実行指示する
 'Argument
 '     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
+'     avGeneralPatterns      : ケースの汎用パターン（配列の配列）
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -128,69 +136,49 @@ End Sub
 '***************************************************************************************************
 Private Sub sub_clsFsBaseTest_1_1( _
     byRef aoUtAssistant _
+    , byRef avGeneralPatterns _
     )
+    Dim vIndividualPatterns : Dim oCreateArgumentFunc : Dim sCaseChildNum
     
-    Call sub_clsFsBaseTest_1_1_1(aoUtAssistant)
-    Call sub_clsFsBaseTest_1_1_2(aoUtAssistant)
-    Call sub_clsFsBaseTest_1_1_3(aoUtAssistant)
+    '1-1-1 全属性の値が正しいこと
+    sCaseChildNum = "1"
+    '全属性のパターン
+    vIndividualPatterns = Array("Attributes", "DateCreated", "DateLastAccessed", "DateLastModified", _
+                                "Drive", "Name", "ParentFolder", "Path", "ShortName", "ShortPath", _
+                                "Size", "Type")
+    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_" & sCaseChildNum & "_x")
+    Call sub_clsFsBaseTest_1_1_x(aoUtAssistant, avGeneralPatterns, vIndividualPatterns, oCreateArgumentFunc, sCaseChildNum)
     
-End Sub
-
-'***************************************************************************************************
-'Processing Order            : 1-1-1
-'Function/Sub Name           : sub_clsFsBaseTest_1_1_1()
-'Overview                    : 各属性の取得の正当性を確認する
-'Detailed Description        : 実施条件
-'                              ・FileSystemObjectオブジェクトの設定有無それぞれについて検証する
-'                              ・ファイル/フォルダそれぞれについて検証する
-'                              ・キャッシュ使用可否は否
-'                              ・キャッシュ有効期間は0秒
-'                              ・全属性の値を1回取得
-'                              期待値
-'                              ・全属性の値が正しいこと
-'Argument
-'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_clsFsBaseTest_1_1_1( _
-    byRef aoUtAssistant _
-    )
-    'FileSystemObjectオブジェクトの設定有無パターン
-    Dim boSetFsoFlgs : boSetFsoFlgs = Array(True, False)
-    'ファイル/フォルダのパターン
-    Dim boTargetIsFiles : boTargetIsFiles = Array(True, False)
-    '各属性のパターン
-    Dim sPropNames : sPropNames = _
-        Array("Attributes", "DateCreated", "DateLastAccessed", "DateLastModified", "Drive", _
-            "Name", "ParentFolder", "Path", "ShortName", "ShortPath", "Size", "Type")
+    '1-1-2 キャッシュ使用可否が変わっていないこと
+    sCaseChildNum = "2"
+    'キャッシュ使用可否のパターン
+    vIndividualPatterns = Array(True, False)
+    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_" & sCaseChildNum & "_x")
+    Call sub_clsFsBaseTest_1_1_x(aoUtAssistant, avGeneralPatterns, vIndividualPatterns, oCreateArgumentFunc, sCaseChildNum)
     
-    '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
-    Dim vPatterns : vPatterns = func_clsFsBaseTestCreateaoHierarchicalPatterns( _
-                                            Array(boSetFsoFlgs, boTargetIsFiles, sPropNames) _
-                                            , 0 _
-                                            , GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_1_x") _
-                                            , vbNullString _
-                                        )
+    '1-1-3 キャッシュ有効期間（秒数）が変わっていないこと
+    sCaseChildNum = "3"
+    'キャッシュ有効期間（秒数）のパターン
+    vIndividualPatterns = Array(0,1,2147483647,-1,-2147483648)
+    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_" & sCaseChildNum & "_x")
+    Call sub_clsFsBaseTest_1_1_x(aoUtAssistant, avGeneralPatterns, vIndividualPatterns, oCreateArgumentFunc, sCaseChildNum)
     
-    'ケース実行
-    Call aoUtAssistant.RunWithMultiplePatterns( _
-                                "func_clsFsBaseTest_1_1_1_" _
-                                , vPatterns _
-                            )
-    
+    Set oCreateArgumentFunc = Nothing
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1-1-1
 'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_1_1_x()
 'Overview                    : sub_clsFsBaseTest_1_1_1()用の引数情報ハッシュマップを作成
-'Detailed Description        : func_clsFsBaseTestCreateArgumentFor_1_1_x()を参照
+'Detailed Description        : 処理はfunc_clsFsBaseTestCreateArgumentFor_1_1_x()に委譲する
+'                              ケースの詳細
+'                              上位から指定されたケースのパターン分下記を実行する
+'                              実施条件
+'                              ・キャッシュ使用可否は否
+'                              ・キャッシュ有効期間は0秒
+'                              ・全属性の値を1回取得
+'                              期待値
+'                              ・全属性の値が正しいこと
 'Argument
 '     avArguments            : ケースごとの引数のパターン
 'Return Value
@@ -204,74 +192,36 @@ End Sub
 Private Function func_clsFsBaseTestCreateArgumentFor_1_1_1_x( _
     byRef avArguments _
     )
-    Dim sFso : If avArguments(0) Then sFso="FSOあり" Else sFso="FSOなし"
-    Dim sIsFile : If avArguments(1) Then sIsFile="ファイル" Else sIsFile="フォルダ"
-    Dim sSubTitle : sSubTitle = sFso & "-" & sIsFile & "-" & avArguments(2)
+    'サブタイトル名の作成
+    Dim sSubTitle : sSubTitle = func_clsFsBaseTestCaseDescriptionFso(avArguments(0)) _
+                              & "-" & func_clsFsBaseTestCaseDescriptionIsFile(avArguments(1)) _
+                              & "-" & avArguments(2)
     
-    Set func_clsFsBaseTestCreateArgumentFor_1_1_1_x = _
-        func_clsFsBaseTestCreateArgumentFor_1_1_x(sSubTitle, avArguments(1), False, 0, avArguments(0), avArguments(2), False, False)
+    'sub_clsFsBaseTest_1_1_1()用の引数情報ハッシュマップを作成
+    Set func_clsFsBaseTestCreateArgumentFor_1_1_1_x = func_clsFsBaseTestCreateArgumentFor_1_1_x( _
+                                                                                sSubTitle _
+                                                                                , avArguments(1) _
+                                                                                , False _
+                                                                                , 0 _
+                                                                                , avArguments(0) _
+                                                                                , avArguments(2) _
+                                                                                , False _
+                                                                                , False _
+                                                                                )
 End Function
-
-'***************************************************************************************************
-'Processing Order            : 1-1-2
-'Function/Sub Name           : sub_clsFsBaseTest_1_1_2()
-'Overview                    : キャッシュ使用可否が変わっていないことを確認する
-'Detailed Description        : 実施条件
-'                              ・FileSystemObjectオブジェクトの設定有無それぞれについて検証する
-'                              ・ファイル/フォルダそれぞれについて検証する
-'                              ・キャッシュ有効期間は0秒
-'                              ・任意の属性の値を1回取得
-'                              期待値
-'                              ・キャッシュ使用可否が変わっていないこと
-'Detailed Description        : 実施条件
-'                              ・FileSystemObjectオブジェクトの設定有無それぞれについて検証する
-'                              ・ファイル/フォルダそれぞれについて検証する
-'                              ・キャッシュ使用可否は否
-'                              ・キャッシュ有効期間は0秒
-'                              ・任意の属性の値を1回取得
-'                              期待値
-'                              ・キャッシュ使用可否が変わっていないこと
-'Argument
-'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
-'Return Value
-'     結果 True,Flase
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_clsFsBaseTest_1_1_2( _
-    byRef aoUtAssistant _
-    )
-    'FileSystemObjectオブジェクトの設定有無パターン
-    Dim boSetFsoFlgs : boSetFsoFlgs = Array(True, False)
-    'ファイル/フォルダのパターン
-    Dim boTargetIsFiles : boTargetIsFiles = Array(True, False)
-    'キャッシュ使用可否のパターン
-    Dim boUseCaches : boUseCaches = Array(True, False)
-    
-    '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
-    Dim vPatterns : vPatterns = func_clsFsBaseTestCreateaoHierarchicalPatterns( _
-                                            Array(boSetFsoFlgs, boTargetIsFiles, boUseCaches) _
-                                            , 0 _
-                                            , GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_2_x") _
-                                            , vbNullString _
-                                        )
-    
-    'ケース実行
-    Call aoUtAssistant.RunWithMultiplePatterns( _
-                                "func_clsFsBaseTest_1_1_2_" _
-                                , vPatterns _
-                            )
-    
-End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1-1-2
 'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_1_2_x()
 'Overview                    : sub_clsFsBaseTest_1_1_2()用の引数情報ハッシュマップを作成
-'Detailed Description        : func_clsFsBaseTestCreateArgumentFor_1_1_x()を参照
+'Detailed Description        : 処理はfunc_clsFsBaseTestCreateArgumentFor_1_1_x()に委譲する
+'                              ケースの詳細
+'                              上位から指定されたケースのパターン分下記を実行する
+'                              実施条件
+'                              ・キャッシュ有効期間は0秒
+'                              ・任意の属性の値を1回取得
+'                              期待値
+'                              ・キャッシュ使用可否が変わっていないこと
 'Argument
 '     avArguments            : ケースごとの引数のパターン
 'Return Value
@@ -285,67 +235,37 @@ End Sub
 Private Function func_clsFsBaseTestCreateArgumentFor_1_1_2_x( _
     byRef avArguments _
     )
-    Dim sFso : If avArguments(0) Then sFso="FSOあり" Else sFso="FSOなし"
-    Dim sIsFile : If avArguments(1) Then sIsFile="ファイル" Else sIsFile="フォルダ"
+    'サブタイトル名の作成
     Dim sUseCache : If avArguments(2) Then sUseCache="キャッシュ使用あり" Else sUseCache="キャッシュ使用なし"
-    Dim sSubTitle : sSubTitle = sFso & "-" & sIsFile & "-" & sUseCache
+    Dim sSubTitle : sSubTitle = func_clsFsBaseTestCaseDescriptionFso(avArguments(0)) _
+                              & "-" & func_clsFsBaseTestCaseDescriptionIsFile(avArguments(1)) _
+                              & "-" & sUseCache
     
-    Set func_clsFsBaseTestCreateArgumentFor_1_1_2_x = _
-        func_clsFsBaseTestCreateArgumentFor_1_1_x(sSubTitle, avArguments(1), avArguments(2), 0, avArguments(0), "Attributes", True, False)
+    'sub_clsFsBaseTest_1_1_2()用の引数情報ハッシュマップを作成
+    Set func_clsFsBaseTestCreateArgumentFor_1_1_2_x = func_clsFsBaseTestCreateArgumentFor_1_1_x( _
+                                                                                sSubTitle _
+                                                                                , avArguments(1) _
+                                                                                , avArguments(2) _
+                                                                                , 0 _
+                                                                                , avArguments(0) _
+                                                                                , "Attributes" _
+                                                                                , True _
+                                                                                , False _
+                                                                                )
 End Function
-
-'***************************************************************************************************
-'Processing Order            : 1-1-3
-'Function/Sub Name           : sub_clsFsBaseTest_1_1_3()
-'Overview                    : キャッシュ有効期間（秒数）が変わっていないことを確認する
-'Detailed Description        : 実施条件
-'                              ・FileSystemObjectオブジェクトの設定有無それぞれについて検証する
-'                              ・ファイル/フォルダそれぞれについて検証する
-'                              ・キャッシュ使用可否は可
-'                              ・任意の属性の値を1回取得
-'                              期待値
-'                              ・キャッシュ有効期間（秒数）が変わっていないこと
-'Argument
-'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
-'Return Value
-'     結果 True,Flase
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_clsFsBaseTest_1_1_3( _
-    byRef aoUtAssistant _
-    )
-    'FileSystemObjectオブジェクトの設定有無パターン
-    Dim boSetFsoFlgs : boSetFsoFlgs = Array(True, False)
-    'ファイル/フォルダのパターン
-    Dim boTargetIsFiles : boTargetIsFiles = Array(True, False)
-    'キャッシュ有効期間（秒数）のパターン
-    Dim lValidPeriods : lValidPeriods = Array(0,1,2147483647,-1,-2147483648)
-    
-    '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
-    Dim vPatterns : vPatterns = func_clsFsBaseTestCreateaoHierarchicalPatterns( _
-                                            Array(boSetFsoFlgs, boTargetIsFiles, lValidPeriods) _
-                                            , 0 _
-                                            , GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_3_x") _
-                                            , vbNullString _
-                                        )
-    
-    'ケース実行
-    Call aoUtAssistant.RunWithMultiplePatterns( _
-                                "func_clsFsBaseTest_1_1_3_" _
-                                , vPatterns _
-                            )
-    
-End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1-1-3
 'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_1_3_x()
 'Overview                    : sub_clsFsBaseTest_1_1_3()用の引数情報ハッシュマップを作成
-'Detailed Description        : func_clsFsBaseTestCreateArgumentFor_1_1_x()を参照
+'Detailed Description        : 処理はfunc_clsFsBaseTestCreateArgumentFor_1_1_x()に委譲する
+'                              ケースの詳細
+'                              上位から指定されたケースのパターン分下記を実行する
+'                              実施条件
+'                              ・キャッシュ使用可否は可
+'                              ・任意の属性の値を1回取得
+'                              期待値
+'                              ・キャッシュ有効期間（秒数）が変わっていないこと
 'Argument
 '     avArguments            : ケースごとの引数のパターン
 'Return Value
@@ -359,10 +279,8 @@ End Sub
 Private Function func_clsFsBaseTestCreateArgumentFor_1_1_3_x( _
     byRef avArguments _
     )
-    Dim sFso : If avArguments(0) Then sFso="FSOあり" Else sFso="FSOなし"
-    Dim sIsFile : If avArguments(1) Then sIsFile="ファイル" Else sIsFile="フォルダ"
-    Dim sValidPeriod
-    Select Case avArguments(2)
+    'サブタイトル名の作成
+    Dim sValidPeriod : Select Case avArguments(2)
         Case 0
             sValidPeriod = "キャッシュ有効期間がゼロ"
         Case 1
@@ -374,16 +292,74 @@ Private Function func_clsFsBaseTestCreateArgumentFor_1_1_3_x( _
         Case -2147483648
             sValidPeriod = "キャッシュ有効期間が最小"
     End Select
-    Dim sSubTitle : sSubTitle = sFso & "-" & sIsFile & "-" & sValidPeriod
+    Dim sSubTitle : sSubTitle = func_clsFsBaseTestCaseDescriptionFso(avArguments(0)) _
+                              & "-" & func_clsFsBaseTestCaseDescriptionIsFile(avArguments(1)) _
+                              & "-" & sValidPeriod
     
-    Set func_clsFsBaseTestCreateArgumentFor_1_1_3_x = _
-        func_clsFsBaseTestCreateArgumentFor_1_1_x(sSubTitle, avArguments(1), True, avArguments(2), avArguments(0), "Attributes", False, True)
+    'sub_clsFsBaseTest_1_1_3()用の引数情報ハッシュマップを作成
+    Set func_clsFsBaseTestCreateArgumentFor_1_1_3_x = func_clsFsBaseTestCreateArgumentFor_1_1_x( _
+                                                                                sSubTitle _
+                                                                                , avArguments(1) _
+                                                                                , True _
+                                                                                , avArguments(2) _
+                                                                                , avArguments(0) _
+                                                                                , "Attributes" _
+                                                                                , False _
+                                                                                , True _
+                                                                                )
 End Function
 
 '***************************************************************************************************
 'Processing Order            : 1-1-x
+'Function/Sub Name           : sub_clsFsBaseTest_1_1_x()
+'Overview                    : ケース1-1-x汎用実行関数
+'Detailed Description        : 汎用パターン＋個別パターン分の検証を行う
+'                              ケースの詳細、引数情報ハッシュマップ作成は引数指定された関数に委譲する
+'Argument
+'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
+'     avGeneralPatterns      : ケースの汎用パターン（配列の配列）
+'     avIndividualPatterns   : ケースの個別パターン（配列の配列）
+'     aoCreateArgumentFunc   : 引数情報ハッシュマップ作成の関数
+'     asCaseChildNum         : ケース子番号
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_clsFsBaseTest_1_1_x( _
+    byRef aoUtAssistant _
+    , byRef avGeneralPatterns _
+    , byRef avIndividualPatterns _
+    , byRef aoCreateArgumentFunc _
+    , byVal asCaseChildNum _
+    )
+    'ケースの汎用パターンにケースの個別パターンを追加
+    Dim vPatterns : vPatterns = avGeneralPatterns
+    Call sub_CM_ArrayAddItem(vPatterns, avIndividualPatterns)
+    
+    '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
+    Dim vPatternInfos : vPatternInfos = func_clsFsBaseTestCreateaoHierarchicalPatterns( _
+                                            vPatterns _
+                                            , 0 _
+                                            , aoCreateArgumentFunc _
+                                            , vbNullString _
+                                        )
+    
+    'ケース実行
+    Call aoUtAssistant.RunWithMultiplePatterns( _
+                                "func_clsFsBaseTest_1_1_" & asCaseChildNum & "_" _
+                                , vPatternInfos _
+                            )
+    
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 1-1-x
 'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_1_x()
-'Overview                    : func_clsFsBaseTest_1_1()用の引数情報ハッシュマップを作成
+'Overview                    : func_clsFsBaseTest_1_1_x()用の引数情報ハッシュマップを作成
 'Detailed Description        : func_clsFsBaseTestCreateArgument()を参照
 'Argument
 '     asSubTitle             : ケースのサブ名称
@@ -430,6 +406,40 @@ Private Function func_clsFsBaseTestCreateArgumentFor_1_1_x( _
             , vbNullString _
             )
 End Function
+
+'***************************************************************************************************
+'Processing Order            : 1-2
+'Function/Sub Name           : sub_clsFsBaseTest_1_2()
+'Overview                    : clsFsBaseのキャッシュの確からしさを確認する
+'Detailed Description        : 上位から指定されたケースの汎用パターン分実行指示する
+'Argument
+'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
+'     avGeneralPatterns      : ケースの汎用パターン（配列の配列）
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/12/05         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_clsFsBaseTest_1_2( _
+    byRef aoUtAssistant _
+    , byRef avGeneralPatterns _
+    )
+    Dim vIndividualPatterns : Dim oCreateArgumentFunc : Dim sCaseChildNum
+    
+    '1-2-1 キャッシュを使用して取得した全属性の値が正しいこと
+    sCaseChildNum = "1"
+    '全属性のパターン
+    vIndividualPatterns = Array("Attributes", "DateCreated", "DateLastAccessed", "DateLastModified", _
+                                "Drive", "Name", "ParentFolder", "Path", "ShortName", "ShortPath", _
+                                "Size", "Type")
+    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_" & sCaseChildNum & "_x")
+    Call sub_clsFsBaseTest_1_1_x(aoUtAssistant, avGeneralPatterns, vIndividualPatterns, oCreateArgumentFunc, sCaseChildNum)
+    
+    Set oCreateArgumentFunc = Nothing
+End Sub
 
 '***************************************************************************************************
 'Processing Order            : none
@@ -541,9 +551,9 @@ End Function
 '                              パターン情報の作成は引数のパターン情報格納用ハッシュマップを作成する
 '                              関数に委譲する
 'Argument
-'     avHierarchicalPatterns : パターン（配列の配列）
+'     avHierarchicalPatterns : ケースのパターン（配列の配列）
 '     alLayerNum             : 階層の位置（パターン（配列の配列）のインデックス）
-'     aoFunc                 : パターン情報格納用ハッシュマップを作成する関数のポインタ
+'     aoFunc                 : 引数情報格納用ハッシュマップを作成する関数のポインタ
 '     avFuncArguments        : 上記関数の引数、ケースごとの引数のパターン
 'Return Value
 '     階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ
@@ -561,11 +571,17 @@ Private Function func_clsFsBaseTestCreateaoHierarchicalPatterns( _
     )
     Dim vArray : Dim vFuncArguments : Dim vItem
     For Each vItem In avHierarchicalPatterns(alLayerNum)
+        '引数パターンの作成
         vFuncArguments = avFuncArguments
         Call sub_CM_ArrayAddItem(vFuncArguments, vItem)
+        
         If Ubound(avHierarchicalPatterns)=alLayerNum Then
+        'ケースのパターンの最下層の場合
+        '引数情報格納用ハッシュマップを作成する関数の戻り値を配列に追加する
             Call sub_CM_ArrayAddItem(vArray, aoFunc(vFuncArguments))
         Else
+        '最下層でない場合
+        '一階層下（ケースのパターン配列の次）の情報を取得する、自身を再帰呼び出し
             Call sub_CM_ArrayAddItem(vArray, _
                 func_clsFsBaseTestCreateaoHierarchicalPatterns(avHierarchicalPatterns, alLayerNum+1, aoFunc, vFuncArguments)_
                 )
@@ -696,6 +712,91 @@ Private Function func_clsFsBaseTestNormalBase( _
     '結果返却
     func_clsFsBaseTestNormalBase = boResult
 End Function
+
+'***************************************************************************************************
+'Processing Order            : none
+'Function/Sub Name           : func_clsFsBaseTestGetExpectedValue()
+'Overview                    : 期待値の取得
+'Detailed Description        : 工事中
+'Argument
+'     aoSomeObject           : File/Folderオブジェクト
+'Return Value
+'     期待値のハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestGetExpectedValue( _
+    byRef aoSomeObject _
+    )
+    
+    Dim oExpect : Set oExpect = CreateObject("Scripting.Dictionary")
+    With aoSomeObject
+        oExpect.Add "Attributes", .Attributes
+        oExpect.Add "DateCreated", .DateCreated
+        oExpect.Add "DateLastAccessed", .DateLastAccessed
+        oExpect.Add "DateLastModified", .DateLastModified
+        oExpect.Add "Drive", .Drive
+        oExpect.Add "Name", .Name
+        oExpect.Add "ParentFolder", .ParentFolder
+        oExpect.Add "Path", .Path
+        oExpect.Add "ShortName", .ShortName
+        oExpect.Add "ShortPath", .ShortPath
+        oExpect.Add "Size", .Size
+        oExpect.Add "Type", .Type
+    End With
+    
+    Set func_clsFsBaseTestGetExpectedValue = oExpect
+    Set oExpect = Nothing
+    
+End Function
+
+'***************************************************************************************************
+'Processing Order            : none
+'Function/Sub Name           : func_clsFsBaseTestCaseDescriptionFso()
+'Overview                    : FSO有無のケース説明
+'Detailed Description        : 工事中
+'Argument
+'     avKey                  : キー
+'Return Value
+'     引数情報ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/12/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCaseDescriptionFso( _
+    byVal avKey _
+    )
+    Dim sDescription: If avKey Then sDescription="FSOあり" Else sDescription="FSOなし"
+    func_clsFsBaseTestCaseDescriptionFso = sDescription
+End Function
+
+'***************************************************************************************************
+'Processing Order            : none
+'Function/Sub Name           : func_clsFsBaseTestCaseDescriptionIsFile()
+'Overview                    : ファイル/フォルダのケース説明
+'Detailed Description        : 工事中
+'Argument
+'     avKey                  : キー
+'Return Value
+'     引数情報ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/12/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCaseDescriptionIsFile( _
+    byVal avKey _
+    )
+    Dim sDescription: If avKey Then sDescription="ファイル" Else sDescription="フォルダ"
+    func_clsFsBaseTestCaseDescriptionIsFile = sDescription
+End Function
+
 
 
 
@@ -926,81 +1027,40 @@ End Function
 '    Set oExpect = Nothing
 '    Set oSut = Nothing
 'End Function
-
-'***************************************************************************************************
-'Processing Order            : none
-'Function/Sub Name           : func_clsFsBaseTestGetExpectedValue()
-'Overview                    : 期待値の取得
-'Detailed Description        : 工事中
-'Argument
-'     aoSomeObject           : File/Folderオブジェクト
-'Return Value
-'     期待値のハッシュマップ
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_clsFsBaseTestGetExpectedValue( _
-    byRef aoSomeObject _
-    )
-    
-    Dim oExpect : Set oExpect = CreateObject("Scripting.Dictionary")
-    With aoSomeObject
-        oExpect.Add "Attributes", .Attributes
-        oExpect.Add "DateCreated", .DateCreated
-        oExpect.Add "DateLastAccessed", .DateLastAccessed
-        oExpect.Add "DateLastModified", .DateLastModified
-        oExpect.Add "Drive", .Drive
-        oExpect.Add "Name", .Name
-        oExpect.Add "ParentFolder", .ParentFolder
-        oExpect.Add "Path", .Path
-        oExpect.Add "ShortName", .ShortName
-        oExpect.Add "ShortPath", .ShortPath
-        oExpect.Add "Size", .Size
-        oExpect.Add "Type", .Type
-    End With
-    
-    Set func_clsFsBaseTestGetExpectedValue = oExpect
-    Set oExpect = Nothing
-    
-End Function
-
-'***************************************************************************************************
-'Processing Order            : none
-'Function/Sub Name           : func_clsFsBaseTestValidateAllItems()
-'Overview                    : 全項目の検証を行う
-'Detailed Description        : 工事中
-'Argument
-'     aoSut                  : テスト対象クラス
-'     aoExpect               : 期待値のハッシュマップ
-'Return Value
-'     結果 True,Flase
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_clsFsBaseTestValidateAllItems( _
-    byRef aoSut _
-    , byRef aoExpect _
-    )
-    Dim boFlg : boFlg = True
-    
-    With aoExpect
-        Dim sKey
-        For Each sKey In .Keys
-            If IsObject(.Item(sKey)) Then
-                If Not (aoSut.Prop(sKey) Is .Item(sKey)) Then boFlg = False
-            Else
-                If aoSut.Prop(sKey) <> .Item(sKey) Then boFlg = False
-            End If
-        Next
-    End With
-    
-    func_clsFsBaseTestValidateAllItems = boFlg
-    
-End Function
-
+'
+''***************************************************************************************************
+''Processing Order            : none
+''Function/Sub Name           : func_clsFsBaseTestValidateAllItems()
+''Overview                    : 全項目の検証を行う
+''Detailed Description        : 工事中
+''Argument
+''     aoSut                  : テスト対象クラス
+''     aoExpect               : 期待値のハッシュマップ
+''Return Value
+''     結果 True,Flase
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/11/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_clsFsBaseTestValidateAllItems( _
+'    byRef aoSut _
+'    , byRef aoExpect _
+'    )
+'    Dim boFlg : boFlg = True
+'    
+'    With aoExpect
+'        Dim sKey
+'        For Each sKey In .Keys
+'            If IsObject(.Item(sKey)) Then
+'                If Not (aoSut.Prop(sKey) Is .Item(sKey)) Then boFlg = False
+'            Else
+'                If aoSut.Prop(sKey) <> .Item(sKey) Then boFlg = False
+'            End If
+'        Next
+'    End With
+'    
+'    func_clsFsBaseTestValidateAllItems = boFlg
+'    
+'End Function
