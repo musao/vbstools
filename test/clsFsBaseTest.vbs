@@ -402,8 +402,8 @@ Private Function func_clsFsBaseTestCreateArgumentFor_1_1_x( _
             , vbNullString _
             , aboDontChgUc _
             , aboDontChgVp _
-            , vbNullString _
-            , vbNullString _
+            , False _
+            , False _
             )
 End Function
 
@@ -427,19 +427,232 @@ Private Sub sub_clsFsBaseTest_1_2( _
     byRef aoUtAssistant _
     , byRef avGeneralPatterns _
     )
-    Dim vIndividualPatterns : Dim oCreateArgumentFunc : Dim sCaseChildNum
-    
-    '1-2-1 キャッシュを使用して取得した全属性の値が正しいこと
-    sCaseChildNum = "1"
+    Dim vProps : Dim oCreateArgumentFunc : Dim sCaseChildNum
     '全属性のパターン
-    vIndividualPatterns = Array("Attributes", "DateCreated", "DateLastAccessed", "DateLastModified", _
+    vProps = Array("Attributes", "DateCreated", "DateLastAccessed", "DateLastModified", _
                                 "Drive", "Name", "ParentFolder", "Path", "ShortName", "ShortPath", _
                                 "Size", "Type")
-    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_1_" & sCaseChildNum & "_x")
-    Call sub_clsFsBaseTest_1_1_x(aoUtAssistant, avGeneralPatterns, vIndividualPatterns, oCreateArgumentFunc, sCaseChildNum)
+    
+    '1-2-1 同じ属性を2回取得する際、キャッシュ有効期間中はキャッシュを使用し属性の値が正しいこと
+    sCaseChildNum = "1"
+    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_2_" & sCaseChildNum & "_x")
+    Call sub_clsFsBaseTest_1_2_x(aoUtAssistant, avGeneralPatterns, vProps, oCreateArgumentFunc, sCaseChildNum, True)
+    
+    '1-2-2 キャッシュがない属性を取得する際、キャッシュを使用ぜず属性の値が正しいこと
+    sCaseChildNum = "2"
+    Set oCreateArgumentFunc = GetRef("func_clsFsBaseTestCreateArgumentFor_1_2_" & sCaseChildNum & "_x")
+    Call sub_clsFsBaseTest_1_2_x(aoUtAssistant, avGeneralPatterns, vProps, oCreateArgumentFunc, sCaseChildNum, False)
     
     Set oCreateArgumentFunc = Nothing
 End Sub
+
+'***************************************************************************************************
+'Processing Order            : 1-2-1
+'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_2_1_x()
+'Overview                    : sub_clsFsBaseTest_1_2_1()用の引数情報ハッシュマップを作成
+'Detailed Description        : 処理はfunc_clsFsBaseTestCreateArgumentFor_1_2_x()に委譲する
+'                              ケースの詳細
+'                              上位から指定されたケースのパターン分下記を実行する
+'                              実施条件
+'                              ・キャッシュ使用可否は可
+'                              ・キャッシュ有効期間は3600秒
+'                              ・同じ属性の値を2回取得
+'                              期待値
+'                              ・属性の値が正しいこと
+'                              ・キャッシュ確認あり（最終キャッシュ確認時間が1回目取得後から変わっていること）
+'                              ・キャッシュ更新なし（最終キャッシュ更新時間が1回目取得後から変わっていないこと）
+'Argument
+'     avArguments            : ケースごとの引数のパターン
+'Return Value
+'     引数情報ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCreateArgumentFor_1_2_1_x( _
+    byRef avArguments _
+    )
+    'サブタイトル名の作成
+    Dim sSubTitle : sSubTitle = func_clsFsBaseTestCaseDescriptionFso(avArguments(0)) _
+                              & "-" & func_clsFsBaseTestCaseDescriptionIsFile(avArguments(1)) _
+                              & "-" & avArguments(2) _
+                              & "-" & avArguments(3)
+    
+    'sub_clsFsBaseTest_1_2_1()用の引数情報ハッシュマップを作成
+    Set func_clsFsBaseTestCreateArgumentFor_1_2_1_x = func_clsFsBaseTestCreateArgumentFor_1_2_x( _
+                                                                                sSubTitle _
+                                                                                , avArguments(1) _
+                                                                                , True _
+                                                                                , 3600 _
+                                                                                , avArguments(0) _
+                                                                                , False _
+                                                                                , 0 _
+                                                                                , avArguments(2) _
+                                                                                , avArguments(3) _
+                                                                                , False _
+                                                                                , True _
+                                                                                )
+End Function
+
+'***************************************************************************************************
+'Processing Order            : 1-2-2
+'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_2_2_x()
+'Overview                    : sub_clsFsBaseTest_1_2_2()用の引数情報ハッシュマップを作成
+'Detailed Description        : 処理はfunc_clsFsBaseTestCreateArgumentFor_1_2_x()に委譲する
+'                              ケースの詳細
+'                              上位から指定されたケースのパターン分下記を実行する
+'                              実施条件
+'                              ・キャッシュ使用可否は可
+'                              ・キャッシュ有効期間は3600秒
+'                              ・1回目と異なる属性の値を取得
+'                              期待値
+'                              ・属性の値が正しいこと
+'                              ・キャッシュ確認なし（最終キャッシュ確認時間が1回目取得後から変わっていないこと）
+'                              ・キャッシュ更新あり（最終キャッシュ更新時間が1回目取得後から変わっていること）
+'Argument
+'     avArguments            : ケースごとの引数のパターン
+'Return Value
+'     引数情報ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCreateArgumentFor_1_2_2_x( _
+    byRef avArguments _
+    )
+    'サブタイトル名の作成
+    Dim sSubTitle : sSubTitle = func_clsFsBaseTestCaseDescriptionFso(avArguments(0)) _
+                              & "-" & func_clsFsBaseTestCaseDescriptionIsFile(avArguments(1)) _
+                              & "-" & avArguments(2) _
+                              & "-" & avArguments(3)
+    
+    'sub_clsFsBaseTest_1_2_1()用の引数情報ハッシュマップを作成
+    Set func_clsFsBaseTestCreateArgumentFor_1_2_2_x = func_clsFsBaseTestCreateArgumentFor_1_2_x( _
+                                                                                sSubTitle _
+                                                                                , avArguments(1) _
+                                                                                , True _
+                                                                                , 3600 _
+                                                                                , avArguments(0) _
+                                                                                , False _
+                                                                                , 0 _
+                                                                                , avArguments(2) _
+                                                                                , avArguments(3) _
+                                                                                , True _
+                                                                                , False _
+                                                                                )
+End Function
+
+'***************************************************************************************************
+'Processing Order            : 1-2-x
+'Function/Sub Name           : sub_clsFsBaseTest_1_2_x()
+'Overview                    : ケース1-2-x汎用実行関数
+'Detailed Description        : 汎用パターン分の検証を行う
+'                              ケースの詳細、引数情報ハッシュマップ作成は引数指定された関数に委譲する
+'Argument
+'     aoUtAssistant          : 単体テスト用アシスタントクラスのインスタンス
+'     avGeneralPatterns      : ケースの汎用パターン（配列の配列）
+'     avProps                : 属性のパターン（配列の配列）
+'     aboIsSameProp          : 2回目に参照する属性を1回目と同じとするか
+'     asCaseChildNum         : ケース子番号
+'     aboSamaPropRead        : 同じ属性の値を取得するか否か
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/12/05         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_clsFsBaseTest_1_2_x( _
+    byRef aoUtAssistant _
+    , byRef avGeneralPatterns _
+    , byRef avProps _
+    , byRef aoCreateArgumentFunc _
+    , byVal asCaseChildNum _
+    , byVal aboSamaPropRead _
+    )
+    'ケースの汎用パターンにケースの個別パターンを追加
+    Dim vPatterns : vPatterns = avGeneralPatterns
+    Call sub_CM_ArrayAddItem(vPatterns, avProps)
+    Call sub_CM_ArrayAddItem(vPatterns, avProps)
+    
+    '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
+    Dim vPatternInfos : vPatternInfos = func_clsFsBaseTestCreateaoHierarchicalPatternsEx( _
+                                            vPatterns _
+                                            , 0 _
+                                            , aoCreateArgumentFunc _
+                                            , vbNullString _
+                                            , aboSamaPropRead _
+                                        )
+    
+    'ケース実行
+    Call aoUtAssistant.RunWithMultiplePatterns( _
+                                "func_clsFsBaseTest_1_2_" & asCaseChildNum & "_" _
+                                , vPatternInfos _
+                            )
+    
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 1-2-x
+'Function/Sub Name           : func_clsFsBaseTestCreateArgumentFor_1_2_x()
+'Overview                    : func_clsFsBaseTest_1_2_x()用の引数情報ハッシュマップを作成
+'Detailed Description        : func_clsFsBaseTestCreateArgument()を参照
+'Argument
+'     asSubTitle             : ケースのサブ名称
+'     aboTargetIsFile        : 対象はファイルか否か
+'     aboUseCache            : キャッシュ使用可否
+'     alValidPeriod          : キャッシュ有効期間（秒数）
+'     boSetFsoFlg            : FileSystemObjectオブジェクトの設定有無
+'     aboIsRecreate          : 2回目の属性取得の直前に対象ファイル/フォルダを再作成するか否か
+'     alSleepMSecond         : 1回目の属性取得の直後にスリープする時間（ミリ秒）
+'     asPropName1            : 1回目に取得する属性名（2回目がない場合は値を検証する）
+'     asPropName2            : 2回目に取得する属性名、値を検証する
+'     aboIsUpdLcct           : 最終キャッシュ確認時間が最後の属性取得の直前から変わっているか否か
+'     aboIsUpdLcut           : 最終キャッシュ更新時間が最後の属性取得の直前から変わっているか否か
+'Return Value
+'     引数情報ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCreateArgumentFor_1_2_x( _
+    byVal asSubTitle _
+    , byVal aboTargetIsFile _
+    , byVal aboUseCache _
+    , byVal alValidPeriod _
+    , byVal boSetFsoFlg _
+    , byVal aboIsRecreate _
+    , byVal alSleepMSecond _
+    , byVal asPropName1 _
+    , byVal asPropName2 _
+    , byVal aboIsUpdLcct _
+    , byVal aboIsUpdLcut _
+    )
+    Set func_clsFsBaseTestCreateArgumentFor_1_2_x = _
+        func_clsFsBaseTestCreateArgument( _
+            asSubTitle _
+            , aboTargetIsFile _
+            , aboUseCache _
+            , alValidPeriod _
+            , boSetFsoFlg _
+            , True _
+            , aboIsRecreate _
+            , 0 _
+            , asPropName1 _
+            , asPropName2 _
+            , False _
+            , False _
+            , aboIsUpdLcct _
+            , aboIsUpdLcut _
+            )
+End Function
 
 '***************************************************************************************************
 'Processing Order            : none
@@ -592,6 +805,57 @@ End Function
 
 '***************************************************************************************************
 'Processing Order            : none
+'Function/Sub Name           : func_clsFsBaseTestCreateaoHierarchicalPatternsEx()
+'Overview                    : func_clsFsBaseTestCreateaoHierarchicalPatterns()と同様
+'                              最下層と最下層から2番目の要素の比較結果によって追加判定をする
+'Detailed Description        : func_clsFsBaseTestCreateaoHierarchicalPatterns()と同様
+'Argument
+'     avHierarchicalPatterns : ケースのパターン（配列の配列）
+'     alLayerNum             : 階層の位置（パターン（配列の配列）のインデックス）
+'     aoFunc                 : 引数情報格納用ハッシュマップを作成する関数のポインタ
+'     avFuncArguments        : 上記関数の引数、ケースごとの引数のパターン
+'     aboCompareBottom       : 最下層と最下層から2番目の要素の比較結果
+'Return Value
+'     階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_clsFsBaseTestCreateaoHierarchicalPatternsEx( _
+    byRef avHierarchicalPatterns _
+    , byVal alLayerNum _
+    , byRef aoFunc _
+    , byRef avFuncArguments _
+    , byRef aboCompareBottom _
+    )
+    Dim vArray : Dim vFuncArguments : Dim vItem
+    For Each vItem In avHierarchicalPatterns(alLayerNum)
+        '引数パターンの作成
+        vFuncArguments = avFuncArguments
+        Call sub_CM_ArrayAddItem(vFuncArguments, vItem)
+        
+        If Ubound(avHierarchicalPatterns)=alLayerNum Then
+        'ケースのパターンの最下層の場合
+            If aboCompareBottom = (vItem = avFuncArguments(Ubound(avFuncArguments))) Then
+            '最下層と最下層から2番目の要素の比較結果が引数（aboCompareBottom）と等しい場合
+                '引数情報格納用ハッシュマップを作成する関数の戻り値を配列に追加する
+                Call sub_CM_ArrayAddItem(vArray, aoFunc(vFuncArguments))
+            End If
+        Else
+        '最下層でない場合
+        '一階層下（ケースのパターン配列の次）の情報を取得する、自身を再帰呼び出し
+            Call sub_CM_ArrayAddItem(vArray, _
+                func_clsFsBaseTestCreateaoHierarchicalPatternsEx(avHierarchicalPatterns, alLayerNum+1, aoFunc, vFuncArguments, aboCompareBottom)_
+                )
+        End If
+    Next
+    func_clsFsBaseTestCreateaoHierarchicalPatternsEx = vArray
+End Function
+
+'***************************************************************************************************
+'Processing Order            : none
 'Function/Sub Name           : 割愛
 'Overview                    : ケースごとにノーマルケース汎用実行に委譲する関数
 'Detailed Description        : func_clsFsBaseTestCreateArgumentFor_x_x()を参照
@@ -620,27 +884,22 @@ Private Function func_clsFsBaseTest_1_1_3_( _
     )
     func_clsFsBaseTest_1_1_3_ = func_clsFsBaseTestNormalBase(aoArgument)
 End Function
+Private Function func_clsFsBaseTest_1_2_1_( _
+    byRef aoArgument _
+    )
+    func_clsFsBaseTest_1_2_1_ = func_clsFsBaseTestNormalBase(aoArgument)
+End Function
+Private Function func_clsFsBaseTest_1_2_2_( _
+    byRef aoArgument _
+    )
+    func_clsFsBaseTest_1_2_2_ = func_clsFsBaseTestNormalBase(aoArgument)
+End Function
 
 '***************************************************************************************************
 'Processing Order            : none
 'Function/Sub Name           : func_clsFsBaseTestNormalBase()
 'Overview                    : ノーマルケース汎用実行
 'Detailed Description        : 引数情報ハッシュマップの構成はfunc_clsFsBaseTestCreateArgument()を参照
-'                              本関数で使用する項目に限定して記載する
-'                              実施条件のハッシュマップの内容
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              "TargetIsFile"           対象はファイルか否か
-'                              "UseCache"               キャッシュ使用可否
-'                              "ValidPeriod"            キャッシュ有効期間（秒数）
-'
-'                              検証内容のハッシュマップの内容
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              "PropName1"              1回目に取得する属性名（2回目がない場合は値を検証する）
-'                              "DontChgUc"              最後にキャッシュ使用可否が変わっていないことを検証するか否か
-'                              "DontChgVp"              最後にキャッシュ有効期間（秒数）が変わっていないことを検証するか否か
-'
 'Argument
 '     aoArgument             : 引数情報のハッシュマップ
 'Return Value
@@ -661,26 +920,33 @@ Private Function func_clsFsBaseTestNormalBase( _
         Dim boUseCache : boUseCache = .Item("UseCache")
         Dim dbValidPeriod : dbValidPeriod = .Item("ValidPeriod")
         Dim boSetFsoFlg : boSetFsoFlg = .Item("SetFsoFlg")
+        Dim boDoItTwice : boDoItTwice = .Item("DoItTwice")
+        Dim boIsRecreate : boIsRecreate = .Item("IsRecreate")
+        Dim lSleepMSecond : lSleepMSecond = .Item("SleepMSecond")
     End With
     With aoArgument.Item("Inspections")
     '検証内容
-        Dim sPropName : sPropName = .Item("PropName1")
+        Dim sPropName1 : sPropName1 = .Item("PropName1")
+        Dim sPropName2 : sPropName2 = .Item("PropName2")
         Dim boDontChgUc : boDontChgUc = .Item("DontChgUc")
         Dim boDontChgVp : boDontChgVp = .Item("DontChgVp")
+        Dim boIsUpdLcct : boIsUpdLcct = .Item("IsUpdLcct")
+        Dim boIsUpdLcut : boIsUpdLcut = .Item("IsUpdLcut")
     End With
     
-    '前処理 一時ファイル/フォルダ作成、期待値取得
+    '前処理 一時ファイル/フォルダ作成
+    '期待値は属性取得が1回か、2回目の属性取得直前に一時ファイル/フォルダを再作成しない場合に取得する
     Dim oExpect
     Dim boResult : boResult = True
     Dim sPath : sPath = func_UtGetThisTempFilePath()
     If boTargetIsFile Then
         Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
         If Not(func_CM_FsFileExists(sPath)) Then Exit Function
-        Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+        If Not (boDoItTwice And boIsRecreate) Then Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
     Else
         Call func_CM_FsCreateFolder(sPath)
         If Not(func_CM_FsFolderExists(sPath)) Then Exit Function
-        Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFolder(sPath))
+        If Not (boDoItTwice And boIsRecreate) Then Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFolder(sPath))
     End If
     
     With New clsFsBase
@@ -690,18 +956,68 @@ Private Function func_clsFsBaseTestNormalBase( _
         .Path = sPath
         If boSetFsoFlg Then .Fso = CreateObject("Scripting.FileSystemObject")
         
-        '指定したプロパティの値を検証
-        If IsObject(oExpect.Item(sPropName)) Then
-            If Not (.Prop(sPropName) Is oExpect.Item(sPropName)) Then boResult = False
-        Else
-            If .Prop(sPropName) <> oExpect.Item(sPropName) Then boResult = False
+        '属性取得（1回目）
+        Dim lLastCacheConfirmationTime : lLastCacheConfirmationTime = .LastCacheConfirmationTime
+        Dim lLastCacheUpdateTime : lLastCacheUpdateTime = .LastCacheUpdateTime
+        Dim vProp : Call sub_CM_TransferBetweenVariables(.Prop(sPropName1), vProp)
+        
+        If Not(boDoItTwice) Then
+        '属性取得が1回の場合
+            '属性の値を検証
+            boResult = func_CM_CompareVariables(vProp, oExpect.Item(sPropName1))
+            'キャッシュ使用可否が変わっていないことの検証
+            If boDontChgUc Then boResult = (boUseCache = .UseCache)
+            'キャッシュ有効期間（秒数）が変わっていないことの検証
+            If boDontChgVp Then boResult = (dbValidPeriod = .ValidPeriod)
+            '最終キャッシュ確認時間が最後の属性取得の直前から変わっているか
+            boResult = (boIsUpdLcct = (.LastCacheConfirmationTime=lLastCacheConfirmationTime))
+            '最終キャッシュ更新時間が最後の属性取得の直前から変わっているか
+            boResult = (boIsUpdLcut = (.LastCacheUpdateTime=lLastCacheUpdateTime))
+            
+            '後処理 一時ファイル/フォルダ削除
+            If boTargetIsFile Then Call func_CM_FsDeleteFile(sPath) Else Call func_CM_FsDeleteFolder(sPath)
+            Set oExpect = Nothing
+            
+            '結果返却
+            func_clsFsBaseTestNormalBase = boResult
+            Exit Function
+        End If
+        '以降属性取得が2回の場合
+        
+        'スリープ
+        WScript.Sleep lSleepMSecond
+        
+        If boIsRecreate Then
+        '2回目の属性取得の直前に対象ファイル/フォルダを再作成する
+            '一時ファイル/フォルダ削除
+            If boTargetIsFile Then Call func_CM_FsDeleteFile(sPath) Else Call func_CM_FsDeleteFolder(sPath)
+            '一時ファイル/フォルダ作成、期待値の取得
+            If boTargetIsFile Then
+                Call CreateObject("Scripting.FileSystemObject").CreateTextFile(sPath)
+                If Not(func_CM_FsFileExists(sPath)) Then Exit Function
+                Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFile(sPath))
+            Else
+                Call func_CM_FsCreateFolder(sPath)
+                If Not(func_CM_FsFolderExists(sPath)) Then Exit Function
+                Set oExpect = func_clsFsBaseTestGetExpectedValue(func_CM_FsGetFolder(sPath))
+            End If
         End If
         
-        'キャッシュ使用可否が変わっていないことの検証
-        If (boDontChgUc=True) Then boResult = (boUseCache = .UseCache)
+        '属性取得（2回目）
+        lLastCacheConfirmationTime = .LastCacheConfirmationTime
+        lLastCacheUpdateTime = .LastCacheUpdateTime
+        Call sub_CM_TransferBetweenVariables(.Prop(sPropName2), vProp)
         
+        '属性の値を検証
+        boResult = func_CM_CompareVariables(vProp, oExpect.Item(sPropName2))
+        'キャッシュ使用可否が変わっていないことの検証
+        If boDontChgUc Then boResult = (boUseCache = .UseCache)
         'キャッシュ有効期間（秒数）が変わっていないことの検証
-        If (boDontChgVp=True) Then boResult = (dbValidPeriod = .ValidPeriod)
+        If boDontChgVp Then boResult = (dbValidPeriod = .ValidPeriod)
+        '最終キャッシュ確認時間が最後の属性取得の直前から変わっているか
+        boResult = (boIsUpdLcct = (.LastCacheConfirmationTime=lLastCacheConfirmationTime))
+        '最終キャッシュ更新時間が最後の属性取得の直前から変わっているか
+        boResult = (boIsUpdLcut = (.LastCacheUpdateTime=lLastCacheUpdateTime))
         
     End With
     

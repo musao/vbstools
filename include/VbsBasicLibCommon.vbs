@@ -715,7 +715,7 @@ Private Sub sub_CM_TransferBetweenVariables( _
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_TransferBetweenVariables()
+'Function/Sub Name           : sub_CM_TransferToCollection()
 'Overview                    : 変数間の項目移送
 'Detailed Description        : 移送元がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
 '                              移送先がコレクションの場合は当関数を使用する
@@ -738,3 +738,27 @@ Private Sub sub_CM_TransferToCollection( _
     )
     If IsObject(avFrom) Then Set aoCollection.Item(asKey) = avFrom Else aoCollection.Item(asKey) = avFrom
 End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_CompareVariables()
+'Overview                    : 変数の値が等しいか
+'Detailed Description        : 比較する変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'Argument
+'     avA                    : 比較元
+'     avB                    : 比較先
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_CompareVariables( _
+    byRef avA _
+    , byRef avB _
+    )
+    Dim boReturn : boReturn = False
+    If IsObject(avB) Then boReturn = (avA Is avB) Else boReturn = (avA = avB)
+    func_CM_CompareVariables = boReturn
+End Function
