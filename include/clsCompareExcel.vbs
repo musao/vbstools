@@ -138,7 +138,11 @@ Class clsCompareExcel
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get StartTime()
-        StartTime = func_CM_GetDateInMilliseconds(PdtDate, PdtStart)
+        Dim oDate : Set oDate = new_clsCmDate()
+        oDate.SetDateTimeAndMillisecond PdtDate, PdtStart
+        StartTime = oDate.DisplayFormatAs("YYYYMMDD hh:mm:ss.000")
+        Set oDate = Nothing
+'        StartTime = func_CM_GetDateInMilliseconds(PdtDate, PdtStart)
     End Property
     
     '***************************************************************************************************
@@ -156,7 +160,11 @@ Class clsCompareExcel
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get EndTime()
-        EndTime = func_CM_GetDateInMilliseconds(PdtDate, PdtEnd)
+        Dim oDate : Set oDate = new_clsCmDate()
+        oDate.SetDateTimeAndMillisecond PdtDate, PdtEnd
+        EndTime = oDate.DisplayFormatAs("YYYYMMDD hh:mm:ss.000")
+        Set oDate = Nothing
+'        EndTime = func_CM_GetDateInMilliseconds(PdtDate, PdtEnd)
     End Property
     
     '***************************************************************************************************

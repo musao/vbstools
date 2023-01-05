@@ -632,63 +632,63 @@ Private Function func_CM_GetObjectByIdFromCollection( _
     Set oItem = Nothing
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_GetDateInMilliseconds()
-'Overview                    : 日時をミリ秒で取得する
-'Detailed Description        : 工事中
-'Argument
-'     adtDate                : 日付
-'     adtTimer               : タイマー
-'Return Value
-'     yyyymmdd hh:mm:ss.nnnn形式の日付
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_GetDateInMilliseconds( _
-    byVal adtDate _
-    , byVal adtTimer _
-    )
-    Dim dtNowTime        '現在時刻
-    Dim lHour            '時
-    Dim lngMinute        '分
-    Dim lngSecond        '秒
-    Dim lngMilliSecond   'ミリ秒
-
-    dtNowTime = adtTimer
-    lMilliSecond = dtNowTime - Fix(dtNowTime)
-    lMilliSecond = Right("000" & Fix(lMilliSecond * 1000), 3)
-    dtNowTime = Fix(dtNowTime)
-    lSecond = Right("0" & dtNowTime Mod 60, 2)
-    dtNowTime = dtNowTime \ 60
-    lMinute = Right("0" & dtNowTime Mod 60, 2)
-    dtNowTime = dtNowTime \ 60
-    lHour = Right("0" & dtNowTime, 2)
-
-    func_CM_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_GetDateAsYYYYMMDD()
-'Overview                    : 日時をYYYYMMDD形式で取得する
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     yyyymmdd形式の日付
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_GetDateAsYYYYMMDD( _
-    byVal adtDate _
-    )
-    func_CM_GetDateAsYYYYMMDD = Replace(Left(adtDate,10), "/", "")
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_GetDateInMilliseconds()
+''Overview                    : 日時をミリ秒で取得する
+''Detailed Description        : 工事中
+''Argument
+''     adtDate                : 日付
+''     adtTimer               : タイマー
+''Return Value
+''     yyyymmdd hh:mm:ss.nnnn形式の日付
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/10/12         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_GetDateInMilliseconds( _
+'    byVal adtDate _
+'    , byVal adtTimer _
+'    )
+'    Dim dtNowTime        '現在時刻
+'    Dim lHour            '時
+'    Dim lngMinute        '分
+'    Dim lngSecond        '秒
+'    Dim lngMilliSecond   'ミリ秒
+'
+'    dtNowTime = adtTimer
+'    lMilliSecond = dtNowTime - Fix(dtNowTime)
+'    lMilliSecond = Right("000" & Fix(lMilliSecond * 1000), 3)
+'    dtNowTime = Fix(dtNowTime)
+'    lSecond = Right("0" & dtNowTime Mod 60, 2)
+'    dtNowTime = dtNowTime \ 60
+'    lMinute = Right("0" & dtNowTime Mod 60, 2)
+'    dtNowTime = dtNowTime \ 60
+'    lHour = Right("0" & dtNowTime, 2)
+'
+'    func_CM_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
+'End Function
+'
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_GetDateAsYYYYMMDD()
+''Overview                    : 日時をYYYYMMDD形式で取得する
+''Detailed Description        : 工事中
+''Argument
+''     なし
+''Return Value
+''     yyyymmdd形式の日付
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/10/12         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_GetDateAsYYYYMMDD( _
+'    byVal adtDate _
+'    )
+'    func_CM_GetDateAsYYYYMMDD = Replace(Left(adtDate,10), "/", "")
+'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : sub_CM_TransferBetweenVariables()
@@ -761,4 +761,67 @@ Private Function func_CM_CompareVariables( _
     Dim boReturn : boReturn = False
     If IsObject(avB) Then boReturn = (avA Is avB) Else boReturn = (avA = avB)
     func_CM_CompareVariables = boReturn
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FillInTheCharacters()
+'Overview                    : 文字を埋める
+'Detailed Description        : 対象文字の不足桁を指定したアライメントで指定した文字の1文字目で埋める
+'                              対象文字に不足桁がない場合は、指定した文字数で切り取る
+'Argument
+'     asTarget               : 対象文字列
+'     alWordCount            : 文字数
+'     asToFillCharacter      : 埋める文字
+'     aboIsCutOut            : 文字数で切り取り（True：する/False：しない）
+'     aboIsRightAlignment    : アライメント（True：右寄せ/False：左寄せ）
+'Return Value
+'     埋めた文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FillInTheCharacters( _
+    byVal asTarget _
+    , byVal alWordCount _
+    , byVal asToFillCharacter _
+    , byVal aboIsCutOut _
+    , byVal aboIsRightAlignment _
+    )
+    
+    '切り取りなしで対象文字列が文字数より大きい場合は処理を抜ける
+    Dim lTargetLen : lTargetLen = Len(asTarget)
+    If Not(aboIsCutOut) And lTargetLen>=alWordCount Then
+        func_CM_FillInTheCharacters = asTarget
+        Exit Function
+    End If
+    
+    '埋める文字列の作成
+    Dim sFillStrings : sFillStrings = ""
+    If alWordCount-lTargetLen > 0 Then
+        sFillStrings = String(alWordCount-lTargetLen , asToFillCharacter)
+    End If
+    
+    Dim sResult
+    'アライメント指定によって文字列を埋める
+    If aboIsRightAlignment Then
+        sResult = sFillStrings & asTarget
+    Else
+        sResult = asTarget & sFillStrings
+    End If
+    
+    '切り取りなしの場合は処理を抜ける
+    If Not(aboIsCutOut) Then
+        func_CM_FillInTheCharacters = sResult
+        Exit Function
+    End If
+    
+    'アライメント指定によって文字列を切り取る
+    If aboIsRightAlignment Then
+        sResult = Right(sResult, alWordCount)
+    Else
+        sResult = Left(sResult, alWordCount)
+    End If
+    func_CM_FillInTheCharacters = sResult
 End Function
