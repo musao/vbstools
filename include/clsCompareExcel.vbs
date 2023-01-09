@@ -10,10 +10,8 @@
 '***************************************************************************************************
 Class clsCompareExcel
     'クラス内変数、定数
-    Private PdtNow
-    Private PdtDate
-    Private PdtStart
-    Private PdtEnd
+    Private PoStart
+    Private PoEnd
     Private PsPathFrom
     Private PsPathTo
     Private Cs_FOLDER_TEMP
@@ -21,8 +19,8 @@ Class clsCompareExcel
     'コンストラクタ
     Private Sub Class_Initialize()
         '初期化
-        PasPathA = ""
-        PasPathB = ""
+        PsPathFrom = ""
+        PsPathTo = ""
         Cs_FOLDER_TEMP = "tmp"
     End Sub
     'デストラクタ
@@ -120,7 +118,7 @@ Class clsCompareExcel
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get ProcDate()
-        ProcDate = PdtNow
+        Set ProcDate = PoStart
     End Property
     
     '***************************************************************************************************
@@ -138,11 +136,7 @@ Class clsCompareExcel
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get StartTime()
-        Dim oDate : Set oDate = new_clsCmDate()
-        oDate.SetDateTimeAndMillisecond PdtDate, PdtStart
-        StartTime = oDate.DisplayFormatAs("YYYYMMDD hh:mm:ss.000")
-        Set oDate = Nothing
-'        StartTime = func_CM_GetDateInMilliseconds(PdtDate, PdtStart)
+        StartTime = PoStart.DisplayFormatAs("YYYYMMDD hh:mm:ss.000000")
     End Property
     
     '***************************************************************************************************
@@ -160,21 +154,17 @@ Class clsCompareExcel
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get EndTime()
-        Dim oDate : Set oDate = new_clsCmDate()
-        oDate.SetDateTimeAndMillisecond PdtDate, PdtEnd
-        EndTime = oDate.DisplayFormatAs("YYYYMMDD hh:mm:ss.000")
-        Set oDate = Nothing
-'        EndTime = func_CM_GetDateInMilliseconds(PdtDate, PdtEnd)
+        EndTime = PoEnd.DisplayFormatAs("YYYYMMDD hh:mm:ss.000000")
     End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get ElapsedTime()
-    'Overview                    : 処理にかかった時間を返す
+    'Overview                    : 処理にかかった秒数を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     処理にかかった時間
+    '     処理にかかった秒数
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -182,7 +172,7 @@ Class clsCompareExcel
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get ElapsedTime()
-       ElapsedTime = PdtEnd - PdtStart
+       ElapsedTime = PoEnd.DifferenceInScondsFrom(PoStart)
     End Property
     
     '***************************************************************************************************
@@ -204,9 +194,7 @@ Class clsCompareExcel
         Compare = False
         
         '開始日時の取得
-        PdtNow = Now
-        PdtDate = Date
-        PdtStart = Timer
+        Set PoStart = new_clsCmCalendar()
         
         '比較結果用の新規ワークブックを作成
         With CreateObject("Excel.Application")
@@ -228,7 +216,7 @@ Class clsCompareExcel
         '終了
         Set oParams = Nothing
         Set oWorkbookForResults = Nothing
-        PdtEnd = Timer
+        Set PoEnd = new_clsCmCalendar()
         Compare = True
     End Function
     

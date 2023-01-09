@@ -453,6 +453,38 @@ Private Function func_CM_FsCreateFolder( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsOpenTextFile()
+'Overview                    : ファイルを開きTextStreamオブジェクトを返す
+'Detailed Description        : FileSystemObjectのOpenTextFile()と同等
+'Argument
+'     asPath                 : パス
+'     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
+'     aboCreate              : asPathが存在しない場合に新しいファイルを作成するかどうか
+'     asFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
+'Return Value
+'     TextStreamオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsOpenTextFile( _
+    byVal asPath _
+    , byVal alIomode _
+    , byVal aboCreate _
+    , byVal asFileFormat _
+    )
+    'ファイルを開く
+    Set func_CM_FsOpenTextFile = CreateObject("Scripting.FileSystemObject").OpenTextFile( _
+                                                              asPath _
+                                                              , alIomode _
+                                                              , aboCreate _
+                                                              , asFileFormat _
+                                                              )
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : sub_CM_FsWriteFile()
 'Overview                    : ファイル出力する
 'Detailed Description        : エラーは無視する
@@ -474,7 +506,8 @@ Private Sub sub_CM_FsWriteFile( _
     )
     On Error Resume Next
     'ファイルを開く（存在しない場合は作成する）
-    With CreateObject("Scripting.FileSystemObject").OpenTextFile(asPath, 2, True)
+    With func_CM_FsOpenTextFile(asPath, 2, True, -2)
+'    With CreateObject("Scripting.FileSystemObject").OpenTextFile(asPath, 2, True)
         Call .WriteLine(asCont)
         Call .Close
     End With

@@ -124,7 +124,7 @@ Class clsUtAssistant
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get StartTime()
-        StartTime = func_GetDateInMilliseconds(PdtDate, PdtStart)
+        StartTime = func_GetDateInNanoseconds(PdtDate, PdtStart)
     End Property
     
     '***************************************************************************************************
@@ -160,7 +160,7 @@ Class clsUtAssistant
     '2022/10/13         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get EndTime()
-        EndTime = func_GetDateInMilliseconds(PdtDate, PdtEnd)
+        EndTime = func_GetDateInNanoseconds(PdtDate, PdtEnd)
     End Property
     
     '***************************************************************************************************
@@ -309,8 +309,8 @@ Class clsUtAssistant
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_GetDateInMilliseconds()
-    'Overview                    : ì˙éûÇÉ~ÉäïbÇ≈éÊìæÇ∑ÇÈ
+    'Function/Sub Name           : func_GetDateInNanoseconds()
+    'Overview                    : ì˙éûÇÉiÉmïbÇ≈éÊìæÇ∑ÇÈ
     'Detailed Description        : çHéñíÜ
     'Argument
     '     Ç»Çµ
@@ -322,7 +322,7 @@ Class clsUtAssistant
     '----------         ----------------------   -------------------------------------------------------
     '2022/10/12         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_GetDateInMilliseconds( _
+    Private Function func_GetDateInNanoseconds( _
         byVal adtDate _
         , byVal adtTimer _
         )
@@ -334,7 +334,7 @@ Class clsUtAssistant
 
         dtNowTime = adtTimer
         lMilliSecond = dtNowTime - Fix(dtNowTime)
-        lMilliSecond = Right("000" & Fix(lMilliSecond * 1000), 3)
+        lMilliSecond = Right("000000" & Fix(lMilliSecond * 1000000), 6)
         dtNowTime = Fix(dtNowTime)
         lSecond = Right("0" & dtNowTime Mod 60, 2)
         dtNowTime = dtNowTime \ 60
@@ -342,7 +342,7 @@ Class clsUtAssistant
         dtNowTime = dtNowTime \ 60
         lHour = Right("0" & dtNowTime, 2)
 
-        func_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
+        func_GetDateInNanoseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
     End Function
     
     '***************************************************************************************************
@@ -445,9 +445,10 @@ Class clsUtAssistant
             Call oTemp.Add(.Item(1), lSeq)
             Call oTemp.Add(.Item(2), func_GetCasesSubTitle(aoArgument, sCaseName))
             Call oTemp.Add(.Item(3), boResult)
-            Call oTemp.Add(.Item(4), func_GetDateInMilliseconds(dtDate, dtStart))
-            Call oTemp.Add(.Item(5), func_GetDateInMilliseconds(dtDate, dtEnd))
-            Call oTemp.Add(.Item(6), dtEnd-dtStart)
+            Call oTemp.Add(.Item(4), func_GetDateInNanoseconds(dtDate, dtStart))
+            Call oTemp.Add(.Item(5), func_GetDateInNanoseconds(dtDate, dtEnd))
+            Call oTemp.Add(.Item(6), Fix(dtEnd-dtStart) & "." & Right("000000" & Fix(( (dtEnd-dtStart)-Fix(dtEnd-dtStart) ) * 1000000), 6))
+'            Call oTemp.Add(.Item(6), dtEnd-dtStart)
         End With
         Call PoRecDetail.Add(lSeq, oTemp)
         
