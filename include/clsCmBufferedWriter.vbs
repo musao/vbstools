@@ -10,9 +10,9 @@
 '***************************************************************************************************
 Class clsCmBufferedWriter
     'クラス内変数、定数
-    Private PoFso
     Private PoTextStream
     Private PsPath
+    Private PsPathAlreadyOpened
     Private PsBuffer
     Private PoIomodeLst
     Private PsIomode              '入力/出力モード
@@ -22,10 +22,9 @@ Class clsCmBufferedWriter
     'コンストラクタ
     Private Sub Class_Initialize()
         
-        
-        Set PoFso = CreateObject("Scripting.FileSystemObject")
         Set PoTextStream = Nothing
         PsPath = ""
+        PsPathAlreadyOpened = ""
         PsBuffer = ""
         
         Set PoIomodeLst = CreateObject("Scripting.Dictionary")
@@ -34,7 +33,7 @@ Class clsCmBufferedWriter
             .Add "ForWriting", 2
             .Add "ForAppending", 8
         End With
-        PsIomode = "ForAppending"                'デフォルトはForAppending
+        PsIomode = PoIomodeLst.Item(1)           'デフォルトはForAppending
         
         Set PoFileFormatLst = CreateObject("Scripting.Dictionary")
         With PoFileFormatLst
@@ -42,7 +41,7 @@ Class clsCmBufferedWriter
             .Add "TristateTrue", -1
             .Add "TristateFalse", 0
         End With
-        PsFileFormat = "TristateUseDefault"      'デフォルトはTristateUseDefault
+        PsFileFormat = PoFileFormatLst.Item(1)   'デフォルトはTristateUseDefault
     End Sub
     
     'デストラクタ
@@ -50,7 +49,6 @@ Class clsCmBufferedWriter
         Set PoFormatLst = Nothing
         Set PoIomodeLst = Nothing
         Set PoTextStream = Nothing
-        Set PoFso = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -209,14 +207,41 @@ Class clsCmBufferedWriter
         byVal asContents _
         )
         
+        'テキストストリームを作成する
+        Call sub_CmBufferedWriterGetTextStream()
+        
+        PsBuffer = PsBuffer & vbCrLf & asContents
+    End Sub
+    
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmBufferedWriterGetTextStream()
+    'Overview                    : テキストストリームを作成する
+    'Detailed Description        : 工事中
+    'Argument
+    '     asContents             : 内容
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/08/19         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmBufferedWriterGetTextStream( _
+        )
+        
+        If Len(PsPath)=0 Then Exit Sub
+        If func_CM_FsIsSame(PsPath, PsPathAlreadyOpened) Then
+        
+        
         If PoTextStream Is Nothing Then
         'PoTextStreamがなければ作成する
             Dim boFileExists : boFileExists = func_CM_FsFileExists(PsPath)
-            Dim sParentFolderPath : Dim boParentFolderExists
             If Not boFileExists Then
             '出力先ファイルのパスが存在しない場合
-                sParentFolderPath = func_CM_FsGetParentFolderPath(PsPath)
-                boParentFolderExists = func_CM_FsFolderExists(sParentFolderPath)
+                Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(PsPath)
+                Dim boParentFolderExists : boParentFolderExists = func_CM_FsFolderExists(sParentFolderPath)
                 If Not boParentFolderExists Then
                 '出力先ファイルの親フォルダが存在しない場合、フォルダを作成
                     Call func_CM_FsCreateFolder(sParentFolderPath)
@@ -226,11 +251,8 @@ Class clsCmBufferedWriter
             'ファイルを開く
             Set PoTextStream = func_CM_FsOpenTextFile(PsPath, PoIomodeLst.Item(PsIomode) _
                                                   , True, PoFileFormatLst.Item(PsFileFormat))
+            PsPathAlreadyOpened = PsPath
         End If
-        
-        
-        
-        PsBuffer = PsBuffer & vbCrLf & asContents
     End Sub
-    
+
 End Class

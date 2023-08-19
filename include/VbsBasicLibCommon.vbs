@@ -149,6 +149,7 @@ End Function
 Private Function func_CM_FsDeleteFile( _
     byVal asPath _
     ) 
+    If Not func_CM_FsFileExists(asPath) Then func_CM_FsDeleteFile = False
     On Error Resume Next
     CreateObject("Scripting.FileSystemObject").DeleteFile(asPath)
     func_CM_FsDeleteFile = True
@@ -160,7 +161,7 @@ End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsDeleteFolder()
-'Overview                    : ファイルを削除する
+'Overview                    : フォルダを削除する
 'Detailed Description        : FileSystemObjectのDeleteFolder()と同等
 'Argument
 '     asPath                 : 削除するフォルダのフルパス
@@ -175,6 +176,7 @@ End Function
 Private Function func_CM_FsDeleteFolder( _
     byVal asPath _
     ) 
+    If Not func_CM_FsFolderExists(asPath) Then func_CM_FsDeleteFolder = False
     On Error Resume Next
     CreateObject("Scripting.FileSystemObject").DeleteFolder(asPath)
     func_CM_FsDeleteFolder = True
@@ -185,9 +187,31 @@ Private Function func_CM_FsDeleteFolder( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsDeleteFsObject()
+'Overview                    : ファイルかフォルダを削除する
+'Detailed Description        : func_CM_FsDeleteFile()とfunc_CM_FsDeleteFolder()に委譲
+'Argument
+'     asPath                 : パス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsDeleteFsObject( _
+    byVal asPath _
+    )
+    func_CM_FsDeleteFsObject = False
+    If func_CM_FsFileExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFile(asPath)
+    If func_CM_FsFolderExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFolder(asPath)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsCopyFile ()
 'Overview                    : ファイルをコピーする
-'Detailed Description        : FileSystemObjectのCopyFile ()と同等
+'Detailed Description        : FileSystemObjectのCopyFile()と同等
 'Argument
 '     asPathFrom             : コピー元ファイルのフルパス
 '     asPathTo               : コピー先ファイルのフルパス
@@ -203,6 +227,7 @@ Private Function func_CM_FsCopyFile( _
     byVal asPathFrom _
     , byVal asPathTo _
     ) 
+    If Not func_CM_FsFileExists(asPathFrom) Then func_CM_FsCopyFile = False
     On Error Resume Next
     Call CreateObject("Scripting.FileSystemObject").CopyFile(asPathFrom, asPathTo)
     func_CM_FsCopyFile = True
@@ -210,6 +235,141 @@ Private Function func_CM_FsCopyFile( _
         Err.Clear
         func_CM_FsCopyFile = False
     End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsCopyFolder ()
+'Overview                    : フォルダをコピーする
+'Detailed Description        : FileSystemObjectのCopyFolder()と同等
+'Argument
+'     asPathFrom             : コピー元フォルダのフルパス
+'     asPathTo               : コピー先フォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsCopyFolder( _
+    byVal asPathFrom _
+    , byVal asPathTo _
+    ) 
+    If Not func_CM_FsFolderExists(asPathFrom) Then func_CM_FsCopyFolder = False
+    On Error Resume Next
+    Call CreateObject("Scripting.FileSystemObject").CopyFolder(asPathFrom, asPathTo)
+    func_CM_FsCopyFolder = True
+    If Err.Number Then
+        Err.Clear
+        func_CM_FsCopyFolder = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsCopyFsObject()
+'Overview                    : ファイルかフォルダをコピーする
+'Detailed Description        : func_CM_FsCopyFile()とfunc_CM_FsCopyFolder()に委譲
+'Argument
+'     asPathFrom             : コピー元ファイル/フォルダのフルパス
+'     asPathTo               : コピー先のフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsCopyFsObject( _
+    byVal asPathFrom _
+    , byVal asPathTo _
+    )
+    func_CM_FsCopyFsObject = False
+    If func_CM_FsFileExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFile(asPathFrom, asPathTo)
+    If func_CM_FsFolderExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFolder(asPathFrom, asPathTo)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsMoveFile ()
+'Overview                    : ファイルを移動する
+'Detailed Description        : FileSystemObjectのMoveFile()と同等
+'Argument
+'     asPathFrom             : 移動元ファイルのフルパス
+'     asPathTo               : 移動先ファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsMoveFile( _
+    byVal asPathFrom _
+    , byVal asPathTo _
+    ) 
+    If Not func_CM_FsFileExists(asPathFrom) Then func_CM_FsMoveFile = False
+    On Error Resume Next
+    Call CreateObject("Scripting.FileSystemObject").MoveFile(asPathFrom, asPathTo)
+    func_CM_FsMoveFile = True
+    If Err.Number Then
+        Err.Clear
+        func_CM_FsMoveFile = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsMoveFolder ()
+'Overview                    : フォルダを移動する
+'Detailed Description        : FileSystemObjectのMoveFolder()と同等
+'Argument
+'     asPathFrom             : 移動元フォルダのフルパス
+'     asPathTo               : 移動先フォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsMoveFolder( _
+    byVal asPathFrom _
+    , byVal asPathTo _
+    ) 
+    If Not func_CM_FsFolderExists(asPathFrom) Then func_CM_FsMoveFolder = False
+    On Error Resume Next
+    Call CreateObject("Scripting.FileSystemObject").MoveFolder(asPathFrom, asPathTo)
+    func_CM_FsMoveFolder = True
+    If Err.Number Then
+        Err.Clear
+        func_CM_FsMoveFolder = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsMoveFsObject()
+'Overview                    : ファイルかフォルダを移動する
+'Detailed Description        : func_CM_FsMoveFile()とfunc_CM_FsMoveFolder()に委譲
+'Argument
+'     asPathFrom             : 移動元ファイル/フォルダのフルパス
+'     asPathTo               : 移動先のフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsMoveFsObject( _
+    byVal asPathFrom _
+    , byVal asPathTo _
+    )
+    func_CM_FsMoveFsObject = False
+    If func_CM_FsFileExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFile(asPathFrom, asPathTo)
+    If func_CM_FsFolderExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFolder(asPathFrom, asPathTo)
 End Function
 
 '***************************************************************************************************
@@ -361,7 +521,7 @@ End Function
 'Argument
 '     asPath                 : パス
 'Return Value
-'     Fileオブジェクト
+'     Folderオブジェクト
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -372,6 +532,28 @@ Private Function func_CM_FsGetFolder( _
     byVal asPath _
     ) 
     Set func_CM_FsGetFolder = CreateObject("Scripting.FileSystemObject").GetFolder(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFsObject()
+'Overview                    : ファイルかフォルダオブジェクトの取得
+'Detailed Description        : func_CM_FsGetFile()とfunc_CM_FsGetFolder()に委譲
+'Argument
+'     asPath                 : パス
+'Return Value
+'     File/Folderオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFsObject( _
+    byVal asPath _
+    )
+    Set func_CM_FsGetFsObject = Nothing
+    If func_CM_FsFileExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFile(asPath)
+    If func_CM_FsFolderExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFolder(asPath)
 End Function
 
 '***************************************************************************************************
@@ -415,6 +597,34 @@ Private Function func_CM_FsGetFolders( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFsObjects()
+'Overview                    : 指定したフォルダ以下のFilesコレクションとFoldersコレクションを取得する
+'Detailed Description        : func_CM_FsGetFiles()とfunc_CM_FsGetFolders()に委譲
+'Argument
+'     asPath                 : パス
+'Return Value
+'     FilesコレクションとFoldersコレクション
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFsObjects( _
+    byVal asPath _
+    )
+    Set func_CM_FsGetFsObjects = Nothing
+    If Not func_CM_FsFolderExists(asPath) Then Exit Function
+    Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
+    With oTemp
+        .Add "Filse", func_CM_FsGetFiles(asPath)
+        .Add "Folders", func_CM_FsGetFolders(asPath)
+    End With
+    Set func_CM_FsGetFsObjects = oTemp
+    Set oTemp = Nothing
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetTempFileName()
 'Overview                    : ランダムに生成された一時ファイルまたはフォルダーの名前の取得
 'Detailed Description        : FileSystemObjectのGetTempName()と同等
@@ -434,7 +644,7 @@ End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsCreateFolder()
-'Overview                    : フォルダーを作成する
+'Overview                    : フォルダを作成する
 'Detailed Description        : FileSystemObjectのCreateFolder()と同等
 'Argument
 '     asPath                 : パス
@@ -515,6 +725,157 @@ Private Sub sub_CM_FsWriteFile( _
         Err.Clear
     End If
 End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsIsSame()
+'Overview                    : 指定したパスが同じファイル/フォルダか検査する
+'Detailed Description        : 工事中
+'Argument
+'     asPathA                : ファイル/フォルダのフルパス
+'     asPathB                : ファイル/フォルダのフルパス
+'Return Value
+'     結果 True:同一 / False:同一でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsIsSame( _
+    byVal asPathA _
+    , byVal asPathB _
+    )
+    func_CM_FsIsSame = (func_CM_FsGetFsObject(asPathA) Is func_CM_FsGetFsObject(asPathB))
+End Function
+
+
+
+'文字列操作系
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_StrConvOnlyAlphabet()
+'Overview                    : 英字だけ大文字／小文字に変換する
+'Detailed Description        : 工事中
+'Argument
+'     asTarget               : 変換する文字列
+'     alConversion           : 実行する変換の種類 1:UpperCase,2:LowerCase
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_StrConvOnlyAlphabet( _
+    byVal asTarget _
+    , byVal alConversion _
+    )
+    Dim sChar, asTargetTmp
+    
+    '1文字ずつ判定する
+    Dim asTargetNew : asTargetNew = asTarget
+    Dim lPos : lPos = 1
+    Do While Len(asTargetNew) >= lPos
+        '変換対象の1文字を取得
+        sChar = Mid(asTargetNew, lPos, 1)
+        
+        If func_CM_StrDetermineCharacterType(sChar, 1) Then
+        '変換対象が英字の場合のみ変換する
+            asTargetTmp = ""
+            
+            '変換対象の文字までの文字列
+            If lPos > 1 Then
+                asTargetTmp = Mid(asTargetNew, 1, lPos-1)
+            End If
+            
+            '変換した1文字を結合
+            sChar = func_CM_StrConv(sChar, alConversion)
+            asTargetTmp = asTargetTmp & sChar
+            
+            '変換対象の文字移行の文字列を結合
+            If lPos < Len(asTargetNew) Then
+                asTargetTmp = asTargetTmp & Mid(asTargetNew, lPos+1, Len(asTargetNew)-lPos)
+            End If
+            
+            '変換後の文字列を格納
+            asTargetNew = asTargetTmp
+        End If
+        
+        'カウントアップ
+        lPos = lPos+1
+    Loop
+    
+    func_CM_StrConvOnlyAlphabet = asTargetNew
+    
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_StrDetermineCharacterType()
+'Overview                    : 文字種を判定する
+'Detailed Description        : 工事中
+'Argument
+'     asChar                 : 文字種を判定する文字
+'     alType                 : 文字種 1:半角のAlphabet
+'Return Value
+'     結果 True:合致する / False:合致しない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_StrDetermineCharacterType( _
+    byVal asChar _
+    , byVal alType _
+    )
+    func_CM_StrDetermineCharacterType = False
+    Select Case alType
+        Case 1:
+            If _
+                    Asc("A") <= Asc(asChar) And Asc(asChar) <= Asc("Z") _
+                Or Asc("a") <= Asc(asChar) And Asc(asChar) <= Asc("z")  _
+                Then
+                func_CM_StrDetermineCharacterType = True
+            End If
+    End Select
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_StrConv()
+'Overview                    : 文字列を指定のとおり変換する
+'Detailed Description        : 工事中
+'Argument
+'     asTarget               : 変換する文字列
+'     alConversion           : 実行する変換の種類（現時点で1,2のみ実装）
+'                                 1:文字列を大文字に変換
+'                                 2:文字列を小文字に変換
+'                                 3:文字列内のすべての単語の最初の文字を大文字に変換
+'                                 4:文字列内の狭い (1 バイト) 文字をワイド (2 バイト) 文字に変換
+'                                 8:文字列内のワイド (2 バイト) 文字を狭い (1 バイト) 文字に変換
+'                                16:文字列内のひらがな文字をカタカナ文字に変換
+'                                32:文字列内のカタカナ文字をひらがな文字に変換
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_StrConv( _
+    byVal asTarget _
+    , byVal alalConversion _
+    )
+    Dim sChar, asTargetTmp
+    func_CM_StrConv = asTarget
+    Select Case alalConversion
+        Case 1:
+            func_CM_StrConv = UCase(asTarget)
+        Case 2:
+            func_CM_StrConv = LCase(asTarget)
+    End Select
+End Function
 
 
 '数学系
