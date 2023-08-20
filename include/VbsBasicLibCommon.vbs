@@ -877,6 +877,43 @@ Private Function func_CM_StrConv( _
     End Select
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_StrLen()
+'Overview                    : 全角は2文字、半角は1文字として文字数を返す
+'Detailed Description        : 工事中
+'Argument
+'     asTarget               : 文字列
+'Return Value
+'     文字数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_StrLen( _
+    byVal asTarget _
+    )
+    '1文字ずつ判定する
+    Dim lLength : lLength = 0
+    Dim lPos : lPos = 1
+    Do While Len(asTarget) >= lPos
+        '1文字を取得
+        sChar = Mid(asTarget, lPos, 1)
+        
+        If (Asc(sChar) And &HFF00) <> 0 Then
+            lLength = lLength+2
+        Else
+            lLength = lLength+1
+        End If
+        
+        'カウントアップ
+        lPos = lPos+1
+    Loop
+    
+    func_CM_StrLen = lLength
+End Function
+
 
 '数学系
 
