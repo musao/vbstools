@@ -669,7 +669,7 @@ End Function
 'Argument
 '     asPath                 : パス
 '     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
-'     aboCreate              : asPathが存在しない場合に新しいファイルを作成するかどうか
+'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
 '     asFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
 'Return Value
 '     TextStreamオブジェクト
