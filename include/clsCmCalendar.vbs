@@ -186,15 +186,7 @@ Class clsCmCalendar
     Public Function DifferenceInScondsFrom( _
         byRef aoTarget _
         )
-        Dim dbDifference : dbDifference = CDbl((Me.GetSerial()-aoTarget.GetSerial())*60*60*24)
-        DifferenceInScondsFrom = Fix(dbDifference) & "." _
-                                 & func_CM_FillInTheCharacters( _
-                                                              Abs(Fix( (dbDifference - Fix(dbDifference))*10^6 )) _
-                                                              , 6 _
-                                                              , "0" _
-                                                              , False _
-                                                              , True _
-                                                              )
+        DifferenceInScondsFrom = CDbl((Me.GetSerial()-aoTarget.GetSerial())*60*60*24)
     End Function
     
     '***************************************************************************************************

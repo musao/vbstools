@@ -144,8 +144,7 @@ Class clsCmBufferedWriter
     Public Property Let WriteBufferSize( _
         byVal alWriteBufferSize _
         )
-        If -2147483648<=alWriteBufferSize And alWriteBufferSize<=2147483647 Then
-        'LongŒ^‚Ì”ÍˆÍi-2,147,483,648 ` 2,147,483,647j‚Ìê‡
+        If func_CM_ValidationlIsWithinTheRangeOf(alWriteBufferSize, 2) Then
             PlWriteBufferSize = CLng(alWriteBufferSize)
         End If
     End Property
@@ -187,8 +186,7 @@ Class clsCmBufferedWriter
     Public Property Let WriteIntervalTime( _
         byVal alWriteIntervalTime _
         )
-        If -2147483648<=alWriteIntervalTime And alWriteIntervalTime<=2147483647 Then
-        'LongŒ^‚Ì”ÍˆÍi-2,147,483,648 ` 2,147,483,647j‚Ìê‡
+        If func_CM_ValidationlIsWithinTheRangeOf(alWriteIntervalTime, 2) Then
             PlWriteIntervalTime = CLng(alWriteIntervalTime)
         End If
     End Property

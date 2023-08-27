@@ -1027,6 +1027,62 @@ Private Sub sub_CM_ArrayAddItem( _
     Call sub_CM_TransferBetweenVariables(avItem, avArray(Ubound(avArray)))
 End Sub
 
+'チェック系
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ValidationlIsWithinTheRangeOf()
+'Overview                    : 数値型の範囲内にあるか検査する
+'Detailed Description        : 工事中
+'Argument
+'     avNumber               : 数値
+'     alType                 : 変数の型
+'                                1:整数型（Integer）
+'                                2:長整数型（Long）
+'                                3:バイト型（Byte）
+'                                4:単精度浮動小数点型（Single）
+'                                5:倍精度浮動小数点型（Double）
+'                                6:通貨型（Currency）
+'Return Value
+'     整形した浮動小数点型
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ValidationlIsWithinTheRangeOf( _
+    byVal avNumber _
+    , byVal alType _
+    )
+    Dim vMin,vMax
+    Select Case alType
+        Case 1:                   '整数型（Integer）
+            vMin = -1 * 2^15
+            vMax = 2^15 - 1
+        Case 2:                   '長整数型（Long）
+            vMin = -1 * 2^31
+            vMax = 2^31 - 1
+        Case 3:                   'バイト型（Byte）
+            vMin = 0
+            vMax = 2^8 - 1
+        Case 4:                   '単精度浮動小数点型（Single）
+            vMin = -3.402823E38
+            vMax = 3.402823E38
+        Case 5:                   '倍精度浮動小数点型（Double）
+            vMin = -1.79769313486231E308
+            vMax = 1.79769313486231E308
+        Case 6:                   '通貨型（Currency）
+            vMin = -1 * 2^59 / 1000
+            vMax = ( 2^59 - 1 ) / 1000
+    End Select
+    
+    func_CM_ValidationlIsWithinTheRangeOf = False
+    If vMin<=avNumber And avNumber<=vMax Then
+        func_CM_ValidationlIsWithinTheRangeOf = True
+    End If
+End Function
+
+
 'これ何系かな
 
 '***************************************************************************************************
@@ -1062,64 +1118,6 @@ Private Function func_CM_GetObjectByIdFromCollection( _
     End If
     Set oItem = Nothing
 End Function
-
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_GetDateInMilliseconds()
-''Overview                    : 日時をミリ秒で取得する
-''Detailed Description        : 工事中
-''Argument
-''     adtDate                : 日付
-''     adtTimer               : タイマー
-''Return Value
-''     yyyymmdd hh:mm:ss.nnnn形式の日付
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2022/10/12         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_GetDateInMilliseconds( _
-'    byVal adtDate _
-'    , byVal adtTimer _
-'    )
-'    Dim dtNowTime        '現在時刻
-'    Dim lHour            '時
-'    Dim lngMinute        '分
-'    Dim lngSecond        '秒
-'    Dim lngMilliSecond   'ミリ秒
-'
-'    dtNowTime = adtTimer
-'    lMilliSecond = dtNowTime - Fix(dtNowTime)
-'    lMilliSecond = Right("000" & Fix(lMilliSecond * 1000), 3)
-'    dtNowTime = Fix(dtNowTime)
-'    lSecond = Right("0" & dtNowTime Mod 60, 2)
-'    dtNowTime = dtNowTime \ 60
-'    lMinute = Right("0" & dtNowTime Mod 60, 2)
-'    dtNowTime = dtNowTime \ 60
-'    lHour = Right("0" & dtNowTime, 2)
-'
-'    func_CM_GetDateInMilliseconds = adtDate & " " & lHour & ":" & lMinute & ":" & lSecond & "." & lMilliSecond
-'End Function
-'
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_GetDateAsYYYYMMDD()
-''Overview                    : 日時をYYYYMMDD形式で取得する
-''Detailed Description        : 工事中
-''Argument
-''     なし
-''Return Value
-''     yyyymmdd形式の日付
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2022/10/12         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_GetDateAsYYYYMMDD( _
-'    byVal adtDate _
-'    )
-'    func_CM_GetDateAsYYYYMMDD = Replace(Left(adtDate,10), "/", "")
-'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : sub_CM_TransferBetweenVariables()
@@ -1255,4 +1253,33 @@ Private Function func_CM_FillInTheCharacters( _
         sResult = Left(sResult, alWordCount)
     End If
     func_CM_FillInTheCharacters = sResult
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FormatDecimalNumber()
+'Overview                    : 浮動小数点型を整形する
+'Detailed Description        : 工事中
+'Argument
+'     adbNumber              : 浮動小数点型の数値
+'     alDecimalPlaces        : 小数の桁数
+'Return Value
+'     整形した浮動小数点型
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FormatDecimalNumber( _
+    byVal adbNumber _
+    , byVal alDecimalPlaces _
+    )
+    func_CM_FormatDecimalNumber = Fix(adbNumber) & "." _
+                             & func_CM_FillInTheCharacters( _
+                                                          Abs(Fix( (adbNumber - Fix(adbNumber))*10^alDecimalPlaces )) _
+                                                          , alDecimalPlaces _
+                                                          , "0" _
+                                                          , False _
+                                                          , True _
+                                                          )
 End Function
