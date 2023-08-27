@@ -26,7 +26,7 @@
 Private Function new_clsCmBufferedWriter( _
     byRef aoTextStream _
     )
-    Set new_clsCmBufferedWriter = (New clsCmBufferedWriter).TextStream(aoTextStream)
+    Set new_clsCmBufferedWriter = (New clsCmBufferedWriter).SetTextStream(aoTextStream)
 End Function
 
 Class clsCmBufferedWriter
@@ -81,44 +81,6 @@ Class clsCmBufferedWriter
         Set PoWriteDateTime = Nothing
         Set PoRequestFirstDateTime = Nothing
     End Sub
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Set TextStream()
-    'Overview                    : テキストストリームを設定する
-    'Detailed Description        : 工事中
-    'Argument
-    '     aoTextStream           : テキストストリームオブジェクト
-    'Return Value
-    '     なし
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/08/27         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Set TextStream( _
-        byRef aoTextStream _
-        )
-        Set PoTextStream = aoTextStream
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get TextStream()
-    'Overview                    : テキストストリームを返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     テキストストリームオブジェクト
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/08/27         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get TextStream()
-        Set TextStream = aoTextStream
-    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Let WriteBufferSize()
@@ -203,6 +165,24 @@ Class clsCmBufferedWriter
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get TextStream()
+    'Overview                    : テキストストリームを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     テキストストリームオブジェクト
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/08/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get TextStream()
+        Set TextStream = aoTextStream
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get CurrentBufferSize()
     'Overview                    : 今のバッファサイズを返す
     'Detailed Description        : 工事中
@@ -241,6 +221,28 @@ Class clsCmBufferedWriter
             LastWriteDateTime = PoWriteDateTime.DisplayFormatAs("YYYY/MM/DD hh:mm:ss.000")
         End If
     End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : SetTextStream()
+    'Overview                    : テキストストリームを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoTextStream           : テキストストリームオブジェクト
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/08/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function SetTextStream( _
+        byRef aoTextStream _
+        )
+        Set PoTextStream = aoTextStream
+        Set SetTextStream = Me
+    End Function
+    
     '***************************************************************************************************
     'Function/Sub Name           : WriteContents()
     'Overview                    : ファイル出力する
