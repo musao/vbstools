@@ -218,7 +218,7 @@ Class clsCmBufferedWriter
         If PoWriteDateTime Is Nothing Then
             LastWriteDateTime=""
         Else
-            LastWriteDateTime = PoWriteDateTime.DisplayFormatAs("YYYY/MM/DD hh:mm:ss.000")
+            LastWriteDateTime = PoWriteDateTime
         End If
     End Property
     
@@ -341,7 +341,6 @@ Class clsCmBufferedWriter
     '2023/01/09         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub sub_CmBufferedWriterWriteContents( _
-        byVal asContents _
         )
         'ファイル出力判定＆ファイル出力
         If func_CmBufferedWriterDetermineToWrite() Then Call sub_CmBufferedWriterWriteFile()
@@ -368,23 +367,40 @@ Class clsCmBufferedWriter
         func_CmBufferedWriterDetermineToWrite=False
         If PoTextStream Is Nothing Then Exit Function
         
+        '戻り値の初期化
         Dim boReturn : boReturn=False
         
-        'バッファサイズ
+        'バッファサイズの判定
         If func_CM_StrLen(PsBuffer)>=PlWriteBufferSize Then boReturn=True
         
-        '出力日時
-        If PoWriteDateTime Is Nothing Then
-        '初回書き込み前は初回リクエスト時からの経過時間で判断する
-            If PoRequestFirstDateTime Is Nothing Then
-                Set PoRequestFirstDateTime = new_clsCmCalendar()
-            Else
-                If Abs(PoRequestFirstDateTime.DifferenceInScondsFrom(new_clsCmCalendar()))>=PlWriteIntervalTime Then boReturn=True
-            End If
-        Else
-            If Abs(PoWriteDateTime.DifferenceInScondsFrom(new_clsCmCalendar()))>=PlWriteIntervalTime Then boReturn=True
+        If boReturn Or PlWriteIntervalTime<=0 Then
+        'バッファのサイズが出力バッファサイズを超えたか出力日時から出力間隔時間（秒）が0以下（＝不要）の場合は関数を抜ける
+            func_CmBufferedWriterDetermineToWrite=boReturn
+            Exit Function
         End If
+        
+        If PoWriteDateTime Is Nothing And PoRequestFirstDateTime Is Nothing Then
+        '前回と初回の出力日時がない場合、本リクエスト（＝初回リクエスト）日時を取得して関数を抜ける
+            Set PoRequestFirstDateTime = new_clsCalGetNow()
+            func_CmBufferedWriterDetermineToWrite=boReturn
+            Exit Function
+        End If
+        
+        '比較用日時の取得
+        Dim oForComparison
+        Set oForComparison = PoWriteDateTime
+        If oForComparison Is Nothing Then
+        '前回の出力日時がない場合、初回リクエスト日時を使用する
+            Set oForComparison = PoRequestFirstDateTime
+        End If
+        
+        '出力日時の判定
+        If Abs(oForComparison.DifferenceInScondsFrom(new_clsCalGetNow()))>=PlWriteIntervalTime Then boReturn=True
+        
+        '戻り値を返す
         func_CmBufferedWriterDetermineToWrite=boReturn
+        
+        Set oForComparison = Nothing
     End Function
     
     '***************************************************************************************************
@@ -410,7 +426,7 @@ Class clsCmBufferedWriter
         'バッファのクリア
         PsBuffer = ""
         '出力日時を記録
-        Set PoWriteDateTime = new_clsCmCalendar()
+        Set PoWriteDateTime = new_clsCalGetNow()
     End Sub
     
     '***************************************************************************************************

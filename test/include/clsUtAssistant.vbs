@@ -25,7 +25,7 @@ Class clsUtAssistant
         PdtDate = Date
         PdtStart = Timer
         '結果サマリーのタイトル定義
-        Set PoRecSumTitles = CreateObject("Scripting.Dictionary")
+        Set PoRecSumTitles = new_Dictionary()
         With PoRecSumTitles
             Call .Add(1, "Result")
             Call .Add(2, "CaseCount")
@@ -36,9 +36,9 @@ Class clsUtAssistant
             Call .Add(7, "ElapsedTime")
         End With
         '結果格納用ハッシュマップ
-        Set PoRecDetail = CreateObject("Scripting.Dictionary")
+        Set PoRecDetail = new_Dictionary()
         '結果詳細ハッシュマップに格納する情報のタイトル定義
-        Set PoRecDetailTitles = CreateObject("Scripting.Dictionary")
+        Set PoRecDetailTitles = new_Dictionary()
         With PoRecDetailTitles
             Call .Add(1, "Seq")
             Call .Add(2, "CaseName")
@@ -440,7 +440,7 @@ Class clsUtAssistant
         
         '結果を記録
         Dim lSeq : lSeq = PoRecDetail.Count+1
-        Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
+        Dim oTemp : Set oTemp = new_Dictionary()
         With PoRecDetailTitles
             Call oTemp.Add(.Item(1), lSeq)
             Call oTemp.Add(.Item(2), func_GetCasesSubTitle(aoArgument, sCaseName))

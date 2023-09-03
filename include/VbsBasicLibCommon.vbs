@@ -615,7 +615,7 @@ Private Function func_CM_FsGetFsObjects( _
     )
     Set func_CM_FsGetFsObjects = Nothing
     If Not func_CM_FsFolderExists(asPath) Then Exit Function
-    Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
+    Dim oTemp : Set oTemp = new_Dictionary()
     With oTemp
         .Add "Filse", func_CM_FsGetFiles(asPath)
         .Add "Folders", func_CM_FsGetFolders(asPath)
@@ -746,6 +746,44 @@ Private Function func_CM_FsIsSame( _
     , byVal asPathB _
     )
     func_CM_FsIsSame = (func_CM_FsGetFsObject(asPathA) Is func_CM_FsGetFsObject(asPathB))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetPrivateFolder()
+'Overview                    : 実行中のスクリプト専用のフォルダのフルパスを返す
+'Detailed Description        : 実行中のスクリプト格納フォルダ以下に作成する
+'                              引数で指定したディレクトリ名がある場合はそのフォルダ以下のパスを返す
+'Argument
+'     asParentFolderName     : 親フォルダ名
+'Return Value
+'     実行中のスクリプト専用のフォルダのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetPrivateFolder( _
+    byVal asParentFolderName _
+    )
+    Dim sScriptFullName : sScriptFullName = WScript.ScriptFullName
+    Dim sPath,sParentFolderPath
+    
+    sParentFolderPath = func_CM_FsGetParentFolderPath(sScriptFullName)
+    If Len(asParentFolderName)>0 Then
+    '引数で指定したディレクトリ名がある場合
+        sParentFolderPath = func_CM_FsBuildPath(sParentFolderPath ,asParentFolderName)
+    End If
+    
+    sPath = func_CM_FsBuildPath( _
+                                sParentFolderPath _
+                                ,func_CM_FsGetGetBaseName(sScriptFullName) _
+                                )
+    
+    'ディレクトリがなかったら作成する
+    If Not(func_CM_FsFolderExists(sPath)) Then func_CM_FsCreateFolder(sPath)
+    '戻り値を返す
+    func_CM_FsGetPrivateFolder = sPath
 End Function
 
 
@@ -895,6 +933,7 @@ Private Function func_CM_StrLen( _
     byVal asTarget _
     )
     '1文字ずつ判定する
+    Dim sChar
     Dim lLength : lLength = 0
     Dim lPos : lPos = 1
     Do While Len(asTarget) >= lPos
@@ -998,7 +1037,7 @@ Private Function func_CM_ArrayGetDimensionNumber( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_ArrayAddItem()
+'Function/Sub Name           : sub_CM_Push()
 'Overview                    : 配列に要素を追加する
 'Detailed Description        : 工事中
 'Argument
@@ -1012,7 +1051,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/23         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CM_ArrayAddItem( _
+Private Sub sub_CM_Push( _
     byRef avArray _ 
     , byRef avItem _ 
     )
@@ -1024,7 +1063,7 @@ Private Sub sub_CM_ArrayAddItem( _
         Redim avArray(0)
         Err.Clear
     End If
-    Call sub_CM_TransferBetweenVariables(avItem, avArray(Ubound(avArray)))
+    Call sub_CM_Bind(avArray(Ubound(avArray)), avItem)
 End Sub
 
 'チェック系
@@ -1083,6 +1122,102 @@ Private Function func_CM_ValidationlIsWithinTheRangeOf( _
 End Function
 
 
+'インスタンス生成系
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Dictionary()
+'Overview                    : Dictionaryオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したDictionaryオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Dictionary( _
+    )
+    Set new_Dictionary = CreateObject("Scripting.Dictionary")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_DictSetValues()
+'Overview                    : Dictionaryオブジェクトを生成し初期値を設定する
+'Detailed Description        : 工事中
+'Argument
+'     avParams               : 初期値奇数（1,3,5,...）はKey、偶数（2,4,6,...）はValue
+'                              Keyだけの場合は値にEmptyを設定する。
+'Return Value
+'     生成したDictionaryオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_DictSetValues( _
+    byVal avParams _
+    )
+    Dim oDict, vItem, vKey, boIsKey
+    
+    boIsKey = True
+    Set oDict = new_Dictionary()
+    
+    For Each vItem In avParams
+        If boIsKey Then
+            Call sub_CM_Bind(vKey, vItem)
+            Call sub_CM_BindAt(oDict, vKey, Empty)
+        Else
+            Call sub_CM_BindAt(oDict, vKey, vItem)
+        End If
+        boIsKey = Not boIsKey
+    Next
+    
+    Set new_DictSetValues = oDict
+    Set oDict = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_RegExp()
+'Overview                    : 正規表現オブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPattern              : 正規表現のパターン
+'     asOptions              : この引数内にある文字の有無で正規表現の以下のプロパティをTrueにする
+'                                "i":大文字と小文字を区別する（.IgnoreCase = True）
+'                                "g"文字列全体を検索する（.Global = True）
+'                                "m"文字列を複数行として扱う（.Multiline = True）
+'Return Value
+'     生成した正規表現オブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_RegExp( _
+    byVal asPattern _
+    , byVal asOptions _
+    )
+    Dim oRe, sOpts
+    
+    Set oRe = New RegExp
+    oRe.Pattern = asPattern
+    
+    sOpts = LCase(asOptions)
+    If InStr(sOpts, "i") > 0 Then oRe.IgnoreCase = True
+    If InStr(sOpts, "g") > 0 Then oRe.Global = True
+    If InStr(sOpts, "m") > 0 Then oRe.Multiline = True
+    
+    Set new_RegExp = oRe
+    Set oRe = Nothing
+End Function
+
+
+
 'これ何系かな
 
 '***************************************************************************************************
@@ -1120,14 +1255,14 @@ Private Function func_CM_GetObjectByIdFromCollection( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_TransferBetweenVariables()
+'Function/Sub Name           : sub_CM_Bind()
 'Overview                    : 変数間の項目移送
-'Detailed Description        : 移送元がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
 '                              移送先がコレクションのメンバーの場合は動作しない
 '                              移送先が変数の場合に使用できる
 'Argument
-'     avFrom                 : 移送元の変数
 '     avTo                   : 移送先の変数
+'     avValue                : 移送する値または変数
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -1136,22 +1271,22 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/06         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CM_TransferBetweenVariables( _
-    byRef avFrom _
-    , byRef avTo _
+Private Sub sub_CM_Bind( _
+    byRef avTo _
+    , byRef avValue _
     )
-    If IsObject(avFrom) Then Set avTo = avFrom Else avTo = avFrom
+    If IsObject(avValue) Then Set avTo = avValue Else avTo = avValue
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_TransferToCollection()
+'Function/Sub Name           : sub_CM_BindAt()
 'Overview                    : 変数間の項目移送
-'Detailed Description        : 移送元がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
 '                              移送先がコレクションの場合は当関数を使用する
 'Argument
-'     avFrom                 : 移送元の変数
 '     aoCollection           : 移送先のコレクション
 '     asKey                  : 移送先のコレクションのキー
+'     avValue                : 移送する値または変数
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -1160,16 +1295,16 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/06         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CM_TransferToCollection( _
-    byRef avFrom _
-    , byRef aoCollection _
+Private Sub sub_CM_BindAt( _
+    byRef aoCollection _
     , byVal asKey _
+    , byRef avValue _
     )
-    If IsObject(avFrom) Then Set aoCollection.Item(asKey) = avFrom Else aoCollection.Item(asKey) = avFrom
+    If IsObject(avValue) Then Set aoCollection.Item(asKey) = avValue Else aoCollection.Item(asKey) = avValue
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_CompareVariables()
+'Function/Sub Name           : func_CM_IsSame()
 'Overview                    : 変数の値が等しいか
 'Detailed Description        : 比較する変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
 'Argument
@@ -1183,13 +1318,13 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2022/11/06         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_CM_CompareVariables( _
+Private Function func_CM_IsSame( _
     byRef avA _
     , byRef avB _
     )
     Dim boReturn : boReturn = False
     If IsObject(avB) Then boReturn = (avA Is avB) Else boReturn = (avA = avB)
-    func_CM_CompareVariables = boReturn
+    func_CM_IsSame = boReturn
 End Function
 
 '***************************************************************************************************
@@ -1283,3 +1418,266 @@ Private Function func_CM_FormatDecimalNumber( _
                                                           , True _
                                                           )
 End Function
+
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ToString()
+'Overview                    : 引数の数値・文字列やオブジェクトの中身を可読な表示に変換する
+'Detailed Description        : 配列やディクショナリのようなオブジェクトだったら中身を表示し、
+'                              そうでない場合はVarTypeでオブジェクトのクラスを表示する
+'Argument
+'     avTarget               : 対象
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToString( _
+    byRef avTarget _
+    )
+    Dim oEscapingDoubleQuote, sRet
+    Set oEscapingDoubleQuote = new_RegExp("""", "g")
+    sRet = ""
+    
+    Err.Clear
+    On Error Resume Next
+    
+    If VarType(avTarget) = vbString Then
+        sRet = """" & oEscapingDoubleQuote.Replace(avTarget, """""") & """"
+    ElseIf IsArray(avTarget) Then
+        sRet = func_CM_ToStringArray(avTarget)
+    ElseIf IsObject(avTarget) Then
+        sRet = func_CM_ToStringObject(avTarget)
+    ElseIf IsEmpty(avTarget) Then
+        sRet = "<empty>"
+    ElseIf IsNull(avTarget) Then
+        sRet = "<null>"
+    Else
+        sRet = func_CM_ToStringOther(avTarget)
+    End If
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = func_CM_ToStringUnknown(avTarget)
+    End If
+    
+    func_CM_ToString = sRet
+    
+    Set oEscapingDoubleQuote = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringArray()
+'Overview                    : 配列の中身を可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     avTarget               : 対象
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringArray( _
+    byRef avTarget _
+    )
+    Dim oTemp(), vItem
+    
+    For Each vItem In avTarget
+        Call sub_CM_Push(oTemp, func_CM_ToString(vItem))
+    Next
+    func_CM_ToStringArray = "[" & Join(oTemp, ",") & "]"
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringDictionary()
+'Overview                    : ディクショナリの中身を可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     avTarget               : 対象
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringDictionary( _
+    byRef avTarget _
+    )
+    Dim oTemp(), vKey
+    
+    For Each vKey In avTarget.Keys
+        Call sub_CM_Push(oTemp, func_CM_ToString(vKey) & "=>" & func_CM_ToString(avTarget.Item(vKey)))
+    Next
+    func_CM_ToStringDictionary = "{" & Join(oTemp, ",") & "}"
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringObject()
+'Overview                    : オブジェクトの中身を可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     avTarget               : 対象
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringObject( _
+    byRef avTarget _
+    )
+    Dim sRet
+    
+    Err.Clear
+    On Error Resume Next
+    
+    sRet = func_CM_ToStringDictionary(avTarget)
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = func_CM_ToStringArray(avTarget)
+    End If
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = func_CM_ToStringArray(avTarget.Items)
+    End If
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = "<" & TypeName(avTarget) & ">"
+    End If
+    
+    func_CM_ToStringObject = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringOther()
+'Overview                    : その他オブジェクトの中身を可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     avTarget               : 対象
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringOther( _
+    byRef avTarget _
+    )
+    Dim sRet
+    
+    Err.Clear
+    On Error Resume Next
+    
+    sRet = CStr(avTarget)
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = func_CM_ToStringArray(avTarget)
+    End If
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = func_CM_ToStringDictionary(avTarget)
+    End If
+    
+    If Err.Number <> 0 Then
+        Err.Clear
+        sRet = func_CM_ToStringUnknown(avTarget)
+    End If
+    
+    func_CM_ToStringOther = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringUnknown()
+'Overview                    : 引数の型が不明な場合に可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     avTarget               : 対象
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringUnknown( _
+    byRef avTarget _
+    )
+    func_CM_ToStringUnknown = "<unknown:" & VarType(avTarget) & " " & TypeName(avTarget) & ">"
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_ExcuteSub()
+'Overview                    : 関数を実行する
+'Detailed Description        : 工事中
+'Argument
+'     asSubName              : 実行する関数名
+'     aoArgument             : 実行する関数に渡す引数
+'     asTopic                : トピック
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_ExcuteSub( _
+    byVal asSubName _
+    , byRef aoArgument _
+    , byRef asTopic _
+    )
+    On Error Resume Next
+    
+    Dim oPubSub : Set oPubSub = Nothing
+    If aoArgument.Exists("PubSub") Then Set oPubSub = aoArgument.Item("PubSub")
+    
+    '出版（Publish） 開始
+    If Not oPubSub Is Nothing Then
+        Call oPubSub.Publish(asTopic, Array(5 ,asSubName ,"Start"))
+        Call oPubSub.Publish(asTopic, Array(9 ,asSubName ,func_CM_ToString(aoArgument)))
+    End If
+    
+    Dim oFunc : Set oFunc = GetRef(asSubName)
+    If aoArgument Is Nothing Then
+        Call oFunc()
+    Else
+        Call oFunc(aoArgument)
+    End If
+    
+    If Not oPubSub Is Nothing Then
+        If Err.Number <> 0 Then
+        '出版（Publish） エラー
+            Dim sErrStr :  sErrStr = Err.Number & vbTab & Err.Source & vbTab & Err.Description
+            Call oPubSub.Publish(asTopic, Array(1, asSubName, sErrStr))
+            Call oPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
+        End If
+    End If
+    
+    '出版（Publish） 終了
+    If Not oPubSub Is Nothing Then
+        Call oPubSub.Publish(asTopic, Array(5, asSubName, "End"))
+        Call oPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
+    End If
+    
+    Set oFunc = Nothing
+    Set oPubSub = Nothing
+End Sub
+

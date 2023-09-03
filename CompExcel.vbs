@@ -17,6 +17,7 @@ Option Explicit
 
 '定数
 Private Const Cs_FOLDER_INCLUDE = "include"
+Private PoWriter
 
 'Include用関数定義
 Sub sub_Include( _
@@ -31,10 +32,11 @@ Sub sub_Include( _
     End With
 End Sub
 'Include
-Call sub_Include("VbsBasicLibCommon.vbs")
-Call sub_Include("clsCompareExcel.vbs")
+Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmCalendar.vbs")
-
+Call sub_Include("clsCmPubSub.vbs")
+Call sub_Include("clsCompareExcel.vbs")
+Call sub_Include("VbsBasicLibCommon.vbs")
 
 'メイン関数実行
 Call Main()
@@ -57,23 +59,19 @@ Wscript.Quit
 '2017/04/26         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
+    Dim oParams : Set oParams = new_Dictionary()
     
-    Dim oParams : Set oParams = CreateObject("Scripting.Dictionary")
+    '初期化
+    Call sub_CmpExcelInitialize(oParams)
     
     '当スクリプトの引数取得
-    Call sub_CmpExcelGetParameters( _
-                            oParams _
-                             )
+    Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, WScript.ScriptName)
     
     '比較対象ファイル入力画面の表示と取得
-    Call sub_CmpExcelDispInputFiles( _
-                            oParams _
-                             )
+    Call sub_CM_ExcuteSub("sub_CmpExcelDispInputFiles", oParams, WScript.ScriptName)
     
     'エクセルファイルを比較する
-    Call sub_CmpExcelCompareFiles( _
-                            oParams _
-                             )
+    Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, WScript.ScriptName)
     
     'オブジェクトを開放
     Set oParams = Nothing
@@ -82,6 +80,38 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
+'Function/Sub Name           : sub_CmpExcelInitialize)
+'Overview                    : 初期化
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CmpExcelInitialize( _
+    byRef aoParams _
+    )
+    'ログ出力の設定
+    Dim sPath : sPath = func_CM_FsBuildPath( _
+                    func_CM_FsGetPrivateFolder("log") _
+                    , func_CM_FsGetGetBaseName(WScript.ScriptName) & new_clsCalGetNow().DisplayFormatAs("_YYMMDD_hhmmss.000.log") _
+                    )
+    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
+    
+    '出版-購読型（Publish/subscribe）インスタンスの設定
+    Dim oPubSub : Set oPubSub = new_clsCmPubSub()
+    Call oPubSub.Subscribe(WScript.ScriptName, GetRef("sub_CmpExcelLogger"))
+    Call sub_CM_BindAt( aoParams, "PubSub", oPubSub)
+    
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 2
 'Function/Sub Name           : sub_CmpExcelGetParameters()
 'Overview                    : 当スクリプトの引数取得
 'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
@@ -104,25 +134,28 @@ Private Sub sub_CmpExcelGetParameters( _
     byRef aoParams _
     )
     'パラメータ格納用ハッシュマップ
-    Dim oParameter : Set oParameter = CreateObject("Scripting.Dictionary")
+    Dim oParameter : Set oParameter = new_Dictionary()
+    
     Dim lCnt : lCnt = 0
     Dim sParam
     For Each sParam In WScript.Arguments
         If func_CM_FsFileExists(sParam) Then
         'ファイルが存在する場合パラメータを取得
             lCnt = lCnt + 1
-            Call oParameter.Add(lCnt, sParam)
+            Call sub_CM_BindAt(oParameter, lCnt, sParam)
+'            Call oParameter.Add(lCnt, sParam)
         End If
     Next
     
-    Call aoParams.Add("Parameter", oParameter)
+    Call sub_CM_BindAt(aoParams, "Parameter", oParameter)
+'    Call aoParams.Add("Parameter", oParameter)
     
     'オブジェクトを開放
     Set oParameter = Nothing
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 2
+'Processing Order            : 3
 'Function/Sub Name           : sub_CmpExcelDispInputFiles()
 'Overview                    : 比較対象ファイル入力画面の表示と取得
 'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
@@ -146,7 +179,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
     )
     'パラメータ格納用汎用ハッシュマップ
     Dim oParameter : Set oParameter = aoParams.Item("Parameter")
-
+    
     Const Cs_TITLE_EXCEL = "比較対象ファイルを開く"
     
     If oParameter.Count > 1 Then
@@ -177,7 +210,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 3
+'Processing Order            : 4
 'Function/Sub Name           : sub_CmpExcelCompareFiles()
 'Overview                    : エクセルファイルを比較する
 'Detailed Description        : エラーは無視する
@@ -208,7 +241,7 @@ Private Sub sub_CmpExcelCompareFiles( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 3-1
+'Processing Order            : 4-1
 'Function/Sub Name           : sub_CmpExcelSortByDateLastModified()
 'Overview                    : 比較するファイルを古い順（最終更新日昇順）に並べ替える
 'Detailed Description        : 工事中
@@ -250,4 +283,32 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
     
     'オブジェクトを開放
     Set oParameter = Nothing
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : -
+'Function/Sub Name           : sub_CmpExcelLogger()
+'Overview                    : ログ出力する
+'Detailed Description        : 工事中
+'Argument
+'     avParams               : 配列型のパラメータリスト
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CmpExcelLogger( _
+    byRef avParams _
+    )
+    With PoWriter
+        Dim sCont : sCont = new_clsCalGetNow()
+        sCont = sCont & vbTab & avParams(0)
+        sCont = sCont & vbTab & avParams(1)
+        sCont = sCont & vbTab & avParams(2)
+        .WriteContents(sCont)
+        .newLine()
+    End With
 End Sub

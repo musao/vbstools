@@ -57,7 +57,7 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     
-    Dim oParams : Set oParams = CreateObject("Scripting.Dictionary")
+    Dim oParams : Set oParams = new_Dictionary()
     
     '当スクリプトの引数取得
     Call sub_BackupFilesGetParameters( _
@@ -98,7 +98,7 @@ Private Sub sub_BackupFilesGetParameters( _
     byRef aoParams _
     )
     'パラメータ格納用ハッシュマップ
-    Dim oParameter : Set oParameter = CreateObject("Scripting.Dictionary")
+    Dim oParameter : Set oParameter = new_Dictionary()
     Dim lCnt : lCnt = 0
     Dim lFileFolderKbn : Dim sParam
     For Each sParam In WScript.Arguments
@@ -144,7 +144,7 @@ Private Function func_BackupFilesGetMapParameterInfo( _
     byVal alFileFolderKbn _
     , byVal asPath _
     )
-    Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
+    Dim oTemp : Set oTemp = new_Dictionary()
     Dim boIsFile : boIsFile = False
     If alFileFolderKbn = 1 Then boIsFile = True
     Call oTemp.Add("isFile", boIsFile)
@@ -348,7 +348,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
     )
     
     'バックアップ先フォルダを探す
-    Dim oFolders : Set oFolders = CreateObject("Scripting.Dictionary")
+    Dim oFolders : Set oFolders = new_Dictionary()
     With oFolders
         Call .Add(1, "bak")
         Call .Add(2, "bk")
@@ -415,7 +415,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
     If (Len(sTargetPath)>0) Then Set oTargetFile = func_CM_FsGetFile(sTargetPath)
     
     'パラメータ格納用汎用ハッシュマップに格納する
-    Dim oTempHistory : Set oTempHistory = CreateObject("Scripting.Dictionary")
+    Dim oTempHistory : Set oTempHistory = new_Dictionary()
     With oTempHistory
         Call .Add("Exists", boExistsTargetFile)
         If boExistsTargetFile Then
@@ -424,7 +424,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
             Call .Add("Sequence", lSeq)
         End If
     End With
-    Dim oTempProc : Set oTempProc = CreateObject("Scripting.Dictionary")
+    Dim oTempProc : Set oTempProc = new_Dictionary()
     With oTempProc
         Call .Add("OutputFolderPath", sTargetFolder)
         Call .Add("LatestHistoryInfo", oTempHistory)

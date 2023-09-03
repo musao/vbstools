@@ -194,7 +194,7 @@ Class clsCompareExcel
         Compare = False
         
         '開始日時の取得
-        Set PoStart = new_clsCmCalendar()
+        Set PoStart = new_clsCalGetNow()
         
         '比較結果用の新規ワークブックを作成
         With CreateObject("Excel.Application")
@@ -205,7 +205,7 @@ Class clsCompareExcel
             Set oWorkbookForResults = .Workbooks.Add(-4167)      '新規ワークブック xlWBATWorksheet=-4167
         End With
         
-        Dim oParams : Set oParams = CreateObject("Scripting.Dictionary")
+        Dim oParams : Set oParams = new_Dictionary()
         
         '比較対象ファイルの全シートを比較結果用ワークブックにコピーする
         Call sub_CmpExcelCopyAllSheetsToWorkbookForResults(oWorkbookForResults, oParams)
@@ -216,7 +216,7 @@ Class clsCompareExcel
         '終了
         Set oParams = Nothing
         Set oWorkbookForResults = Nothing
-        Set PoEnd = new_clsCmCalendar()
+        Set PoEnd = new_clsCalGetNow()
         Compare = True
     End Function
     
@@ -299,9 +299,9 @@ Class clsCompareExcel
         
         With oWorkBook
             'ワークシートのリネーム情報格納用ハッシュマップ定義
-            Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = CreateObject("Scripting.Dictionary")
+            Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_Dictionary()
             'タブの色変換用ハッシュマップ定義
-            Dim oStringToThemeColor : Set oStringToThemeColor = CreateObject("Scripting.Dictionary")
+            Dim oStringToThemeColor : Set oStringToThemeColor = new_Dictionary()
             Call oStringToThemeColor.Add("From",2)
             Call oStringToThemeColor.Add("To",8)
 
@@ -355,7 +355,7 @@ Class clsCompareExcel
         End If
 
         'サマリーシートのカラム位置変換用ハッシュマップ定義
-        Dim oStringToColumn : Set oStringToColumn = CreateObject("Scripting.Dictionary")
+        Dim oStringToColumn : Set oStringToColumn = new_Dictionary()
         Call oStringToColumn.Add("From",1)
         Call oStringToColumn.Add("To",2)
         
@@ -432,7 +432,7 @@ Class clsCompareExcel
         byVal asBefore _
         , byVal asAfter _
         )
-        Dim oTemp : Set oTemp = CreateObject("Scripting.Dictionary")
+        Dim oTemp : Set oTemp = new_Dictionary()
         Call oTemp.Add("Before", asBefore)
         Call oTemp.Add("After", asAfter)
         Set func_CmpExcelGetMapWorkSheetRenameInfo = oTemp

@@ -26,7 +26,7 @@ Class clsFsBase
         PdbLastCacheUpdateTime = 0
         PdbValidPeriod = 1
         
-        Set PoProp = CreateObject("Scripting.Dictionary")
+        Set PoProp = new_Dictionary()
         With PoProp
             .Add "Attributes", vbNullString                '属性
             .Add "DateCreated", vbNullString               '作成された日付と時刻
@@ -235,38 +235,51 @@ Class clsFsBase
             With func_FsBaseGetObject()
                 Select Case asKey
                 Case "Attributes"                          '属性
-                    Call sub_CM_TransferToCollection(.Attributes, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .Attributes)
+'                    Call sub_CM_TransferToCollection(.Attributes, PoProp, asKey)
                 Case "DateCreated"                         '作成された日付と時刻
-                    Call sub_CM_TransferToCollection(.DateCreated, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .DateCreated)
+'                    Call sub_CM_TransferToCollection(.DateCreated, PoProp, asKey)
                 Case "DateLastAccessed"                    '最後にアクセスした日付と時刻
-                    Call sub_CM_TransferToCollection(.DateLastAccessed, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .DateLastAccessed)
+'                    Call sub_CM_TransferToCollection(.DateLastAccessed, PoProp, asKey)
                 Case "DateLastModified"                    '最終更新日時
                     '最終更新日は常に設定するため、ここでは何もしない
                 Case "Drive"                               'ファイルまたはフォルダーがあるドライブのドライブ文字
-                    Call sub_CM_TransferToCollection(.Drive, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .Drive)
+'                    Call sub_CM_TransferToCollection(.Drive, PoProp, asKey)
                 Case "Name"                                '名前
-                    Call sub_CM_TransferToCollection(.Name, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .Name)
+'                    Call sub_CM_TransferToCollection(.Name, PoProp, asKey)
                 Case "ParentFolder"                        '親のフォルダーオブジェクト
-                    Call sub_CM_TransferToCollection(.ParentFolder, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .ParentFolder)
+'                    Call sub_CM_TransferToCollection(.ParentFolder, PoProp, asKey)
                 Case "Path"                                'パス
-                    Call sub_CM_TransferToCollection(.Path, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .Path)
+'                    Call sub_CM_TransferToCollection(.Path, PoProp, asKey)
                 Case "ShortName"                           '短い名前(8.3 名前付け規則)
-                    Call sub_CM_TransferToCollection(.ShortName, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .ShortName)
+'                    Call sub_CM_TransferToCollection(.ShortName, PoProp, asKey)
                 Case "ShortPath"                           '短いパス(8.3 名前付け規則)
-                    Call sub_CM_TransferToCollection(.ShortPath, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .ShortPath)
+'                    Call sub_CM_TransferToCollection(.ShortPath, PoProp, asKey)
                 Case "Size"                                'サイズ（バイト単位）
-                    Call sub_CM_TransferToCollection(.Size, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .Size)
+'                    Call sub_CM_TransferToCollection(.Size, PoProp, asKey)
                 Case "Type"                                '種類
-                    Call sub_CM_TransferToCollection(.Type, PoProp, asKey)
+                    Call sub_CM_BindAt(PoProp, asKey, .Type)
+'                    Call sub_CM_TransferToCollection(.Type, PoProp, asKey)
                 End Select
                 '最終更新日時 と 最終キャッシュ更新時間（Timer関数の値） の更新
-                Call sub_CM_TransferToCollection(.DateLastModified, PoProp, "DateLastModified")
+                Call sub_CM_BindAt(PoProp, "DateLastModified", .DateLastModified)
+'                Call sub_CM_TransferToCollection(.DateLastModified, PoProp, "DateLastModified")
                 PdbLastCacheUpdateTime = Timer()
             End With
         End If
         
         '値を返却
-        Call sub_CM_TransferBetweenVariables(PoProp.Item(asKey), Prop)
+        Call sub_CM_Bind(Prop, PoProp.Item(asKey))
+'        Call sub_CM_TransferBetweenVariables(PoProp.Item(asKey), Prop)
     End Function
     
     '***************************************************************************************************
