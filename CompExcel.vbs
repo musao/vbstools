@@ -62,16 +62,19 @@ Sub Main()
     Dim oParams : Set oParams = new_Dictionary()
     
     '初期化
-    Call sub_CmpExcelInitialize(oParams)
+    Call sub_CM_ExcuteSub("sub_CmpExcelInitialize", oParams, "log")
     
     '当スクリプトの引数取得
-    Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, WScript.ScriptName)
+    Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, "log")
     
     '比較対象ファイル入力画面の表示と取得
-    Call sub_CM_ExcuteSub("sub_CmpExcelDispInputFiles", oParams, WScript.ScriptName)
+    Call sub_CM_ExcuteSub("sub_CmpExcelDispInputFiles", oParams, "log")
     
     'エクセルファイルを比較する
-    Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, WScript.ScriptName)
+    Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, "log")
+    
+    '終了処理
+    Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", oParams, "log")
     
     'オブジェクトを開放
     Set oParams = Nothing
@@ -80,7 +83,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_CmpExcelInitialize)
+'Function/Sub Name           : sub_CmpExcelInitialize()
 'Overview                    : 初期化
 'Detailed Description        : 工事中
 'Argument
@@ -105,7 +108,7 @@ Private Sub sub_CmpExcelInitialize( _
     
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Dim oPubSub : Set oPubSub = new_clsCmPubSub()
-    Call oPubSub.Subscribe(WScript.ScriptName, GetRef("sub_CmpExcelLogger"))
+    Call oPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
     Call sub_CM_BindAt( aoParams, "PubSub", oPubSub)
     
 End Sub
@@ -143,12 +146,10 @@ Private Sub sub_CmpExcelGetParameters( _
         'ファイルが存在する場合パラメータを取得
             lCnt = lCnt + 1
             Call sub_CM_BindAt(oParameter, lCnt, sParam)
-'            Call oParameter.Add(lCnt, sParam)
         End If
     Next
     
     Call sub_CM_BindAt(aoParams, "Parameter", oParameter)
-'    Call aoParams.Add("Parameter", oParameter)
     
     'オブジェクトを開放
     Set oParameter = Nothing
@@ -194,6 +195,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
             sPath = .GetOpenFilename( , , Cs_TITLE_EXCEL, , False)
             If sPath = False Then
             'ファイル選択キャンセルの場合は当スクリプトを終了する
+                Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", aoParams, "log")
                 Wscript.Quit
             End If
             If func_CM_FsFileExists(sPath) Then
@@ -228,13 +230,17 @@ Private Sub sub_CmpExcelCompareFiles( _
     byRef aoParams _
     )
     
-    '3-1 比較するファイルを古い順（最終更新日昇順）に並べ替える
-    Call sub_CmpExcelSortByDateLastModified(aoParams)
+    '4-1 比較するファイルを古い順（最終更新日昇順）に並べ替える
+    Call sub_CM_ExcuteSub("sub_CmpExcelSortByDateLastModified", aoParams, "log")
     
-    '3-2 比較
+    '4-2 比較
     With New clsCompareExcel
-        .PathFrom = aoParams.Item("Parameter").Item(1)
-        .PathTo = aoParams.Item("Parameter").Item(2)
+        Call sub_CM_Bind(.PubSub, aoParams.Item("PubSub"))
+        Call sub_CM_Bind(.PathFrom, aoParams.Item("Parameter").Item(1))
+        Call sub_CM_Bind(.PathTo, aoParams.Item("Parameter").Item(2))
+'        Set .PubSub = aoParams.Item("PubSub")
+'        .PathFrom = aoParams.Item("Parameter").Item(1)
+'        .PathTo = aoParams.Item("Parameter").Item(2)
         .Compare()
     End With
 
@@ -261,17 +267,16 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
     'パラメータ格納用汎用ハッシュマップ
     Dim oParameter : Set oParameter = aoParams.Item("Parameter")
     
-    If func_CM_FsGetFile(oParameter.Item(1)).DateLastModified _
-        <= _
-        func_CM_FsGetFile(oParameter.Item(2)).DateLastModified _
-        Then
-    '最初のファイルの方が古い（最終更新日が小さい）場合、処理を抜ける
-        Exit Sub
-    End If
-    
-    '値を入れ替える
     With oParameter
-        Dim sValue1 : Dim sValue2
+        Dim oDateTimeA : Set oDateTimeA = new_clsCalSetDate(func_CM_FsGetFile(.Item(1)).DateLastModified)
+        Dim oDateTimeB : Set oDateTimeB = new_clsCalSetDate(func_CM_FsGetFile(.Item(2)).DateLastModified)
+        If oDateTimeA.CompareTo(oDateTimeB) <= 0 Then
+        '最初のファイルの方が古い（最終更新日が小さい）場合、処理を抜ける
+            Exit Sub
+        End If
+        
+        '値を入れ替える
+        Dim sValue1, sValue2
         sValue1 = .Item(1)
         sValue2 = .Item(2)
         
@@ -283,6 +288,31 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
     
     'オブジェクトを開放
     Set oParameter = Nothing
+    Set oDateTimeA = Nothing
+    Set oDateTimeB = Nothing
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 5
+'Function/Sub Name           : sub_CmpExcelTerminate()
+'Overview                    : 初期化
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CmpExcelTerminate( _
+    byRef aoParams _
+    )
+    'ファイル接続をクローズする
+    Call PoWriter.FileClose()
+    Set PoWriter = Nothing
 End Sub
 
 '***************************************************************************************************

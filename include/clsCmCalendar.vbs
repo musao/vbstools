@@ -45,7 +45,7 @@ End Function
 Private Function new_clsCalSetDate( _
     ByVal avDateTime _
     )
-    Set new_clsCalGetNow = (New clsCmCalendar).SetDateTime(avDateTime)
+    Set new_clsCalSetDate = (New clsCmCalendar).SetDateTime(avDateTime)
 End Function
 
 Class clsCmCalendar

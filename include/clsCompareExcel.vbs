@@ -14,16 +14,45 @@ Class clsCompareExcel
     Private PoEnd
     Private PsPathFrom
     Private PsPathTo
+    Private PoPubSub
     Private Cs_FOLDER_TEMP
     
-    'コンストラクタ
+    '***************************************************************************************************
+    'Function/Sub Name           : Class_Initialize()
+    'Overview                    : コンストラクタ
+    'Detailed Description        : 内部変数の初期化
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/03         Y.Fujii                  First edition
+    '***************************************************************************************************
     Private Sub Class_Initialize()
         '初期化
         PsPathFrom = ""
         PsPathTo = ""
+        Set PoPubSub = Nothing
         Cs_FOLDER_TEMP = "tmp"
     End Sub
-    'デストラクタ
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Class_Terminate()
+    'Overview                    : デストラクタ
+    'Detailed Description        : 終了処理
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/03         Y.Fujii                  First edition
+    '***************************************************************************************************
     Private Sub Class_Terminate()
     End Sub
     
@@ -101,6 +130,44 @@ Class clsCompareExcel
     '***************************************************************************************************
     Public Property Get PathTo()
         PathTo = PsPathTo
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Set PubSub()
+    'Overview                    : 出版-購読型（Publish/subscribe）クラスのオブジェクトを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoPubSub               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Set PubSub( _
+        byRef aoPubSub _
+        )
+        Set PoPubSub = aoPubSub
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get PubSub()
+    'Overview                    : 出版-購読型（Publish/subscribe）クラスのオブジェクトを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     出版-購読型（Publish/subscribe）クラスのオブジェクト
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get PubSub()
+        Set PubSub = PoPubSub
     End Property
     
     '***************************************************************************************************

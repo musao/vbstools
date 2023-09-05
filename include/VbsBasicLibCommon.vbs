@@ -1647,14 +1647,15 @@ Private Sub sub_CM_ExcuteSub( _
     On Error Resume Next
     
     Dim oPubSub : Set oPubSub = Nothing
-    If aoArgument.Exists("PubSub") Then Set oPubSub = aoArgument.Item("PubSub")
     
     '出版（Publish） 開始
+    If aoArgument.Exists("PubSub") Then Set oPubSub = aoArgument.Item("PubSub")
     If Not oPubSub Is Nothing Then
         Call oPubSub.Publish(asTopic, Array(5 ,asSubName ,"Start"))
         Call oPubSub.Publish(asTopic, Array(9 ,asSubName ,func_CM_ToString(aoArgument)))
     End If
     
+    '関数の実行
     Dim oFunc : Set oFunc = GetRef(asSubName)
     If aoArgument Is Nothing Then
         Call oFunc()
@@ -1662,18 +1663,16 @@ Private Sub sub_CM_ExcuteSub( _
         Call oFunc(aoArgument)
     End If
     
+    If aoArgument.Exists("PubSub") Then Set oPubSub = aoArgument.Item("PubSub")
     If Not oPubSub Is Nothing Then
         If Err.Number <> 0 Then
-        '出版（Publish） エラー
+        'エラー
             Dim sErrStr :  sErrStr = Err.Number & vbTab & Err.Source & vbTab & Err.Description
             Call oPubSub.Publish(asTopic, Array(1, asSubName, sErrStr))
-            Call oPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
+        Else
+        '正常
+            Call oPubSub.Publish(asTopic, Array(5, asSubName, "End"))
         End If
-    End If
-    
-    '出版（Publish） 終了
-    If Not oPubSub Is Nothing Then
-        Call oPubSub.Publish(asTopic, Array(5, asSubName, "End"))
         Call oPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
     End If
     
