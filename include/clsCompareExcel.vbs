@@ -10,8 +10,6 @@
 '***************************************************************************************************
 Class clsCompareExcel
     'クラス内変数、定数
-    Private PoStart
-    Private PoEnd
     Private PsPathFrom
     Private PsPathTo
     Private PoPubSub
@@ -171,78 +169,6 @@ Class clsCompareExcel
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get ProcDate()
-    'Overview                    : 処理実施日時を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     処理日時
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/10/13         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get ProcDate()
-        Set ProcDate = PoStart
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get StartTime()
-    'Overview                    : 処理開始日時を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     処理開始日時
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/10/13         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get StartTime()
-        StartTime = PoStart.DisplayFormatAs("YYYYMMDD hh:mm:ss.000000")
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get EndTime()
-    'Overview                    : 処理終了日時を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     処理の終了日時
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/10/13         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get EndTime()
-        EndTime = PoEnd.DisplayFormatAs("YYYYMMDD hh:mm:ss.000000")
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get ElapsedTime()
-    'Overview                    : 処理にかかった秒数を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     処理にかかった秒数
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2022/10/13         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get ElapsedTime()
-       ElapsedTime = PoEnd.DifferenceInScondsFrom(PoStart)
-    End Property
-    
-    '***************************************************************************************************
     'Function/Sub Name           : Compare()
     'Overview                    : エクセルファイルを比較する
     'Detailed Description        : 工事中
@@ -260,9 +186,6 @@ Class clsCompareExcel
         )
         Compare = False
         
-        '開始日時の取得
-        Set PoStart = new_clsCalGetNow()
-        
         '比較結果用の新規ワークブックを作成
         With CreateObject("Excel.Application")
             .DisplayAlerts = False
@@ -272,18 +195,17 @@ Class clsCompareExcel
             Set oWorkbookForResults = .Workbooks.Add(-4167)      '新規ワークブック xlWBATWorksheet=-4167
         End With
         
-        Dim oParams : Set oParams = new_Dictionary()
+        Dim oParams : Set oParams = new_DictSetValues(Array("WorkbookForResults", oWorkbookForResults))
         
         '比較対象ファイルの全シートを比較結果用ワークブックにコピーする
-        Call sub_CmpExcelCopyAllSheetsToWorkbookForResults(oWorkbookForResults, oParams)
+        Call sub_CmpExcelCopyAllSheetsToWorkbookForResults(oParams)
         
         'エクセルファイルを比較する
-        Call sub_CmpExcelCompare(oWorkbookForResults, oParams)
+        Call sub_CmpExcelCompare(oParams)
         
         '終了
         Set oParams = Nothing
         Set oWorkbookForResults = Nothing
-        Set PoEnd = new_clsCalGetNow()
         Compare = True
     End Function
     
@@ -292,13 +214,13 @@ Class clsCompareExcel
     'Overview                    : 比較対象ファイルの全シートを比較結果用ワークブックにコピーする
     'Detailed Description        : パラメータ格納用汎用ハッシュマップに格納する
     '                              ワークシートのリネーム情報のハッシュマップの構成
-    '                              Key                      Value
-    '                              -------------------      --------------------------------------------
-    '                              "From"                   比較元のワークシートのリネーム情報のハッシュマップ
-    '                              "To"                     比較先のワークシートのリネーム情報のハッシュマップ
+    '                              Key                       Value
+    '                              --------------------      -------------------------------------------
+    '                              "WorkbookForResults"      比較結果用のワークブック
+    '                              "From"                    比較元のワークシートのリネーム情報のハッシュマップ
+    '                              "To"                      比較先のワークシートのリネーム情報のハッシュマップ
     'Argument
     '     aoParams               : パラメータ格納用汎用ハッシュマップ
-    '     aoWorkbookForResults   : 比較結果用のワークブック
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -308,21 +230,24 @@ Class clsCompareExcel
     '2017/04/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub sub_CmpExcelCopyAllSheetsToWorkbookForResults( _
-        byRef aoWorkbookForResults _
-        , byRef aoParams _
+        byRef aoParams _
         )
+        
+        'パラメータ格納用汎用ハッシュマップから必要な要素を取り出す
+        Dim oWorkbookForResults : Call sub_CM_Bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
         
         Dim sPath : Dim sFromToString
         '比較元ファイルのコピー
         sPath = PsPathFrom : sFromToString = "From" 
         Call aoParams.Add(sFromToString, _
-            func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(aoWorkbookForResults, sPath, sFromToString))
-
+            func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(oWorkbookForResults, sPath, sFromToString))
+        
         '比較先ファイルのコピー
         sPath = PsPathTo : sFromToString = "To"
         Call aoParams.Add(sFromToString, _
-            func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(aoWorkbookForResults, sPath, sFromToString))
-
+            func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(oWorkbookForResults, sPath, sFromToString))
+        
+        Set oWorkbookForResults = Nothing
     End Sub
 
     '***************************************************************************************************
@@ -368,10 +293,8 @@ Class clsCompareExcel
             'ワークシートのリネーム情報格納用ハッシュマップ定義
             Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_Dictionary()
             'タブの色変換用ハッシュマップ定義
-            Dim oStringToThemeColor : Set oStringToThemeColor = new_Dictionary()
-            Call oStringToThemeColor.Add("From",2)
-            Call oStringToThemeColor.Add("To",8)
-
+            Dim oStringToThemeColor : Set oStringToThemeColor = new_DictSetValues(Array("From", 2, "To", 8))
+            
             Dim oWorksheet
             Dim lCnt : lCnt = 0
             For Each oWorksheet In .Worksheets
@@ -380,15 +303,16 @@ Class clsCompareExcel
                     
                     '変更前後のワークシート名を取得
                     lCnt = lCnt + 1
-                    Call oWorkSheetRenameInfo.Add( _
-                                    lCnt, func_CmpExcelGetMapWorkSheetRenameInfo( _
-                                                            oWorksheet.Name _
-                                                            , func_CmpExcelMakeSheetName( _
-                                                                                    lCnt _
-                                                                                    , asFromToString _
-                                                                                    ) _
-                                                            ) _
-                                    )
+                    Call sub_CM_BindAt( _
+                             oWorkSheetRenameInfo _
+                             , lCnt _
+                             , new_DictSetValues( _
+                                 Array( _
+                                     "Before", oWorksheet.Name, _
+                                     "After", func_CmpExcelMakeSheetName(lCnt, asFromToString) _
+                                     ) _
+                                 ) _
+                             )
                     
                     'シートの表示を整える
                     If oWorksheet.AutoFilterMode Then
@@ -422,9 +346,7 @@ Class clsCompareExcel
         End If
 
         'サマリーシートのカラム位置変換用ハッシュマップ定義
-        Dim oStringToColumn : Set oStringToColumn = new_Dictionary()
-        Call oStringToColumn.Add("From",1)
-        Call oStringToColumn.Add("To",2)
+        Dim oStringToColumn : Set oStringToColumn = new_DictSetValues(Array("From", 1, "To", 2))
         
         'サマリーシートに比較対象ファイルの情報を出力
         Dim lRow : Dim lColumn : Dim oItem
@@ -477,42 +399,11 @@ Class clsCompareExcel
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmpExcelGetMapWorkSheetRenameInfo()
-    'Overview                    : 変更前後のワークシート名格納用ハッシュマップ作成
-    'Detailed Description        : 変更前後のワークシート名格納用ハッシュマップの構成
-    '                              Key                      Value
-    '                              -------------------      --------------------------------------------
-    '                              "Before"                 変更前のシート名
-    '                              "After"                  変更後のシート名
-    'Argument
-    '     asBefore               : 変更前のシート名
-    '     asAfter                : 変更後のシート名
-    'Return Value
-    '     変更前後のワークシート名格納用ハッシュマップ
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2017/04/26         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function func_CmpExcelGetMapWorkSheetRenameInfo( _
-        byVal asBefore _
-        , byVal asAfter _
-        )
-        Dim oTemp : Set oTemp = new_Dictionary()
-        Call oTemp.Add("Before", asBefore)
-        Call oTemp.Add("After", asAfter)
-        Set func_CmpExcelGetMapWorkSheetRenameInfo = oTemp
-        Set oTemp = Nothing
-    End Function
-
-    '***************************************************************************************************
     'Function/Sub Name           : sub_CmpExcelCompare()
     'Overview                    : エクセルファイルを比較する
     'Detailed Description        : 工事中
     'Argument
     '     aoParams               : パラメータ格納用汎用ハッシュマップ
-    '     aoWorkbookForResults   : 比較結果用のワークブック
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -522,27 +413,27 @@ Class clsCompareExcel
     '2017/04/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub sub_CmpExcelCompare( _
-        byRef aoWorkbookForResults _
-        , byRef aoParams _
+        byRef aoParams _
         )
-        'ワークシートごとのシート名リネーム情報用ハッシュマップ
-        Dim oFrom : Set oFrom = aoParams.Item("From")
-        Dim oTo : Set oTo = aoParams.Item("To")
+        'パラメータ格納用汎用ハッシュマップから必要な要素を取り出す
+        Dim oWorkbookForResults : Call sub_CM_Bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
+        Dim oFrom : Call sub_CM_Bind(oFrom, aoParams.Item("From"))
+        Dim oTo : Call sub_CM_Bind(oTo, aoParams.Item("To"))
 
         Dim lCnt
         For lCnt = 1 To func_CM_MathMin(oFrom.Count, oTo.Count)
         '比較元先の各シートに差分が分かる書式設定をする
             '比較元（To）のシートに対し比較先（From）との差分が分かるようにする
             Call sub_CmpExcelSetFormatToUnderstandDifference(_
-                    aoWorkbookForResults, oFrom.Item(lCnt).Item("After"), oTo.Item(lCnt).Item("After"))        
+                    oWorkbookForResults, oFrom.Item(lCnt).Item("After"), oTo.Item(lCnt).Item("After"))
             '比較先（From）のシートに対し比較元（To）との差分が分かるようにする
             Call sub_CmpExcelSetFormatToUnderstandDifference( _
-                    aoWorkbookForResults, oTo.Item(lCnt).Item("After"), oFrom.Item(lCnt).Item("After"))        
+                    oWorkbookForResults, oTo.Item(lCnt).Item("After"), oFrom.Item(lCnt).Item("After"))
         Next
 
         '同じブックの新しいウィンドウを開く
-        aoWorkbookForResults.Worksheets(oFrom.Item(1).Item("After")).Activate
-        With aoWorkbookForResults.Windows(1).NewWindow
+        oWorkbookForResults.Worksheets(oFrom.Item(1).Item("After")).Activate
+        With oWorkbookForResults.Windows(1).NewWindow
             Dim sCaption : sCaption = .Caption
             Dim oWorksheet
             For Each oWorksheet In .Parent.Worksheets
@@ -550,10 +441,10 @@ Class clsCompareExcel
                 .Zoom = 25
             Next
         End With
-        aoWorkbookForResults.Worksheets(oTo.Item(1).Item("After")).Activate
+        oWorkbookForResults.Worksheets(oTo.Item(1).Item("After")).Activate
         '並べて比較
-        aoWorkbookForResults.Activate
-        With aoWorkbookForResults.Parent
+        oWorkbookForResults.Activate
+        With oWorkbookForResults.Parent
             .Windows.CompareSideBySideWith(sCaption)
             Call .Windows.Arrange(-4166, True)               'xlVertical = -4166
             .DisplayAlerts = True
@@ -566,6 +457,7 @@ Class clsCompareExcel
         Set oWorksheet = Nothing
         Set oTo = Nothing
         Set oFrom = Nothing
+        Set oWorkbookForResults = Nothing
 
     End Sub
 

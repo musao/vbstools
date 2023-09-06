@@ -235,12 +235,9 @@ Private Sub sub_CmpExcelCompareFiles( _
     
     '4-2 î‰är
     With New clsCompareExcel
-        Call sub_CM_Bind(.PubSub, aoParams.Item("PubSub"))
-        Call sub_CM_Bind(.PathFrom, aoParams.Item("Parameter").Item(1))
-        Call sub_CM_Bind(.PathTo, aoParams.Item("Parameter").Item(2))
-'        Set .PubSub = aoParams.Item("PubSub")
-'        .PathFrom = aoParams.Item("Parameter").Item(1)
-'        .PathTo = aoParams.Item("Parameter").Item(2)
+'        Call sub_CM_Bind(.PubSub, aoParams.Item("PubSub"))
+        .PathFrom = aoParams.Item("Parameter").Item(1)
+        .PathTo = aoParams.Item("Parameter").Item(2)
         .Compare()
     End With
 
