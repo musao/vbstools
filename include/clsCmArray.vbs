@@ -51,6 +51,32 @@ Private Function new_ArraySetData( _
     Set oArray = Nothing
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : new_ArraySplit()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : vbscriptのSplit関数と同等の機能、同クラスのインスタンスを返す
+'Argument
+'     asTarget               : 部分文字列と区切り文字を含む文字列表現
+'     asDelimiter            : 区切り文字
+'     alCompare              : 比較方法
+'                                "0"(vbBinaryCompare):バイナリ比較を実行します
+'                                "1"(vbTextCompare ):テキスト比較を実行します
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArraySplit( _
+    byVal asTarget _
+    , byVal asDelimiter _
+    , byVal alCompare _
+    )
+    Set new_ArraySplit = new_ArraySetData(Split(asTarget, asDelimiter, -1, alCompare))
+End Function
+
 Class clsCmArray
     'クラス内変数、定数
     Private PoArray
@@ -106,9 +132,72 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Default Property Get Item( _
-        ByVal aIndex _
+        byVal aIndex _
         )
         Call sub_CM_Bind(Item, func_CmArrayItem(aIndex))
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Set Item()
+    'Overview                    : 配列の指定したインデックスに要素を設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aIndex                 : インデックス
+    '     aoElement              : 設定する要素
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Set Item( _
+        byVal aIndex _
+        , byRef aoElement _
+        )
+        Call sub_CM_BindAt(PoArray, aIndex, aoElement)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Let Item()
+    'Overview                    : 配列の指定したインデックスに要素を設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aIndex                 : インデックス
+    '     aoElement              : 設定する要素
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Let Item( _
+        byVal aIndex _
+        , byRef aoElement _
+        )
+        Call sub_CM_BindAt(PoArray, aIndex, aoElement)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get Items()
+    'Overview                    : 配列を返す
+    'Detailed Description        : func_CmArrayConvArray()に委譲する
+    'Argument
+    '     なし
+    'Return Value
+    '     配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get Items( _
+        )
+        Items = func_CmArrayConvArray()
     End Property
     
     '***************************************************************************************************
@@ -449,7 +538,7 @@ Class clsCmArray
     Private Function func_CmArrayFilter( _
         byRef aoFunc _
         )
-        Dim oItem, oArray()
+        Dim oItem, oArray
         
         '引数の関数で抽出した要素だけ抽出
         If PoArray.Count>0 Then
@@ -464,6 +553,35 @@ Class clsCmArray
         Call sub_CM_Bind(func_CmArrayFilter, new_ArraySetData(oArray))
         
         Set oItem = Nothing
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArrayConvArray()
+    'Overview                    : 内部で保持する配列（ディクショナリ）をプリミティブの配列に変換する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArrayConvArray( _
+        )
+        Dim oArray
+        
+        If PoArray.Count>0 Then
+            Dim oItem
+            For Each oItem In PoArray.Items()
+                Call sub_CM_Push(oArray, oItem)
+            Next
+        End If
+        func_CmArrayConvArray = oArray
+        
+        Set oArray = Nothing
     End Function
     
 End Class
