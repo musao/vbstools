@@ -59,8 +59,8 @@ End Function
 '     asTarget               : 部分文字列と区切り文字を含む文字列表現
 '     asDelimiter            : 区切り文字
 '     alCompare              : 比較方法
-'                                "0"(vbBinaryCompare):バイナリ比較を実行します
-'                                "1"(vbTextCompare ):テキスト比較を実行します
+'                                0(vbBinaryCompare):バイナリ比較を実行します
+'                                1(vbTextCompare ):テキスト比較を実行します
 'Return Value
 '     同クラスのインスタンス
 '---------------------------------------------------------------------------------------------------
@@ -354,6 +354,54 @@ Class clsCmArray
         byRef aoFunc _
         )
         Call sub_CM_Bind(Filter, func_CmArrayFilter(aoFunc))
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : FilterVbs()
+    'Overview                    : 引数で指定した条件に合致する要素だけの配列を作成する
+    'Detailed Description        : vbscriptのFilter関数と同等の機能
+    'Argument
+    '     asTarget               : 検索する文字列
+    '     aobInclude             : 検索する文字列を検索対象とするか否かの区分
+    '                                True :検索する文字列を検索対象とする
+    '                                False:検索する文字列以外を検索対象とする
+    '     alCompare              : 比較方法
+    '                                0(vbBinaryCompare):バイナリ比較を実行します
+    '                                1(vbTextCompare ):テキスト比較を実行します
+    'Return Value
+    '     同クラスのインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function FilterVbs( _
+        byVal asTarget _
+        , byVal aobInclude _
+        , byVal alCompare _
+        )
+        Call sub_CM_Bind(FilterVbs, new_ArraySetData(Filter(func_CmArrayConvArray(), asTarget, aobInclude, alCompare)))
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : JoinVbs()
+    'Overview                    : 配列の各要素を連結した文字列を作成する
+    'Detailed Description        : vbscriptのJoin関数と同等の機能
+    'Argument
+    '     asDelimiter            : 区切り文字
+    'Return Value
+    '     配列の各要素を連結した文字列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function JoinVbs( _
+        byVal asDelimiter _
+        )
+        JoinVbs = Join(func_CmArrayConvArray(), asDelimiter)
     End Function
     
     
