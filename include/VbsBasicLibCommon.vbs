@@ -953,6 +953,71 @@ Private Function func_CM_StrLen( _
     func_CM_StrLen = lLength
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_GenerateRandomString()
+'Overview                    : ランダムな文字列を生成する
+'Detailed Description        : 指定した長さ、文字の種類でランダムな文字列を生成する
+'Argument
+'     alLength               : 文字の長さ
+'     alCharacterType        : 文字の種類（複数指定する場合は以下の和を設定する）
+'                                 1:半角英字大文字
+'                                 2:半角英字大文字
+'                                 4:半角数字
+'                                 8:半角記号
+'Return Value
+'     生成した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/13         Y.Fujii                  First edition
+'***************************************************************************************************
+'Private Function func_CM_GenerateRandomString( _
+'    byVal alLength _
+'    , byVal alCharacterType _
+'    )
+'    Dim lType : lType = alCharacterType
+'    Dim lPowerOf2 : lPowerOf2 = 3
+'    Dim lQuotient,lDivide
+'    Do Until lPowerOf2<0
+'        lDivide = 2~lPowerOf2
+'        lQuotient = lType \ lDivide
+'        lType = lType Mod lDivide
+'        
+'        If lQuotient>0 Then
+'            
+'        End If
+'        
+'        lPowerOf2 = lPowerOf2 - 1
+'    Loop
+'    
+'End Function
+'英字	大文字	Asc("A") ～ Asc("Z")
+'		小文字	Asc("a") ～ Asc("z")
+'数字			Asc("0") ～ Asc("9")
+'記号			Asc("!") ～ Asc("/")、Asc(":") ～ Asc("@")、Asc("[") ～ Asc("`")、Asc("{") ～ Asc("~")
+'
+'
+'
+'!（エクスクラメーション）	21
+'"							22
+'#（シャープ）				23
+'$（ドル）					24
+'%（パーセント）				25
+'&（アンド）					26
+''							27
+'(（左かっこ）				28
+')（右かっこ）				29
+'*（アスタリスク）			2a
+'+（プラス）					2b
+',（カンマ）					2c
+'-（ハイフン）				2d
+'.（ドット）					2e
+'/（スラッシュ）				2f
+'_（アンダーバー）			5f
+'~（チルダ）					7e
+'|（パイプ）					7c
+
 
 '数学系
 
