@@ -348,7 +348,7 @@ Class clsCmCalendar
     '                               m{m]      分
     '                               s{s]      秒
     '                               .000      ミリ秒まで
-    '                               .000000   ナノ秒まで
+    '                               .000000   マイクロ秒まで
     'Argument
     '     asFormat               : 表示形式
     'Return Value
