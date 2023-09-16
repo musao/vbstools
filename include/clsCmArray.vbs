@@ -245,7 +245,7 @@ Class clsCmArray
     
     '***************************************************************************************************
     'Function/Sub Name           : Every()
-    'Overview                    : 配列の全ての要素について引数の関数の判定を満たすか確認する
+    'Overview                    : 配列の全ての要素が引数の関数の判定を満たすか確認する
     'Detailed Description        : func_CmArrayEvery()に委譲する
     'Argument
     '     aoFunc                 : 判定する関数
@@ -260,7 +260,7 @@ Class clsCmArray
     Public Function Every( _
         byRef aoFunc _
         )
-        Every = func_CmArrayEvery(aoFunc)
+        Every = func_CmArrayEveryOrSome(aoFunc, True)
     End Function
     
     '***************************************************************************************************
@@ -492,7 +492,7 @@ Class clsCmArray
     
     '***************************************************************************************************
     'Function/Sub Name           : Reduce()
-    'Overview                    : 配列のそれぞれの要素に対して引数の関数で算出した結果を返す
+    'Overview                    : 配列のそれぞれの要素に対して正順に引数の関数で算出した結果を返す
     'Detailed Description        : func_CmArrayReduce()に委譲する
     'Argument
     '     aoFunc                 : 関数
@@ -507,7 +507,27 @@ Class clsCmArray
     Public Function Reduce( _
         byRef aoFunc _
         )
-        Call sub_CM_Bind(Reduce, func_CmArrayReduce(aoFunc))
+        Call sub_CM_Bind(Reduce, func_CmArrayReduce(aoFunc, True))
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : ReduceRight()
+    'Overview                    : 配列のそれぞれの要素に対して逆順に引数の関数で算出した結果を返す
+    'Detailed Description        : func_CmArrayReduce()に委譲する
+    'Argument
+    '     aoFunc                 : 関数
+    'Return Value
+    '     引数の関数で算出した結果
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/16         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function ReduceRight( _
+        byRef aoFunc _
+        )
+        Call sub_CM_Bind(ReduceRight, func_CmArrayReduce(aoFunc, False))
     End Function
     
     '***************************************************************************************************
@@ -546,6 +566,51 @@ Class clsCmArray
     Public Function Shift( _
         )
         Call sub_CM_Bind(Shift, func_CmArrayShift())
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Slice()
+    'Overview                    : 配列の一部を切り出した配列を生成する
+    'Detailed Description        : func_CmArraySlice()に委譲する
+    'Argument
+    '     alStart                : 開始位置のインデックス番号、負値は最後の要素のからの位置を示す
+    '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
+    '     alEnd                  : 終了位置のインデックス番号、負値はalStartと同じ
+    '                              切り出した配列に終了位置の要素は含まない
+    '                              vbNullStringを指定した場合は切り出した配列に最後の要素を含める
+    'Return Value
+    '     同クラスの別インスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/16         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function Slice( _
+        byVal alStart _
+        , byVal alEnd _
+        )
+        Set Slice = func_CmArraySlice(alStart, alEnd)
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Some()
+    'Overview                    : 配列のいずれか一つの要素が引数の関数の判定を満たすか確認する
+    'Detailed Description        : func_CmArrayEvery()に委譲する
+    'Argument
+    '     aoFunc                 : 判定する関数
+    'Return Value
+    '     結果 True:満たす / False:満たさない
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/16         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function Some( _
+        byRef aoFunc _
+        )
+        Some = func_CmArrayEveryOrSome(aoFunc, False)
     End Function
     
     '***************************************************************************************************
@@ -618,42 +683,46 @@ Class clsCmArray
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmArrayEvery()
-    'Overview                    : 配列の全ての要素について引数の関数の判定を満たすか確認する
+    'Function/Sub Name           : func_CmArrayEveryOrSome()
+    'Overview                    : 配列の要素が引数の関数の判定を満たすか確認する
     'Detailed Description        : 引数の関数の引数は以下のとおり
     '                                element :配列の要素
     '                                index   :インデックス
     '                                array   :配列
     'Argument
     '     aoFunc                 : 判定する関数
+    '     aboFlg                 : 判定方法
+    '                                True  :配列の全ての要素が引数の関数の判定を満たす
+    '                                False :配列のいずれか一つの要素が引数の関数の判定を満たす
     'Return Value
     '     結果 True:満たす / False:満たさない
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/09/14         Y.Fujii                  First edition
+    '2023/09/16         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmArrayEvery( _
+    Private Function func_CmArrayEveryOrSome( _
         byRef aoFunc _
+        , byRef aboFlg _
         )
         Dim oItem, lIndex, oArray, boRet
-        boRet = True
+        boRet = aboFlg
         
-        '引数の関数で抽出できる最初の要素を検索
+        '引数の関数で判定する
         If PoArray.Count>0 Then
             oArray = func_CmArrayConvArray(True)
             For lIndex=0 To PoArray.Count-1
                 Call sub_CM_Bind(oItem, oArray(lIndex))
-                If Not aoFunc(oItem, lIndex, oArray) Then
-                    boRet = False
+                If Not aoFunc(oItem, lIndex, oArray) = aboFlg Then
+                    boRet = Not aboFlg
                     Exit For
                 End If
             Next
         End If
         
-        '配列から抽出した要素を返却
-        func_CmArrayEvery = boRet
+        '判定結果を返却
+        func_CmArrayEveryOrSome = boRet
         
         Set oItem = Nothing
         Set oArray = Nothing
@@ -947,6 +1016,7 @@ Class clsCmArray
     '                                array         :配列
     'Argument
     '     aoFunc                 : 関数
+    '     aboOrder               : True：正順（順番どおり） / False：逆順
     'Return Value
     '     引数の関数で算出した結果
     '---------------------------------------------------------------------------------------------------
@@ -957,12 +1027,13 @@ Class clsCmArray
     '***************************************************************************************************
     Private Function func_CmArrayReduce( _
         byRef aoFunc _
+        , byVal aboOrder _
         )
         Dim oItem, lIndex, oArray, oRet
         
         '配列の全ての要素について引数の関数の処理を行う
         If PoArray.Count>0 Then
-            oArray = func_CmArrayConvArray(True)
+            oArray = func_CmArrayConvArray(aboOrder)
             Call sub_CM_Bind(oRet, oArray(0))
             For lIndex=1 To PoArray.Count-1
                 Call sub_CM_Bind(oItem, oArray(lIndex))
@@ -1046,6 +1117,51 @@ Class clsCmArray
         Call sub_CM_Bind(func_CmArrayShift, oElement)
         
         Set oElement = Nothing
+        Set oItem = Nothing
+        Set oArray = Nothing
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArraySlice()
+    'Overview                    : 配列の一部を切り出した配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     alStart                : 開始位置のインデックス番号、負値は最後の要素のからの位置を示す
+    '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
+    '     alEnd                  : 終了位置のインデックス番号、負値はalStartと同じ
+    '                              切り出した配列に終了位置の要素は含まない
+    '                              vbNullStringを指定した場合は切り出した配列に最後の要素を含める
+    'Return Value
+    '     同クラスの別インスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/16         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArraySlice( _
+        byVal alStart _
+        , byVal alEnd _
+        )
+        Dim oItem, lIndex, oArray, oRet, lStart, lEnd
+        
+        '配列の一部を切り出す
+        If PoArray.Count>0 Then
+            If alStart<0 Then lStart = PoArray.Count + alStart Else lStart = alStart
+            If alEnd = vbNullString Then
+                lEnd = PoArray.Count - 1
+            Else
+                If alEnd<0 Then lEnd = PoArray.Count + alEnd - 1 Else lEnd = alEnd - 1
+            End If
+            oArray = func_CmArrayConvArray(True)
+            For lIndex=lStart To lEnd
+                Call sub_CM_Bind(oItem, oArray(lIndex))
+                Call sub_CM_Push(oRet, oItem)
+            Next
+        End If
+        
+        Set func_CmArraySlice = new_ArraySetData(oRet)
+        
         Set oItem = Nothing
         Set oArray = Nothing
     End Function
