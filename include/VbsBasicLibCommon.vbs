@@ -1069,8 +1069,61 @@ Private Function func_CM_MathMax( _
     func_CM_MathMax = lRet
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_MathRoundup()
+'Overview                    : 切り上げする
+'Detailed Description        : 工事中
+'Argument
+'     adbNumber              : 数値
+'     aiPlace                : 切り上げする小数点以下の桁数
+'Return Value
+'     al1とal2の値が大きい方
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_MathRoundup( _
+    byVal adbNumber _ 
+    , byVal aiPlace _
+    )
+    Dim lMultiply, lReverse
+    lReverse = 10^(aiPlace-1)
+    lMultiply = 10^(-1*aiPlace)
+    func_CM_MathRoundup = Fix((adbNumber + 9*lMultiply)*lReverse)/lReverse
+End Function
+
 
 '配列系
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ArrayIsAvailable()
+'Overview                    : 有効な配列か検査する
+'Detailed Description        : 初期状態ではなく要素を1つ以上含む配列
+'Argument
+'     avArray                : 検査対象の配列
+'Return Value
+'     結果 True:有効 / False:無効
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ArrayIsAvailable( _
+    byRef avArray _
+    )
+    func_CM_ArrayIsAvailable = False
+    On Error Resume Next
+    If IsArray(avArray) And (Not IsEmpty(avArray)) Then
+        Ubound(avArray)
+        If Err.Number=0 Then
+            func_CM_ArrayIsAvailable = True
+            Err.Clear
+        End If
+    End If
+End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_ArrayGetDimensionNumber()
@@ -1484,7 +1537,6 @@ Private Function func_CM_FormatDecimalNumber( _
                                                           )
 End Function
 
-
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_ToString()
 'Overview                    : 引数の数値・文字列やオブジェクトの中身を可読な表示に変換する
@@ -1744,4 +1796,217 @@ Private Sub sub_CM_ExcuteSub( _
     Set oFunc = Nothing
     Set oPubSub = Nothing
 End Sub
+
+
+'ユーティリティ系
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortBubble()
+'Overview                    : バブルソート
+'Detailed Description        : 計算回数はO(N^2)
+'Argument
+'     avArray                : 配列
+'     aoFunc                 : 関数
+'     aboFlg                 : 判定方法
+'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+'                                False :降順（関数の結果がFalseの場合に入れ替える）
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilSortBubble( _
+    byRef avArray _
+    , byRef aoFunc _
+    , byVal aboFlg _
+    )
+    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
+    If Ubound(avArray)=0 Then Exit Function
+    
+    Dim lEnd, lPos, oTemp
+    lEnd = Ubound(avArray)
+    Do While lEnd>0
+        For lPos=0 To lEnd-1
+            If aoFunc(avArray(lPos), avArray(lPos+1))=aboFlg Then
+            'lPos番目の要素と(lPos+1)番目の要素を入れ替える
+                Call sub_CM_Bind(oTemp, avArray(lPos))
+                Call sub_CM_Bind(avArray(lPos), avArray(lPos+1))
+                Call sub_CM_Bind(avArray(lPos+1), oTemp)
+            End If
+        Next
+        lEnd = lEnd-1
+    Loop
+    func_CM_UtilSortBubble = avArray
+    Set oTemp = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortQuick()
+'Overview                    : クイックソート
+'Detailed Description        : 計算回数は平均O(N*logN)、最悪はO(N^2)
+'Argument
+'     avArray                : 配列
+'     aoFunc                 : 関数
+'     aboFlg                 : 判定方法
+'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+'                                False :降順（関数の結果がFalseの場合に入れ替える）
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilSortQuick( _
+    byRef avArray _
+    , byRef aoFunc _
+    , byVal aboFlg _
+    )
+    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
+    
+    func_CM_UtilSortQuick = avArray
+    If Ubound(avArray)=0 Then Exit Function
+    
+    '0番目の要素をピボットに決める
+    Dim oPivot : Call sub_CM_Bind(oPivot, avArray(0))
+    
+    'ピボットと要素を関数で判定し判定方法に合致するグループをRight、そうでないグループをLeftとする
+    Dim lPos, vRight, vLeft
+    For lPos=1 To Ubound(avArray)
+        If aoFunc(avArray(lPos), oPivot)=aboFlg Then
+            Call sub_CM_Push(vRight, avArray(lPos))
+        Else
+            Call sub_CM_Push(vLeft, avArray(lPos))
+        End If
+    Next
+    
+    '上述で分けたRight、Leftのグループごとに再帰処理する
+    vLeft = func_CM_UtilSortQuick(vLeft, aoFunc, aboFlg)
+    vRight = func_CM_UtilSortQuick(vRight, aoFunc, aboFlg)
+    
+    'Leftにピボット＋Rightを結合する
+    Call sub_CM_Push(vLeft, oPivot)
+    If func_CM_ArrayIsAvailable(vRight) Then
+        For lPos=0 To Ubound(vRight)
+            Call sub_CM_Push(vLeft, vRight(lPos))
+        Next
+    End If
+    
+    func_CM_UtilSortQuick = vLeft
+    Set oPivot = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortMerge()
+'Overview                    : マージソート
+'Detailed Description        : 計算回数は最悪でもO(N*logN)
+'                              マージ処理はfunc_CM_UtilSortMergeMerge()に委譲する
+'Argument
+'     avArray                : 配列
+'     aoFunc                 : 関数
+'     aboFlg                 : 判定方法
+'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+'                                False :降順（関数の結果がFalseの場合に入れ替える）
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilSortMerge( _
+    byRef avArray _
+    , byRef aoFunc _
+    , byVal aboFlg _
+    )
+    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
+    
+    func_CM_UtilSortMerge = avArray
+    If Ubound(avArray)=0 Then Exit Function
+    
+    '2つの配列に分解する
+    Dim lLength, lMedian
+    lLength = Ubound(avArray) - Lbound(avArray) + 1
+    lMedian = func_CM_MathRoundup(lLength/2, 1)
+    Dim lPos, vFirst, vSecond
+    For lPos=Lbound(avArray) To lMedian-1
+        Call sub_CM_Push(vFirst, avArray(lPos))
+    Next
+    For lPos=lMedian To Ubound(avArray)
+        Call sub_CM_Push(vSecond, avArray(lPos))
+    Next
+    
+    '再帰処理で配列の要素が1つになるまで分解する
+    vFirst = func_CM_UtilSortMerge(vFirst, aoFunc, aboFlg)
+    vSecond = func_CM_UtilSortMerge(vSecond, aoFunc, aboFlg)
+    
+    'マージをしながら上位に戻す
+    func_CM_UtilSortMerge = func_CM_UtilSortMergeMerge(vFirst, vSecond, aoFunc, aboFlg)
+    
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortMergeMerge()
+'Overview                    : マージソートのマージ処理
+'Detailed Description        : func_CM_UtilSortMerge()から呼び出す
+'Argument
+'     avFirst                : マージするソート済みの配列
+'     avSecond               : マージするソート済みの配列
+'     aoFunc                 : 関数
+'     aboFlg                 : 判定方法
+'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+'                                False :降順（関数の結果がFalseの場合に入れ替える）
+'Return Value
+'     マージ済の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilSortMergeMerge( _
+    byRef avFirst _
+    , byRef avSecond _
+    , byRef aoFunc _
+    , byVal aboFlg _
+    )
+    Dim lPosF, lPosS, lEndF, lEndS
+    lPosF = Lbound(avFirst) : lPosS = Lbound(avSecond)
+    lEndF = Ubound(avFirst) : lEndS = Ubound(avSecond)
+    
+    '双方の配列の先頭の要素同士を関数で判定して戻り値の配列に追加する
+    Dim vRet
+    Do While lPosF<=lEndF And lPosS<=lEndS
+        If aoFunc(avFirst(lPosF), avSecond(lPosS))=aboFlg Then
+            Call sub_CM_Push(vRet, avSecond(lPosS))
+            lPosS = lPosS + 1
+        Else
+            Call sub_CM_Push(vRet, avFirst(lPosF))
+            lPosF = lPosF + 1
+        End If
+    Loop
+    
+    'それぞれ残っている方の配列の要素を追加する
+    Dim lPos
+    If lPosF<=lEndF Then
+        For lPos=lPosF To lEndF
+            Call sub_CM_Push(vRet, avFirst(lPos))
+        Next
+    End If
+    If lPosS<=lEndS Then
+        For lPos=lPosS To lEndS
+            Call sub_CM_Push(vRet, avSecond(lPos))
+        Next
+    End If
+    
+    'マージ済の配列を返す
+    func_CM_UtilSortMergeMerge = vRet
+    
+End Function
+
 
