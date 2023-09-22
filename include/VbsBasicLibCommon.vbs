@@ -1397,6 +1397,32 @@ Private Sub sub_CM_Bind( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : sub_CM_Swap()
+'Overview                    : 変数の値を入れ替える
+'Detailed Description        : 移送処理はsub_CM_Bind()を使用する
+'Argument
+'     avA                    : 値を入れ替える変数
+'     avB                    : 値を入れ替える変数
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_Swap( _
+    byRef avA _
+    , byRef avB _
+    )
+    Dim oTemp
+    Call sub_CM_Bind(oTemp, avA)
+    Call sub_CM_Bind(avA, avB)
+    Call sub_CM_Bind(avB, oTemp)
+    Set oTemp = Nothing
+End Sub
+
+'***************************************************************************************************
 'Function/Sub Name           : sub_CM_BindAt()
 'Overview                    : 変数間の項目移送
 'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
@@ -1826,21 +1852,18 @@ Private Function func_CM_UtilSortBubble( _
     If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
     If Ubound(avArray)=0 Then Exit Function
     
-    Dim lEnd, lPos, oTemp
+    Dim lEnd, lPos
     lEnd = Ubound(avArray)
     Do While lEnd>0
         For lPos=0 To lEnd-1
             If aoFunc(avArray(lPos), avArray(lPos+1))=aboFlg Then
             'lPos番目の要素と(lPos+1)番目の要素を入れ替える
-                Call sub_CM_Bind(oTemp, avArray(lPos))
-                Call sub_CM_Bind(avArray(lPos), avArray(lPos+1))
-                Call sub_CM_Bind(avArray(lPos+1), oTemp)
+                Call sub_CM_Swap(avArray(lPos), avArray(lPos+1))
             End If
         Next
         lEnd = lEnd-1
     Loop
     func_CM_UtilSortBubble = avArray
-    Set oTemp = Nothing
 End Function
 
 '***************************************************************************************************
@@ -1903,7 +1926,7 @@ End Function
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilSortMerge()
 'Overview                    : マージソート
-'Detailed Description        : 計算回数は最悪でもO(N*logN)
+'Detailed Description        : 計算回数はO(N*logN)
 '                              マージ処理はfunc_CM_UtilSortMergeMerge()に委譲する
 'Argument
 '     avArray                : 配列
@@ -2009,4 +2032,108 @@ Private Function func_CM_UtilSortMergeMerge( _
     
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortHeap()
+'Overview                    : ヒープソート
+'Detailed Description        : 計算回数はO(N*logN)
+'Argument
+'     avArray                : 配列
+'     aoFunc                 : 関数
+'     aboFlg                 : 判定方法
+'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+'                                False :降順（関数の結果がFalseの場合に入れ替える）
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilSortHeap( _
+    byRef avArray _
+    , byRef aoFunc _
+    , byVal aboFlg _
+    )
+    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
+    
+    'ヒープの作成
+    Dim lLb, lUb, lSize, lParent
+    lLb = Lbound(avArray) : lUb = Ubound(avArray)
+    lSize = lUb - lLb + 1
+    '子を持つ最下部のノードから上位に向けて順番にノード単位の処理を行う
+    For lParent=lSize\2-1 To lLb Step -1
+        Call sub_CM_UtilSortHeapPerNodeProc(avArray, lSize, lParent, aoFunc, aboFlg)
+    Next
+    
+    'ヒープの先頭（最大/最小値）を順番に取り出す
+    Do While lSize>0
+'Call Msgbox("avArray = " & func_CM_ToString(avArray))
+        'ヒープの先頭と末尾を入れ替える
+        Call sub_CM_Swap(avArray(lLb), avArray(lSize-1))
+        'ヒープサイズを１つ減らして再作成
+        lSize = lSize - 1
+        Call sub_CM_UtilSortHeapPerNodeProc(avArray, lSize, 0, aoFunc, aboFlg)
+    Loop
+    
+    'ソート済の配列を返す
+    func_CM_UtilSortHeap = avArray
+    
+End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortHeapPerNodeProc()
+'Overview                    : ヒープソートのノード単位の処理
+'Detailed Description        : func_CM_UtilSortHeap()から呼び出す
+'Argument
+'     avArray                : 配列
+'     alSize                 : ヒープのサイズ
+'     alParent               : ノードの親の配列番号
+'     aoFunc                 : 関数
+'     aboFlg                 : 判定方法
+'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+'                                False :降順（関数の結果がFalseの場合に入れ替える）
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_UtilSortHeapPerNodeProc( _
+    byRef avArray _
+    , byVal alSize _
+    , byVal alParent _
+    , byRef aoFunc _
+    , byVal aboFlg _
+    )
+    Dim lRight, lLeft, lToSwap
+    lLeft = alParent*2 + 1
+    lRight = lLeft + 1
+    lToSwap = alParent
+    
+    If lRight<alSize Then
+    '右側の子がある場合
+        If aoFunc(avArray(lRight), avArray(alParent))=aboFlg Then
+        '親と右側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
+            lToSwap = lRight
+        End If
+    End If
+    
+    If lLeft<alSize Then
+    '左側の子がある場合
+        If aoFunc(avArray(lLeft), avArray(lToSwap))=aboFlg Then
+        '親と右側の子の勝者と左側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
+            lToSwap = lLeft
+        End If
+    End If
+    
+    If lToSwap<>alParent Then
+        '親と子の要素を入れ替える
+        Call sub_CM_Swap(avArray(alParent), avArray(lToSwap))
+        '入れ替えた子の要素以下のノードを再処理する
+        Call sub_CM_UtilSortHeapPerNodeProc(avArray, alSize, lToSwap, aoFunc, aboFlg)
+    End If
+    
+End Sub
