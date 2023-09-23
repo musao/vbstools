@@ -150,22 +150,22 @@ dim arr5
 'Call msgbox( arr5.LastIndexOf(2) )            '1
 'Call msgbox( arr5.LastIndexOf("2") )          '-1
 
-'Test Length(),Push(),Pop(),Shift(),Unshift()
-Set arr5 = new_clsCmArray()
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '<clsCmArray> 0
-Set arr5 = Nothing
-Set arr5 = new_ArraySetData(Array("1", 2))
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
-arr5.Concat Array(3, "Four")
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
-arr5.Push Array("th", "ree")
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2,["th","ree"]] 3
-arr5.Unshift new_DictSetValues(Array(4, "四"))
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2,["th","ree"]] 4
-Call msgbox( func_CM_ToString(arr5.Pop) )                        '["th","ree"]
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2] 3
-Call msgbox( func_CM_ToString(arr5.Shift) )                      '{4=>"四"}
-Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
+''Test Length(),Push(),Pop(),Shift(),Unshift()
+'Set arr5 = new_clsCmArray()
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '<clsCmArray> 0
+'Set arr5 = Nothing
+'Set arr5 = new_ArraySetData(Array("1", 2))
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
+'arr5.Concat Array(3, "Four")
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
+'arr5.Push Array("th", "ree")
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2,["th","ree"]] 3
+'arr5.Unshift new_DictSetValues(Array(4, "四"))
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2,["th","ree"]] 4
+'Call msgbox( func_CM_ToString(arr5.Pop) )                        '["th","ree"]
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2] 3
+'Call msgbox( func_CM_ToString(arr5.Shift) )                      '{4=>"四"}
+'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 
 ''Test Map()
 'private function MapTest(arg, i, a)
@@ -205,6 +205,15 @@ Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 'Call msgbox( func_CM_ToString(arr5.Slice(1, -1)) )             '[2,3,4]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -3)) )            '<clsCmArray>
+
+'Test Sort()
+private function ArraySortTest(x,y)
+    ArraySortTest = (x > y)
+end function
+Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+Call msgbox( func_CM_ToString(arr5) )
+Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
+
 
 wscript.quit
 

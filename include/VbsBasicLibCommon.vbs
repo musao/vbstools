@@ -1077,7 +1077,7 @@ End Function
 '     adbNumber              : 数値
 '     aiPlace                : 切り上げする小数点以下の桁数
 'Return Value
-'     al1とal2の値が大きい方
+'     切り上げした値
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -1173,15 +1173,22 @@ Private Sub sub_CM_Push( _
     byRef avArray _ 
     , byRef avItem _ 
     )
-    On Error Resume Next
-    If Ubound(avArray)>=0 Then
+    If func_CM_ArrayIsAvailable(avArray) Then
         Redim Preserve avArray(Ubound(avArray)+1)
-    End If
-    If Err.Number Then
+    Else
         Redim avArray(0)
-        Err.Clear
     End If
     Call sub_CM_Bind(avArray(Ubound(avArray)), avItem)
+    
+'    On Error Resume Next
+'    If Ubound(avArray)>=0 Then
+'        Redim Preserve avArray(Ubound(avArray)+1)
+'    End If
+'    If Err.Number Then
+'        Redim avArray(0)
+'        Err.Clear
+'    End If
+'    Call sub_CM_Bind(avArray(Ubound(avArray)), avItem)
 End Sub
 
 'チェック系
@@ -1830,6 +1837,9 @@ End Sub
 'Function/Sub Name           : func_CM_UtilSortBubble()
 'Overview                    : バブルソート
 'Detailed Description        : 計算回数はO(N^2)
+'                              引数の関数の引数は以下のとおり
+'                                currentValue :配列の要素
+'                                nextValue    :次の配列の要素
 'Argument
 '     avArray                : 配列
 '     aoFunc                 : 関数
@@ -1870,6 +1880,9 @@ End Function
 'Function/Sub Name           : func_CM_UtilSortQuick()
 'Overview                    : クイックソート
 'Detailed Description        : 計算回数は平均O(N*logN)、最悪はO(N^2)
+'                              引数の関数の引数は以下のとおり
+'                                currentValue :配列の要素
+'                                nextValue    :次の配列の要素
 'Argument
 '     avArray                : 配列
 '     aoFunc                 : 関数
@@ -1977,6 +1990,9 @@ End Function
 'Function/Sub Name           : func_CM_UtilSortMergeMerge()
 'Overview                    : マージソートのマージ処理
 'Detailed Description        : func_CM_UtilSortMerge()から呼び出す
+'                              引数の関数の引数は以下のとおり
+'                                currentValue :配列の要素
+'                                nextValue    :次の配列の要素
 'Argument
 '     avFirst                : マージするソート済みの配列
 '     avSecond               : マージするソート済みの配列
@@ -2084,6 +2100,9 @@ End Function
 'Function/Sub Name           : func_CM_UtilSortHeapPerNodeProc()
 'Overview                    : ヒープソートのノード単位の処理
 'Detailed Description        : func_CM_UtilSortHeap()から呼び出す
+'                              引数の関数の引数は以下のとおり
+'                                currentValue :配列の要素
+'                                nextValue    :次の配列の要素
 'Argument
 '     avArray                : 配列
 '     alSize                 : ヒープのサイズ
