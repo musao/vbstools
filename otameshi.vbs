@@ -25,14 +25,13 @@ Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
 
-'Test func_CM_UtilSort～()
-Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
-'Dim vArray : vArray = Array("C","$","b","漢","a","B","あ","A","c","0")
-Call msgbox( func_CM_ToString(vArray) )  '[5,2,9,6,4,8,7,3,0,1]
-private function SortTest(x,y)
-    SortTest = (x > y)
-end function
-
+''Test func_CM_UtilSort～()
+'Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
+''Dim vArray : vArray = Array("C","$","b","漢","a","B","あ","A","c","0")
+'Call msgbox( func_CM_ToString(vArray) )  '[5,2,9,6,4,8,7,3,0,1]
+'private function SortTest(x,y)
+'    SortTest = (x > y)
+'end function
 ''Test func_CM_UtilSortBubble()
 'Call msgbox( func_CM_ToString( func_CM_UtilSortBubble(vArray, getref("SortTest"), True) ) )  '[0,1,2,3,4,5,6,7,8,9]
 'Call msgbox( func_CM_ToString( func_CM_UtilSortBubble(vArray, getref("SortTest"), False) ) ) '[9,8,7,6,5,4,3,2,1,0]
@@ -45,45 +44,23 @@ end function
 'Call msgbox( func_CM_ToString( func_CM_UtilSortMerge(vArray, getref("SortTest"), True) ) )  '[0,1,2,3,4,5,6,7,8,9]
 'Call msgbox( func_CM_ToString( func_CM_UtilSortMerge(vArray, getref("SortTest"), False) ) ) '[9,8,7,6,5,4,3,2,1,0]
 
-'Test func_CM_UtilSortHeap()
-Call msgbox( func_CM_ToString( func_CM_UtilSortHeap(vArray, getref("SortTest"), True) ) )  '[0,1,2,3,4,5,6,7,8,9]
-Call msgbox( func_CM_ToString( func_CM_UtilSortHeap(vArray, getref("SortTest"), False) ) ) '[9,8,7,6,5,4,3,2,1,0]
-
-wscript.quit
-
-
-Dim vArrayTest
-'Call Msgbox("IsArray(vArrayTest) = " & IsArray(vArrayTest)) 'False
-'Call Msgbox("IsEmpty(vArrayTest) = " & IsEmpty(vArrayTest)) 'True
-'Call Msgbox("Ubound(vArrayTest) = " & Ubound(vArrayTest)) 'err
-'Call Msgbox("Join(vArrayTest) = " & Join(vArrayTest)) 'err
-Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest) = " & func_CM_ArrayIsAvailable(vArrayTest)) 'False
+''Test func_CM_UtilSortHeap()
+'Call msgbox( func_CM_ToString( func_CM_UtilSortHeap(vArray, getref("SortTest"), True) ) )  '[0,1,2,3,4,5,6,7,8,9]
+'Call msgbox( func_CM_ToString( func_CM_UtilSortHeap(vArray, getref("SortTest"), False) ) ) '[9,8,7,6,5,4,3,2,1,0]
 '
-Dim vArrayTest2()
-'Call Msgbox("IsArray(vArrayTest2) = " & IsArray(vArrayTest2)) 'True
-'Call Msgbox("IsEmpty(vArrayTest2) = " & IsEmpty(vArrayTest2)) 'False
-'Call Msgbox("Ubound(vArrayTest2) = " & Ubound(vArrayTest2)) 'err
-'Call Msgbox("Join(vArrayTest2, ""+"") = " & Join(vArrayTest2, "+")) '
-'Ubound(vArrayTest2)
-Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest2) = " & func_CM_ArrayIsAvailable(vArrayTest2)) 'True
+'wscript.quit
 
-Redim vArrayTest2(0)
-'Call Msgbox("IsArray(vArrayTest2) = " & IsArray(vArrayTest2)) 'True
-'Call Msgbox("IsEmpty(vArrayTest2) = " & IsEmpty(vArrayTest2)) 'False
-'Call Msgbox("Ubound(vArrayTest2) = " & Ubound(vArrayTest2)) '0
-'Call Msgbox("Join(vArrayTest2, ""+"") = " & Join(vArrayTest2, "+")) '
-'Ubound(vArrayTest2)
-Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest2) = " & func_CM_ArrayIsAvailable(vArrayTest2)) 'True
-
-Redim vArrayTest2(1)
-'Call Msgbox("IsArray(vArrayTest2) = " & IsArray(vArrayTest2)) 'True
-'Call Msgbox("IsEmpty(vArrayTest2) = " & IsEmpty(vArrayTest2)) 'False
-'Call Msgbox("Ubound(vArrayTest2) = " & Ubound(vArrayTest2)) '1
-'Call Msgbox("Join(vArrayTest2, ""+"") = " & Join(vArrayTest2, "+")) '
-'Ubound(vArrayTest2)
-Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest2) = " & func_CM_ArrayIsAvailable(vArrayTest2)) 'True
-
-wscript.quit
+''Test func_CM_ArrayIsAvailable()
+'Dim vArrayTest
+'Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest) = " & func_CM_ArrayIsAvailable(vArrayTest)) 'False
+'Dim vArrayTest2()
+'Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest) = " & func_CM_ArrayIsAvailable(vArrayTest2)) 'False
+'Redim vArrayTest2(0)
+'Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest) = " & func_CM_ArrayIsAvailable(vArrayTest2)) 'True
+'Redim vArrayTest2(1)
+'Call Msgbox("func_CM_ArrayIsAvailable(vArrayTest) = " & func_CM_ArrayIsAvailable(vArrayTest2)) 'True
+'
+'wscript.quit
 
 
 dim arr5
@@ -93,34 +70,34 @@ dim arr5
 'Call msgbox(func_CM_ToString(arr5))
 'Call msgbox(func_CM_ToString(arr5.Concat(Array("a",9))))
 
-'Test Every(),Some()
-private function EveryTestOk(arg, i, a)
-    EveryTestOk = (arg < 5)
-end function
-private function EveryTestNg(arg, i, a)
-    EveryTestNg = (arg < 3)
-end function
-private function EveryTestNg2(arg, i, a)
-    EveryTestNg2 = (arg < 0)
-end function
-Set arr5 = new_ArraySetData(Array(1,2,3))
-Call msgbox(func_CM_ToString(arr5))
-Call msgbox( arr5.Every(getref("EveryTestOk")) )     'True
-Call msgbox( arr5.Every(getref("EveryTestNg")) )     'False
-Call msgbox( arr5.Every(getref("EveryTestNg2")) )    'False
-private function SomeTestNg(arg, i, a)
-    SomeTestNg = (arg > 5)
-end function
-private function SomeTestOk(arg, i, a)
-    SomeTestOk = (arg > 2)
-end function
-private function SomeTestNg2(arg, i, a)
-    SomeTestNg2 = True
-end function
-Call msgbox( arr5.Some(getref("SomeTestNg")) )       'False
-Call msgbox( arr5.Some(getref("SomeTestOk")) )       'True
-Set arr5 = new_clsCmArray()
-Call msgbox( arr5.Some(getref("SomeTestNg2")) )      'False
+''Test Every(),Some()
+'private function EveryTestOk(arg, i, a)
+'    EveryTestOk = (arg < 5)
+'end function
+'private function EveryTestNg(arg, i, a)
+'    EveryTestNg = (arg < 3)
+'end function
+'private function EveryTestNg2(arg, i, a)
+'    EveryTestNg2 = (arg < 0)
+'end function
+'Set arr5 = new_ArraySetData(Array(1,2,3))
+'Call msgbox(func_CM_ToString(arr5))
+'Call msgbox( arr5.Every(getref("EveryTestOk")) )     'True
+'Call msgbox( arr5.Every(getref("EveryTestNg")) )     'False
+'Call msgbox( arr5.Every(getref("EveryTestNg2")) )    'False
+'private function SomeTestNg(arg, i, a)
+'    SomeTestNg = (arg > 5)
+'end function
+'private function SomeTestOk(arg, i, a)
+'    SomeTestOk = (arg > 2)
+'end function
+'private function SomeTestNg2(arg, i, a)
+'    SomeTestNg2 = True
+'end function
+'Call msgbox( arr5.Some(getref("SomeTestNg")) )       'False
+'Call msgbox( arr5.Some(getref("SomeTestOk")) )       'True
+'Set arr5 = new_clsCmArray()
+'Call msgbox( arr5.Some(getref("SomeTestNg2")) )      'False
 
 
 ''Test Filter()
@@ -173,22 +150,22 @@ Call msgbox( arr5.Some(getref("SomeTestNg2")) )      'False
 'Call msgbox( arr5.LastIndexOf(2) )            '1
 'Call msgbox( arr5.LastIndexOf("2") )          '-1
 
-''Test Length(),Push(),Pop(),Shift(),Unshift()
-'Set arr5 = new_clsCmArray()
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '<clsCmArray> 0
-'Set arr5 = Nothing
-'Set arr5 = new_ArraySetData(Array("1", 2))
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
-'arr5.Concat Array(3, "Four")
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
-'arr5.Push Array("th", "ree")
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2,["th","ree"]] 3
-'arr5.Unshift new_DictSetValues(Array(4, "四"))
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2,["th","ree"]] 4
-'Call msgbox( func_CM_ToString(arr5.Pop) )                        '["th","ree"]
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2] 3
-'Call msgbox( func_CM_ToString(arr5.Shift) )                      '{4=>"四"}
-'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
+'Test Length(),Push(),Pop(),Shift(),Unshift()
+Set arr5 = new_clsCmArray()
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '<clsCmArray> 0
+Set arr5 = Nothing
+Set arr5 = new_ArraySetData(Array("1", 2))
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
+arr5.Concat Array(3, "Four")
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
+arr5.Push Array("th", "ree")
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2,["th","ree"]] 3
+arr5.Unshift new_DictSetValues(Array(4, "四"))
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2,["th","ree"]] 4
+Call msgbox( func_CM_ToString(arr5.Pop) )                        '["th","ree"]
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2] 3
+Call msgbox( func_CM_ToString(arr5.Shift) )                      '{4=>"四"}
+Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 
 ''Test Map()
 'private function MapTest(arg, i, a)
@@ -213,6 +190,12 @@ Call msgbox( arr5.Some(getref("SomeTestNg2")) )      'False
 'Set arr5 = new_ArraySetData(Array(2,10,60))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( arr5.ReduceRight(getref("ReduceRightTest")) )
+
+''Test Reverse()
+'Set arr5 = new_ArraySetData(Array(1,2,3))
+'Call msgbox( func_CM_ToString(arr5) )                  '[1.2.3]
+'arr5.Reverse
+'Call msgbox( func_CM_ToString(arr5) )                  '[3,2,1]
 
 ''Test Slice()
 'Set arr5 = new_ArraySetData(Array(1,2,3,4,5))

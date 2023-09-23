@@ -2068,7 +2068,6 @@ Private Function func_CM_UtilSortHeap( _
     
     'ヒープの先頭（最大/最小値）を順番に取り出す
     Do While lSize>0
-'Call Msgbox("avArray = " & func_CM_ToString(avArray))
         'ヒープの先頭と末尾を入れ替える
         Call sub_CM_Swap(avArray(lLb), avArray(lSize-1))
         'ヒープサイズを１つ減らして再作成
