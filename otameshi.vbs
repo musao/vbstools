@@ -206,13 +206,23 @@ dim arr5
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -3)) )            '<clsCmArray>
 
-'Test Sort()
-private function ArraySortTest(x,y)
-    ArraySortTest = (x > y)
-end function
-Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
-Call msgbox( func_CM_ToString(arr5) )
-Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
+''Test Sort()
+'private function ArraySortTest(x,y)
+'    ArraySortTest = (x > y)
+'end function
+'Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+'Call msgbox( func_CM_ToString(arr5) )
+'Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
+
+'Test Splice()
+Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))
+Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,4,5,6,7,8]
+Call msgbox( func_CM_ToString(arr5.splice(1,2,Nothing)) )      '[2,3]
+Call msgbox( func_CM_ToString(arr5) )                          '[1,4,5,6,7,8]
+Call msgbox( func_CM_ToString(arr5.splice(1,1,Nothing)) )      '[4]
+Call msgbox( func_CM_ToString(arr5) )                          '[1,5,6,7,8]
+Call msgbox( func_CM_ToString(arr5.splice(1,0,Array(2,3))) )   '[]
+Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,5,6,7,8]
 
 
 wscript.quit

@@ -1120,6 +1120,7 @@ Private Function func_CM_ArrayIsAvailable( _
         Ubound(avArray)
         If Err.Number=0 Then
             func_CM_ArrayIsAvailable = True
+        Else
             Err.Clear
         End If
     End If

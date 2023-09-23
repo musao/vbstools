@@ -638,6 +638,32 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
+    'Function/Sub Name           : Splice()
+    'Overview                    : 配列の要素の挿入、削除、置換を行う
+    'Detailed Description        : func_CmArraySplice()に委譲する
+    'Argument
+    '     alStart                : 開始位置のインデックス番号、負値は最後の要素のからの位置を示す
+    '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
+    '     alDelCnt               : 開始位置から削除する要素数
+    '                              0の場合は削除しない
+    '     avArray                : 開始位置に追加する要素（配列）
+    'Return Value
+    '     削除した配列があれば、削除した配列の同クラスの別インスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function Splice( _
+        byVal alStart _
+        , byVal alDelCnt _
+        , byRef avArray _
+        )
+        Set Splice = func_CmArraySplice(alStart, alDelCnt, avArray)
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : Unshift()
     'Overview                    : 配列の先頭に要素を1つ追加する
     'Detailed Description        : func_CmArrayUnshiftMulti()に委譲する
@@ -1134,17 +1160,18 @@ Class clsCmArray
         byVal alStart _
         , byVal alEnd _
         )
-        Dim lIndex, vArray, vRet, lStart, lEnd
+        Dim lIndex, vArray, lUb, vRet, lStart, lEnd
 
         '配列の一部を切り出す
         If PoArray.Count>0 Then
             vArray = func_CmArrayConvArray(True)
+            lUb = Ubound(vArray)
             
             If alStart<0 Then lStart = PoArray.Count + alStart Else lStart = alStart
             If alEnd = vbNullString Then
-                lEnd = PoArray.Count - 1
+                lEnd = lUb
             Else
-                If alEnd<0 Then lEnd = PoArray.Count + alEnd - 1 Else lEnd = alEnd - 1
+                If alEnd<0 Then lEnd = lUb + alEnd Else lEnd = alEnd - 1
             End If
             
             For lIndex=lStart To lEnd
@@ -1153,6 +1180,68 @@ Class clsCmArray
         End If
 
         Set func_CmArraySlice = new_ArraySetData(vRet)
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArraySplice()
+    'Overview                    : 配列の要素の挿入、削除、置換を行う
+    'Detailed Description        : 工事中
+    'Argument
+    '     alStart                : 開始位置のインデックス番号、負値は最後の要素のからの位置を示す
+    '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
+    '     alDelCnt               : 開始位置から削除する要素数
+    '                              0の場合は削除しない
+    '     avArray                : 開始位置に追加する要素（配列）
+    'Return Value
+    '     削除した配列があれば、削除した配列の同クラスの別インスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArraySplice( _
+        byVal alStart _
+        , byVal alDelCnt _
+        , byRef avArray _
+        )
+        Dim lIndex, vArray, lUb, vArrayAft, vRet(), lStart
+
+        If PoArray.Count>0 Then
+            vArray = func_CmArrayConvArray(True)
+            lUb = Ubound(vArray)
+            
+            If alStart<0 Then lStart = PoArray.Count + alStart Else lStart = alStart
+            
+            For lIndex = 0 To lStart - 1
+            '開始位置までは今の配列のまま
+                Call sub_CM_Push(vArrayAft, vArray(lIndex))
+            Next
+            
+            For lIndex = lStart To lStart + alDelCnt -1
+            '開始位置から削除する要素数は戻り値の配列に移す
+                Call sub_CM_Push(vRet, vArray(lIndex))
+            Next
+            
+            If func_CM_ArrayIsAvailable(avArray) Then
+            '追加する要素があれば追加する
+                For lIndex = 0 To Ubound(avArray)
+                '削除した要素以降は今の配列に残す
+                    Call sub_CM_Push(vArrayAft, avArray(lIndex))
+                Next
+            End If
+            
+            For lIndex = lStart + alDelCnt To lUb
+            '削除した要素以降は今の配列に残す
+                Call sub_CM_Push(vArrayAft, vArray(lIndex))
+            Next
+            
+            
+            '配列から取り除いた要素を返す
+            Call sub_CM_Bind(func_CmArraySplice, new_ArraySetData(vRet))
+            '作成した配列（ディクショナリ）を置換え
+            Set PoArray = func_CmArrayAddDictionary(vArrayAft, 0)
+        End If
     End Function
 
     '***************************************************************************************************
