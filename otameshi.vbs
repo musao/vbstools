@@ -25,6 +25,45 @@ Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
 
+''Test func_CM_MathRound()
+'Dim dbPlus0, dbPlus1, dbPlus5 ,dbMinas0 ,dbMinas2 ,dbMinas5
+'dbPlus0=14.555555
+'dbPlus1=14.456789
+'dbPlus5=14.432154
+'dbMinas0=-14.555555
+'dbMinas2=-14.501234
+'dbMinas5=-14.432154
+'call MsgBox( func_CM_MathRound(dbPlus5, 0, 5) )      '14.4321
+'call MsgBox( func_CM_MathRound(dbPlus0, 5, 0) )      '10
+'call MsgBox( func_CM_MathRound(dbPlus1, 5, 1) )      '14
+'call MsgBox( func_CM_MathRound(dbPlus0, 9, 0) )      '20
+'call MsgBox( func_CM_MathRound(dbPlus1, 9, 1) )      '15
+'call MsgBox( func_CM_MathRound(dbPlus5, 9, 5) )      '14.4322
+'call MsgBox( func_CM_MathRound(dbMinas5, 0, 5) )      '-14.4322
+'call MsgBox( func_CM_MathRound(dbMinas0, 5, 0) )      '-10
+'call MsgBox( func_CM_MathRound(dbMinas2, 5, 2) )      '-14.5
+'call MsgBox( func_CM_MathRound(dbMinas0, 9, 0) )      '-10
+'call MsgBox( func_CM_MathRound(dbMinas2, 9, 2) )      '-14.5
+'call MsgBox( func_CM_MathRound(dbMinas5, 9, 5) )      '-14.4321
+'
+'wscript.quit
+
+'Test func_CM_GenerateRandomString
+'Call msgbox( func_CM_GenerateRandomString(50, 15, Nothing) )        '大小数記
+'Call msgbox( func_CM_GenerateRandomString(50, 8, Nothing)  )        '　　　記
+'Call msgbox( func_CM_GenerateRandomString(50, 7, Nothing)  )        '大小数
+'Call msgbox( func_CM_GenerateRandomString(50, 4, Nothing)  )        '　　数
+'Call msgbox( func_CM_GenerateRandomString(50, 3, Nothing)  )        '大小
+'Call msgbox( func_CM_GenerateRandomString(50, 2, Nothing)  )        '　小
+'Call msgbox( func_CM_GenerateRandomString(50, 1, Nothing)  )        '大
+Call msgbox( func_CM_GenerateRandomString(50, 4, Nothing)  )        '　　数　
+Call msgbox( func_CM_GenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
+Call msgbox( func_CM_GenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
+Call msgbox( func_CM_GenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
+
+
+wscript.quit
+
 ''Test func_CM_UtilSort～()
 'Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
 ''Dim vArray : vArray = Array("C","$","b","漢","a","B","あ","A","c","0")
@@ -214,15 +253,15 @@ dim arr5
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
 
-'Test Splice()
-Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))
-Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,4,5,6,7,8]
-Call msgbox( func_CM_ToString(arr5.splice(1,2,Nothing)) )      '[2,3]
-Call msgbox( func_CM_ToString(arr5) )                          '[1,4,5,6,7,8]
-Call msgbox( func_CM_ToString(arr5.splice(1,1,Nothing)) )      '[4]
-Call msgbox( func_CM_ToString(arr5) )                          '[1,5,6,7,8]
-Call msgbox( func_CM_ToString(arr5.splice(1,0,Array(2,3))) )   '[]
-Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,5,6,7,8]
+''Test Splice()
+'Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))
+'Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,4,5,6,7,8]
+'Call msgbox( func_CM_ToString(arr5.splice(1,2,Nothing)) )      '[2,3]
+'Call msgbox( func_CM_ToString(arr5) )                          '[1,4,5,6,7,8]
+'Call msgbox( func_CM_ToString(arr5.splice(1,1,Nothing)) )      '[4]
+'Call msgbox( func_CM_ToString(arr5) )                          '[1,5,6,7,8]
+'Call msgbox( func_CM_ToString(arr5.splice(1,0,Array(2,3))) )   '[]
+'Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,5,6,7,8]
 
 
 wscript.quit

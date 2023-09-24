@@ -33,7 +33,7 @@ End Function
 'Overview                    : インスタンス生成関数
 'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
 'Argument
-'     avArray                : 配列に追加する要素（配列）
+'     avArr                  : 配列に追加する要素（配列）
 'Return Value
 '     同クラスのインスタンス
 '---------------------------------------------------------------------------------------------------
@@ -43,12 +43,12 @@ End Function
 '2023/09/08         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function new_ArraySetData( _
-    byRef avArray _
+    byRef avArr _
     )
-    Dim oArray : Set oArray = new_clsCmArray()
-    oArray.PushMulti avArray
-    Set new_ArraySetData = oArray
-    Set oArray = Nothing
+    Dim oArr : Set oArr = new_clsCmArray()
+    oArr.PushMulti avArr
+    Set new_ArraySetData = oArr
+    Set oArr = Nothing
 End Function
 
 '***************************************************************************************************
@@ -79,7 +79,7 @@ End Function
 
 Class clsCmArray
     'クラス内変数、定数
-    Private PoArray
+    Private PoArr
 
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -96,7 +96,7 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        Set PoArray = new_Dictionary()
+        Set PoArr = new_Dictionary()
     End Sub
 
     '***************************************************************************************************
@@ -114,7 +114,7 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        Set PoArray = Nothing
+        Set PoArr = Nothing
     End Sub
 
     '***************************************************************************************************
@@ -122,7 +122,7 @@ Class clsCmArray
     'Overview                    : 配列の指定したインデックスの要素を返す
     'Detailed Description        : func_CmArrayItem()に委譲する
     'Argument
-    '     alIndex                : インデックス
+    '     alIdx                  : インデックス
     'Return Value
     '     指定したインデックスの要素
     '---------------------------------------------------------------------------------------------------
@@ -132,9 +132,9 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Default Property Get Item( _
-        byVal alIndex _
+        byVal alIdx _
         )
-        Call sub_CM_Bind(Item, func_CmArrayItem(alIndex))
+        Call sub_CM_Bind(Item, func_CmArrayItem(alIdx))
     End Property
 
     '***************************************************************************************************
@@ -142,7 +142,7 @@ Class clsCmArray
     'Overview                    : 配列の指定したインデックスに要素を設定する
     'Detailed Description        : 工事中
     'Argument
-    '     alIndex                : インデックス
+    '     alIdx                  : インデックス
     '     aoEle                  : 設定する要素
     'Return Value
     '     なし
@@ -153,10 +153,12 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Set Item( _
-        byVal alIndex _
+        byVal alIdx _
         , byRef aoEle _
         )
-        Call sub_CM_BindAt(PoArray, alIndex, aoEle)
+        If func_CmArrayInspectIndex(alIdx) Then
+            Call sub_CM_BindAt(PoArr, alIdx, aoEle)
+        End If
     End Property
 
     '***************************************************************************************************
@@ -164,7 +166,7 @@ Class clsCmArray
     'Overview                    : 配列の指定したインデックスに要素を設定する
     'Detailed Description        : 工事中
     'Argument
-    '     alIndex                : インデックス
+    '     alIdx                  : インデックス
     '     aoEle                  : 設定する要素
     'Return Value
     '     なし
@@ -175,10 +177,12 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Let Item( _
-        byVal alIndex _
+        byVal alIdx _
         , byRef aoEle _
         )
-        Call sub_CM_BindAt(PoArray, alIndex, aoEle)
+        If func_CmArrayInspectIndex(alIdx) Then
+            Call sub_CM_BindAt(PoArr, alIdx, aoEle)
+        End If
     End Property
 
     '***************************************************************************************************
@@ -215,7 +219,7 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get Length()
-        Length = PoArray.Count
+        Length = PoArr.Count
     End Property
 
     '***************************************************************************************************
@@ -223,7 +227,7 @@ Class clsCmArray
     'Overview                    : 引数で指定した要素を連結した配列を返す
     'Detailed Description        : 自身のインスタンスは変更しない
     'Argument
-    '     avArray                : 配列に追加する要素（配列）
+    '     avArr                  : 配列に追加する要素（配列）
     'Return Value
     '     同クラスの別インスタンス
     '---------------------------------------------------------------------------------------------------
@@ -233,14 +237,14 @@ Class clsCmArray
     '2023/09/14         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Function Concat( _
-        byRef avArray _
+        byRef avArr _
         )
-        Dim oArray : Set oArray = new_clsCmArray()
-        oArray.PushMulti func_CmArrayConvArray(True)
-        oArray.PushMulti avArray
-        Set Concat = oArray
+        Dim oArr : Set oArr = new_clsCmArray()
+        oArr.PushMulti func_CmArrayConvArray(True)
+        oArr.PushMulti avArr
+        Set Concat = oArr
 
-        Set oArray = Nothing
+        Set oArr = Nothing
     End Function
 
     '***************************************************************************************************
@@ -475,7 +479,7 @@ Class clsCmArray
     'Overview                    : 配列の末尾に要素を1つ追加する
     'Detailed Description        : func_CmArrayPushMulti()に委譲する
     'Argument
-    '     avArray                : 配列の末尾に追加する要素（配列）
+    '     avArr                  : 配列の末尾に追加する要素（配列）
     'Return Value
     '     配列内の要素数
     '---------------------------------------------------------------------------------------------------
@@ -485,9 +489,9 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Function PushMulti( _
-        byRef avArray _
+        byRef avArr _
         )
-        PushMulti = func_CmArrayPushMulti(avArray)
+        PushMulti = func_CmArrayPushMulti(avArr)
     End Function
 
     '***************************************************************************************************
@@ -633,7 +637,7 @@ Class clsCmArray
     Public Function Sort( _
         byRef aoFunc _
         )
-        Set PoArray = func_CmArrayAddDictionary(func_CM_UtilSortHeap(func_CmArrayConvArray(True), aoFunc, True), 0)
+        Set PoArr = func_CmArrayAddDictionary(func_CM_UtilSortHeap(func_CmArrayConvArray(True), aoFunc, True), 0)
         Set Sort = Me
     End Function
 
@@ -646,7 +650,7 @@ Class clsCmArray
     '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
     '     alDelCnt               : 開始位置から削除する要素数
     '                              0の場合は削除しない
-    '     avArray                : 開始位置に追加する要素（配列）
+    '     avArr                  : 開始位置に追加する要素（配列）
     'Return Value
     '     削除した配列があれば、削除した配列の同クラスの別インスタンス
     '---------------------------------------------------------------------------------------------------
@@ -658,9 +662,9 @@ Class clsCmArray
     Public Function Splice( _
         byVal alStart _
         , byVal alDelCnt _
-        , byRef avArray _
+        , byRef avArr _
         )
-        Set Splice = func_CmArraySplice(alStart, alDelCnt, avArray)
+        Set Splice = func_CmArraySplice(alStart, alDelCnt, avArr)
     End Function
 
     '***************************************************************************************************
@@ -688,7 +692,7 @@ Class clsCmArray
     'Overview                    : 配列の先頭に要素を1つ追加する
     'Detailed Description        : func_CmArrayUnshiftMulti()に委譲する
     'Argument
-    '     avArray                : 配列の先頭に追加する要素（配列）
+    '     avArr                  : 配列の先頭に追加する要素（配列）
     'Return Value
     '     配列内の要素数
     '---------------------------------------------------------------------------------------------------
@@ -698,9 +702,9 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Function UnshiftMulti( _
-        byRef avArray _
+        byRef avArr _
         )
-        UnshiftMulti = func_CmArrayUnshiftMulti(avArray)
+        UnshiftMulti = func_CmArrayUnshiftMulti(avArr)
     End Function
 
 
@@ -712,7 +716,7 @@ Class clsCmArray
     'Overview                    : 配列の指定したインデックスの要素を返す
     'Detailed Description        : 工事中
     'Argument
-    '     alIndex                : インデックス
+    '     alIdx                  : インデックス
     'Return Value
     '     指定したインデックスの要素
     '---------------------------------------------------------------------------------------------------
@@ -722,11 +726,11 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function func_CmArrayItem( _
-        ByVal alIndex _
+        ByVal alIdx _
         )
         Dim oEle : Set oEle = Nothing
-        If PoArray.Count>0 Then
-            Call sub_CM_Bind(oEle, PoArray.Item(alIndex))
+        If PoArr.Count>0 Then
+            Call sub_CM_Bind(oEle, PoArr.Item(alIdx))
         End If
         Call sub_CM_Bind(func_CmArrayItem, oEle)
         Set oEle = Nothing
@@ -756,16 +760,16 @@ Class clsCmArray
         byRef aoFunc _
         , byRef aboFlg _
         )
-        Dim lIndex, vArray, lUb, boRet
+        Dim lIdx, vArr, lUb, boRet
         boRet = aboFlg
 
         '引数の関数で判定する
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            For lIndex=0 To lUb
-                If Not aoFunc(vArray(lIndex), lIndex, vArray) = aboFlg Then
+            For lIdx=0 To lUb
+                If Not aoFunc(vArr(lIdx), lIdx, vArr) = aboFlg Then
                     boRet = Not aboFlg
                     Exit For
                 End If
@@ -797,16 +801,16 @@ Class clsCmArray
     Private Function func_CmArrayFilter( _
         byRef aoFunc _
         )
-        Dim oEle, lIndex, vArray, lUb, oRet
+        Dim oEle, lIdx, vArr, lUb, oRet
 
         '引数の関数で抽出した要素だけの配列を作成
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            For lIndex=0 To lUb
-                Call sub_CM_Bind(oEle, vArray(lIndex))
-                If aoFunc(oEle, lIndex, vArray) Then
+            For lIdx=0 To lUb
+                Call sub_CM_Bind(oEle, vArr(lIdx))
+                If aoFunc(oEle, lIdx, vArr) Then
                     Call sub_CM_Push(oRet, oEle)
                 End If
             Next
@@ -839,17 +843,17 @@ Class clsCmArray
     Private Function func_CmArrayFind( _
         byRef aoFunc _
         )
-        Dim oEle, lIndex, vArray, lUb, oRet
+        Dim oEle, lIdx, vArr, lUb, oRet
         Set oRet = Nothing
 
         '引数の関数で抽出できる最初の要素を検索
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            For lIndex=0 To lUb
-                Call sub_CM_Bind(oEle, vArray(lIndex))
-                If aoFunc(oEle, lIndex, vArray) Then
+            For lIdx=0 To lUb
+                Call sub_CM_Bind(oEle, vArr(lIdx))
+                If aoFunc(oEle, lIdx, vArr) Then
                     Call sub_CM_Bind(oRet, oEle)
                     Exit For
                 End If
@@ -883,15 +887,15 @@ Class clsCmArray
     Private Function func_CmArrayForEach( _
         byRef aoFunc _
         )
-        Dim lIndex, vArray, lUb
+        Dim lIdx, vArr, lUb
 
         '配列の全ての要素について引数の関数の処理を行う
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            For lIndex=0 To lUb
-                Call aoFunc(vArray(lIndex), lIndex, vArray)
+            For lIdx=0 To lUb
+                Call aoFunc(vArr(lIdx), lIdx, vArr)
             Next
         End If
     End Function
@@ -923,12 +927,12 @@ Class clsCmArray
         , byVal aboOrder _
         )
         func_CmArrayIndexOf = -1
-        Dim oEle, lIndex, vArray, lUb, boFlg, lStart, lEnd, lStep
+        Dim oEle, lIdx, vArr, lUb, boFlg, lStart, lEnd, lStep
 
         '配列の全ての要素について引数の関数の処理を行う
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
             If alStart=vbNullString Then
                 If aboOrder Then lStart=0 Else lStart=lUb
@@ -939,8 +943,8 @@ Class clsCmArray
             If aboOrder Then lStep=1 Else lStep=-1
 
             boFlg = False
-            For lIndex=lStart To lEnd Step lStep
-                Call sub_CM_Bind(oEle, vArray(lIndex))
+            For lIdx=lStart To lEnd Step lStep
+                Call sub_CM_Bind(oEle, vArr(lIdx))
 
                 If IsObject(avTarget) And IsObject(oEle) Then
                     If avTarget Is oEle Then boFlg = True
@@ -953,7 +957,7 @@ Class clsCmArray
                 End If
 
                 If boFlg Then
-                    func_CmArrayIndexOf = lIndex
+                    func_CmArrayIndexOf = lIdx
                     Exit For
                 End If
 
@@ -983,15 +987,15 @@ Class clsCmArray
     Private Function func_CmArrayMap( _
         byRef aoFunc _
         )
-        Dim lIndex, vArray, lUb, vRet
+        Dim lIdx, vArr, lUb, vRet
 
         '配列の全ての要素について引数の関数の処理を行う
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            For lIndex=0 To lUb
-                Call sub_CM_Push(vRet, aoFunc(vArray(lIndex), lIndex, vArray))
+            For lIdx=0 To lUb
+                Call sub_CM_Push(vRet, aoFunc(vArr(lIdx), lIdx, vArr))
             Next
         End If
 
@@ -1016,10 +1020,10 @@ Class clsCmArray
         )
         Dim oEle, lCount
         Set oEle = Nothing
-        lCount = PoArray.Count
+        lCount = PoArr.Count
         If lCount>0 Then
-            Call sub_CM_Bind(oEle, PoArray.Item(lCount-1))
-            PoArray.Remove lCount-1
+            Call sub_CM_Bind(oEle, PoArr.Item(lCount-1))
+            PoArr.Remove lCount-1
         End If
         Call sub_CM_Bind(func_CmArrayPop, oEle)
         Set oEle = Nothing
@@ -1030,7 +1034,7 @@ Class clsCmArray
     'Overview                    : 配列の末尾に要素を複数追加する
     'Detailed Description        : 工事中
     'Argument
-    '     avArray                : 配列の末尾に追加する要素（配列）
+    '     avArr                  : 配列の末尾に追加する要素（配列）
     'Return Value
     '     配列内の要素数
     '---------------------------------------------------------------------------------------------------
@@ -1040,15 +1044,15 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function func_CmArrayPushMulti( _
-        byRef avArray _
+        byRef avArr _
         )
-        If func_CM_ArrayIsAvailable(avArray) Then
+        If func_CM_ArrayIsAvailable(avArr) Then
             Dim oEle
-            For Each oEle In avArray
-                Call sub_CM_BindAt(PoArray, PoArray.Count, oEle)
+            For Each oEle In avArr
+                Call sub_CM_BindAt(PoArr, PoArr.Count, oEle)
             Next
         End If
-        func_CmArrayPushMulti = PoArray.Count
+        func_CmArrayPushMulti = PoArr.Count
         Set oEle = Nothing
     End Function
 
@@ -1075,16 +1079,16 @@ Class clsCmArray
         byRef aoFunc _
         , byVal aboOrder _
         )
-        Dim lIndex, vArray, lUb, oRet
+        Dim lIdx, vArr, lUb, oRet
 
         '配列の全ての要素について引数の関数の処理を行う
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(aboOrder)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(aboOrder)
+            lUb = Ubound(vArr)
             
-            Call sub_CM_Bind(oRet, vArray(0))
-            For lIndex=1 To lUb
-                Call sub_CM_Bind(oRet, aoFunc(oRet, vArray(lIndex), lIndex, vArray))
+            Call sub_CM_Bind(oRet, vArr(0))
+            For lIdx=1 To lUb
+                Call sub_CM_Bind(oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr))
             Next
         End If
 
@@ -1109,8 +1113,8 @@ Class clsCmArray
     '***************************************************************************************************
     Private Function func_CmArrayReverse( _
         )
-        If PoArray.Count>0 Then
-            Set PoArray = func_CmArrayAddDictionary(func_CmArrayConvArray(False), 0)
+        If PoArr.Count>0 Then
+            Set PoArr = func_CmArrayAddDictionary(func_CmArrayConvArray(False), 0)
         End If
     End Function
 
@@ -1130,11 +1134,11 @@ Class clsCmArray
     '***************************************************************************************************
     Private Function func_CmArrayShift( _
         )
-        If PoArray.Count>0 Then
+        If PoArr.Count>0 Then
             '配列から取り除いた要素を返す
-            Call sub_CM_Bind(func_CmArrayShift, PoArray.Item(0))
+            Call sub_CM_Bind(func_CmArrayShift, PoArr.Item(0))
             '作成した配列（ディクショナリ）を置換え
-            Set PoArray = func_CmArrayAddDictionary(func_CmArrayConvArray(True), 1)
+            Set PoArr = func_CmArrayAddDictionary(func_CmArrayConvArray(True), 1)
         End If
     End Function
 
@@ -1160,22 +1164,22 @@ Class clsCmArray
         byVal alStart _
         , byVal alEnd _
         )
-        Dim lIndex, vArray, lUb, vRet, lStart, lEnd
+        Dim lIdx, vArr, lUb, vRet, lStart, lEnd
 
         '配列の一部を切り出す
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            If alStart<0 Then lStart = PoArray.Count + alStart Else lStart = alStart
+            If alStart<0 Then lStart = PoArr.Count + alStart Else lStart = alStart
             If alEnd = vbNullString Then
                 lEnd = lUb
             Else
                 If alEnd<0 Then lEnd = lUb + alEnd Else lEnd = alEnd - 1
             End If
             
-            For lIndex=lStart To lEnd
-                Call sub_CM_Push(vRet, vArray(lIndex))
+            For lIdx=lStart To lEnd
+                Call sub_CM_Push(vRet, vArr(lIdx))
             Next
         End If
 
@@ -1191,7 +1195,7 @@ Class clsCmArray
     '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
     '     alDelCnt               : 開始位置から削除する要素数
     '                              0の場合は削除しない
-    '     avArray                : 開始位置に追加する要素（配列）
+    '     avArr                  : 開始位置に追加する要素（配列）
     'Return Value
     '     削除した配列があれば、削除した配列の同クラスの別インスタンス
     '---------------------------------------------------------------------------------------------------
@@ -1203,44 +1207,44 @@ Class clsCmArray
     Private Function func_CmArraySplice( _
         byVal alStart _
         , byVal alDelCnt _
-        , byRef avArray _
+        , byRef avArr _
         )
-        Dim lIndex, vArray, lUb, vArrayAft, vRet(), lStart
+        Dim lIdx, vArr, lUb, vArrayAft, vRet(), lStart
 
-        If PoArray.Count>0 Then
-            vArray = func_CmArrayConvArray(True)
-            lUb = Ubound(vArray)
+        If PoArr.Count>0 Then
+            vArr = func_CmArrayConvArray(True)
+            lUb = Ubound(vArr)
             
-            If alStart<0 Then lStart = PoArray.Count + alStart Else lStart = alStart
+            If alStart<0 Then lStart = PoArr.Count + alStart Else lStart = alStart
             
-            For lIndex = 0 To lStart - 1
+            For lIdx = 0 To lStart - 1
             '開始位置までは今の配列のまま
-                Call sub_CM_Push(vArrayAft, vArray(lIndex))
+                Call sub_CM_Push(vArrayAft, vArr(lIdx))
             Next
             
-            For lIndex = lStart To lStart + alDelCnt -1
+            For lIdx = lStart To lStart + alDelCnt -1
             '開始位置から削除する要素数は戻り値の配列に移す
-                Call sub_CM_Push(vRet, vArray(lIndex))
+                Call sub_CM_Push(vRet, vArr(lIdx))
             Next
             
-            If func_CM_ArrayIsAvailable(avArray) Then
+            If func_CM_ArrayIsAvailable(avArr) Then
             '追加する要素があれば追加する
-                For lIndex = 0 To Ubound(avArray)
+                For lIdx = 0 To Ubound(avArr)
                 '削除した要素以降は今の配列に残す
-                    Call sub_CM_Push(vArrayAft, avArray(lIndex))
+                    Call sub_CM_Push(vArrayAft, avArr(lIdx))
                 Next
             End If
             
-            For lIndex = lStart + alDelCnt To lUb
+            For lIdx = lStart + alDelCnt To lUb
             '削除した要素以降は今の配列に残す
-                Call sub_CM_Push(vArrayAft, vArray(lIndex))
+                Call sub_CM_Push(vArrayAft, vArr(lIdx))
             Next
             
             
             '配列から取り除いた要素を返す
             Call sub_CM_Bind(func_CmArraySplice, new_ArraySetData(vRet))
             '作成した配列（ディクショナリ）を置換え
-            Set PoArray = func_CmArrayAddDictionary(vArrayAft, 0)
+            Set PoArr = func_CmArrayAddDictionary(vArrayAft, 0)
         End If
     End Function
 
@@ -1249,7 +1253,7 @@ Class clsCmArray
     'Overview                    : 配列の先頭に要素を複数追加する
     'Detailed Description        : 工事中
     'Argument
-    '     avArray                : 配列の先頭に追加する要素（配列）
+    '     avArr                  : 配列の先頭に追加する要素（配列）
     'Return Value
     '     配列内の要素数
     '---------------------------------------------------------------------------------------------------
@@ -1259,27 +1263,27 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function func_CmArrayUnshiftMulti( _
-        byRef avArray _
+        byRef avArr _
         )
-        Dim oArray, oEle
-        Set oArray = new_Dictionary()
+        Dim oArr, oEle
+        Set oArr = new_Dictionary()
 
-        If func_CM_ArrayIsAvailable(avArray) Then
+        If func_CM_ArrayIsAvailable(avArr) Then
         '引数の要素を先頭に追加
-            Set oArray = func_CmArrayAddDictionary(avArray, 0)
+            Set oArr = func_CmArrayAddDictionary(avArr, 0)
         End If
 
         '続いて今ある要素を追加
         For Each oEle In func_CmArrayConvArray(True)
-            Call sub_CM_BindAt(oArray, oArray.Count, oEle)
+            Call sub_CM_BindAt(oArr, oArr.Count, oEle)
         Next
 
         '作成した配列（ディクショナリ）を置換え
-        Set PoArray = oArray
-        func_CmArrayUnshiftMulti = PoArray.Count
+        Set PoArr = oArr
+        func_CmArrayUnshiftMulti = PoArr.Count
 
         Set oEle = Nothing
-        Set oArray = Nothing
+        Set oArr = Nothing
     End Function
 
     '***************************************************************************************************
@@ -1299,20 +1303,20 @@ Class clsCmArray
     Private Function func_CmArrayConvArray( _
         aboOrder _
         )
-        Dim lIndex, vArray, vRet, lStt, lEnd, lStep
+        Dim lIdx, vArr, vRet, lStt, lEnd, lStep
 
         '配列の全ての要素
-        If PoArray.Count>0 Then
-            vArray = PoArray.Items()
+        If PoArr.Count>0 Then
+            vArr = PoArr.Items()
             
             If aboOrder Then
-                lStt = 0 : lEnd = PoArray.Count-1 : lStep = 1
+                lStt = 0 : lEnd = PoArr.Count-1 : lStep = 1
             Else
-                lStt = PoArray.Count-1 : lEnd = 0 : lStep = -1
+                lStt = PoArr.Count-1 : lEnd = 0 : lStep = -1
             End If
 
-            For lIndex=lStt To lEnd Step lStep
-                Call sub_CM_Push(vRet, vArray(lIndex))
+            For lIdx=lStt To lEnd Step lStep
+                Call sub_CM_Push(vRet, vArr(lIdx))
             Next
         End If
 
@@ -1324,7 +1328,7 @@ Class clsCmArray
     'Overview                    : 引数の配列の内容を配列（ディクショナリ）に追加する
     'Detailed Description        : 工事中
     'Argument
-    '     avArray                : 配列（ディクショナリ）に追加する要素（配列）
+    '     avArr                  : 配列（ディクショナリ）に追加する要素（配列）
     '     alStart                : 開始位置のインデックス番号、負値は最後の要素のからの位置を示す
     '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
     'Return Value
@@ -1336,23 +1340,44 @@ Class clsCmArray
     '2023/09/23         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function func_CmArrayAddDictionary( _
-        byRef avArray _
+        byRef avArr _
         , byVal alStart _
         )
-        Dim oArray, lStart, lIndex, lUb
+        Dim oArr, lStart, lIdx, lUb
 
-        lUb = Ubound(avArray)
+        lUb = Ubound(avArr)
         If alStart<0 Then lStart = lUb + alStart Else lStart = alStart
-        Set oArray = new_Dictionary()
+        Set oArr = new_Dictionary()
 
-        For lIndex = alStart To lUb
-            Call sub_CM_BindAt(oArray, oArray.Count, avArray(lIndex))
+        For lIdx = alStart To lUb
+            Call sub_CM_BindAt(oArr, oArr.Count, avArr(lIdx))
         Next
 
         '作成した配列（ディクショナリ）を返す
-        Set func_CmArrayAddDictionary = oArray
+        Set func_CmArrayAddDictionary = oArr
 
-        Set oArray = Nothing
+        Set oArr = Nothing
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArrayInspectIndex()
+    'Overview                    : インデックスが有効か検査する
+    'Detailed Description        : 工事中
+    'Argument
+    '     alIdx                  : インデックス
+    'Return Value
+    '     結果 True:有効なインデックス / False:無効なインデックス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/24         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArrayInspectIndex( _
+        byVal alIdx _
+        )
+        func_CmArrayInspectIndex = False
+        If 0 <= alIdx And alIdx < PoArr.Count Then func_CmArrayInspectIndex = True
     End Function
 
 End Class
