@@ -18,6 +18,7 @@ Option Explicit
 '定数
 Private Const Cs_FOLDER_INCLUDE = "include"
 Private PoWriter
+Private PoPubSub
 
 'Include用関数定義
 Sub sub_Include( _
@@ -59,26 +60,31 @@ Wscript.Quit
 '2017/04/26         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
+    Set PoPubSub = Nothing
     Dim oParams : Set oParams = new_Dictionary()
     
     '初期化
-    Call sub_CM_ExcuteSub("sub_CmpExcelInitialize", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_CmpExcelInitialize", oParams, PoPubSub, "log")
     
     '当スクリプトの引数取得
-    Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, PoPubSub, "log")
     
     '比較対象ファイル入力画面の表示と取得
-    Call sub_CM_ExcuteSub("sub_CmpExcelDispInputFiles", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_CmpExcelDispInputFiles", oParams, PoPubSub, "log")
     
     'エクセルファイルを比較する
-    Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, PoPubSub, "log")
     
     '終了処理
-    Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", oParams, PoPubSub, "log")
+    
+    'ファイル接続をクローズする
+    Call PoWriter.FileClose()
     
     'オブジェクトを開放
     Set oParams = Nothing
-    
+    Set PoWriter = Nothing
+    Set PoPubSub = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -107,9 +113,9 @@ Private Sub sub_CmpExcelInitialize( _
     Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
     
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Dim oPubSub : Set oPubSub = new_clsCmPubSub()
-    Call oPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
-    Call sub_CM_BindAt( aoParams, "PubSub", oPubSub)
+    Set PoPubSub = new_clsCmPubSub()
+    Call PoPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
+'    Call sub_CM_BindAt( aoParams, "PubSub", oPubSub)
     
 End Sub
 
@@ -231,7 +237,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     )
     
     '4-1 比較するファイルを古い順（最終更新日昇順）に並べ替える
-    Call sub_CM_ExcuteSub("sub_CmpExcelSortByDateLastModified", aoParams, "log")
+    Call sub_CM_ExcuteSub("sub_CmpExcelSortByDateLastModified", aoParams, PoPubSub, "log")
     
     '4-2 比較
     With New clsCompareExcel
@@ -292,7 +298,7 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 5
 'Function/Sub Name           : sub_CmpExcelTerminate()
-'Overview                    : 初期化
+'Overview                    : 終了処理
 'Detailed Description        : 工事中
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
@@ -307,9 +313,9 @@ End Sub
 Private Sub sub_CmpExcelTerminate( _
     byRef aoParams _
     )
-    'ファイル接続をクローズする
-    Call PoWriter.FileClose()
-    Set PoWriter = Nothing
+'    'ファイル接続をクローズする
+'    Call PoWriter.FileClose()
+'    Set PoWriter = Nothing
 End Sub
 
 '***************************************************************************************************

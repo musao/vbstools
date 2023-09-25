@@ -17,6 +17,7 @@ Option Explicit
 '定数
 Private Const Cs_FOLDER_INCLUDE = "include"
 Private PoWriter
+Private PoPubSub
 
 'Include用関数定義
 Sub sub_Include( _
@@ -59,23 +60,28 @@ Wscript.Quit
 '2023/09/24         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
+    Set PoPubSub = Nothing
     Dim oParams : Set oParams = new_Dictionary()
     
     '初期化
-    Call sub_CM_ExcuteSub("sub_GnrtPwInitialize", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_GnrtPwInitialize", oParams, PoPubSub, "log")
     
     '当スクリプトの引数取得（処理なし）
-    Call sub_CM_ExcuteSub("sub_GnrtPwGetParameters", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_GnrtPwGetParameters", oParams, PoPubSub, "log")
     
     '比較対象ファイル入力画面の表示と取得
-    Call sub_CM_ExcuteSub("sub_GnrtPwGenerate", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_GnrtPwGenerate", oParams, PoPubSub, "log")
     
     '終了処理
-    Call sub_CM_ExcuteSub("sub_GnrtPwTerminate", oParams, "log")
+    Call sub_CM_ExcuteSub("sub_GnrtPwTerminate", oParams, PoPubSub, "log")
+    
+    'ファイル接続をクローズする
+    Call PoWriter.FileClose()
     
     'オブジェクトを開放
     Set oParams = Nothing
-    
+    Set PoPubSub = Nothing
+    Set PoWriter = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -104,9 +110,8 @@ Private Sub sub_GnrtPwInitialize( _
     Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
     
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Dim oPubSub : Set oPubSub = new_clsCmPubSub()
-    Call oPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
-    Call sub_CM_BindAt( aoParams, "PubSub", oPubSub)
+    Set PoPubSub = new_clsCmPubSub()
+    Call PoPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
     
 End Sub
 
@@ -153,7 +158,7 @@ End Sub
 Private Sub sub_GnrtPwGenerate( _
     byRef aoParams _
     )
-    Dim sPw : sPw = func_CM_GenerateRandomString(16, 15, Nothing)
+    Dim sPw : sPw = func_CM_UtilGenerateRandomString(16, 15, Nothing)
     aoParams.Add "GeneratedPassword", sPw
 '    Call CreateObject("Wscript.Shell").Run("cmd /c clip <""" & sPw & """", 0, True)
     
@@ -167,7 +172,7 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 4
 'Function/Sub Name           : sub_GnrtPwTerminate()
-'Overview                    : 初期化
+'Overview                    : 終了処理
 'Detailed Description        : 工事中
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
@@ -182,9 +187,6 @@ End Sub
 Private Sub sub_GnrtPwTerminate( _
     byRef aoParams _
     )
-    'ファイル接続をクローズする
-    Call PoWriter.FileClose()
-    Set PoWriter = Nothing
 End Sub
 
 '***************************************************************************************************

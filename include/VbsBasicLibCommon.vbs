@@ -953,84 +953,6 @@ Private Function func_CM_StrLen( _
     func_CM_StrLen = lLength
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_GenerateRandomString()
-'Overview                    : ランダムな文字列を生成する
-'Detailed Description        : 指定した長さ、文字の種類でランダムな文字列を生成する
-'Argument
-'     alLength               : 文字の長さ
-'     alType                 : 文字の種類（複数指定する場合は以下の和を設定する）
-'                                 1:半角英字大文字
-'                                 2:半角英字小文字
-'                                 4:半角数字
-'                                 8:半角記号
-'     avAdditional           : 配列で指定する文字種、前述の文字の種類と重複する場合は追加しない
-'                              指定がない場合はNothingなど配列以外を指定する
-'Return Value
-'     生成した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_GenerateRandomString( _
-    byVal alLength _
-    , byVal alType _
-    , byRef avAdditional _
-    )
-    
-    '文字の種類（alType）で指定した文字のリストを作成する
-    Dim vSettings
-    vSettings = Array( _
-                    Array( Array("A", "Z") ) _
-                    , Array( Array("a", "z") ) _
-                    , Array( Array("0", "9") ) _
-                    , Array( Array("!", "/"), Array(":", "@"), Array("[", "`"), Array("{", "~") ) _
-                    )
-    Dim lType : lType = alType
-    Dim lPowerOf2 : lPowerOf2 = 3
-    Dim oChars : Set oChars = new_clsCmArray()
-    Dim lQuotient,lDivide, vSetting, vItem, bCode
-    Do Until lPowerOf2<0
-        lDivide = 2^lPowerOf2
-        lQuotient = lType \ lDivide
-        lType = lType Mod lDivide
-        
-        If lQuotient>0 Then
-            vSetting = vSettings(lPowerOf2)
-            For Each vItem In vSetting
-                For bCode = Asc(vItem(0)) To Asc(vItem(1))
-                    oChars.Push Chr(bCode)
-                Next
-            Next
-        End If
-        
-        lPowerOf2 = lPowerOf2 - 1
-    Loop
-    
-    '配列で指定する文字種（avAdditional）を追加する
-    If func_CM_ArrayIsAvailable(avAdditional) Then
-        Dim sChar
-        For Each sChar In avAdditional
-            If oChars.IndexOf(sChar)<0 Then
-                oChars.Push sChar
-            End If
-        Next
-    End If
-    
-    '上述で作成した文字のリストを使ってランダムな文字列を生成する
-    Dim lPos, oRet
-    Set oRet = new_clsCmArray()
-    For lPos = 1 To alLength
-        oRet.Push oChars( func_CM_UtilGenerateRandomNumber(0, oChars.Length - 1, 1) )
-    Next
-    func_CM_GenerateRandomString = oRet.JoinVbs("")
-    
-    Set oRet = Nothing
-    Set oChars = Nothing
-End Function
-
 '数学系
 
 '***************************************************************************************************
@@ -1858,12 +1780,37 @@ Private Function func_CM_ToStringUnknown( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringErr()
+'Overview                    : Errオブジェクトの内容を可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringErr( _
+    )
+    Dim oRet : Set oRet = new_clsCmArray()
+    oRet.Push "Number => " & Err.Number
+    oRet.Push "Source => """ & Err.Source & """"
+    oRet.Push "Description => """ & Err.Description & """"
+    func_CM_ToStringErr = "<Err> {" & oRet.JoinVbs(",") & "}"
+    Set oRet = Nothing
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : sub_CM_ExcuteSub()
 'Overview                    : 関数を実行する
 'Detailed Description        : 工事中
 'Argument
 '     asSubName              : 実行する関数名
 '     aoArgument             : 実行する関数に渡す引数
+'     aoPubSub               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
 '     asTopic                : トピック
 'Return Value
 '     なし
@@ -1876,17 +1823,15 @@ End Function
 Private Sub sub_CM_ExcuteSub( _
     byVal asSubName _
     , byRef aoArgument _
-    , byRef asTopic _
+    , byRef aoPubSub _
+    , byVal asTopic _
     )
-    On Error Resume Next
-    
-    Dim oPubSub : Set oPubSub = Nothing
+'    On Error Resume Next
     
     '出版（Publish） 開始
-    If aoArgument.Exists("PubSub") Then Set oPubSub = aoArgument.Item("PubSub")
-    If Not oPubSub Is Nothing Then
-        Call oPubSub.Publish(asTopic, Array(5 ,asSubName ,"Start"))
-        Call oPubSub.Publish(asTopic, Array(9 ,asSubName ,func_CM_ToString(aoArgument)))
+    If Not aoPubSub Is Nothing Then
+        Call aoPubSub.Publish(asTopic, Array(5 ,asSubName ,"Start"))
+        Call aoPubSub.Publish(asTopic, Array(9 ,asSubName ,func_CM_ToString(aoArgument)))
     End If
     
     '関数の実行
@@ -1897,21 +1842,18 @@ Private Sub sub_CM_ExcuteSub( _
         Call oFunc(aoArgument)
     End If
     
-    If aoArgument.Exists("PubSub") Then Set oPubSub = aoArgument.Item("PubSub")
-    If Not oPubSub Is Nothing Then
+    If Not aoPubSub Is Nothing Then
         If Err.Number <> 0 Then
         'エラー
-            Dim sErrStr :  sErrStr = Err.Number & vbTab & Err.Source & vbTab & Err.Description
-            Call oPubSub.Publish(asTopic, Array(1, asSubName, sErrStr))
+            Call aoPubSub.Publish(asTopic, Array(1, asSubName, func_CM_ToStringErr()))
         Else
         '正常
-            Call oPubSub.Publish(asTopic, Array(5, asSubName, "End"))
+            Call aoPubSub.Publish(asTopic, Array(5, asSubName, "End"))
         End If
-        Call oPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
+        Call aoPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
     End If
     
     Set oFunc = Nothing
-    Set oPubSub = Nothing
 End Sub
 
 
@@ -2263,4 +2205,82 @@ Private Function func_CM_UtilGenerateRandomNumber( _
     )
     Randomize
     func_CM_UtilGenerateRandomNumber = func_CM_MathRoundDown( (adbMax - adbMin + 1) * Rnd + adbMin, 1 )
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilGenerateRandomString()
+'Overview                    : ランダムな文字列を生成する
+'Detailed Description        : 指定した長さ、文字の種類でランダムな文字列を生成する
+'Argument
+'     alLength               : 文字の長さ
+'     alType                 : 文字の種類（複数指定する場合は以下の和を設定する）
+'                                 1:半角英字大文字
+'                                 2:半角英字小文字
+'                                 4:半角数字
+'                                 8:半角記号
+'     avAdditional           : 配列で指定する文字種、前述の文字の種類と重複する場合は追加しない
+'                              指定がない場合はNothingなど配列以外を指定する
+'Return Value
+'     生成した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilGenerateRandomString( _
+    byVal alLength _
+    , byVal alType _
+    , byRef avAdditional _
+    )
+    
+    '文字の種類（alType）で指定した文字のリストを作成する
+    Dim vSettings
+    vSettings = Array( _
+                    Array( Array("A", "Z") ) _
+                    , Array( Array("a", "z") ) _
+                    , Array( Array("0", "9") ) _
+                    , Array( Array("!", "/"), Array(":", "@"), Array("[", "`"), Array("{", "~") ) _
+                    )
+    Dim lType : lType = alType
+    Dim lPowerOf2 : lPowerOf2 = 3
+    Dim oChars : Set oChars = new_clsCmArray()
+    Dim lQuotient,lDivide, vSetting, vItem, bCode
+    Do Until lPowerOf2<0
+        lDivide = 2^lPowerOf2
+        lQuotient = lType \ lDivide
+        lType = lType Mod lDivide
+        
+        If lQuotient>0 Then
+            vSetting = vSettings(lPowerOf2)
+            For Each vItem In vSetting
+                For bCode = Asc(vItem(0)) To Asc(vItem(1))
+                    oChars.Push Chr(bCode)
+                Next
+            Next
+        End If
+        
+        lPowerOf2 = lPowerOf2 - 1
+    Loop
+    
+    '配列で指定する文字種（avAdditional）を追加する
+    If func_CM_ArrayIsAvailable(avAdditional) Then
+        Dim sChar
+        For Each sChar In avAdditional
+            If oChars.IndexOf(sChar)<0 Then
+                oChars.Push sChar
+            End If
+        Next
+    End If
+    
+    '上述で作成した文字のリストを使ってランダムな文字列を生成する
+    Dim lPos, oRet
+    Set oRet = new_clsCmArray()
+    For lPos = 1 To alLength
+        oRet.Push oChars( func_CM_UtilGenerateRandomNumber(0, oChars.Length - 1, 1) )
+    Next
+    func_CM_UtilGenerateRandomString = oRet.JoinVbs("")
+    
+    Set oRet = Nothing
+    Set oChars = Nothing
 End Function
