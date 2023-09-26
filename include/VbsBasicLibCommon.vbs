@@ -643,6 +643,97 @@ Private Function func_CM_FsGetTempFileName()
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetPrivateFilePath()
+'Overview                    : 実行中のスクリプトがあるフォルダからのパスを返す
+'Detailed Description        : 上位フォルダが存在しない場合は作成する
+'Argument
+'     asParentFolderName     : 親フォルダ名
+'     asFileName             : ファイル名
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetPrivateFilePath( _
+    byVal asParentFolderName _
+    , byVal asFileName _
+    )
+    Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(WScript.ScriptFullName)
+    If Len(asParentFolderName)>0 Then
+    '引数で指定したディレクトリ名がある場合
+        sParentFolderPath = func_CM_FsBuildPath(sParentFolderPath ,asParentFolderName)
+    End If
+    func_CM_FsGetPrivateFilePath = func_CM_FsGetFilePathWithCreateParentFolder(sParentFolderPath, asFileName)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetTempFilePath()
+'Overview                    : 一時ファイルのパスを返す
+'Detailed Description        : 実行中のスクリプトがあるフォルダのtmpフォルダ以下に作成する
+'                              上位フォルダが存在しない場合は作成する
+'Argument
+'     なし
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetTempFilePath( _
+    )
+    func_CM_FsGetTempFilePath = func_CM_FsGetPrivateFilePath("tmp", func_CM_FsGetTempFileName())
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetPrivateLogFilePath()
+'Overview                    : 実行中のスクリプトのログファイルパスを返す
+'Detailed Description        : 実行中のスクリプトがあるフォルダのlogフォルダ以下に
+'                              スクリプトファイル名＋".log"形式のファイル名で作成する
+'                              上位フォルダが存在しない場合は作成する
+'Argument
+'     なし
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetPrivateLogFilePath( _
+    )
+    func_CM_FsGetPrivateLogFilePath = func_CM_FsGetPrivateFilePath("log", func_CM_FsGetGetBaseName(WScript.ScriptName) & ".log" )
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_FsGetFilePathWithCreateParentFolder()
+'Overview                    : ファイルのパスを取得
+'Detailed Description        : 上位フォルダが存在しない場合は作成する
+'Argument
+'     asParentFolderPath     : 親フォルダのパス
+'     asFileName             : ファイル名
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_FsGetFilePathWithCreateParentFolder( _
+    byVal asParentFolderPath _
+    , byVal asFileName _
+    )
+    If Not(func_CM_FsFolderExists(asParentFolderPath)) Then func_CM_FsCreateFolder(asParentFolderPath)
+    func_CM_FsGetFilePathWithCreateParentFolder = func_CM_FsBuildPath(asParentFolderPath, asFileName)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsCreateFolder()
 'Overview                    : フォルダを作成する
 'Detailed Description        : FileSystemObjectのCreateFolder()と同等
@@ -747,45 +838,6 @@ Private Function func_CM_FsIsSame( _
     )
     func_CM_FsIsSame = (func_CM_FsGetFsObject(asPathA) Is func_CM_FsGetFsObject(asPathB))
 End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetPrivateFolder()
-'Overview                    : 実行中のスクリプト専用のフォルダのフルパスを返す
-'Detailed Description        : 実行中のスクリプト格納フォルダ以下に作成する
-'                              引数で指定したディレクトリ名がある場合はそのフォルダ以下のパスを返す
-'Argument
-'     asParentFolderName     : 親フォルダ名
-'Return Value
-'     実行中のスクリプト専用のフォルダのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetPrivateFolder( _
-    byVal asParentFolderName _
-    )
-    Dim sScriptFullName : sScriptFullName = WScript.ScriptFullName
-    Dim sPath,sParentFolderPath
-    
-    sParentFolderPath = func_CM_FsGetParentFolderPath(sScriptFullName)
-    If Len(asParentFolderName)>0 Then
-    '引数で指定したディレクトリ名がある場合
-        sParentFolderPath = func_CM_FsBuildPath(sParentFolderPath ,asParentFolderName)
-    End If
-    
-    sPath = func_CM_FsBuildPath( _
-                                sParentFolderPath _
-                                ,func_CM_FsGetGetBaseName(sScriptFullName) _
-                                )
-    
-    'ディレクトリがなかったら作成する
-    If Not(func_CM_FsFolderExists(sPath)) Then func_CM_FsCreateFolder(sPath)
-    '戻り値を返す
-    func_CM_FsGetPrivateFolder = sPath
-End Function
-
 
 
 '文字列操作系
@@ -2284,3 +2336,39 @@ Private Function func_CM_UtilGenerateRandomString( _
     Set oRet = Nothing
     Set oChars = Nothing
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_UtilCommonLogger()
+'Overview                    : ログ出力する
+'Detailed Description        : 工事中
+'Argument
+'     avParams               : 配列型のパラメータリスト
+'     aoWriter               : ファイル出力バッファリング処理クラスのインスタンス
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_UtilCommonLogger( _
+    byRef avParams _
+    , byRef aoWriter _
+    )
+    Dim oCont : Set oCont = new_clsCmArray()
+    oCont.Push new_clsCalGetNow()
+    
+    Dim vEle
+    For Each vEle In avParams
+        oCont.Push vEle
+    Next
+    
+    With aoWriter
+        .WriteContents(oCont.JoinVbs(vbTab))
+        .newLine()
+    End With
+    
+    Set vEle = Nothing
+    Set oCont = Nothing
+End Sub

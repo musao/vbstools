@@ -60,7 +60,13 @@ Wscript.Quit
 '2023/09/24         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
-    Set PoPubSub = Nothing
+    'ログ出力の設定
+    Dim sPath : sPath = func_CM_FsGetPrivateLogFilePath()
+    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
+    '出版-購読型（Publish/subscribe）インスタンスの設定
+    Set PoPubSub = new_clsCmPubSub()
+    Call PoPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
+    'パラメータ格納用汎用ハッシュマップ宣言
     Dim oParams : Set oParams = new_Dictionary()
     
     '初期化
@@ -102,17 +108,6 @@ End Sub
 Private Sub sub_GnrtPwInitialize( _
     byRef aoParams _
     )
-    'ログ出力の設定
-    Dim sPath : sPath = func_CM_FsBuildPath( _
-                    func_CM_FsGetPrivateFolder("log") _
-                    , func_CM_FsGetGetBaseName(WScript.ScriptName) & new_clsCalGetNow().DisplayFormatAs("_YYMMDD_hhmmss.000.log") _
-                    )
-    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
-    
-    '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_clsCmPubSub()
-    Call PoPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
-    
 End Sub
 
 '***************************************************************************************************
@@ -137,14 +132,9 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 3
-'Function/Sub Name           : sub_GnrtPwDispInputFiles()
-'Overview                    : 比較対象ファイル入力画面の表示と取得
-'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
-'                              パラメータ格納用ハッシュマップの構成
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              Seq(1,2)                 比較するエクセルファイルのパス
-'                              比較するエクセルファイルのパスが2つ未満の場合に不足分を取得格納する
+'Function/Sub Name           : sub_GnrtPwGenerate()
+'Overview                    : パスワード生成
+'Detailed Description        : 工事中
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
 'Return Value
@@ -158,14 +148,26 @@ End Sub
 Private Sub sub_GnrtPwGenerate( _
     byRef aoParams _
     )
+    '一時ファイルのパスを作成
+    Dim sPath : sPath = func_CM_FsGetTempFilePath()
+    
+    'パスワード生成
     Dim sPw : sPw = func_CM_UtilGenerateRandomString(16, 15, Nothing)
     aoParams.Add "GeneratedPassword", sPw
-'    Call CreateObject("Wscript.Shell").Run("cmd /c clip <""" & sPw & """", 0, True)
     
     Dim sMsg, sTitle
     sMsg = "パスワードを生成しました" & vbNewLine & "OKボタンを押下するとクリップボードにコピーします"
     sTitle = new_clsCalGetNow() & " に作成"
-    Call Inputbox(sMsg, sTitle, sPw)
+    
+    Do
+        '一時ファイルに生成したパスワードを出力
+        Call sub_CM_FsWriteFile(sPath, sPw)
+        'クリップボードに一時ファイルの内容を出力
+        Call CreateObject("Wscript.Shell").Run("cmd /c clip <""" & sPath & """", 0, True)
+        '一時ファイルを削除
+        Call func_CM_FsDeleteFile(sPath)
+    Loop Until Inputbox(sMsg, sTitle, sPw)=False
+    
     
 End Sub
 
@@ -187,6 +189,7 @@ End Sub
 Private Sub sub_GnrtPwTerminate( _
     byRef aoParams _
     )
+    PoWriter.Flush
 End Sub
 
 '***************************************************************************************************
@@ -207,12 +210,5 @@ End Sub
 Private Sub sub_GnrtPwLogger( _
     byRef avParams _
     )
-    With PoWriter
-        Dim sCont : sCont = new_clsCalGetNow()
-        sCont = sCont & vbTab & avParams(0)
-        sCont = sCont & vbTab & avParams(1)
-        sCont = sCont & vbTab & avParams(2)
-        .WriteContents(sCont)
-        .newLine()
-    End With
+    Call sub_CM_UtilCommonLogger(avParams, PoWriter)
 End Sub

@@ -24,6 +24,8 @@ Call sub_Include("clsCmCalendar.vbs")
 Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
+Call msgbox(WScript.Path)
+wscript.quit
 
 ''Test func_CM_MathRound()
 'Dim dbPlus0, dbPlus1, dbPlus5 ,dbMinas0 ,dbMinas2 ,dbMinas5
@@ -56,13 +58,13 @@ Call sub_Include("clsCmArray.vbs")
 'Call msgbox( func_CM_UtilGenerateRandomString(50, 3, Nothing)  )        '大小
 'Call msgbox( func_CM_UtilGenerateRandomString(50, 2, Nothing)  )        '　小
 'Call msgbox( func_CM_UtilGenerateRandomString(50, 1, Nothing)  )        '大
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数　
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
-
-
-wscript.quit
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数　
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
+'
+'
+'wscript.quit
 
 ''Test func_CM_UtilSort～()
 'Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
@@ -386,8 +388,7 @@ wscript.quit
 
 
 Dim sPatha
-sPatha = func_CM_FsGetPrivateFolder("log")
-sPatha = func_CM_FsBuildPath(sPatha, func_CM_FsGetGetBaseName(WScript.ScriptFullName) & new_clsCalGetNow().DisplayFormatAs("_YYMMDD_hhmmss.000.log"))
+sPatha = func_CM_FsGetPrivateLogFilePath()
 Dim bw
 Set bw = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPatha, 8, True, -2))
 

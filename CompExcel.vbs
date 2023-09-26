@@ -33,6 +33,7 @@ Sub sub_Include( _
     End With
 End Sub
 'Include
+Call sub_Include("clsCmArray.vbs")
 Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmCalendar.vbs")
 Call sub_Include("clsCmPubSub.vbs")
@@ -60,7 +61,13 @@ Wscript.Quit
 '2017/04/26         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
-    Set PoPubSub = Nothing
+    'ログ出力の設定
+    Dim sPath : sPath = func_CM_FsGetPrivateLogFilePath()
+    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
+    '出版-購読型（Publish/subscribe）インスタンスの設定
+    Set PoPubSub = new_clsCmPubSub()
+    Call PoPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
+    'パラメータ格納用汎用ハッシュマップ宣言
     Dim oParams : Set oParams = new_Dictionary()
     
     '初期化
@@ -79,12 +86,12 @@ Sub Main()
     Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", oParams, PoPubSub, "log")
     
     'ファイル接続をクローズする
-    Call PoWriter.FileClose()
+    PoWriter.FileClose
     
     'オブジェクトを開放
     Set oParams = Nothing
-    Set PoWriter = Nothing
     Set PoPubSub = Nothing
+    Set PoWriter = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -105,18 +112,6 @@ End Sub
 Private Sub sub_CmpExcelInitialize( _
     byRef aoParams _
     )
-    'ログ出力の設定
-    Dim sPath : sPath = func_CM_FsBuildPath( _
-                    func_CM_FsGetPrivateFolder("log") _
-                    , func_CM_FsGetGetBaseName(WScript.ScriptName) & new_clsCalGetNow().DisplayFormatAs("_YYMMDD_hhmmss.000.log") _
-                    )
-    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
-    
-    '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_clsCmPubSub()
-    Call PoPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
-'    Call sub_CM_BindAt( aoParams, "PubSub", oPubSub)
-    
 End Sub
 
 '***************************************************************************************************
@@ -201,7 +196,8 @@ Private Sub sub_CmpExcelDispInputFiles( _
             sPath = .GetOpenFilename( , , Cs_TITLE_EXCEL, , False)
             If sPath = False Then
             'ファイル選択キャンセルの場合は当スクリプトを終了する
-                Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", aoParams, "log")
+                Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", aoParams, PoPubSub, "log")
+                PoWriter.FileClose
                 Wscript.Quit
             End If
             If func_CM_FsFileExists(sPath) Then
@@ -241,7 +237,6 @@ Private Sub sub_CmpExcelCompareFiles( _
     
     '4-2 比較
     With New clsCompareExcel
-'        Call sub_CM_Bind(.PubSub, aoParams.Item("PubSub"))
         .PathFrom = aoParams.Item("Parameter").Item(1)
         .PathTo = aoParams.Item("Parameter").Item(2)
         .Compare()
@@ -313,9 +308,7 @@ End Sub
 Private Sub sub_CmpExcelTerminate( _
     byRef aoParams _
     )
-'    'ファイル接続をクローズする
-'    Call PoWriter.FileClose()
-'    Set PoWriter = Nothing
+    PoWriter.Flush
 End Sub
 
 '***************************************************************************************************
@@ -336,12 +329,5 @@ End Sub
 Private Sub sub_CmpExcelLogger( _
     byRef avParams _
     )
-    With PoWriter
-        Dim sCont : sCont = new_clsCalGetNow()
-        sCont = sCont & vbTab & avParams(0)
-        sCont = sCont & vbTab & avParams(1)
-        sCont = sCont & vbTab & avParams(2)
-        .WriteContents(sCont)
-        .newLine()
-    End With
+    Call sub_CM_UtilCommonLogger(avParams, PoWriter)
 End Sub
