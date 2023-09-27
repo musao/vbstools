@@ -1856,6 +1856,25 @@ Private Function func_CM_ToStringErr( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_ToStringArguments()
+'Overview                    : Argumentsオブジェクトの内容を可読な表示に変換する
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     変換した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ToStringArguments( _
+    )
+    func_CM_ToStringArguments = func_CM_ToString(func_CM_UtilStoringArguments())
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : sub_CM_ExcuteSub()
 'Overview                    : 関数を実行する
 'Detailed Description        : 工事中
@@ -1878,7 +1897,7 @@ Private Sub sub_CM_ExcuteSub( _
     , byRef aoPubSub _
     , byVal asTopic _
     )
-'    On Error Resume Next
+    On Error Resume Next
     
     '出版（Publish） 開始
     If Not aoPubSub Is Nothing Then
@@ -2372,3 +2391,58 @@ Private Sub sub_CM_UtilCommonLogger( _
     Set vEle = Nothing
     Set oCont = Nothing
 End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilStoringArguments()
+'Overview                    : Argumentsオブジェクトの内容をオブジェクトに変換する
+'Detailed Description        : 変換したオブジェクトの構成
+'                              例は引数が a /X /Hoge:Fuga, b の場合
+'                              Key         Value                                        例
+'                              ----------  -------------------------------------------  -------------
+'                              "All"       WScript.Arguments以下のItemの内容            a /X /Hoge:Fuga, b
+'                              "Named"     WScript.Arguments.Named以下のItemの内容      X: Hoge:Fuga
+'                              "Unnamed"   WScript.Arguments.Unnamed以下のItemの内容    a b
+'Argument
+'     なし
+'Return Value
+'     変換したオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilStoringArguments( _
+    )
+    Dim oRet : Set oRet = new_Dictionary()
+    Dim oTemp, oEle, oKey
+    
+    'All
+    Set oTemp = new_clsCmArray()
+    For Each oEle In WScript.Arguments
+        oTemp.Push oEle
+    Next
+    oRet.Add "All", oTemp
+    
+    'Named
+    Set oTemp = new_Dictionary()
+    For Each oKey In WScript.Arguments.Named
+        oTemp.Add oKey, WScript.Arguments.Named.Item(oKey)
+    Next
+    oRet.Add "Named", oTemp
+    
+    'Unnamed
+    Set oTemp = new_clsCmArray()
+    For Each oEle In WScript.Arguments.Unnamed
+        oTemp.Push oEle
+    Next
+    oRet.Add "Unnamed", oTemp
+    
+    Set func_CM_UtilStoringArguments = oRet
+    
+    Set oKey = Nothing
+    Set oEle = Nothing
+    Set oTemp = Nothing
+    Set oRet = Nothing
+End Function
+

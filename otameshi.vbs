@@ -24,7 +24,7 @@ Call sub_Include("clsCmCalendar.vbs")
 Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
-Call msgbox(WScript.Path)
+Call msgbox( func_CM_ToStringArguments() )
 wscript.quit
 
 ''Test func_CM_MathRound()

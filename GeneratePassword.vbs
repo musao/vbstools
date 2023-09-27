@@ -72,7 +72,7 @@ Sub Main()
     '初期化
     Call sub_CM_ExcuteSub("sub_GnrtPwInitialize", oParams, PoPubSub, "log")
     
-    '当スクリプトの引数取得（処理なし）
+    '当スクリプトの引数取得
     Call sub_CM_ExcuteSub("sub_GnrtPwGetParameters", oParams, PoPubSub, "log")
     
     '比較対象ファイル入力画面の表示と取得
@@ -113,8 +113,17 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 2
 'Function/Sub Name           : sub_GnrtPwGetParameters()
-'Overview                    : 当スクリプトの引数取得（処理なし）
-'Detailed Description        : 工事中
+'Overview                    : 当スクリプトの引数取得
+'Detailed Description        : 引数はいずれも名前付き引数（/Key:Value 形式）
+'                              Key         Value                                        Default
+'                              ----------  -------------------------------------------  -------------
+'                              "Length"    文字の長さ                                   16
+'                              U,L,N,S     文字の種類                                   全て含む
+'                               "U"         半角英字大文字
+'                               "L"         半角英字小文字
+'                               "N"         半角数字
+'                               "S"         全ての記号
+'                              "Add"       追加指定する文字種をカンマ区切りで指定       なし
 'Argument
 '     aoParams               : パラメータ格納用汎用ハッシュマップ
 'Return Value
@@ -128,6 +137,39 @@ End Sub
 Private Sub sub_GnrtPwGetParameters( _
     byRef aoParams _
     )
+    'オリジナルの引数を取得
+    Dim oArg : Set oArg = func_CM_UtilStoringArguments()
+    Call sub_CM_BindAt(aoParams, "Arguments", oArg)
+    
+    '文字の長さ（alLength）
+    Dim oKey, lLength
+    oKey = "Length"
+    If oArg.Item("Named").Exists(oKey) Then lLength = oArg.Item("Named").Item(oKey) Else lLength = 16
+    
+    '追加指定する文字種（avAdditional）
+    Dim vAdd
+    oKey = "Add"
+    If oArg.Item("Named").Exists(oKey) Then 
+        vAdd = new_ArraySplit(oArg.Item("Named").Item(oKey), ",", vbBinaryCompare).Items
+    Else
+        vAdd = Empty
+    End If
+    
+    '文字の種類（alType）
+    Dim oSetting, lSum, lType
+    Set oSetting = new_DictSetValues(Array("U", 1, "L", 2, "N", 4, "S", 8))
+    lSum = 0
+    For Each oKey In oSetting.Keys
+        If oArg.Item("Named").Exists(oKey) Then lSum = lSum + oSetting.Item(oKey)
+    Next
+    lType = lSum
+    If lType = 0 And func_CM_ArrayIsAvailable(vAdd)<>True Then lType = 15
+    
+    Dim oParam : Set oParam = new_DictSetValues(Array("Length", lLength, "Type", lType, "Additional", vAdd))
+    Call sub_CM_BindAt(aoParams, "Parameter", oParam)
+    
+    Set oParam = Nothing
+    Set oArg = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -148,17 +190,25 @@ End Sub
 Private Sub sub_GnrtPwGenerate( _
     byRef aoParams _
     )
-    '一時ファイルのパスを作成
-    Dim sPath : sPath = func_CM_FsGetTempFilePath()
+    'パラメータの取得
+    Dim lLength, lType, vAdd
+    With aoParams.Item("Parameter")
+        Call sub_CM_Bind(lLength, .Item("Length"))
+        Call sub_CM_Bind(lType, .Item("Type"))
+        Call sub_CM_Bind(vAdd, .Item("Additional"))
+    End With
     
     'パスワード生成
-    Dim sPw : sPw = func_CM_UtilGenerateRandomString(16, 15, Nothing)
-    aoParams.Add "GeneratedPassword", sPw
+    Dim sPw : sPw = func_CM_UtilGenerateRandomString(lLength, lType, vAdd)
+    Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw))
     
+    'ダイアログのメッセージなどを作成
     Dim sMsg, sTitle
     sMsg = "パスワードを生成しました" & vbNewLine & "OKボタンを押下するとクリップボードにコピーします"
     sTitle = new_clsCalGetNow() & " に作成"
     
+    '一時ファイルのパスを作成
+    Dim sPath : sPath = func_CM_FsGetTempFilePath()
     Do
         '一時ファイルに生成したパスワードを出力
         Call sub_CM_FsWriteFile(sPath, sPw)
