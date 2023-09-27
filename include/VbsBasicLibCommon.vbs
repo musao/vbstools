@@ -2446,3 +2446,58 @@ Private Function func_CM_UtilStoringArguments( _
     Set oRet = Nothing
 End Function
 
+
+
+
+'.filter(i => {
+'  if (i % 2 === 0) {
+'    return true;
+'  } else {
+'    return false;
+'  }
+'})
+'.map(a => a * 100)
+'.reduce((previousValue, currentValue) => previousValue * currentValue)
+'.find(i => i > 0 && i % 3 === 0)
+'.every(value => value >= 0)
+'.some(value => value > 10)
+'
+'
+'
+'
+'
+'
+'
+'i => {
+'  if (i % 2 === 0) {
+'    return true;
+'  } else {
+'    return false;
+'  }
+'}
+'a => a * 100
+'(previousValue, currentValue) => previousValue * currentValue
+'i => i > 0 && i % 3 === 0
+'value => value >= 0
+'value => value > 10
+'
+'
+'
+'
+'１．一時的な関数名を決める
+'２．改行→":"に置換
+'
+'■"=>"がある場合
+'１．"=>"で分割
+'　前半（引数）
+'　　１．大外の()を削除する
+'　後半（関数内部）
+'　　１．大外の{}を削除する
+'　　２．"return"がない場合は"return = ()"を先頭につける
+'　　３．return xxx"を"関数名 = xxx"に置換する
+'
+'
+'◆"=>"がない場合
+'１．function ($1) {$2}に分解
+'　$1を引数とする
+'　$2は"return xxx"を"関数名 = xxx"に置換する

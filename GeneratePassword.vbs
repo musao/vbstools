@@ -1,9 +1,15 @@
 '***************************************************************************************************
 'FILENAME                    : GeneratePassword.vbs
 'Overview                    : パスワードを生成する
-'Detailed Description        : 工事中
+'Detailed Description        : 生成したパスワードはクリップボードにコピーする
 'Argument
-'     なし
+'     /Length                : 生成するパスワードの文字数
+'     /U                     : 生成するパスワードの文字種に半角英字大文字を使用する
+'     /L                     : 生成するパスワードの文字種に半角英字小文字を使用する
+'     /N                     : 生成するパスワードの文字種に半角数字を使用する
+'     /S                     : 生成するパスワードの文字種に記号を使用する
+'                                記号の種類   !"#$%&'()*+,-./:;<=>?[\]^_`{|}~（31種類）
+'     /Add                   : 追加指定する文字種（カンマ区切りで複数指定可能）
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -16,8 +22,7 @@ Option Explicit
 
 '定数
 Private Const Cs_FOLDER_INCLUDE = "include"
-Private PoWriter
-Private PoPubSub
+Private PoWriter, PoPubSub
 
 'Include用関数定義
 Sub sub_Include( _
@@ -66,20 +71,14 @@ Sub Main()
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Set PoPubSub = new_clsCmPubSub()
     Call PoPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
-    'パラメータ格納用汎用ハッシュマップ宣言
+    'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dictionary()
     
-    '初期化
-    Call sub_CM_ExcuteSub("sub_GnrtPwInitialize", oParams, PoPubSub, "log")
-    
-    '当スクリプトの引数取得
+    '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
     Call sub_CM_ExcuteSub("sub_GnrtPwGetParameters", oParams, PoPubSub, "log")
     
-    '比較対象ファイル入力画面の表示と取得
+    'パスワードを生成する
     Call sub_CM_ExcuteSub("sub_GnrtPwGenerate", oParams, PoPubSub, "log")
-    
-    '終了処理
-    Call sub_CM_ExcuteSub("sub_GnrtPwTerminate", oParams, PoPubSub, "log")
     
     'ファイル接続をクローズする
     Call PoWriter.FileClose()
@@ -92,40 +91,25 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_GnrtPwInitialize()
-'Overview                    : 初期化
-'Detailed Description        : 工事中
-'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_GnrtPwInitialize( _
-    byRef aoParams _
-    )
-End Sub
-
-'***************************************************************************************************
-'Processing Order            : 2
 'Function/Sub Name           : sub_GnrtPwGetParameters()
-'Overview                    : 当スクリプトの引数取得
-'Detailed Description        : 引数はいずれも名前付き引数（/Key:Value 形式）
-'                              Key         Value                                        Default
-'                              ----------  -------------------------------------------  -------------
-'                              "Length"    文字の長さ                                   16
-'                              U,L,N,S     文字の種類                                   全て含む
-'                               "U"         半角英字大文字
-'                               "L"         半角英字小文字
-'                               "N"         半角数字
-'                               "S"         全ての記号
-'                              "Add"       追加指定する文字種をカンマ区切りで指定       なし
+'Overview                    : 当スクリプトの引数をパラメータ格納用オブジェクトに取得する
+'Detailed Description        : 名前付き引数（/Key:Value 形式）だけを取得する
+'                              Key           Value                                     Default
+'                              ------------  ----------------------------------------  -------------
+'                              "Parameter"   解析した結果
+'
+'                              名前付き引数（/Key:Value 形式）の構成
+'                              Key           Value                                     Default
+'                              ------------  ----------------------------------------  -------------
+'                              "Length"      文字の長さ                                16
+'                              U,L,N,S       文字の種類                                全て含む
+'                               "U"           半角英字大文字
+'                               "L"           半角英字小文字
+'                               "N"           半角数字
+'                               "S"           全ての記号
+'                              "Add"         追加指定する文字種をカンマ区切りで指定    なし
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -139,14 +123,17 @@ Private Sub sub_GnrtPwGetParameters( _
     )
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
-    Call sub_CM_BindAt(aoParams, "Arguments", oArg)
+    '★ログ出力
+    Call sub_GnrtPwLogger(Array(9, "sub_GnrtPwGetParameters", "Arguments are " & func_CM_ToStringArguments()))
     
-    '文字の長さ（alLength）
+    '引数の内容を解析
+    
+    '文字の長さ
     Dim oKey, lLength
     oKey = "Length"
     If oArg.Item("Named").Exists(oKey) Then lLength = oArg.Item("Named").Item(oKey) Else lLength = 16
     
-    '追加指定する文字種（avAdditional）
+    '追加指定する文字種
     Dim vAdd
     oKey = "Add"
     If oArg.Item("Named").Exists(oKey) Then 
@@ -155,7 +142,7 @@ Private Sub sub_GnrtPwGetParameters( _
         vAdd = Empty
     End If
     
-    '文字の種類（alType）
+    '文字の種類
     Dim oSetting, lSum, lType
     Set oSetting = new_DictSetValues(Array("U", 1, "L", 2, "N", 4, "S", 8))
     lSum = 0
@@ -166,6 +153,8 @@ Private Sub sub_GnrtPwGetParameters( _
     If lType = 0 And func_CM_ArrayIsAvailable(vAdd)<>True Then lType = 15
     
     Dim oParam : Set oParam = new_DictSetValues(Array("Length", lLength, "Type", lType, "Additional", vAdd))
+    
+    'パラメータ格納用オブジェクトに設定
     Call sub_CM_BindAt(aoParams, "Parameter", oParam)
     
     Set oParam = Nothing
@@ -173,12 +162,12 @@ Private Sub sub_GnrtPwGetParameters( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 3
+'Processing Order            : 2
 'Function/Sub Name           : sub_GnrtPwGenerate()
-'Overview                    : パスワード生成
-'Detailed Description        : 工事中
+'Overview                    : パスワードを生成する
+'Detailed Description        : 生成したパスワードはクリップボードにコピーし、InputBoxに表示する
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -190,16 +179,16 @@ End Sub
 Private Sub sub_GnrtPwGenerate( _
     byRef aoParams _
     )
-    'パラメータの取得
+    'パスワード生成
     Dim lLength, lType, vAdd
     With aoParams.Item("Parameter")
         Call sub_CM_Bind(lLength, .Item("Length"))
         Call sub_CM_Bind(lType, .Item("Type"))
         Call sub_CM_Bind(vAdd, .Item("Additional"))
     End With
-    
-    'パスワード生成
     Dim sPw : sPw = func_CM_UtilGenerateRandomString(lLength, lType, vAdd)
+    
+    '★ログ出力
     Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw))
     
     'ダイアログのメッセージなどを作成
@@ -216,37 +205,18 @@ Private Sub sub_GnrtPwGenerate( _
         Call CreateObject("Wscript.Shell").Run("cmd /c clip <""" & sPath & """", 0, True)
         '一時ファイルを削除
         Call func_CM_FsDeleteFile(sPath)
+        '★ログ出力
+        Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Display Inputbox"))
     Loop Until Inputbox(sMsg, sTitle, sPw)=False
     
     
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 4
-'Function/Sub Name           : sub_GnrtPwTerminate()
-'Overview                    : 終了処理
-'Detailed Description        : 工事中
-'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_GnrtPwTerminate( _
-    byRef aoParams _
-    )
-    PoWriter.Flush
-End Sub
-
-'***************************************************************************************************
 'Processing Order            : -
 'Function/Sub Name           : sub_GnrtPwLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : 工事中
+'Detailed Description        : sub_CM_UtilCommonLogger()に委譲する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 'Return Value
