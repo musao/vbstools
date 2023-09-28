@@ -24,8 +24,42 @@ Call sub_Include("clsCmCalendar.vbs")
 Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
-Call msgbox( func_CM_ToStringArguments() )
-wscript.quit
+
+''Test new_Func()
+'Dim sSoruceCode
+'sSoruceCode = "function(a, b){ return (a > b) }"
+'Call Msgbox(new_Func(sSoruceCode)(1,1))   'False
+'Call Msgbox(new_Func(sSoruceCode)(2,1))   'True
+'
+'sSoruceCode = "function(a, b){ Dim c }"
+'Call Msgbox(new_Func(sSoruceCode)(9,8))   '‹ó
+'
+'sSoruceCode = "function(){ return ""OK"" }"
+'Call Msgbox(new_Func(sSoruceCode)())      'OK
+'
+'sSoruceCode = "function (a, b) { Dim c" & vbNewLine & _
+'                         "c = a + b" & vbNewLine & _
+'                         "return c }"
+'Call Msgbox(new_Func(sSoruceCode)(5,6))   '11
+'
+'sSoruceCode = "function(a, b){}"
+'Call Msgbox(new_Func(sSoruceCode)(-4,0))  '‹ó
+'
+'sSoruceCode = "a => (a + a)"
+'Call Msgbox(new_Func(sSoruceCode)(-8)  )  '-16
+'
+'sSoruceCode = "(a, b) => b"
+'Call Msgbox(new_Func(sSoruceCode)(5,6))   '6
+'
+'sSoruceCode = "(a, b) => { Dim c" & vbNewLine & _
+'                         "c = a + b" & vbNewLine & _
+'                         "return c }"
+'Call Msgbox(new_Func(sSoruceCode)(7,3))   '10
+'
+'sSoruceCode = "a => a^2"
+'Call Msgbox(new_Func(sSoruceCode)(9))     '81
+'
+'wscript.quit
 
 ''Test func_CM_MathRound()
 'Dim dbPlus0, dbPlus1, dbPlus5 ,dbMinas0 ,dbMinas2 ,dbMinas5
@@ -247,13 +281,14 @@ dim arr5
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -3)) )            '<clsCmArray>
 
-''Test Sort()
-'private function ArraySortTest(x,y)
-'    ArraySortTest = (x > y)
-'end function
-'Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
-'Call msgbox( func_CM_ToString(arr5) )
+'Test Sort()
+private function ArraySortTest(x,y)
+    ArraySortTest = (x > y)
+end function
+Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
+Call msgbox( func_CM_ToString(arr5.sort(new_Func("(x,y) => (x>y)"))) )
 
 ''Test Splice()
 'Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))

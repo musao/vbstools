@@ -2446,58 +2446,143 @@ Private Function func_CM_UtilStoringArguments( _
     Set oRet = Nothing
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : new_Func()
+'Overview                    : 関数のインスタンスを生成する
+'Detailed Description        : javascriptの無名関数に準拠（vbscriptの仕様上仮の名前はつける）
+'Argument
+'     asSoruceCode           : 生成する関数のソースコード
+'                              以下のいずれかの様式とし、function（subではない）を生成する
+'                              1.通常
+'                               function (①) {②}
+'                                ①引数をカンマ区切りで指定する
+'                                ②vbscriptの構文に準拠する、戻り値は"return hoge"と表記する
+'                                  "return"句がない場合は戻り値はなしとする
+'                              2.Arrow関数
+'                               ① => ②
+'                                ①引数をカンマ区切りで指定する、複数の場合は()で囲む
+'                                ②単一行の場合はそのまま戻り値とする、複数行の場合は1.通常の②と同じ
+'Return Value
+'     生成した関数のインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Func( _
+    byVal asSoruceCode _
+    )
+    '生成する関数のソースコードの改行を:に変換
+    Dim sSoruceCode : sSoruceCode = Replace(asSoruceCode, vbNewLine, ":")
+    
+    '関数名（仮名）を作る
+    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
+    
+    Dim sPattern, oRegExp, sArgStr, sProcStr
+    '生成する関数のソースコードの様式が「1.通常」の場合
+    sPattern = "function\s?\((.*)\)\s?{(.*)}"
+    Set oRegExp = new_RegExp(sPattern, "gm")
+    If oRegExp.Test(sSoruceCode) Then
+        sArgStr = oRegExp.Replace(sSoruceCode, "$1")
+        sProcStr = oRegExp.Replace(sSoruceCode, "$2")
+        
+        '"return"句があれば関数名で書き換える
+        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
+        
+        '関数の生成
+        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
+        Set oRegExp = Nothing
+        Exit Function
+    End If
+    
+    '生成する関数のソースコードの様式が「2.Arrow関数」の場合
+    sPattern = "(.*)\s?=>\s?(.*)\s?"
+    Set oRegExp = new_RegExp(sPattern, "gm")
+    If oRegExp.Test(sSoruceCode) Then
+        sArgStr = oRegExp.Replace(sSoruceCode, "$1")
+        sProcStr = oRegExp.Replace(sSoruceCode, "$2")
+        
+        'それぞれ前後の括弧があれば除去
+        sPattern = "\(\s?(.*)\s?\)"
+        Set oRegExp = new_RegExp(sPattern, "gm")
+        sArgStr = oRegExp.Replace(sArgStr, "$1")
+        sPattern = "{\s?(.*)\s?}"
+        Set oRegExp = new_RegExp(sPattern, "gm")
+        sProcStr = oRegExp.Replace(sProcStr, "$1")
+        
+        If Instr(sProcStr, ":") > 0 Then
+        '複数行ある場合
+            '"return"句があれば関数名で書き換える
+            sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
+        Else
+        '1行だけの場合
+            sProcStr = "Call sub_CM_Bind(" & sFuncName & ", (" & sProcStr & ") )"
+        End If
+        
+        '関数の生成
+        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
+    End If
+    
+    Set oRegExp = Nothing
+End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_FuncRewriteReturnPhrase()
+'Overview                    : "return"句を書き換える
+'Detailed Description        : new_Func()から使用する
+'Argument
+'     asFuncName             : 関数名
+'     asProcStr              : ソースの処理内容部分のソースコード
+'Return Value
+'     書き換えたソースの処理内容部分のソースコード
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FuncRewriteReturnPhrase( _
+    byVal asFuncName _
+    , byVal asProcStr _
+    )
+    Dim oRegExp : Set oRegExp = new_RegExp("(.*)return\s+(.*)", "gm")
+    Dim sRet : sRet = asProcStr
+    If oRegExp.Test(sRet) Then
+        sRet = oRegExp.Replace(sRet, "$1" & vbNewLine & "Call sub_CM_Bind(" & asFuncName & ", $2)")
+    End If
+    func_FuncRewriteReturnPhrase = sRet
+End Function
 
-
-'.filter(i => {
-'  if (i % 2 === 0) {
-'    return true;
-'  } else {
-'    return false;
-'  }
-'})
-'.map(a => a * 100)
-'.reduce((previousValue, currentValue) => previousValue * currentValue)
-'.find(i => i > 0 && i % 3 === 0)
-'.every(value => value >= 0)
-'.some(value => value > 10)
-'
-'
-'
-'
-'
-'
-'
-'i => {
-'  if (i % 2 === 0) {
-'    return true;
-'  } else {
-'    return false;
-'  }
-'}
-'a => a * 100
-'(previousValue, currentValue) => previousValue * currentValue
-'i => i > 0 && i % 3 === 0
-'value => value >= 0
-'value => value > 10
-'
-'
-'
-'
-'１．一時的な関数名を決める
-'２．改行→":"に置換
-'
-'■"=>"がある場合
-'１．"=>"で分割
-'　前半（引数）
-'　　１．大外の()を削除する
-'　後半（関数内部）
-'　　１．大外の{}を削除する
-'　　２．"return"がない場合は"return = ()"を先頭につける
-'　　３．return xxx"を"関数名 = xxx"に置換する
-'
-'
-'◆"=>"がない場合
-'１．function ($1) {$2}に分解
-'　$1を引数とする
-'　$2は"return xxx"を"関数名 = xxx"に置換する
+'***************************************************************************************************
+'Function/Sub Name           : func_FuncGenerate()
+'Overview                    : 引数の情報で関数のインスタンスを生成する
+'Detailed Description        : new_Func()から使用する
+'Argument
+'     asFuncName             : 関数名
+'     asArgStr               : ソースの引数部分のソースコード
+'     asProcStr              : ソースの処理内容部分のソースコード
+'Return Value
+'     生成した関数のインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FuncGenerate( _
+    byVal asFuncName _
+    , byVal asArgStr _
+    , byVal asProcStr _
+    )
+    Dim sCode
+    'ソースコード作成
+    sCode = _
+        "Private Function " & asFuncName & "(" & asArgStr & ")" & vbNewLine _
+        & asProcStr & vbNewLine _
+        & "End Function"
+    
+    '関数の生成
+    ExecuteGlobal sCode
+    Set func_FuncGenerate = Getref(asFuncName)
+End Function
