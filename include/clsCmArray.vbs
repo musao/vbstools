@@ -1171,11 +1171,13 @@ Class clsCmArray
             vArr = func_CmArrayConvArray(True)
             lUb = Ubound(vArr)
             
-            If alStart<0 Then lStart = PoArr.Count + alStart Else lStart = alStart
+            If alStart<0 Then lStart = func_CM_MathMin(PoArr.Count + alStart, 0) Else lStart = func_CM_MathMin(alStart, lUb)
+'            If alStart<0 Then lStart = PoArr.Count + alStart Else lStart = alStart
             If alEnd = vbNullString Then
                 lEnd = lUb
             Else
-                If alEnd<0 Then lEnd = lUb + alEnd Else lEnd = alEnd - 1
+                If alEnd<0 Then lEnd = func_CM_MathMin(lUb + alEnd, 0) Else lEnd = func_CM_MathMin(alEnd - 1, lUb)
+'                If alEnd<0 Then lEnd = lUb + alEnd Else lEnd = alEnd - 1
             End If
             
             For lIdx=lStart To lEnd

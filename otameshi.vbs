@@ -280,15 +280,18 @@ dim arr5
 'Call msgbox( func_CM_ToString(arr5.Slice(1, -1)) )             '[2,3,4]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -3)) )            '<clsCmArray>
-
-'Test Sort()
-private function ArraySortTest(x,y)
-    ArraySortTest = (x > y)
-end function
-Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+Set arr5 = new_ArraySetData(Array(1))
 Call msgbox( func_CM_ToString(arr5) )
+Call msgbox( func_CM_ToString(arr5.Slice(0,2)) )               '[1]
+
+''Test Sort()
+'private function ArraySortTest(x,y)
+'    ArraySortTest = (x > y)
+'end function
+'Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
-Call msgbox( func_CM_ToString(arr5.sort(new_Func("(x,y) => (x>y)"))) )
+'Call msgbox( func_CM_ToString(arr5.sort(new_Func("(x,y) => (x>y)"))) )
 
 ''Test Splice()
 'Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))

@@ -118,7 +118,7 @@ End Sub
 'Processing Order            : 2
 'Function/Sub Name           : sub_CmpExcelGetParameters()
 'Overview                    : 当スクリプトの引数取得
-'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
+'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Param"で格納する
 '                              パラメータ格納用ハッシュマップの構成
 '                              Key                      Value
 '                              -------------------      --------------------------------------------
@@ -137,23 +137,15 @@ End Sub
 Private Sub sub_CmpExcelGetParameters( _
     byRef aoParams _
     )
-    'パラメータ格納用ハッシュマップ
-    Dim oParameter : Set oParameter = new_Dictionary()
+    'オリジナルの引数を取得
+    Dim oArg : Set oArg = func_CM_UtilStoringArguments()
+    '★ログ出力
+    Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelGetParameters", "Arguments are " & func_CM_ToStringArguments()))
     
-    Dim lCnt : lCnt = 0
-    Dim sParam
-    For Each sParam In WScript.Arguments
-        If func_CM_FsFileExists(sParam) Then
-        'ファイルが存在する場合パラメータを取得
-            lCnt = lCnt + 1
-            Call sub_CM_BindAt(oParameter, lCnt, sParam)
-        End If
-    Next
+    'パラメータ格納用オブジェクトに設定
+    Call sub_CM_BindAt(aoParams, "Param", oArg.Item("Unnamed").Slice(0,2))
     
-    Call sub_CM_BindAt(aoParams, "Parameter", oParameter)
-    
-    'オブジェクトを開放
-    Set oParameter = Nothing
+    Set oArg = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -180,18 +172,18 @@ Private Sub sub_CmpExcelDispInputFiles( _
     byRef aoParams _
     )
     'パラメータ格納用汎用ハッシュマップ
-    Dim oParameter : Set oParameter = aoParams.Item("Parameter")
+    Dim oParam : Set oParam = aoParams.Item("Param")
     
     Const Cs_TITLE_EXCEL = "比較対象ファイルを開く"
     
-    If oParameter.Count > 1 Then
+    If oParam.Length > 1 Then
     'パラメータが2個以上だったら関数を抜ける
         Exit Sub
     End If
     
     With CreateObject("Excel.Application")
         Dim sPath
-        Do Until oParameter.Count > 1
+        Do Until oParam.Length > 1
             
             sPath = .GetOpenFilename( , , Cs_TITLE_EXCEL, , False)
             If sPath = False Then
@@ -202,7 +194,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
             End If
             If func_CM_FsFileExists(sPath) Then
             'ファイルが存在する場合パラメータを取得
-                Call oParameter.Add(oParameter.Count+1, sPath)
+                oParam.Push sPath
             End If
         Loop
         
@@ -210,7 +202,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
     End With
     
     'オブジェクトを開放
-    Set oParameter = Nothing
+    Set oParam = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -231,17 +223,21 @@ End Sub
 Private Sub sub_CmpExcelCompareFiles( _
     byRef aoParams _
     )
+    'パラメータ格納用汎用ハッシュマップ
+    Dim oParam : Set oParam = aoParams.Item("Param")
     
     '4-1 比較するファイルを古い順（最終更新日昇順）に並べ替える
     Call sub_CM_ExcuteSub("sub_CmpExcelSortByDateLastModified", aoParams, PoPubSub, "log")
     
     '4-2 比較
     With New clsCompareExcel
-        .PathFrom = aoParams.Item("Parameter").Item(1)
-        .PathTo = aoParams.Item("Parameter").Item(2)
+        .PathFrom = oParam(0)
+        .PathTo = oParam(1)
         .Compare()
     End With
-
+    
+    'オブジェクトを開放
+    Set oParam = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -263,29 +259,17 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
     byRef aoParams _
     )
     'パラメータ格納用汎用ハッシュマップ
-    Dim oParameter : Set oParameter = aoParams.Item("Parameter")
+    Dim oParam : Set oParam = aoParams.Item("Param")
     
-    With oParameter
-        Dim oDateTimeA : Set oDateTimeA = new_clsCalSetDate(func_CM_FsGetFile(.Item(1)).DateLastModified)
-        Dim oDateTimeB : Set oDateTimeB = new_clsCalSetDate(func_CM_FsGetFile(.Item(2)).DateLastModified)
-        If oDateTimeA.CompareTo(oDateTimeB) <= 0 Then
-        '最初のファイルの方が古い（最終更新日が小さい）場合、処理を抜ける
-            Exit Sub
-        End If
-        
-        '値を入れ替える
-        Dim sValue1, sValue2
-        sValue1 = .Item(1)
-        sValue2 = .Item(2)
-        
-        .RemoveAll
-        
-        Call .Add(1, sValue2)
-        Call .Add(2, sValue1)
-    End With
+    Dim oDateTimeA : Set oDateTimeA = new_clsCalSetDate(func_CM_FsGetFile(oParam(0)).DateLastModified)
+    Dim oDateTimeB : Set oDateTimeB = new_clsCalSetDate(func_CM_FsGetFile(oParam(1)).DateLastModified)
+    If oDateTimeA.CompareTo(oDateTimeB) > 0 Then
+    '最初のファイルの方が新しい（最終更新日が大きい）場合、順番を入れ替える
+        oParam.Reverse
+    End If
     
     'オブジェクトを開放
-    Set oParameter = Nothing
+    Set oParam = Nothing
     Set oDateTimeA = Nothing
     Set oDateTimeB = Nothing
 End Sub

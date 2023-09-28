@@ -2375,20 +2375,11 @@ Private Sub sub_CM_UtilCommonLogger( _
     byRef avParams _
     , byRef aoWriter _
     )
-    Dim oCont : Set oCont = new_clsCmArray()
-    oCont.Push new_clsCalGetNow()
-    
-    Dim vEle
-    For Each vEle In avParams
-        oCont.Push vEle
-    Next
-    
+    Dim oCont : Set oCont = new_ArraySetData(Array(new_clsCalGetNow()))
     With aoWriter
-        .WriteContents(oCont.JoinVbs(vbTab))
+        .WriteContents(oCont.Concat(avParams).JoinVbs(vbTab))
         .newLine()
     End With
-    
-    Set vEle = Nothing
     Set oCont = Nothing
 End Sub
 
