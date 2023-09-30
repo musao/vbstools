@@ -10,10 +10,7 @@
 '***************************************************************************************************
 Class clsCompareExcel
     'クラス内変数、定数
-    Private PsPathFrom
-    Private PsPathTo
-    Private PoPubSub
-    Private Cs_FOLDER_TEMP
+    Private PsPathFrom, PsPathTo, PoPubSub
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -34,7 +31,6 @@ Class clsCompareExcel
         PsPathFrom = ""
         PsPathTo = ""
         Set PoPubSub = Nothing
-        Cs_FOLDER_TEMP = "tmp"
     End Sub
     
     '***************************************************************************************************
@@ -52,6 +48,7 @@ Class clsCompareExcel
     '2023/09/03         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
+        Set PoPubSub = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -184,6 +181,11 @@ Class clsCompareExcel
     '***************************************************************************************************
     Public Function Compare( _
         )
+        Dim sMyName : sMyName = "+Compare"
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
+        Call sub_CmpExcelPublish("log", 9, sMyName, "PsPathFrom = " & func_CM_ToString(PsPathFrom) & ", PsPathTo = " & func_CM_ToString(PsPathTo))
+        
         Compare = False
         
         '比較結果用の新規ワークブックを作成
@@ -194,6 +196,8 @@ Class clsCompareExcel
             Dim oWorkbookForResults
             Set oWorkbookForResults = .Workbooks.Add(-4167)      '新規ワークブック xlWBATWorksheet=-4167
         End With
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Create a new workbook for comparison.")
         
         Dim oParams : Set oParams = new_DictSetValues(Array("WorkbookForResults", oWorkbookForResults))
         
@@ -202,6 +206,9 @@ Class clsCompareExcel
         
         'エクセルファイルを比較する
         Call sub_CmpExcelCompare(oParams)
+        
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "End")
         
         '終了
         Set oParams = Nothing
@@ -212,15 +219,15 @@ Class clsCompareExcel
     '***************************************************************************************************
     'Function/Sub Name           : sub_CmpExcelCopyAllSheetsToWorkbookForResults()
     'Overview                    : 比較対象ファイルの全シートを比較結果用ワークブックにコピーする
-    'Detailed Description        : パラメータ格納用汎用ハッシュマップに格納する
+    'Detailed Description        : パラメータ格納用汎用オブジェクトに格納する
     '                              ワークシートのリネーム情報のハッシュマップの構成
     '                              Key                       Value
     '                              --------------------      -------------------------------------------
     '                              "WorkbookForResults"      比較結果用のワークブック
-    '                              "From"                    比較元のワークシートのリネーム情報のハッシュマップ
-    '                              "To"                      比較先のワークシートのリネーム情報のハッシュマップ
+    '                              "From"                    比較元ワークシートのリネーム情報（clsCmArray型）
+    '                              "To"                      比較先ワークシートのリネーム情報（clsCmArray型）
     'Argument
-    '     aoParams               : パラメータ格納用汎用ハッシュマップ
+    '     aoParams               : パラメータ格納用汎用オブジェクト
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -232,8 +239,12 @@ Class clsCompareExcel
     Private Sub sub_CmpExcelCopyAllSheetsToWorkbookForResults( _
         byRef aoParams _
         )
+        Dim sMyName : sMyName = "-sub_CmpExcelCopyAllSheetsToWorkbookForResults"
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
+        Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
         
-        'パラメータ格納用汎用ハッシュマップから必要な要素を取り出す
+        'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : Call sub_CM_Bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
         
         Dim sPath : Dim sFromToString
@@ -242,10 +253,18 @@ Class clsCompareExcel
         Call aoParams.Add(sFromToString, _
             func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(oWorkbookForResults, sPath, sFromToString))
         
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Source file copy completed.")
+        Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
+        
         '比較先ファイルのコピー
         sPath = PsPathTo : sFromToString = "To"
         Call aoParams.Add(sFromToString, _
             func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail(oWorkbookForResults, sPath, sFromToString))
+        
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "End")
+        Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
         
         Set oWorkbookForResults = Nothing
     End Sub
@@ -253,16 +272,19 @@ Class clsCompareExcel
     '***************************************************************************************************
     'Function/Sub Name           : func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail()
     'Overview                    : 比較対象ファイルの全シートを比較結果用ワークブックにコピーする
-    'Detailed Description        : ワークシートのリネーム情報のハッシュマップの構成
+    'Detailed Description        : 比較対象の全シートを比較結果用ワークブックにコピーした上で、
+    '                              シートごとの変更前後のシート名を格納したオブジェクト（以下参照）
+    '                              の配列（clsCmArray型）を返す
     '                              Key                      Value
     '                              -------------------      --------------------------------------------
-    '                              Seq(1,2,3…)              変更前後のワークシート名格納用ハッシュマップ
+    '                              "Before"                 変更前のワークシート名
+    '                              "After"                  変更後のワークシート名
     'Argument
     '     aoWorkbookForResults   : 比較結果用のワークブック
     '     asPath                 : 比較対象ファイルのパス
     '     asFromToString         : 比較元先を識別する文字列 "From","To"
     'Return Value
-    '     ワークシートのリネーム情報のハッシュマップ
+    '     シートごとの変更前後のシート名を格納したオブジェクトの配列（clsCmArray型）
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -274,80 +296,99 @@ Class clsCompareExcel
         , byVal asPath _
         , byVal asFromToString _
         )
+        Dim sMyName : sMyName = "-func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail"
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
+        Call sub_CmpExcelPublish("log", 9, sMyName, "aoWorkbookForResults = " & func_CM_ToString(aoWorkbookForResults) & ", asPath = " & func_CM_ToString(asPath)& ", asFromToString = " & func_CM_ToString(asFromToString))
 
         '比較対象ファイルを開く
         Dim oExcel : Set oExcel = aoWorkbookForResults.Parent
         Dim oWorkBook : Set oWorkBook = func_CM_ExcelOpenFile(oExcel, asPath)
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Opened Excel file, file path is " & func_CM_ToString(asPath) )
+        
         Dim sTempPath : sTempPath = ""
         If oWorkBook.HasVBProject Then
-        'マクロありの場合は別名で保存した上で再度開く）
-            sTempPath = func_CmpExcelGetTempFilePath()
+        'マクロありの場合は別名で保存した上で再度開く
+            sTempPath = func_CM_FsGetTempFilePath()
             Call sub_CM_ExcelSaveAs(oWorkBook, sTempPath, vbNullString)
             Set oWorkBook = func_CM_ExcelOpenFile( oExcel, sTempPath)
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "It was Excel with a macro, so save it with a different name and reopen it.")
         End If
 
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Attempt to unprotect Excel file." )
         '文書の保護を解除する
         Call sub_CM_OfficeUnprotect(oWorkBook, vbNullString)
+        If Err.Number<>0 Then
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." )
+            Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToStringErr() )
+            Err.Clear
+        End If
         
         With oWorkBook
-            'ワークシートのリネーム情報格納用ハッシュマップ定義
-            Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_Dictionary()
+            'ワークシートのリネーム情報格納用配列（clsCmArray型）
+            Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_clsCmArray()
             'タブの色変換用ハッシュマップ定義
             Dim oStringToThemeColor : Set oStringToThemeColor = new_DictSetValues(Array("From", 2, "To", 8))
             
-            Dim oWorksheet
-            Dim lCnt : lCnt = 0
+            Dim oWorksheet, sNewSheetName
             For Each oWorksheet In .Worksheets
-                If oWorksheet.Visible Then
+                If oWorksheet.Visible=True Then
                 '全ての見えるシートを比較結果用ワークブックにコピーする
+                    '★ログ出力
+                    Call sub_CmpExcelPublish("log", 3, sMyName, "Start processing sheet " & func_CM_ToString(oWorksheet.Name) & "." )
                     
-                    '変更前後のワークシート名を取得
-                    lCnt = lCnt + 1
-                    Call sub_CM_BindAt( _
-                             oWorkSheetRenameInfo _
-                             , lCnt _
-                             , new_DictSetValues( _
-                                 Array( _
-                                     "Before", oWorksheet.Name, _
-                                     "After", func_CmpExcelMakeSheetName(lCnt, asFromToString) _
-                                     ) _
-                                 ) _
-                             )
+                    'ワークシート名取得および変更する名称を決める
+                    sNewSheetName = func_CmpExcelMakeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
+                    oWorkSheetRenameInfo.Push new_DictSetValues( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
+                    '★ログ出力
+                    Call sub_CmpExcelPublish("log", 9, sMyName, "oWorkSheetRenameInfo = " & func_CM_ToString(oWorkSheetRenameInfo) )
                     
+                    'シート保護の解除
+                    Call sub_CmpExcelTryToSomething(1, oWorksheet, "Try to unprotect a sheet.")
+                    
+                    'オートフィルタの解除
+                    Call sub_CmpExcelTryToSomething(2, oWorksheet, "Try to clear the AutoFilter.")
+                    
+                    'シート名変更＆タブの色を変更
+                    oWorksheet.Name = sNewSheetName
+                    oWorksheet.Tab.ThemeColor = oStringToThemeColor.Item(asFromToString)
+                    oWorksheet.Tab.TintAndShade = 0
                     'シートの表示を整える
-                    If oWorksheet.AutoFilterMode Then
-                    'オートフィルタが設定されていたら解除する
-                         oWorksheet.Cells(1,1).AutoFilter
-                    End If
                     oWorksheet.Activate
                     .Windows(1).View = 1                      'xlNormalView 標準
                     .Windows(1).Zoom = 25                     '表示倍率
                     .Windows(1).ScrollColumn = 1              '列1が左端になるようにウィンドウをスクロール
                     .Windows(1).ScrollRow = 1                 '行1が上端になるようにウィンドウをスクロール
                     .Windows(1).FreezePanes = False           'ウィンドウ枠の固定解除
-
-                    'シート名を変更、タブの色を変更
-                    oWorksheet.Name = oWorkSheetRenameInfo.Item(lCnt).Item("After")
-                    oWorksheet.Tab.ThemeColor = oStringToThemeColor.Item(asFromToString)
-                    oWorksheet.Tab.TintAndShade = 0
-
+                    
+                    '★ログ出力
+                    Call sub_CmpExcelPublish("log", 3, sMyName, "Start copying sheets to a new workbook for comparison results.")
                     'シートを比較結果用の新規ワークブックにコピー
                     Call oWorksheet.Copy(, aoWorkbookForResults.Worksheets(aoWorkbookForResults.Worksheets.Count))
+                    '★ログ出力
+                    Call sub_CmpExcelPublish("log", 3, sMyName, "Copy Complete.")
                 End If
             Next
 
             '比較対象ファイルを閉じる
             Call .Close(False)
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "Close the file being compared." )
         End With
         
         If Len(sTempPath) Then
         'マクロありの場合に別名で保存したファイルがあったら削除する
             Call func_CM_FsDeleteFile(sTempPath)
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "Delete file saved with a different name.")
         End If
 
         'サマリーシートのカラム位置変換用ハッシュマップ定義
         Dim oStringToColumn : Set oStringToColumn = new_DictSetValues(Array("From", 1, "To", 2))
-        
         'サマリーシートに比較対象ファイルの情報を出力
         Dim lRow : Dim lColumn : Dim oItem
         lColumn = oStringToColumn.Item(asFromToString)
@@ -356,15 +397,20 @@ Class clsCompareExcel
             lRow = 1
             .Cells(lRow, lColumn).Value = asPath
             'シート名
-            For Each oItem In oWorkSheetRenameInfo.Items
+            For Each oItem In oWorkSheetRenameInfo.Map(new_Func( "(e,i,a)=>e.Item(""Before"")" ) ).Items
                 lRow = lRow + 1
-                .Cells(lRow, lColumn).Value = oItem.Item("Before")
+                .Cells(lRow, lColumn).Value = oItem
             Next
         End With
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Output the information of the files to be compared in the summary sheet.")
 
         'ワークシートのリネーム情報を返却
         Set func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = oWorkSheetRenameInfo
-
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "End")
+        Call sub_CmpExcelPublish("log", 9, sMyName, "func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = " & func_CM_ToString(oWorkSheetRenameInfo))
+        
         'オブジェクトを開放
         Set oStringToColumn = Nothing
         Set oItem = Nothing
@@ -403,7 +449,7 @@ Class clsCompareExcel
     'Overview                    : エクセルファイルを比較する
     'Detailed Description        : 工事中
     'Argument
-    '     aoParams               : パラメータ格納用汎用ハッシュマップ
+    '     aoParams               : パラメータ格納用汎用オブジェクト
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -415,24 +461,40 @@ Class clsCompareExcel
     Private Sub sub_CmpExcelCompare( _
         byRef aoParams _
         )
-        'パラメータ格納用汎用ハッシュマップから必要な要素を取り出す
+        Dim sMyName : sMyName = "-sub_CmpExcelCompare"
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
+        Call sub_CmpExcelPublish("log", 9, sMyName, "aoParams = " & func_CM_ToString(aoParams))
+        
+        'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : Call sub_CM_Bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
         Dim oFrom : Call sub_CM_Bind(oFrom, aoParams.Item("From"))
         Dim oTo : Call sub_CM_Bind(oTo, aoParams.Item("To"))
 
         Dim lCnt
-        For lCnt = 1 To func_CM_MathMin(oFrom.Count, oTo.Count)
+        For lCnt = 0 To func_CM_MathMin(oFrom.Length, oTo.Length)-1
         '比較元先の各シートに差分が分かる書式設定をする
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "Comparison of " & lCnt+1 & "th sheets.")
+            
             '比較元（To）のシートに対し比較先（From）との差分が分かるようにする
             Call sub_CmpExcelSetFormatToUnderstandDifference(_
-                    oWorkbookForResults, oFrom.Item(lCnt).Item("After"), oTo.Item(lCnt).Item("After"))
+                    oWorkbookForResults, oFrom(lCnt).Item("After"), oTo(lCnt).Item("After"))
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "to see the difference from the comparison destination (" & oFrom(lCnt).Item("Before") & ") to the source sheet (" & oTo(lCnt).Item("Before") & ").")
+            
             '比較先（From）のシートに対し比較元（To）との差分が分かるようにする
             Call sub_CmpExcelSetFormatToUnderstandDifference( _
-                    oWorkbookForResults, oTo.Item(lCnt).Item("After"), oFrom.Item(lCnt).Item("After"))
+                    oWorkbookForResults, oTo(lCnt).Item("After"), oFrom(lCnt).Item("After"))
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, "to see the difference from the comparison source (" & oTo(lCnt).Item("Before") & ") to the comparison destination sheet (" & oFrom(lCnt).Item("Before") & ").")
+            
         Next
-
+        
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Arrange the Window so that you can see the difference.")
         '同じブックの新しいウィンドウを開く
-        oWorkbookForResults.Worksheets(oFrom.Item(1).Item("After")).Activate
+        oWorkbookForResults.Worksheets(oFrom(0).Item("After")).Activate
         With oWorkbookForResults.Windows(1).NewWindow
             Dim sCaption : sCaption = .Caption
             Dim oWorksheet
@@ -441,7 +503,7 @@ Class clsCompareExcel
                 .Zoom = 25
             Next
         End With
-        oWorkbookForResults.Worksheets(oTo.Item(1).Item("After")).Activate
+        oWorkbookForResults.Worksheets(oTo(0).Item("After")).Activate
         '並べて比較
         oWorkbookForResults.Activate
         With oWorkbookForResults.Parent
@@ -452,7 +514,10 @@ Class clsCompareExcel
             .AutomationSecurity = 2                     'msoAutomationSecurityByUI = 2 [ セキュリティ] ダイアログ ボックスで指定されたセキュリティ設定を使用
             .Visible = True
         End With
-
+        
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 5, sMyName, "End")
+        
         'オブジェクトを開放
         Set oWorksheet = Nothing
         Set oTo = Nothing
@@ -482,6 +547,7 @@ Class clsCompareExcel
         , byVal asSheetNameA _
         , byVal asSheetNameB _
         )
+        Dim sMyName : sMyName = "-sub_CmpExcelSetFormatToUnderstandDifference"
 
         'セルの比較
         aoWorkbookForResults.Worksheets(asSheetNameA).Activate
@@ -510,6 +576,8 @@ Class clsCompareExcel
         End With
 
         aoWorkbookForResults.Worksheets(asSheetNameA).Range("A1").Select
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Cell comparison complete.")
 
         'オートシェイプの比較
         Dim oAutoshapeA : Dim oAutoshapeB
@@ -521,6 +589,8 @@ Class clsCompareExcel
                 Call sub_CmpExcelSetAutoshapeColor(oAutoshapeA)
             End If
         Next
+        '★ログ出力
+        Call sub_CmpExcelPublish("log", 3, sMyName, "AutoShape comparison complete.")
 
         'オブジェクトを開放
         Set oAutoshapeA = Nothing
@@ -560,26 +630,88 @@ Class clsCompareExcel
     End Sub
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmpExcelGetTempFilePath()
-    'Overview                    : 一時ファイルのフルパスを取得
-    'Detailed Description        : 実行中のスクリプトファイルがあるフォルダの下にある
-    '                              Cs_FOLDER_TEMP以下の一時ファイルのパスを返す
-    '                              Cs_FOLDER_TEMPフォルダがない場合は作成する
+    'Function/Sub Name           : sub_CmpExcelTryToSomething()
+    'Overview                    : シートの設定変更を試みる
+    'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     alType                 : 種類
+    '                               1:シートが保護されていたら解除する
+    '                               2:オートフィルタが設定されていたら解除する
+    '     aoWorksheet            : ワークシート
+    '     asLogMsg               : ログに出力するメッセージ
     'Return Value
-    '     一時ファイルのフルパス
+    '     シート名
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2017/04/26         Y.Fujii                  First edition
+    '2023/09/29         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmpExcelGetTempFilePath()
-        Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(WScript.ScriptFullName)
-        Dim sFolderPath : sFolderPath = func_CM_FsBuildPath(sParentFolderPath, Cs_FOLDER_TEMP)
-        If Not(func_CM_FsFolderExists(sFolderPath)) Then func_CM_FsCreateFolder(sFolderPath)
-        func_CmpExcelGetTempFilePath = func_CM_FsBuildPath(sFolderPath, func_CM_FsGetTempFileName())
-    End Function
+    Private Sub sub_CmpExcelTryToSomething( _
+        byVal alType _
+        , byRef aoWorksheet _
+        , byVal asLogMsg _
+        )
+        Dim sMyName : sMyName = "-sub_CmpExcelTryToSomething"
+        
+        '確認内容
+        Dim boFlg
+        Select Case alType
+            Case 1:
+                boFlg = aoWorksheet.ProtectContents
+            Case 2:
+                boFlg = aoWorksheet.AutoFilterMode
+        End Select
+        
+        If boFlg Then
+            '★ログ出力
+            Call sub_CmpExcelPublish("log", 3, sMyName, asLogMsg)
+            
+            On Error Resume Next
+            
+            '設定変更を試みる
+            Select Case alType
+                Case 1:
+                    aoWorksheet.Unprotect
+                Case 2:
+                    aoWorksheet.Cells(1,1).AutoFilter
+            End Select
+            
+            '結果
+            If Err.Number<>0 Then
+                '★ログ出力
+                Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." )
+                Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToStringErr() )
+                Err.Clear
+            End If
+        End If
+    End Sub
 
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmpExcelPublish()
+    'Overview                    : 出版（Publish）処理
+    'Detailed Description        : 出版-購読型（Publish/subscribe）クラスがあれば出版（Publish）処理する
+    'Argument
+    '     asTopic                : トピック
+    '     alLevel                : レベル
+    '     asFuncName             : 関数名
+    '     asCont                 : 内容
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/28         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmpExcelPublish( _
+        byVal asTopic _
+        , byVal alLevel _
+        , byVal asFuncName _
+        , byVal asCont _
+        )
+        If PoPubSub Is Nothing Then Exit Sub
+        Call PoPubSub.Publish(asTopic, Array(alLevel, TypeName(Me)&asFuncName, asCont))
+    End Sub
+    
 End Class

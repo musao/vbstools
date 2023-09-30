@@ -34,9 +34,9 @@ Private Sub sub_CM_OfficeUnprotect( _
     )
     On Error Resume Next
     aoOffice.Unprotect(asPassword)
-    If Err.Number Then
-        Err.Clear
-    End If
+'    If Err.Number Then
+'        Err.Clear
+'    End If
 End Sub
 
 
@@ -2357,9 +2357,9 @@ Private Function func_CM_UtilGenerateRandomString( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_UtilCommonLogger()
+'Function/Sub Name           : sub_CM_UtilLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : 工事中
+'Detailed Description        : 引数の情報にタイムスタンプを付加してファイル出力する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 '     aoWriter               : ファイル出力バッファリング処理クラスのインスタンス
@@ -2371,7 +2371,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CM_UtilCommonLogger( _
+Private Sub sub_CM_UtilLogger( _
     byRef avParams _
     , byRef aoWriter _
     )

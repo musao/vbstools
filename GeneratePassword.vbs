@@ -2,14 +2,14 @@
 'FILENAME                    : GeneratePassword.vbs
 'Overview                    : パスワードを生成する
 'Detailed Description        : 生成したパスワードはクリップボードにコピーする
-'Argument
-'     /Length                : 生成するパスワードの文字数
-'     /U                     : 生成するパスワードの文字種に半角英字大文字を使用する
-'     /L                     : 生成するパスワードの文字種に半角英字小文字を使用する
-'     /N                     : 生成するパスワードの文字種に半角数字を使用する
-'     /S                     : 生成するパスワードの文字種に記号を使用する
-'                                記号の種類   !"#$%&'()*+,-./:;<=>?[\]^_`{|}~（31種類）
-'     /Add                   : 追加指定する文字種（カンマ区切りで複数指定可能）
+'Argument                    : 以下の名前付き引数（/Key:Value 形式）のみ、名前なし引数は無視する
+'                                /Length : 生成するパスワードの文字数
+'                                /U      : 生成するパスワードの文字種に半角英字大文字を使用する
+'                                /L      : 生成するパスワードの文字種に半角英字小文字を使用する
+'                                /N      : 生成するパスワードの文字種に半角数字を使用する
+'                                /S      : 生成するパスワードの文字種に記号を使用する
+'                                            記号の種類   !"#$%&'()*+,-./:;<=>?[\]^_`{|}~（31種類）
+'                                /Add    : 追加指定する文字種（カンマ区切りで複数指定可能）
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -96,13 +96,13 @@ End Sub
 'Detailed Description        : 名前付き引数（/Key:Value 形式）だけを取得する
 '                              Key           Value                                     Default
 '                              ------------  ----------------------------------------  -------------
-'                              "Parameter"   解析した結果
+'                              "Param"       パラメータの解析結果
 '
 '                              名前付き引数（/Key:Value 形式）の構成
 '                              Key           Value                                     Default
 '                              ------------  ----------------------------------------  -------------
 '                              "Length"      文字の長さ                                16
-'                              U,L,N,S       文字の種類                                全て含む
+'                                            文字の種類                                全て含む
 '                               "U"           半角英字大文字
 '                               "L"           半角英字小文字
 '                               "N"           半角数字
@@ -155,7 +155,7 @@ Private Sub sub_GnrtPwGetParameters( _
     Dim oParam : Set oParam = new_DictSetValues(Array("Length", lLength, "Type", lType, "Additional", vAdd))
     
     'パラメータ格納用オブジェクトに設定
-    Call sub_CM_BindAt(aoParams, "Parameter", oParam)
+    Call sub_CM_BindAt(aoParams, "Param", oParam)
     
     Set oParam = Nothing
     Set oArg = Nothing
@@ -181,7 +181,7 @@ Private Sub sub_GnrtPwGenerate( _
     )
     'パスワード生成
     Dim lLength, lType, vAdd
-    With aoParams.Item("Parameter")
+    With aoParams.Item("Param")
         Call sub_CM_Bind(lLength, .Item("Length"))
         Call sub_CM_Bind(lType, .Item("Type"))
         Call sub_CM_Bind(vAdd, .Item("Additional"))
@@ -216,7 +216,7 @@ End Sub
 'Processing Order            : -
 'Function/Sub Name           : sub_GnrtPwLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : sub_CM_UtilCommonLogger()に委譲する
+'Detailed Description        : sub_CM_UtilLogger()に委譲する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 'Return Value
@@ -230,5 +230,5 @@ End Sub
 Private Sub sub_GnrtPwLogger( _
     byRef avParams _
     )
-    Call sub_CM_UtilCommonLogger(avParams, PoWriter)
+    Call sub_CM_UtilLogger(avParams, PoWriter)
 End Sub

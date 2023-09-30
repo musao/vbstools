@@ -1,10 +1,11 @@
 '***************************************************************************************************
 'FILENAME                    : CompExcel.vbs
 'Overview                    : エクセルファイルを比較する
-'Detailed Description        : 工事中
-'Argument
-'     PATH1                  : 比較するエクセルファイルのパス1
-'     PATH2                  : 比較するエクセルファイルのパス2
+'Detailed Description        : 引数で指定されたエクセルファイルを比較対象とする
+'                              指定がないまたは1つだけの場合は、ダイアログで比較対象の入力を求める
+'Argument                    : 名前なし引数（/Key:Value 形式でない）のみ
+'                                1,2番目   : 比較するエクセルファイルのパス（ともに省略可能）
+'                                3番目以降 : 無視する
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -17,8 +18,7 @@ Option Explicit
 
 '定数
 Private Const Cs_FOLDER_INCLUDE = "include"
-Private PoWriter
-Private PoPubSub
+Private PoWriter, PoPubSub
 
 'Include用関数定義
 Sub sub_Include( _
@@ -67,11 +67,8 @@ Sub Main()
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Set PoPubSub = new_clsCmPubSub()
     Call PoPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
-    'パラメータ格納用汎用ハッシュマップ宣言
+    'パラメータ格納用汎用オブジェクト宣言
     Dim oParams : Set oParams = new_Dictionary()
-    
-    '初期化
-    Call sub_CM_ExcuteSub("sub_CmpExcelInitialize", oParams, PoPubSub, "log")
     
     '当スクリプトの引数取得
     Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, PoPubSub, "log")
@@ -81,9 +78,6 @@ Sub Main()
     
     'エクセルファイルを比較する
     Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, PoPubSub, "log")
-    
-    '終了処理
-    Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", oParams, PoPubSub, "log")
     
     'ファイル接続をクローズする
     PoWriter.FileClose
@@ -96,36 +90,18 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_CmpExcelInitialize()
-'Overview                    : 初期化
-'Detailed Description        : 工事中
-'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CmpExcelInitialize( _
-    byRef aoParams _
-    )
-End Sub
-
-'***************************************************************************************************
-'Processing Order            : 2
 'Function/Sub Name           : sub_CmpExcelGetParameters()
 'Overview                    : 当スクリプトの引数取得
-'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Param"で格納する
-'                              パラメータ格納用ハッシュマップの構成
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              Seq(1,2)                 比較するエクセルファイルのパス
-'                              引数があり存在するファイルパスのみ取得する
+'Detailed Description        : パラメータ格納用汎用オブジェクトにKey="Param"で格納する
+'                              配列（clsCmArray型）に名前なし引数（/Key:Value 形式でない）があるれば
+'                              2番目まで取得する
+'                              名前なし引数の3番目以降あるいは名前付き引数（/Key:Value 形式）は無視する
+'                              Index   Contents
+'                              -----   -------------------------------------------------------------
+'                              0       名前なし引数の1番目
+'                              1       名前なし引数の2番目
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用汎用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -149,17 +125,17 @@ Private Sub sub_CmpExcelGetParameters( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 3
+'Processing Order            : 2
 'Function/Sub Name           : sub_CmpExcelDispInputFiles()
 'Overview                    : 比較対象ファイル入力画面の表示と取得
-'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
-'                              パラメータ格納用ハッシュマップの構成
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              Seq(1,2)                 比較するエクセルファイルのパス
-'                              比較するエクセルファイルのパスが2つ未満の場合に不足分を取得格納する
+'Detailed Description        : 引数で比較するエクセルファイルの指定がない場合、Excel.Applicationの
+'                              ダイアログを表示してユーザにファイルを選択させる
+'                              Index   Contents
+'                              -----   -------------------------------------------------------------
+'                              0       Excel.Applicationのダイアログで選択したファイルパスを設定する
+'                              1       同上
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用汎用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -171,16 +147,16 @@ End Sub
 Private Sub sub_CmpExcelDispInputFiles( _
     byRef aoParams _
     )
-    'パラメータ格納用汎用ハッシュマップ
     Dim oParam : Set oParam = aoParams.Item("Param")
-    
-    Const Cs_TITLE_EXCEL = "比較対象ファイルを開く"
-    
     If oParam.Length > 1 Then
     'パラメータが2個以上だったら関数を抜ける
+        '★ログ出力
+        Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelDispInputFiles", "No dialog required."))
         Exit Sub
     End If
     
+    'パラメータ格納用汎用オブジェクト
+    Const Cs_TITLE_EXCEL = "比較対象ファイルを開く"
     With CreateObject("Excel.Application")
         Dim sPath
         Do Until oParam.Length > 1
@@ -188,14 +164,15 @@ Private Sub sub_CmpExcelDispInputFiles( _
             sPath = .GetOpenFilename( , , Cs_TITLE_EXCEL, , False)
             If sPath = False Then
             'ファイル選択キャンセルの場合は当スクリプトを終了する
-                Call sub_CM_ExcuteSub("sub_CmpExcelTerminate", aoParams, PoPubSub, "log")
+                '★ログ出力
+                Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelDispInputFiles", "Dialog input canceled."))
+                
                 PoWriter.FileClose
+                Set oParam = Nothing
                 Wscript.Quit
             End If
-            If func_CM_FsFileExists(sPath) Then
-            'ファイルが存在する場合パラメータを取得
-                oParam.Push sPath
-            End If
+            '選択したファイルのパスを取得
+            oParam.Push sPath
         Loop
         
         .Quit
@@ -206,12 +183,12 @@ Private Sub sub_CmpExcelDispInputFiles( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 4
+'Processing Order            : 3
 'Function/Sub Name           : sub_CmpExcelCompareFiles()
 'Overview                    : エクセルファイルを比較する
 'Detailed Description        : エラーは無視する
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用汎用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -223,42 +200,7 @@ End Sub
 Private Sub sub_CmpExcelCompareFiles( _
     byRef aoParams _
     )
-    'パラメータ格納用汎用ハッシュマップ
-    Dim oParam : Set oParam = aoParams.Item("Param")
-    
-    '4-1 比較するファイルを古い順（最終更新日昇順）に並べ替える
-    Call sub_CM_ExcuteSub("sub_CmpExcelSortByDateLastModified", aoParams, PoPubSub, "log")
-    
-    '4-2 比較
-    With New clsCompareExcel
-        .PathFrom = oParam(0)
-        .PathTo = oParam(1)
-        .Compare()
-    End With
-    
-    'オブジェクトを開放
-    Set oParam = Nothing
-End Sub
-
-'***************************************************************************************************
-'Processing Order            : 4-1
-'Function/Sub Name           : sub_CmpExcelSortByDateLastModified()
-'Overview                    : 比較するファイルを古い順（最終更新日昇順）に並べ替える
-'Detailed Description        : 工事中
-'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2017/04/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CmpExcelSortByDateLastModified( _
-    byRef aoParams _
-    )
-    'パラメータ格納用汎用ハッシュマップ
+    'パラメータ格納用汎用オブジェクト
     Dim oParam : Set oParam = aoParams.Item("Param")
     
     Dim oDateTimeA : Set oDateTimeA = new_clsCalSetDate(func_CM_FsGetFile(oParam(0)).DateLastModified)
@@ -266,7 +208,17 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
     If oDateTimeA.CompareTo(oDateTimeB) > 0 Then
     '最初のファイルの方が新しい（最終更新日が大きい）場合、順番を入れ替える
         oParam.Reverse
+        '★ログ出力
+        Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelCompareFiles", "Swapped parameters."))
     End If
+    
+    '比較
+    With New clsCompareExcel
+        Set .PubSub = PoPubSub
+        .PathFrom = oParam(0)
+        .PathTo = oParam(1)
+        .Compare()
+    End With
     
     'オブジェクトを開放
     Set oParam = Nothing
@@ -275,31 +227,10 @@ Private Sub sub_CmpExcelSortByDateLastModified( _
 End Sub
 
 '***************************************************************************************************
-'Processing Order            : 5
-'Function/Sub Name           : sub_CmpExcelTerminate()
-'Overview                    : 終了処理
-'Detailed Description        : 工事中
-'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CmpExcelTerminate( _
-    byRef aoParams _
-    )
-    PoWriter.Flush
-End Sub
-
-'***************************************************************************************************
 'Processing Order            : -
 'Function/Sub Name           : sub_CmpExcelLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : 工事中
+'Detailed Description        : sub_CM_UtilLogger()に委譲する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 'Return Value
@@ -313,5 +244,5 @@ End Sub
 Private Sub sub_CmpExcelLogger( _
     byRef avParams _
     )
-    Call sub_CM_UtilCommonLogger(avParams, PoWriter)
+    Call sub_CM_UtilLogger(avParams, PoWriter)
 End Sub

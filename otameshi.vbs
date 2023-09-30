@@ -24,6 +24,7 @@ Call sub_Include("clsCmCalendar.vbs")
 Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
+Call Msgbox( "VarType(new clsCompareExcel) = " & VarType(new clsCompareExcel) & vbNewLine & "TypeName(new clsCompareExcel) = " & TypeName(new clsCompareExcel) )
 
 ''Test new_Func()
 'Dim sSoruceCode
