@@ -203,14 +203,11 @@ Private Sub sub_CmpExcelCompareFiles( _
     'パラメータ格納用汎用オブジェクト
     Dim oParam : Set oParam = aoParams.Item("Param")
     
-    Dim oDateTimeA : Set oDateTimeA = new_clsCalSetDate(func_CM_FsGetFile(oParam(0)).DateLastModified)
-    Dim oDateTimeB : Set oDateTimeB = new_clsCalSetDate(func_CM_FsGetFile(oParam(1)).DateLastModified)
-    If oDateTimeA.CompareTo(oDateTimeB) > 0 Then
-    '最初のファイルの方が新しい（最終更新日が大きい）場合、順番を入れ替える
-        oParam.Reverse
-        '★ログ出力
-        Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelCompareFiles", "Swapped parameters."))
-    End If
+    'ファイルの最終更新日昇順に並べ替える
+    oParam.Sort new_Func("(c,n)=>new_clsCalSetDate(func_CM_FsGetFile(c).DateLastModified).CompareTo(new_clsCalSetDate(func_CM_FsGetFile(n).DateLastModified))>0")
+    '★ログ出力
+    Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelCompareFiles", "aoParams sorted."))
+    Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & func_CM_ToString(aoParams)))
     
     '比較
     With New clsCompareExcel
@@ -222,8 +219,6 @@ Private Sub sub_CmpExcelCompareFiles( _
     
     'オブジェクトを開放
     Set oParam = Nothing
-    Set oDateTimeA = Nothing
-    Set oDateTimeB = Nothing
 End Sub
 
 '***************************************************************************************************
