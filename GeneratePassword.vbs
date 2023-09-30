@@ -196,9 +196,11 @@ Private Sub sub_GnrtPwGenerate( _
     sMsg = "パスワードを生成しました" & vbNewLine & "OKボタンを押下するとクリップボードにコピーします"
     sTitle = new_clsCalGetNow() & " に作成"
     
+    '★ログ出力
+    Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Display Inputbox."))
     '一時ファイルのパスを作成
     Dim sPath : sPath = func_CM_FsGetTempFilePath()
-    Do
+    Do Until Inputbox(sMsg, sTitle, sPw)=False
         '一時ファイルに生成したパスワードを出力
         Call sub_CM_FsWriteFile(sPath, sPw)
         'クリップボードに一時ファイルの内容を出力
@@ -206,8 +208,8 @@ Private Sub sub_GnrtPwGenerate( _
         '一時ファイルを削除
         Call func_CM_FsDeleteFile(sPath)
         '★ログ出力
-        Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Display Inputbox"))
-    Loop Until Inputbox(sMsg, sTitle, sPw)=False
+        Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Copied to clipboard."))
+    Loop
     
     
 End Sub
