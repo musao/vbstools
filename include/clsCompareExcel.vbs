@@ -320,12 +320,10 @@ Class clsCompareExcel
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "Attempt to unprotect Excel file." )
         '文書の保護を解除する
-        Call sub_CM_OfficeUnprotect(oWorkBook, vbNullString)
-        If Err.Number<>0 Then
+        Dim oRet : Set oRet = func_CM_TryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty)
+        If oRet.Item("Result") = False Then
             '★ログ出力
-            Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." )
-            Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToStringErr() )
-            Err.Clear
+            Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." ) : Call sub_CmpExcelPublish("log", 9, sMyName, oRet.Item("Err") )
         End If
         
         With oWorkBook
@@ -348,10 +346,20 @@ Class clsCompareExcel
                     Call sub_CmpExcelPublish("log", 9, sMyName, "oWorkSheetRenameInfo = " & func_CM_ToString(oWorkSheetRenameInfo) )
                     
                     'シート保護の解除
-                    Call sub_CmpExcelTryToSomething(1, oWorksheet, "Try to unprotect a sheet.")
+                    Call sub_CmpExcelPublish("log", 3, sMyName, "Try to unprotect a sheet.")
+                    Set oRet = func_CM_TryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect:End If}"), oWorksheet, empty, empty)
+                    If oRet.Item("Result") = False Then
+                        '★ログ出力
+                        Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." ) : Call sub_CmpExcelPublish("log", 9, sMyName, oRet.Item("Err") )
+                    End If
                     
                     'オートフィルタの解除
-                    Call sub_CmpExcelTryToSomething(2, oWorksheet, "Try to clear the AutoFilter.")
+                    Call sub_CmpExcelPublish("log", 3, sMyName, "Try to clear the AutoFilter.")
+                    Set oRet = func_CM_TryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty)
+                    If oRet.Item("Result") = False Then
+                        '★ログ出力
+                        Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." ) : Call sub_CmpExcelPublish("log", 9, sMyName, oRet.Item("Err") )
+                    End If
                     
                     'シート名変更＆タブの色を変更
                     oWorksheet.Name = sNewSheetName
@@ -412,6 +420,7 @@ Class clsCompareExcel
         Call sub_CmpExcelPublish("log", 9, sMyName, "func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = " & func_CM_ToString(oWorkSheetRenameInfo))
         
         'オブジェクトを開放
+        Set oRet = Nothing
         Set oStringToColumn = Nothing
         Set oItem = Nothing
         Set oWorksheet = Nothing
@@ -629,63 +638,63 @@ Class clsCompareExcel
         End If
     End Sub
 
-    '***************************************************************************************************
-    'Function/Sub Name           : sub_CmpExcelTryToSomething()
-    'Overview                    : シートの設定変更を試みる
-    'Detailed Description        : 工事中
-    'Argument
-    '     alType                 : 種類
-    '                               1:シートが保護されていたら解除する
-    '                               2:オートフィルタが設定されていたら解除する
-    '     aoWorksheet            : ワークシート
-    '     asLogMsg               : ログに出力するメッセージ
-    'Return Value
-    '     シート名
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/09/29         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Sub sub_CmpExcelTryToSomething( _
-        byVal alType _
-        , byRef aoWorksheet _
-        , byVal asLogMsg _
-        )
-        Dim sMyName : sMyName = "-sub_CmpExcelTryToSomething"
-        
-        '確認内容
-        Dim boFlg
-        Select Case alType
-            Case 1:
-                boFlg = aoWorksheet.ProtectContents
-            Case 2:
-                boFlg = aoWorksheet.AutoFilterMode
-        End Select
-        
-        If boFlg Then
-            '★ログ出力
-            Call sub_CmpExcelPublish("log", 3, sMyName, asLogMsg)
-            
-            On Error Resume Next
-            
-            '設定変更を試みる
-            Select Case alType
-                Case 1:
-                    aoWorksheet.Unprotect
-                Case 2:
-                    aoWorksheet.Cells(1,1).AutoFilter
-            End Select
-            
-            '結果
-            If Err.Number<>0 Then
-                '★ログ出力
-                Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." )
-                Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToStringErr() )
-                Err.Clear
-            End If
-        End If
-    End Sub
+'    '***************************************************************************************************
+'    'Function/Sub Name           : sub_CmpExcelTryToSomething()
+'    'Overview                    : シートの設定変更を試みる
+'    'Detailed Description        : 工事中
+'    'Argument
+'    '     alType                 : 種類
+'    '                               1:シートが保護されていたら解除する
+'    '                               2:オートフィルタが設定されていたら解除する
+'    '     aoWorksheet            : ワークシート
+'    '     asLogMsg               : ログに出力するメッセージ
+'    'Return Value
+'    '     シート名
+'    '---------------------------------------------------------------------------------------------------
+'    'Histroy
+'    'Date               Name                     Reason for Changes
+'    '----------         ----------------------   -------------------------------------------------------
+'    '2023/09/29         Y.Fujii                  First edition
+'    '***************************************************************************************************
+'    Private Sub sub_CmpExcelTryToSomething( _
+'        byVal alType _
+'        , byRef aoWorksheet _
+'        , byVal asLogMsg _
+'        )
+'        Dim sMyName : sMyName = "-sub_CmpExcelTryToSomething"
+'        
+'        '確認内容
+'        Dim boFlg
+'        Select Case alType
+'            Case 1:
+'                boFlg = aoWorksheet.ProtectContents
+'            Case 2:
+'                boFlg = aoWorksheet.AutoFilterMode
+'        End Select
+'        
+'        If boFlg Then
+'            '★ログ出力
+'            Call sub_CmpExcelPublish("log", 3, sMyName, asLogMsg)
+'            
+'            On Error Resume Next
+'            
+'            '設定変更を試みる
+'            Select Case alType
+'                Case 1:
+'                    aoWorksheet.Unprotect
+'                Case 2:
+'                    aoWorksheet.Cells(1,1).AutoFilter
+'            End Select
+'            
+'            '結果
+'            If Err.Number<>0 Then
+'                '★ログ出力
+'                Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." )
+'                Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToStringErr() )
+'                Err.Clear
+'            End If
+'        End If
+'    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : sub_CmpExcelPublish()
