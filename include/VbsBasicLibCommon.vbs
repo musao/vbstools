@@ -2123,7 +2123,7 @@ Private Function func_CM_TryCatch( _
         boFlg = False
         Call sub_CM_Bind(oErr, func_CM_UtilStoringErr())
         Err.Clear
-        Call sub_CM_Bind(oRet, aoCatch(aoArgs))
+        Call sub_CM_Bind(oRet, aoCatch(aoArgs, oErr))
     End If
     'finaryƒuƒƒbƒN‚Ìˆ—
     If IsObject(aoFinary) Then
