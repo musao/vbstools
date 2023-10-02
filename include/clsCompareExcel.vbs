@@ -297,10 +297,6 @@ Class clsCompareExcel
         , byVal asFromToString _
         )
         Dim sMyName : sMyName = "-func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail"
-        Dim oFuncErr : Set oFuncErr = new_Func( "(a,e)=>{" & vbNewLine _
-                        & "Call sub_CmpExcelPublish(""log"", 3, """ & sMyName & """, ""It couldn't."" )" & vbNewLine _
-                        & "Call sub_CmpExcelPublish(""log"", 9, """ & sMyName & """, func_CM_ToString(e) )" & vbNewLine _
-                        & "}" )
         
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
@@ -325,12 +321,7 @@ Class clsCompareExcel
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "Attempt to unprotect Excel file." )
         '文書の保護を解除する
-        Call func_CM_TryCatch(new_Func("a=>a.Unprotect"), oWorkBook, oFuncErr, empty)
-'        Dim oRet : Set oRet = func_CM_TryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty)
-'        If oRet.Item("Result") = False Then
-'            '★ログ出力
-'            Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." ) : Call sub_CmpExcelPublish("log", 9, sMyName, oRet.Item("Err") )
-'        End If
+        Call sub_CmpExcelTryCatchAfterProc(func_CM_TryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName)
         
         With oWorkBook
             'ワークシートのリネーム情報格納用配列（clsCmArray型）
@@ -347,21 +338,11 @@ Class clsCompareExcel
                     
                     'シート保護の解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to unprotect a sheet.")
-                    Set oRet = func_CM_TryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect:End If}"), oWorksheet, oFuncErr, empty)
-'                    Set oRet = func_CM_TryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect:End If}"), oWorksheet, empty, empty)
-'                    If oRet.Item("Result") = False Then
-'                        '★ログ出力
-'                        Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." ) : Call sub_CmpExcelPublish("log", 9, sMyName, oRet.Item("Err") )
-'                    End If
+                    Call sub_CmpExcelTryCatchAfterProc(func_CM_TryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet, empty, empty), sMyName)
                     
                     'オートフィルタの解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to clear the AutoFilter.")
-                    Set oRet = func_CM_TryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, oFuncErr, empty)
-'                    Set oRet = func_CM_TryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty)
-'                    If oRet.Item("Result") = False Then
-'                        '★ログ出力
-'                        Call sub_CmpExcelPublish("log", 3, sMyName, "It couldn't." ) : Call sub_CmpExcelPublish("log", 9, sMyName, oRet.Item("Err") )
-'                    End If
+                    Call sub_CmpExcelTryCatchAfterProc(func_CM_TryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty), sMyName)
                     
                     'ワークシート名取得および変更する名称を決める
                     sNewSheetName = func_CmpExcelMakeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
@@ -428,8 +409,6 @@ Class clsCompareExcel
         Call sub_CmpExcelPublish("log", 9, sMyName, "func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = " & func_CM_ToString(oWorkSheetRenameInfo))
         
         'オブジェクトを開放
-        Set oFuncErr = Nothing
-'        Set oRet = Nothing
         Set oStringToColumn = Nothing
         Set oItem = Nothing
         Set oWorksheet = Nothing
@@ -645,6 +624,30 @@ Class clsCompareExcel
         If Err.Number Then
             Err.Clear
         End If
+    End Sub
+
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmpExcelTryCatchAfterProc()
+    'Overview                    : TryCatchでエラー時の処理
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoRet                  : func_CM_TryCatch()の戻り値
+    '     asYourName             : 処理を実行した関数名
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/28         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmpExcelTryCatchAfterProc( _
+        byRef aoRet _
+        , byVal asYourName _
+        )
+        If aoRet.Item("Result") Then Exit Sub
+        Call sub_CmpExcelPublish("log", 3, asYourName, "It couldn't." )
+        Call sub_CmpExcelPublish("log", 9, asYourName, "<Err> " & func_CM_ToString(aoRet.Item("Err")) )
     End Sub
 
     '***************************************************************************************************

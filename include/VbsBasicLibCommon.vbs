@@ -2121,14 +2121,14 @@ Private Function func_CM_TryCatch( _
     'catchブロックの処理
     If Err.Number<>0 Then
         boFlg = False
-        Call sub_CM_Bind(oErr, func_CM_UtilStoringErr())
+        Set oErr = func_CM_UtilStoringErr()
         Err.Clear
         Call sub_CM_Bind(oRet, aoCatch(aoArgs, oErr))
     End If
     'finaryブロックの処理
     If IsObject(aoFinary) Then
         If Not aoFinary Is Nothing Then
-            Call sub_CM_Bind(oRet, aoFinary(oRet))
+            Call sub_CM_Bind(oRet, aoFinary(aoArgs, oRet, oErr))
         End If
     End If
     '結果を返却

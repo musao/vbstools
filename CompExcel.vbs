@@ -116,7 +116,7 @@ Private Sub sub_CmpExcelGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelGetParameters", "Arguments are " & func_CM_ToStringArguments()))
+    Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelGetParameters", func_CM_ToStringArguments()))
     
     'パラメータ格納用オブジェクトに設定
     Call sub_CM_BindAt(aoParams, "Param", oArg.Item("Unnamed").Slice(0,2))
