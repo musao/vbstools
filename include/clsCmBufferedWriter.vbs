@@ -355,7 +355,7 @@ Class clsCmBufferedWriter
     'Argument
     '     なし
     'Return Value
-    '     なし
+    '     結果 True:ファイルに出力する / False:ファイルに出力しない
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
