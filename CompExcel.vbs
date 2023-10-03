@@ -80,7 +80,7 @@ Sub Main()
     Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, PoPubSub, "log")
     
     'ファイル接続をクローズする
-    PoWriter.FileClose
+    PoWriter.Close
     
     'オブジェクトを開放
     Set oParams = Nothing
@@ -167,7 +167,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
                 '★ログ出力
                 Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelDispInputFiles", "Dialog input canceled."))
                 
-                PoWriter.FileClose
+                PoWriter.Close
                 Set oParam = Nothing
                 Wscript.Quit
             End If

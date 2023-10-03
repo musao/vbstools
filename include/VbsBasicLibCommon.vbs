@@ -2589,7 +2589,7 @@ Private Sub sub_CM_UtilLogger( _
     )
     Dim oCont : Set oCont = new_ArraySetData(Array(new_clsCalGetNow()))
     With aoWriter
-        .WriteContents(oCont.Concat(avParams).JoinVbs(vbTab))
+        .Write(oCont.Concat(avParams).JoinVbs(vbTab))
         .newLine()
     End With
     Set oCont = Nothing

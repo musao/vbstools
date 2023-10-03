@@ -77,7 +77,7 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        Call sub_CmBufferedWriterCloseFile()
+        Call sub_CmBufferedWriterClose()
         Set PoWriteDateTime = Nothing
         Set PoRequestFirstDateTime = Nothing
     End Sub
@@ -244,9 +244,9 @@ Class clsCmBufferedWriter
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : WriteContents()
+    'Function/Sub Name           : Write()
     'Overview                    : ファイル出力する
-    'Detailed Description        : sub_CmBufferedWriterWriteFile()に委譲する
+    'Detailed Description        : sub_CmBufferedWriterWrite()に委譲する
     'Argument
     '     asContents             : 内容
     'Return Value
@@ -257,11 +257,11 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/07         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub WriteContents( _
+    Public Sub Write( _
         byVal asContents _
         )
         PsBuffer = PsBuffer & asContents
-        Call sub_CmBufferedWriterWriteContents()
+        Call sub_CmBufferedWriterWrite()
     End Sub
     
     '***************************************************************************************************
@@ -281,7 +281,7 @@ Class clsCmBufferedWriter
     Public Sub newLine( _
         )
         PsBuffer = PsBuffer & vbNewLine
-        Call sub_CmBufferedWriterWriteContents()
+        Call sub_CmBufferedWriterWrite()
     End Sub
     
     '***************************************************************************************************
@@ -304,9 +304,9 @@ Class clsCmBufferedWriter
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : FileClose()
+    'Function/Sub Name           : Close()
     'Overview                    : ファイル接続をクローズする
-    'Detailed Description        : sub_CmBufferedWriterCloseFile()に委譲する
+    'Detailed Description        : sub_CmBufferedWriterClose()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -317,9 +317,9 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/08/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub FileClose( _
+    Public Sub Close( _
         )
-        Call sub_CmBufferedWriterCloseFile()
+        Call sub_CmBufferedWriterClose()
     End Sub
     
     
@@ -327,9 +327,9 @@ Class clsCmBufferedWriter
     
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterWriteContents()
+    'Function/Sub Name           : sub_CmBufferedWriterWrite()
     'Overview                    : ファイル出力する
-    'Detailed Description        : sub_CmBufferedWriterWriteContents()に委譲する
+    'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
@@ -340,7 +340,7 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/09         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterWriteContents( _
+    Private Sub sub_CmBufferedWriterWrite( _
         )
         'ファイル出力判定＆ファイル出力
         If func_CmBufferedWriterDetermineToWrite() Then Call sub_CmBufferedWriterWriteFile()
@@ -430,7 +430,7 @@ Class clsCmBufferedWriter
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterCloseFile()
+    'Function/Sub Name           : sub_CmBufferedWriterClose()
     'Overview                    : ファイル接続をクローズする
     'Detailed Description        : バッファの未出力分を出力後にファイル接続をクローズする
     'Argument
@@ -443,7 +443,7 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterCloseFile( _
+    Private Sub sub_CmBufferedWriterClose( _
         )
         If PoTextStream Is Nothing Then Exit Sub
         

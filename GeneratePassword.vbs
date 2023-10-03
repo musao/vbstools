@@ -81,7 +81,7 @@ Sub Main()
     Call sub_CM_ExcuteSub("sub_GnrtPwGenerate", oParams, PoPubSub, "log")
     
     'ファイル接続をクローズする
-    Call PoWriter.FileClose()
+    Call PoWriter.Close()
     
     'オブジェクトを開放
     Set oParams = Nothing
@@ -124,7 +124,7 @@ Private Sub sub_GnrtPwGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    Call sub_GnrtPwLogger(Array(9, "sub_GnrtPwGetParameters", "Arguments are " & func_CM_ToStringArguments()))
+    Call sub_GnrtPwLogger(Array(9, "sub_GnrtPwGetParameters", func_CM_ToStringArguments()))
     
     '引数の内容を解析
     

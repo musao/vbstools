@@ -75,7 +75,7 @@ Sub Main()
     Call sub_CM_ExcuteSub("sub_GetPathsProc", oParams, PoPubSub, "log")
     
     'ファイル接続をクローズする
-    Call PoWriter.FileClose()
+    Call PoWriter.Close()
     
     'オブジェクトを開放
     Set oParams = Nothing
@@ -106,7 +106,7 @@ Private Sub sub_GetPathsGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    Call sub_GetPathsLogger(Array(9, "sub_GetPathsGetParameters", "Arguments are " & func_CM_ToStringArguments()))
+    Call sub_GetPathsLogger(Array(9, "sub_GetPathsGetParameters", func_CM_ToStringArguments()))
     
     'パラメータ格納用オブジェクトに設定
     Call sub_CM_BindAt(aoParams, "Param", oArg.Item("Unnamed").Slice(0,vbNullString))
