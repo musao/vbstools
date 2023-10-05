@@ -25,66 +25,66 @@ Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
 
-'Test func_CM_TryCatch()
-Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
-
-'normal
-Set oFuncTry = new_Func("a=>msgbox(""ok"")")
-Call func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)           'ok
-inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
-                                                                               '
-
-'normal2
-Set oFuncTry = new_Func("a=>a(0)+a(1)")
-oArguments = Array(1,2)
-Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
-inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>True,"Return"=>3,"Err"=><Nothing>}
-                                                                               '
-inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
-                                                                               '
-'normal3
-Set oFuncTry = new_Func("a=>a(0)+a(1)")
-oArguments = Array(1,2)
-Set oFuncFinary = new_Func("a=>""anser is ""&a")
-Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
-inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>True,"Return"=>"anser is 3","Err"=><Nothing>}
-                                                                               '
-inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
-                                                                               '
-
-'err
-Set oFuncTry = new_Func("a=>a(0)/a(1)")
-oFuncFinary = empty
-oArguments = Array(1,0)
-Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
-inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=><empty>,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
-                                                                               '
-inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
-                                                                               '
-
-'err2
-Set oFuncTry = new_Func("a=>a(0)/a(1)")
-oArguments = Array(1,0)
-Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
-Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
-inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=>1,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
-                                                                               '
-inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
-                                                                               '
-
-'err3
-Set oFuncTry = new_Func("a=>a(0)/a(1)")
-oArguments = Array(1,0)
-Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
-Set oFuncFinary = new_Func("a=>""anser is ""&a")
-Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
-inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=>"anser is 1","Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
-                                                                               '
-inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
-                                                                               '
-
-wscript.quit
-
+''Test func_CM_TryCatch()
+'Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
+'
+''normal
+'Set oFuncTry = new_Func("a=>msgbox(""ok"")")
+'Call func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)           'ok
+'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
+'                                                                               '
+'
+''normal2
+'Set oFuncTry = new_Func("a=>a(0)+a(1)")
+'oArguments = Array(1,2)
+'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>True,"Return"=>3,"Err"=><Nothing>}
+'                                                                               '
+'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
+'                                                                               '
+''normal3
+'Set oFuncTry = new_Func("a=>a(0)+a(1)")
+'oArguments = Array(1,2)
+'Set oFuncFinary = new_Func("a=>""anser is ""&a")
+'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>True,"Return"=>"anser is 3","Err"=><Nothing>}
+'                                                                               '
+'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
+'                                                                               '
+'
+''err
+'Set oFuncTry = new_Func("a=>a(0)/a(1)")
+'oFuncFinary = empty
+'oArguments = Array(1,0)
+'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=><empty>,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
+'                                                                               '
+'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
+'                                                                               '
+'
+''err2
+'Set oFuncTry = new_Func("a=>a(0)/a(1)")
+'oArguments = Array(1,0)
+'Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
+'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=>1,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
+'                                                                               '
+'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
+'                                                                               '
+'
+''err3
+'Set oFuncTry = new_Func("a=>a(0)/a(1)")
+'oArguments = Array(1,0)
+'Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
+'Set oFuncFinary = new_Func("a=>""anser is ""&a")
+'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=>"anser is 1","Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
+'                                                                               '
+'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
+'                                                                               '
+'
+'wscript.quit
+'
 
 ''Test new_Func()
 'Dim sSoruceCode
@@ -237,12 +237,9 @@ dim arr5
 
 
 ''Test Filter()
-'private function FilterTest(arg, i, a)
-'    FilterTest = (arg > 1)
-'end function
 'Set arr5 = new_ArraySetData(Array(1,2,3))
-'Call msgbox(func_CM_ToString(arr5))
-'Call msgbox( func_CM_ToString(arr5.Filter(getref("FilterTest"))) )
+'Call msgbox(func_CM_ToString(arr5))                                       '[1,2,3]
+'Call msgbox( func_CM_ToString(arr5.Filter(new_Func("(e,i,a)=>(e>1)"))) )  '[2,3]
 
 ''Test ForEach()
 'private function ForEachTest(arg, i, a)
@@ -341,9 +338,9 @@ dim arr5
 'Call msgbox( func_CM_ToString(arr5.Slice(1, -1)) )             '[2,3,4]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -3)) )            '<clsCmArray>
-Set arr5 = new_ArraySetData(Array(1))
-Call msgbox( func_CM_ToString(arr5) )
-Call msgbox( func_CM_ToString(arr5.Slice(0,2)) )               '[1]
+'Set arr5 = new_ArraySetData(Array(1))
+'Call msgbox( func_CM_ToString(arr5) )
+'Call msgbox( func_CM_ToString(arr5.Slice(0,2)) )               '[1]
 
 ''Test Sort()
 'private function ArraySortTest(x,y)
