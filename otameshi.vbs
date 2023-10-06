@@ -264,11 +264,13 @@ dim arr5
 'Call msgbox( arr5.IndexOf(2) )            '1
 'Call msgbox( arr5.IndexOf("2") )          '-1
 
-''Test Join()
-'Set arr5 = new_ArraySetData(Array(1, 2, 3.14, "Testing"))
-'Call msgbox(func_CM_ToString(arr5))
-'Call msgbox( arr5.JoinVbs("") )
-'Call msgbox( arr5.JoinVbs("+") )
+'Test Join()
+Set arr5 = new_ArraySetData(Array(1, 2, 3.14, "Testing"))
+Call msgbox(func_CM_ToString(arr5))         '[1,2,3.14,"Testing"]
+Call msgbox( arr5.JoinVbs("") )             '"123.14Testing"
+Call msgbox( arr5.JoinVbs("+") )            '"1+2+3.14+Testing"
+Call msgbox( arr5.Join("") )             '"123.14Testing"
+Call msgbox( arr5.Join("+") )            '"1+2+3.14+Testing"
 
 ''Test LastIndexOf()
 'Dim LastIndexOfTest : Set LastIndexOfTest = new_DictSetValues(Array(4, "five"))

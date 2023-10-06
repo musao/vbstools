@@ -58,9 +58,6 @@ End Function
 'Argument
 '     asTarget               : 部分文字列と区切り文字を含む文字列表現
 '     asDelimiter            : 区切り文字
-'     alCompare              : 比較方法
-'                                0(vbBinaryCompare):バイナリ比較
-'                                1(vbTextCompare):テキスト比較
 'Return Value
 '     同クラスのインスタンス
 '---------------------------------------------------------------------------------------------------
@@ -72,9 +69,8 @@ End Function
 Private Function new_ArraySplit( _
     byVal asTarget _
     , byVal asDelimiter _
-    , byVal alCompare _
     )
-    Set new_ArraySplit = new_ArraySetData(Split(asTarget, asDelimiter, -1, alCompare))
+    Set new_ArraySplit = new_ArraySetData(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
 End Function
 
 Class clsCmArray
