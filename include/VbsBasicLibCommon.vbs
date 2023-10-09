@@ -11,6 +11,581 @@
 
 
 '###################################################################################################
+'カスタム関数
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_bind()
+'Overview                    : 変数間の項目移送
+'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'                              移送先がコレクションのメンバーの場合は動作しない
+'                              移送先が変数の場合に使用できる
+'Argument
+'     avTo                   : 移送先の変数
+'     avValue                : 移送する値または変数
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub cf_bind( _
+    byRef avTo _
+    , byRef avValue _
+    )
+    If IsObject(avValue) Then Set avTo = avValue Else avTo = avValue
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_bindAt()
+'Overview                    : 変数間の項目移送
+'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
+'                              移送先がコレクションの場合は当関数を使用する
+'Argument
+'     aoCollection           : 移送先のコレクション
+'     asKey                  : 移送先のコレクションのキー
+'     avValue                : 移送する値または変数
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub cf_bindAt( _
+    byRef aoCollection _
+    , byVal asKey _
+    , byRef avValue _
+    )
+    If IsObject(avValue) Then Set aoCollection.Item(asKey) = avValue Else aoCollection.Item(asKey) = avValue
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_push()
+'Overview                    : 配列に要素を追加する
+'Detailed Description        : 工事中
+'Argument
+'     avArr                  : 配列
+'     aoEle                  : 追加する要素
+'Return Value
+'     配列の次元数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/23         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub cf_push( _
+    byRef avArr _ 
+    , byRef aoEle _ 
+    )
+    If func_CM_ArrayIsAvailable(avArr) Then
+        Redim Preserve avArr(Ubound(avArr)+1)
+    Else
+        Redim avArr(0)
+    End If
+    Call cf_bind(avArr(Ubound(avArr)), aoEle)
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_tryCatch()
+'Overview                    : 処理の実行とエラー発生時の処理実行
+'Detailed Description        : 他の言語のtry-chatch文に準拠
+'Argument
+'     aoTry                  : 実行する処理（tryブロックの処理）
+'     aoArgs                 : 実行する処理の引数
+'     aoCatch                : エラー発生時の処理（catchブロックの処理）
+'     aoFinary               : エラーの有無に依らず最後に実行する処理（finaryブロックの処理）
+'Return Value
+'     処理結果
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/01         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_tryCatch( _
+    byRef aoTry _
+    , byRef aoArgs _
+    , byRef aoCatch _
+    , byRef aoFinary _
+    )
+    On Error Resume Next
+    Dim boFlg : boFlg = True
+    Dim oErr : Set oErr = Nothing
+    Dim oRet
+    'tryブロックの処理
+    Call cf_bind(oRet, aoTry(aoArgs))
+    'catchブロックの処理
+    If Err.Number<>0 Then
+        boFlg = False
+        Set oErr = func_CM_UtilStoringErr()
+        Err.Clear
+        Call cf_bind(oRet, aoCatch(aoArgs, oErr))
+    End If
+    'finaryブロックの処理
+    If IsObject(aoFinary) Then
+        If Not aoFinary Is Nothing Then
+            Call cf_bind(oRet, aoFinary(aoArgs, oRet, oErr))
+        End If
+    End If
+    '結果を返却
+    Set cf_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
+    Set oRet = Nothing
+    Set oErr = Nothing
+End Function
+
+
+'###################################################################################################
+'インスタンス生成系
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Dic()
+'Overview                    : Dictionaryオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したDictionaryオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Dic( _
+    )
+    Set new_Dic = CreateObject("Scripting.Dictionary")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_DicWith()
+'Overview                    : Dictionaryオブジェクトを生成し初期値を設定する
+'Detailed Description        : 工事中
+'Argument
+'     avParams               : 初期値奇数（1,3,5,...）はKey、偶数（2,4,6,...）はValue
+'                              Keyだけの場合は値にEmptyを設定する。
+'Return Value
+'     生成したDictionaryオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_DicWith( _
+    byVal avParams _
+    )
+    Dim oDict, vItem, vKey, boIsKey
+    
+    boIsKey = True
+    Set oDict = new_Dic()
+    
+    For Each vItem In avParams
+        If boIsKey Then
+            Call cf_bind(vKey, vItem)
+            Call cf_bindAt(oDict, vKey, Empty)
+        Else
+            Call cf_bindAt(oDict, vKey, vItem)
+        End If
+        boIsKey = Not boIsKey
+    Next
+    
+    Set new_DicWith = oDict
+    Set oDict = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Re()
+'Overview                    : 正規表現オブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPattern              : 正規表現のパターン
+'     asOptions              : この引数内にある文字の有無で正規表現の以下のプロパティをTrueにする
+'                                "i":大文字と小文字を区別する（.IgnoreCase = True）
+'                                "g"文字列全体を検索する（.Global = True）
+'                                "m"文字列を複数行として扱う（.Multiline = True）
+'Return Value
+'     生成した正規表現オブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Re( _
+    byVal asPattern _
+    , byVal asOptions _
+    )
+    Dim oRe, sOpts
+    
+    Set oRe = New RegExp
+    oRe.Pattern = asPattern
+    
+    sOpts = LCase(asOptions)
+    If InStr(sOpts, "i") > 0 Then oRe.IgnoreCase = True
+    If InStr(sOpts, "g") > 0 Then oRe.Global = True
+    If InStr(sOpts, "m") > 0 Then oRe.Multiline = True
+    
+    Set new_Re = oRe
+    Set oRe = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Reader()
+'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     aoTextStream           : テキストストリームオブジェクト
+'Return Value
+'     生成したファイル読込バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Reader( _
+    byRef aoTextStream _
+    )
+    Set new_Reader = (New clsCmBufferedReader).setTextStream(aoTextStream)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ReaderFrom()
+'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 読み込むファイルのパス
+'Return Value
+'     生成したファイル読込バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ReaderFrom( _
+    byVal asPath _
+    )
+    Set new_ReaderFrom = (New clsCmBufferedReader).setTextStream(func_CM_FsOpenTextFile(asPath, 1, False, -2))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Writer()
+'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     aoTextStream           : テキストストリームオブジェクト
+'Return Value
+'     生成したファイル出力バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Writer( _
+    byRef aoTextStream _
+    )
+    Set new_Writer = (New clsCmBufferedWriter).setTextStream(aoTextStream)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_WriterTo()
+'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 書き込むファイルのパス
+'     alIomode               : 出力モード 2:ForWriting,8:ForAppending
+'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
+'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
+'Return Value
+'     生成したファイル出力バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_WriterTo( _
+    byVal asPath _
+    , byVal alIomode _
+    , byVal aboCreate _
+    , byVal alFileFormat _
+    )
+    Set new_WriterTo = (New clsCmBufferedWriter).setTextStream(func_CM_FsOpenTextFile(asPath, alIomode, aboCreate, alFileFormat))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Now()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 今の日付時刻で生成した日付クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     日付クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Now( _
+    )
+    Set new_Now = (New clsCmCalendar).getNow()
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_CalAt()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 指定した日付時刻で生成した日付クラスのインスタンスを返す
+'Argument
+'     avDateTime             : 設定する日付時刻
+'Return Value
+'     日付クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_CalAt( _
+    ByVal avDateTime _
+    )
+    Set new_CalAt = (New clsCmCalendar).setDateTime(avDateTime)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Pubsub()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 出版-購読型（Publish/Subscribe）クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     出版-購読型（Publish/Subscribe）クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Pubsub( _
+    )
+    Set new_Pubsub = (New clsCmPubSub)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Arr()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 生成した同クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Arr( _
+    )
+    Set new_Arr = (New clsCmArray)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ArrWith()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
+'Argument
+'     avArr                  : 配列に追加する要素（配列）
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArrWith( _
+    byRef avArr _
+    )
+    Dim oArr : Set oArr = new_Arr()
+    oArr.PushMulti avArr
+    Set new_ArrWith = oArr
+    Set oArr = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ArrSplit()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : vbscriptのSplit関数と同等の機能、同クラスのインスタンスを返す
+'Argument
+'     asTarget               : 部分文字列と区切り文字を含む文字列表現
+'     asDelimiter            : 区切り文字
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArrSplit( _
+    byVal asTarget _
+    , byVal asDelimiter _
+    )
+    Set new_ArrSplit = new_ArrWith(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Func()
+'Overview                    : 関数のインスタンスを生成する
+'Detailed Description        : javascriptの無名関数に準拠（vbscriptの仕様上仮の名前はつける）
+'Argument
+'     asSoruceCode           : 生成する関数のソースコード
+'                              以下のいずれかの様式とし、function（subではない）を生成する
+'                              1.通常
+'                               function (①) {②}
+'                                ①引数をカンマ区切りで指定する
+'                                ②vbscriptの構文に準拠する、戻り値は"return hoge"と表記する
+'                                  "return"句がない場合は戻り値はなしとする
+'                              2.Arrow関数
+'                               ① => ②
+'                                ①引数をカンマ区切りで指定する、複数の場合は()で囲む
+'                                ②単一行の場合はそのまま戻り値とする、複数行の場合は1.通常の②と同じ
+'Return Value
+'     生成した関数のインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Func( _
+    byVal asSoruceCode _
+    )
+    '生成する関数のソースコードの改行を:に変換
+    Dim sSoruceCode : sSoruceCode = Replace(asSoruceCode, vbNewLine, ":")
+    
+    '関数名（仮名）を作る
+    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
+    
+    Dim sPattern, oRegExp, sArgStr, sProcStr
+    '生成する関数のソースコードの様式が「1.通常」の場合
+    sPattern = "function\s?\((.*)\)\s?{(.*)}"
+    Set oRegExp = new_Re(sPattern, "gm")
+    If oRegExp.Test(sSoruceCode) Then
+        sArgStr = oRegExp.Replace(sSoruceCode, "$1")
+        sProcStr = oRegExp.Replace(sSoruceCode, "$2")
+        
+        '"return"句があれば関数名で書き換える
+        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
+        
+        '関数の生成
+        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
+        Set oRegExp = Nothing
+        Exit Function
+    End If
+    
+    '生成する関数のソースコードの様式が「2.Arrow関数」の場合
+    sPattern = "(.*)\s?=>\s?(.*)\s?"
+    Set oRegExp = new_Re(sPattern, "gm")
+    If oRegExp.Test(sSoruceCode) Then
+        sArgStr = oRegExp.Replace(sSoruceCode, "$1")
+        sProcStr = oRegExp.Replace(sSoruceCode, "$2")
+        
+        'それぞれ前後の括弧があれば除去
+        sPattern = "\(\s?(.*)\s?\)"
+        Set oRegExp = new_Re(sPattern, "gm")
+        sArgStr = oRegExp.Replace(sArgStr, "$1")
+        sPattern = "{\s?(.*)\s?}"
+        Set oRegExp = new_Re(sPattern, "gm")
+        sProcStr = oRegExp.Replace(sProcStr, "$1")
+        
+        If Instr(sProcStr, ":") > 0 Then
+        '複数行ある場合
+            '"return"句があれば関数名で書き換える
+            sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
+        Else
+        '1行だけの場合
+            sProcStr = "Call cf_bind(" & sFuncName & ", (" & sProcStr & ") )"
+        End If
+        
+        '関数の生成
+        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
+    End If
+    Set oRegExp = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FuncRewriteReturnPhrase()
+'Overview                    : "return"句を書き換える
+'Detailed Description        : new_Func()から使用する
+'Argument
+'     asFuncName             : 関数名
+'     asProcStr              : ソースの処理内容部分のソースコード
+'Return Value
+'     書き換えたソースの処理内容部分のソースコード
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FuncRewriteReturnPhrase( _
+    byVal asFuncName _
+    , byVal asProcStr _
+    )
+    Dim oRegExp : Set oRegExp = new_Re("(.*)return\s+(.*)", "gm")
+    Dim sRet : sRet = asProcStr
+    If oRegExp.Test(sRet) Then
+        sRet = oRegExp.Replace(sRet, "$1" & vbNewLine & "Call cf_bind(" & asFuncName & ", $2)")
+    End If
+    func_FuncRewriteReturnPhrase = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FuncGenerate()
+'Overview                    : 引数の情報で関数のインスタンスを生成する
+'Detailed Description        : new_Func()から使用する
+'Argument
+'     asFuncName             : 関数名
+'     asArgStr               : ソースの引数部分のソースコード
+'     asProcStr              : ソースの処理内容部分のソースコード
+'Return Value
+'     生成した関数のインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FuncGenerate( _
+    byVal asFuncName _
+    , byVal asArgStr _
+    , byVal asProcStr _
+    )
+    Dim sCode
+    'ソースコード作成
+    sCode = _
+        "Private Function " & asFuncName & "(" & asArgStr & ")" & vbNewLine _
+        & asProcStr & vbNewLine _
+        & "End Function"
+    
+'inputbox "","",sCode
+    '関数の生成
+    ExecuteGlobal sCode
+    Set func_FuncGenerate = Getref(asFuncName)
+End Function
+
+
+'###################################################################################################
 'オフィス全般
 '###################################################################################################
 
@@ -621,7 +1196,7 @@ Private Function func_CM_FsGetFsObjects( _
     )
     Set func_CM_FsGetFsObjects = Nothing
     If Not func_CM_FsFolderExists(asPath) Then Exit Function
-    Dim oTemp : Set oTemp = new_Dictionary()
+    Dim oTemp : Set oTemp = new_Dic()
     With oTemp
         .Add "Filse", func_CM_FsGetFiles(asPath)
         .Add "Folders", func_CM_FsGetFolders(asPath)
@@ -767,7 +1342,7 @@ End Function
 '     asPath                 : パス
 '     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
 '     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
-'     asFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
+'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
 'Return Value
 '     TextStreamオブジェクト
 '---------------------------------------------------------------------------------------------------
@@ -780,14 +1355,14 @@ Private Function func_CM_FsOpenTextFile( _
     byVal asPath _
     , byVal alIomode _
     , byVal aboCreate _
-    , byVal asFileFormat _
+    , byVal alFileFormat _
     )
     'ファイルを開く
     Set func_CM_FsOpenTextFile = CreateObject("Scripting.FileSystemObject").OpenTextFile( _
                                                               asPath _
                                                               , alIomode _
                                                               , aboCreate _
-                                                              , asFileFormat _
+                                                              , alFileFormat _
                                                               )
 End Function
 
@@ -1225,43 +1800,6 @@ Private Function func_CM_ArrayGetDimensionNumber( _
    func_CM_ArrayGetDimensionNumber = lNum - 1
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : sub_CM_Push()
-'Overview                    : 配列に要素を追加する
-'Detailed Description        : 工事中
-'Argument
-'     avArray                : 配列
-'     avItem                 : 追加する要素
-'Return Value
-'     配列の次元数
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/23         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_Push( _
-    byRef avArray _ 
-    , byRef avItem _ 
-    )
-    If func_CM_ArrayIsAvailable(avArray) Then
-        Redim Preserve avArray(Ubound(avArray)+1)
-    Else
-        Redim avArray(0)
-    End If
-    Call sub_CM_Bind(avArray(Ubound(avArray)), avItem)
-    
-'    On Error Resume Next
-'    If Ubound(avArray)>=0 Then
-'        Redim Preserve avArray(Ubound(avArray)+1)
-'    End If
-'    If Err.Number Then
-'        Redim avArray(0)
-'        Err.Clear
-'    End If
-'    Call sub_CM_Bind(avArray(Ubound(avArray)), avItem)
-End Sub
-
 
 '###################################################################################################
 'チェック系
@@ -1322,406 +1860,6 @@ End Function
 
 
 '###################################################################################################
-'インスタンス生成系
-'###################################################################################################
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Dictionary()
-'Overview                    : Dictionaryオブジェクト生成関数
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     生成したDictionaryオブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Dictionary( _
-    )
-    Set new_Dictionary = CreateObject("Scripting.Dictionary")
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_DictSetValues()
-'Overview                    : Dictionaryオブジェクトを生成し初期値を設定する
-'Detailed Description        : 工事中
-'Argument
-'     avParams               : 初期値奇数（1,3,5,...）はKey、偶数（2,4,6,...）はValue
-'                              Keyだけの場合は値にEmptyを設定する。
-'Return Value
-'     生成したDictionaryオブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_DictSetValues( _
-    byVal avParams _
-    )
-    Dim oDict, vItem, vKey, boIsKey
-    
-    boIsKey = True
-    Set oDict = new_Dictionary()
-    
-    For Each vItem In avParams
-        If boIsKey Then
-            Call sub_CM_Bind(vKey, vItem)
-            Call sub_CM_BindAt(oDict, vKey, Empty)
-        Else
-            Call sub_CM_BindAt(oDict, vKey, vItem)
-        End If
-        boIsKey = Not boIsKey
-    Next
-    
-    Set new_DictSetValues = oDict
-    Set oDict = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_RegExp()
-'Overview                    : 正規表現オブジェクト生成関数
-'Detailed Description        : 工事中
-'Argument
-'     asPattern              : 正規表現のパターン
-'     asOptions              : この引数内にある文字の有無で正規表現の以下のプロパティをTrueにする
-'                                "i":大文字と小文字を区別する（.IgnoreCase = True）
-'                                "g"文字列全体を検索する（.Global = True）
-'                                "m"文字列を複数行として扱う（.Multiline = True）
-'Return Value
-'     生成した正規表現オブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_RegExp( _
-    byVal asPattern _
-    , byVal asOptions _
-    )
-    Dim oRe, sOpts
-    
-    Set oRe = New RegExp
-    oRe.Pattern = asPattern
-    
-    sOpts = LCase(asOptions)
-    If InStr(sOpts, "i") > 0 Then oRe.IgnoreCase = True
-    If InStr(sOpts, "g") > 0 Then oRe.Global = True
-    If InStr(sOpts, "m") > 0 Then oRe.Multiline = True
-    
-    Set new_RegExp = oRe
-    Set oRe = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCmBufferedReader()
-'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoTextStream           : テキストストリームオブジェクト
-'Return Value
-'     生成したファイル読込バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/02         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCmBufferedReader( _
-    byRef aoTextStream _
-    )
-    Set new_clsCmBufferedReader = (New clsCmBufferedReader).setTextStream(aoTextStream)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCmBufferedWriter()
-'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoTextStream           : テキストストリームオブジェクト
-'Return Value
-'     ファイル出力バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCmBufferedWriter( _
-    byRef aoTextStream _
-    )
-    Set new_clsCmBufferedWriter = (New clsCmBufferedWriter).setTextStream(aoTextStream)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCalGetNow()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 今の日付時刻で生成した同クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     日付クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/01/04         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCalGetNow( _
-    )
-    Set new_clsCalGetNow = (New clsCmCalendar).getNow()
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCalSetDate()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 指定した日付時刻で生成した同クラスのインスタンスを返す
-'Argument
-'     avDateTime             : 設定する日付時刻
-'Return Value
-'     日付クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCalSetDate( _
-    ByVal avDateTime _
-    )
-    Set new_clsCalSetDate = (New clsCmCalendar).setDateTime(avDateTime)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCmPubSub()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 同クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCmPubSub( _
-    )
-    Set new_clsCmPubSub = (New clsCmPubSub)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCmArray()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 生成した同クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/08         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCmArray( _
-    )
-    Set new_clsCmArray = (New clsCmArray)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_ArraySetData()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
-'Argument
-'     avArr                  : 配列に追加する要素（配列）
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/08         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_ArraySetData( _
-    byRef avArr _
-    )
-    Dim oArr : Set oArr = new_clsCmArray()
-    oArr.PushMulti avArr
-    Set new_ArraySetData = oArr
-    Set oArr = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_ArraySplit()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : vbscriptのSplit関数と同等の機能、同クラスのインスタンスを返す
-'Argument
-'     asTarget               : 部分文字列と区切り文字を含む文字列表現
-'     asDelimiter            : 区切り文字
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/08         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_ArraySplit( _
-    byVal asTarget _
-    , byVal asDelimiter _
-    )
-    Set new_ArraySplit = new_ArraySetData(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Func()
-'Overview                    : 関数のインスタンスを生成する
-'Detailed Description        : javascriptの無名関数に準拠（vbscriptの仕様上仮の名前はつける）
-'Argument
-'     asSoruceCode           : 生成する関数のソースコード
-'                              以下のいずれかの様式とし、function（subではない）を生成する
-'                              1.通常
-'                               function (①) {②}
-'                                ①引数をカンマ区切りで指定する
-'                                ②vbscriptの構文に準拠する、戻り値は"return hoge"と表記する
-'                                  "return"句がない場合は戻り値はなしとする
-'                              2.Arrow関数
-'                               ① => ②
-'                                ①引数をカンマ区切りで指定する、複数の場合は()で囲む
-'                                ②単一行の場合はそのまま戻り値とする、複数行の場合は1.通常の②と同じ
-'Return Value
-'     生成した関数のインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Func( _
-    byVal asSoruceCode _
-    )
-    '生成する関数のソースコードの改行を:に変換
-    Dim sSoruceCode : sSoruceCode = Replace(asSoruceCode, vbNewLine, ":")
-    
-    '関数名（仮名）を作る
-    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
-    
-    Dim sPattern, oRegExp, sArgStr, sProcStr
-    '生成する関数のソースコードの様式が「1.通常」の場合
-    sPattern = "function\s?\((.*)\)\s?{(.*)}"
-    Set oRegExp = new_RegExp(sPattern, "gm")
-    If oRegExp.Test(sSoruceCode) Then
-        sArgStr = oRegExp.Replace(sSoruceCode, "$1")
-        sProcStr = oRegExp.Replace(sSoruceCode, "$2")
-        
-        '"return"句があれば関数名で書き換える
-        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
-        
-        '関数の生成
-        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
-        Set oRegExp = Nothing
-        Exit Function
-    End If
-    
-    '生成する関数のソースコードの様式が「2.Arrow関数」の場合
-    sPattern = "(.*)\s?=>\s?(.*)\s?"
-    Set oRegExp = new_RegExp(sPattern, "gm")
-    If oRegExp.Test(sSoruceCode) Then
-        sArgStr = oRegExp.Replace(sSoruceCode, "$1")
-        sProcStr = oRegExp.Replace(sSoruceCode, "$2")
-        
-        'それぞれ前後の括弧があれば除去
-        sPattern = "\(\s?(.*)\s?\)"
-        Set oRegExp = new_RegExp(sPattern, "gm")
-        sArgStr = oRegExp.Replace(sArgStr, "$1")
-        sPattern = "{\s?(.*)\s?}"
-        Set oRegExp = new_RegExp(sPattern, "gm")
-        sProcStr = oRegExp.Replace(sProcStr, "$1")
-        
-        If Instr(sProcStr, ":") > 0 Then
-        '複数行ある場合
-            '"return"句があれば関数名で書き換える
-            sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
-        Else
-        '1行だけの場合
-            sProcStr = "Call sub_CM_Bind(" & sFuncName & ", (" & sProcStr & ") )"
-        End If
-        
-        '関数の生成
-        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
-    End If
-    Set oRegExp = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_FuncRewriteReturnPhrase()
-'Overview                    : "return"句を書き換える
-'Detailed Description        : new_Func()から使用する
-'Argument
-'     asFuncName             : 関数名
-'     asProcStr              : ソースの処理内容部分のソースコード
-'Return Value
-'     書き換えたソースの処理内容部分のソースコード
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_FuncRewriteReturnPhrase( _
-    byVal asFuncName _
-    , byVal asProcStr _
-    )
-    Dim oRegExp : Set oRegExp = new_RegExp("(.*)return\s+(.*)", "gm")
-    Dim sRet : sRet = asProcStr
-    If oRegExp.Test(sRet) Then
-        sRet = oRegExp.Replace(sRet, "$1" & vbNewLine & "Call sub_CM_Bind(" & asFuncName & ", $2)")
-    End If
-    func_FuncRewriteReturnPhrase = sRet
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_FuncGenerate()
-'Overview                    : 引数の情報で関数のインスタンスを生成する
-'Detailed Description        : new_Func()から使用する
-'Argument
-'     asFuncName             : 関数名
-'     asArgStr               : ソースの引数部分のソースコード
-'     asProcStr              : ソースの処理内容部分のソースコード
-'Return Value
-'     生成した関数のインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_FuncGenerate( _
-    byVal asFuncName _
-    , byVal asArgStr _
-    , byVal asProcStr _
-    )
-    Dim sCode
-    'ソースコード作成
-    sCode = _
-        "Private Function " & asFuncName & "(" & asArgStr & ")" & vbNewLine _
-        & asProcStr & vbNewLine _
-        & "End Function"
-    
-'inputbox "","",sCode
-    '関数の生成
-    ExecuteGlobal sCode
-    Set func_FuncGenerate = Getref(asFuncName)
-End Function
-
-
-'###################################################################################################
 'その他
 '###################################################################################################
 
@@ -1760,33 +1898,9 @@ Private Function func_CM_GetObjectByIdFromCollection( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_Bind()
-'Overview                    : 変数間の項目移送
-'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
-'                              移送先がコレクションのメンバーの場合は動作しない
-'                              移送先が変数の場合に使用できる
-'Argument
-'     avTo                   : 移送先の変数
-'     avValue                : 移送する値または変数
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/06         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_Bind( _
-    byRef avTo _
-    , byRef avValue _
-    )
-    If IsObject(avValue) Then Set avTo = avValue Else avTo = avValue
-End Sub
-
-'***************************************************************************************************
 'Function/Sub Name           : sub_CM_Swap()
 'Overview                    : 変数の値を入れ替える
-'Detailed Description        : 移送処理はsub_CM_Bind()を使用する
+'Detailed Description        : 移送処理はcf_bind()を使用する
 'Argument
 '     avA                    : 値を入れ替える変数
 '     avB                    : 値を入れ替える変数
@@ -1803,35 +1917,10 @@ Private Sub sub_CM_Swap( _
     , byRef avB _
     )
     Dim oTemp
-    Call sub_CM_Bind(oTemp, avA)
-    Call sub_CM_Bind(avA, avB)
-    Call sub_CM_Bind(avB, oTemp)
+    Call cf_bind(oTemp, avA)
+    Call cf_bind(avA, avB)
+    Call cf_bind(avB, oTemp)
     Set oTemp = Nothing
-End Sub
-
-'***************************************************************************************************
-'Function/Sub Name           : sub_CM_BindAt()
-'Overview                    : 変数間の項目移送
-'Detailed Description        : 移送する値または変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
-'                              移送先がコレクションの場合は当関数を使用する
-'Argument
-'     aoCollection           : 移送先のコレクション
-'     asKey                  : 移送先のコレクションのキー
-'     avValue                : 移送する値または変数
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/06         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_BindAt( _
-    byRef aoCollection _
-    , byVal asKey _
-    , byRef avValue _
-    )
-    If IsObject(avValue) Then Set aoCollection.Item(asKey) = avValue Else aoCollection.Item(asKey) = avValue
 End Sub
 
 '***************************************************************************************************
@@ -1969,7 +2058,7 @@ Private Function func_CM_ToString( _
     byRef avTarget _
     )
     Dim oEscapingDoubleQuote, sRet
-    Set oEscapingDoubleQuote = new_RegExp("""", "g")
+    Set oEscapingDoubleQuote = new_Re("""", "g")
     sRet = ""
     
     Err.Clear
@@ -2019,7 +2108,7 @@ Private Function func_CM_ToStringArray( _
     Dim oTemp(), vItem
     
     For Each vItem In avTarget
-        Call sub_CM_Push(oTemp, func_CM_ToString(vItem))
+        Call cf_push(oTemp, func_CM_ToString(vItem))
     Next
     func_CM_ToStringArray = "[" & Join(oTemp, ",") & "]"
 End Function
@@ -2044,7 +2133,7 @@ Private Function func_CM_ToStringDictionary( _
     Dim oTemp(), vKey
     
     For Each vKey In avTarget.Keys
-        Call sub_CM_Push(oTemp, func_CM_ToString(vKey) & "=>" & func_CM_ToString(avTarget.Item(vKey)))
+        Call cf_push(oTemp, func_CM_ToString(vKey) & "=>" & func_CM_ToString(avTarget.Item(vKey)))
     Next
     func_CM_ToStringDictionary = "{" & Join(oTemp, ",") & "}"
 End Function
@@ -2170,12 +2259,6 @@ End Function
 Private Function func_CM_ToStringErr( _
     )
     func_CM_ToStringErr = "<Err> " & func_CM_ToString(func_CM_UtilStoringErr())
-'    Dim oRet : Set oRet = new_clsCmArray()
-'    oRet.Push "Number => " & Err.Number
-'    oRet.Push "Source => """ & Err.Source & """"
-'    oRet.Push "Description => """ & Err.Description & """"
-'    func_CM_ToStringErr = "<Err> {" & oRet.JoinVbs(",") & "}"
-'    Set oRet = Nothing
 End Function
 
 '***************************************************************************************************
@@ -2195,7 +2278,6 @@ End Function
 Private Function func_CM_ToStringArguments( _
     )
     func_CM_ToStringArguments = "<Arguments> " & func_CM_ToString(func_CM_UtilStoringArguments())
-'    func_CM_ToStringArguments = func_CM_ToString(func_CM_UtilStoringArguments())
 End Function
 
 '***************************************************************************************************
@@ -2250,55 +2332,6 @@ Private Sub sub_CM_ExcuteSub( _
     
     Set oFunc = Nothing
 End Sub
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_TryCatch()
-'Overview                    : 処理の実行とエラー発生時の処理実行
-'Detailed Description        : 他の言語のtry-chatch文に準拠
-'Argument
-'     aoTry                  : 実行する処理（tryブロックの処理）
-'     aoArgs                 : 実行する処理の引数
-'     aoCatch                : エラー発生時の処理（catchブロックの処理）
-'     aoFinary               : エラーの有無に依らず最後に実行する処理（finaryブロックの処理）
-'Return Value
-'     処理結果
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/01         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_TryCatch( _
-    byRef aoTry _
-    , byRef aoArgs _
-    , byRef aoCatch _
-    , byRef aoFinary _
-    )
-    On Error Resume Next
-    Dim boFlg : boFlg = True
-    Dim oErr : Set oErr = Nothing
-    Dim oRet
-    'tryブロックの処理
-    Call sub_CM_Bind(oRet, aoTry(aoArgs))
-    'catchブロックの処理
-    If Err.Number<>0 Then
-        boFlg = False
-        Set oErr = func_CM_UtilStoringErr()
-        Err.Clear
-        Call sub_CM_Bind(oRet, aoCatch(aoArgs, oErr))
-    End If
-    'finaryブロックの処理
-    If IsObject(aoFinary) Then
-        If Not aoFinary Is Nothing Then
-            Call sub_CM_Bind(oRet, aoFinary(aoArgs, oRet, oErr))
-        End If
-    End If
-    '結果を返却
-    Set func_CM_TryCatch = new_DictSetValues(Array("Result", boFlg, "Return", oRet, "Err", oErr))
-    Set oRet = Nothing
-    Set oErr = Nothing
-End Function
-
 
 '###################################################################################################
 'ユーティリティ系
@@ -2379,15 +2412,15 @@ Private Function func_CM_UtilSortQuick( _
     If Ubound(avArray)=0 Then Exit Function
     
     '0番目の要素をピボットに決める
-    Dim oPivot : Call sub_CM_Bind(oPivot, avArray(0))
+    Dim oPivot : Call cf_bind(oPivot, avArray(0))
     
     'ピボットと要素を関数で判定し判定方法に合致するグループをRight、そうでないグループをLeftとする
     Dim lPos, vRight, vLeft
     For lPos=1 To Ubound(avArray)
         If aoFunc(avArray(lPos), oPivot)=aboFlg Then
-            Call sub_CM_Push(vRight, avArray(lPos))
+            Call cf_push(vRight, avArray(lPos))
         Else
-            Call sub_CM_Push(vLeft, avArray(lPos))
+            Call cf_push(vLeft, avArray(lPos))
         End If
     Next
     
@@ -2396,10 +2429,10 @@ Private Function func_CM_UtilSortQuick( _
     vRight = func_CM_UtilSortQuick(vRight, aoFunc, aboFlg)
     
     'Leftにピボット＋Rightを結合する
-    Call sub_CM_Push(vLeft, oPivot)
+    Call cf_push(vLeft, oPivot)
     If func_CM_ArrayIsAvailable(vRight) Then
         For lPos=0 To Ubound(vRight)
-            Call sub_CM_Push(vLeft, vRight(lPos))
+            Call cf_push(vLeft, vRight(lPos))
         Next
     End If
     
@@ -2442,10 +2475,10 @@ Private Function func_CM_UtilSortMerge( _
     lMedian = func_CM_MathRoundup(lLength/2, 1)
     Dim lPos, vFirst, vSecond
     For lPos=Lbound(avArray) To lMedian-1
-        Call sub_CM_Push(vFirst, avArray(lPos))
+        Call cf_push(vFirst, avArray(lPos))
     Next
     For lPos=lMedian To Ubound(avArray)
-        Call sub_CM_Push(vSecond, avArray(lPos))
+        Call cf_push(vSecond, avArray(lPos))
     Next
     
     '再帰処理で配列の要素が1つになるまで分解する
@@ -2493,10 +2526,10 @@ Private Function func_CM_UtilSortMergeMerge( _
     Dim vRet
     Do While lPosF<=lEndF And lPosS<=lEndS
         If aoFunc(avFirst(lPosF), avSecond(lPosS))=aboFlg Then
-            Call sub_CM_Push(vRet, avSecond(lPosS))
+            Call cf_push(vRet, avSecond(lPosS))
             lPosS = lPosS + 1
         Else
-            Call sub_CM_Push(vRet, avFirst(lPosF))
+            Call cf_push(vRet, avFirst(lPosF))
             lPosF = lPosF + 1
         End If
     Loop
@@ -2505,12 +2538,12 @@ Private Function func_CM_UtilSortMergeMerge( _
     Dim lPos
     If lPosF<=lEndF Then
         For lPos=lPosF To lEndF
-            Call sub_CM_Push(vRet, avFirst(lPos))
+            Call cf_push(vRet, avFirst(lPos))
         Next
     End If
     If lPosS<=lEndS Then
         For lPos=lPosS To lEndS
-            Call sub_CM_Push(vRet, avSecond(lPos))
+            Call cf_push(vRet, avSecond(lPos))
         Next
     End If
     
@@ -2719,7 +2752,7 @@ Private Function func_CM_UtilGenerateRandomString( _
 
     Dim lType : lType = alType
     Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
-    Dim oChars : Set oChars = new_clsCmArray()
+    Dim oChars : Set oChars = new_Arr()
     Dim lQuotient,lDivide, vSetting, vItem, bCode, sCodeHex
     Do Until lPowerOf2<0
         lDivide = 2^lPowerOf2
@@ -2753,7 +2786,7 @@ Private Function func_CM_UtilGenerateRandomString( _
     
     '上述で作成した文字のリストを使ってランダムな文字列を生成する
     Dim lPos, oRet
-    Set oRet = new_clsCmArray()
+    Set oRet = new_Arr()
     For lPos = 1 To alLength
         oRet.Push oChars( func_CM_UtilGenerateRandomNumber(0, oChars.Length - 1, 1) )
     Next
@@ -2782,7 +2815,7 @@ Private Sub sub_CM_UtilLogger( _
     byRef avParams _
     , byRef aoWriter _
     )
-    Dim oCont : Set oCont = new_ArraySetData(Array(new_clsCalGetNow()))
+    Dim oCont : Set oCont = new_ArrWith(Array(new_Now()))
     With aoWriter
         .Write(oCont.Concat(avParams).JoinVbs(vbTab))
         .newLine()
@@ -2811,7 +2844,7 @@ End Sub
 '***************************************************************************************************
 Private Function func_CM_UtilStoringErr( _
     )
-    Dim oRet : Set oRet = new_Dictionary()
+    Dim oRet : Set oRet = new_Dic()
     oRet.Add "Number", Err.Number
     oRet.Add "Description", Err.Description
     oRet.Add "Source", Err.Source
@@ -2841,25 +2874,25 @@ End Function
 '***************************************************************************************************
 Private Function func_CM_UtilStoringArguments( _
     )
-    Dim oRet : Set oRet = new_Dictionary()
+    Dim oRet : Set oRet = new_Dic()
     Dim oTemp, oEle, oKey
     
     'All
-    Set oTemp = new_clsCmArray()
+    Set oTemp = new_Arr()
     For Each oEle In WScript.Arguments
         oTemp.Push oEle
     Next
     oRet.Add "All", oTemp
     
     'Named
-    Set oTemp = new_Dictionary()
+    Set oTemp = new_Dic()
     For Each oKey In WScript.Arguments.Named
         oTemp.Add oKey, WScript.Arguments.Named.Item(oKey)
     Next
     oRet.Add "Named", oTemp
     
     'Unnamed
-    Set oTemp = new_clsCmArray()
+    Set oTemp = new_Arr()
     For Each oEle In WScript.Arguments.Unnamed
         oTemp.Push oEle
     Next

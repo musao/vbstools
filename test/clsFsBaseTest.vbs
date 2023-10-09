@@ -456,7 +456,7 @@ Private Sub sub_clsFsBaseTest_1_1_x( _
     )
     'ケースの汎用パターンにケースの個別パターンを追加
     Dim vPatterns : vPatterns = avGeneralPatterns
-    Call sub_CM_Push(vPatterns, avIndividualPatterns)
+    Call cf_push(vPatterns, avIndividualPatterns)
     
     '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
     Dim vPatternInfos : vPatternInfos = func_clsFsBaseTestCreateaoHierarchicalPatterns( _
@@ -701,8 +701,8 @@ Private Sub sub_clsFsBaseTest_1_2_x( _
     )
     'ケースの汎用パターンにケースの個別パターンを追加
     Dim vPatterns : vPatterns = avGeneralPatterns
-    Call sub_CM_Push(vPatterns, avProps)
-    Call sub_CM_Push(vPatterns, avProps)
+    Call cf_push(vPatterns, avProps)
+    Call cf_push(vPatterns, avProps)
     
     '階層構造（配列の入れ子）のパターン情報格納用ハッシュマップ作成
     Dim vPatternInfos : vPatternInfos = func_clsFsBaseTestCreateaoHierarchicalPatternsEx( _
@@ -846,7 +846,7 @@ Private Function func_clsFsBaseTestCreateArgument( _
     , byVal aboIsUpdLcct _
     , byVal aboIsUpdLcut _
     )
-    Dim oConditions : Set oConditions = new_Dictionary()
+    Dim oConditions : Set oConditions = new_Dic()
     With oConditions
         .Add "TargetIsFile", aboTargetIsFile
         .Add "UseCache", aboUseCache
@@ -857,7 +857,7 @@ Private Function func_clsFsBaseTestCreateArgument( _
         .Add "SleepMSecond", alSleepMSecond
     End With
     
-    Dim oInspections : Set oInspections = new_Dictionary()
+    Dim oInspections : Set oInspections = new_Dic()
     With oInspections
         .Add "PropName1", asPropName1
         .Add "PropName2", asPropName2
@@ -867,7 +867,7 @@ Private Function func_clsFsBaseTestCreateArgument( _
         .Add "IsUpdLcut", aboIsUpdLcut
     End With
     
-    Dim oArgument : Set oArgument = new_Dictionary()
+    Dim oArgument : Set oArgument = new_Dic()
     With oArgument
         .Add "SubTitle", asSubTitle
         .Add "Conditions", oConditions
@@ -910,16 +910,16 @@ Private Function func_clsFsBaseTestCreateaoHierarchicalPatterns( _
     For Each vItem In avHierarchicalPatterns(alLayerNum)
         '引数パターンの作成
         vFuncArguments = avFuncArguments
-        Call sub_CM_Push(vFuncArguments, vItem)
+        Call cf_push(vFuncArguments, vItem)
         
         If Ubound(avHierarchicalPatterns)=alLayerNum Then
         'ケースのパターンの最下層の場合
         '引数情報格納用ハッシュマップを作成する関数の戻り値を配列に追加する
-            Call sub_CM_Push(vArray, aoFunc(vFuncArguments))
+            Call cf_push(vArray, aoFunc(vFuncArguments))
         Else
         '最下層でない場合
         '一階層下（ケースのパターン配列の次）の情報を取得する、自身を再帰呼び出し
-            Call sub_CM_Push(vArray, _
+            Call cf_push(vArray, _
                 func_clsFsBaseTestCreateaoHierarchicalPatterns(avHierarchicalPatterns, alLayerNum+1, aoFunc, vFuncArguments)_
                 )
         End If
@@ -958,19 +958,19 @@ Private Function func_clsFsBaseTestCreateaoHierarchicalPatternsEx( _
     For Each vItem In avHierarchicalPatterns(alLayerNum)
         '引数パターンの作成
         vFuncArguments = avFuncArguments
-        Call sub_CM_Push(vFuncArguments, vItem)
+        Call cf_push(vFuncArguments, vItem)
         
         If Ubound(avHierarchicalPatterns)=alLayerNum Then
         'ケースのパターンの最下層の場合
             If aboCompareBottom = (vItem = avFuncArguments(Ubound(avFuncArguments))) Then
             '最下層と最下層から2番目の要素の比較結果が引数（aboCompareBottom）と等しい場合
                 '引数情報格納用ハッシュマップを作成する関数の戻り値を配列に追加する
-                Call sub_CM_Push(vArray, aoFunc(vFuncArguments))
+                Call cf_push(vArray, aoFunc(vFuncArguments))
             End If
         Else
         '最下層でない場合
         '一階層下（ケースのパターン配列の次）の情報を取得する、自身を再帰呼び出し
-            Call sub_CM_Push(vArray, _
+            Call cf_push(vArray, _
                 func_clsFsBaseTestCreateaoHierarchicalPatternsEx(avHierarchicalPatterns, alLayerNum+1, aoFunc, vFuncArguments, aboCompareBottom)_
                 )
         End If
@@ -1093,7 +1093,7 @@ Private Function func_clsFsBaseTestNormalBase( _
         '属性取得（1回目）
         Dim lLastCacheConfirmationTime : lLastCacheConfirmationTime = .LastCacheConfirmationTime
         Dim lLastCacheUpdateTime : lLastCacheUpdateTime = .LastCacheUpdateTime
-        Dim vProp : Call sub_CM_Bind(vProp, .Prop(sPropName1))
+        Dim vProp : Call cf_bind(vProp, .Prop(sPropName1))
 '        Dim vProp : Call sub_CM_TransferBetweenVariables(.Prop(sPropName1), vProp)
         
         If Not(boDoItTwice) Then
@@ -1145,7 +1145,7 @@ Private Function func_clsFsBaseTestNormalBase( _
         '属性取得（2回目）
         lLastCacheConfirmationTime = .LastCacheConfirmationTime
         lLastCacheUpdateTime = .LastCacheUpdateTime
-        Call sub_CM_Bind(vProp, .Prop(sPropName2))
+        Call cf_bind(vProp, .Prop(sPropName2))
 '        Call sub_CM_TransferBetweenVariables(.Prop(sPropName2), vProp)
         
         '属性の値を検証
@@ -1192,7 +1192,7 @@ Private Function func_clsFsBaseTestGetExpectedValue( _
     byRef aoSomeObject _
     )
     
-    Dim oExpect : Set oExpect = new_Dictionary()
+    Dim oExpect : Set oExpect = new_Dic()
     With aoSomeObject
         oExpect.Add "Attributes", .Attributes
         oExpect.Add "DateCreated", .DateCreated

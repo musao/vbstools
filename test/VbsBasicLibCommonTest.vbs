@@ -235,7 +235,7 @@ Private Function func_CM_FsGetParentFolderPathTestNormal( _
     )
     func_CM_FsGetParentFolderPathTestNormal = False
     
-    Dim oParams : Set oParams = new_Dictionary()
+    Dim oParams : Set oParams = new_Dic()
     With oParams               '“ü—Í’lAŠú‘Ò’l
         Call .Add("c:\a\b", "c:\a")
         Call .Add("C:\A\", "C:\")

@@ -60,13 +60,12 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Dim sPath : sPath = func_CM_FsGetPrivateLogFilePath()
-    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
+    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_clsCmPubSub()
+    Set PoPubSub = new_Pubsub()
     Call PoPubSub.Subscribe("log", GetRef("sub_GetPathsLogger"))
     'パラメータ格納用オブジェクト宣言
-    Dim oParams : Set oParams = new_Dictionary()
+    Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
     Call sub_CM_ExcuteSub("sub_GetPathsGetParameters", oParams, PoPubSub, "log")
@@ -109,7 +108,7 @@ Private Sub sub_GetPathsGetParameters( _
     Call sub_GetPathsLogger(Array(9, "sub_GetPathsGetParameters", func_CM_ToStringArguments()))
     
     'パラメータ格納用オブジェクトに設定
-    Call sub_CM_BindAt(aoParams, "Param", oArg.Item("Unnamed").Slice(0,vbNullString))
+    cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,vbNullString)
     
     Set oArg = Nothing
 End Sub

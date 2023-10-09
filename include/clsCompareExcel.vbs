@@ -199,7 +199,7 @@ Class clsCompareExcel
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "Create a new workbook for comparison.")
         
-        Dim oParams : Set oParams = new_DictSetValues(Array("WorkbookForResults", oWorkbookForResults))
+        Dim oParams : Set oParams = new_DicWith(Array("WorkbookForResults", oWorkbookForResults))
         
         '比較対象ファイルの全シートを比較結果用ワークブックにコピーする
         Call sub_CmpExcelCopyAllSheetsToWorkbookForResults(oParams)
@@ -249,7 +249,7 @@ Class clsCompareExcel
         Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
         
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
-        Dim oWorkbookForResults : Call sub_CM_Bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
+        Dim oWorkbookForResults : Call cf_bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
         
         Dim sPath : Dim sFromToString
         '比較元ファイルのコピー
@@ -325,13 +325,13 @@ Class clsCompareExcel
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "Attempt to unprotect Excel file." )
         '文書の保護を解除する
-        Call sub_CmpExcelTryCatchAfterProc(func_CM_TryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName)
+        Call sub_CmpExcelTryCatchAfterProc(cf_tryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName)
         
         With oWorkBook
             'ワークシートのリネーム情報格納用配列（clsCmArray型）
-            Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_clsCmArray()
+            Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_Arr()
             'タブの色変換用ハッシュマップ定義
-            Dim oStringToThemeColor : Set oStringToThemeColor = new_DictSetValues(Array("From", 2, "To", 8))
+            Dim oStringToThemeColor : Set oStringToThemeColor = new_DicWith(Array("From", 2, "To", 8))
             
             Dim oWorksheet, sNewSheetName
             For Each oWorksheet In .Worksheets
@@ -342,15 +342,15 @@ Class clsCompareExcel
                     
                     'シート保護の解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to unprotect a sheet.")
-                    Call sub_CmpExcelTryCatchAfterProc(func_CM_TryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet, empty, empty), sMyName)
+                    Call sub_CmpExcelTryCatchAfterProc(cf_tryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet, empty, empty), sMyName)
                     
                     'オートフィルタの解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to clear the AutoFilter.")
-                    Call sub_CmpExcelTryCatchAfterProc(func_CM_TryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty), sMyName)
+                    Call sub_CmpExcelTryCatchAfterProc(cf_tryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty), sMyName)
                     
                     'ワークシート名取得および変更する名称を決める
                     sNewSheetName = func_CmpExcelMakeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
-                    oWorkSheetRenameInfo.Push new_DictSetValues( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
+                    oWorkSheetRenameInfo.Push new_DicWith( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
                     '★ログ出力
                     Call sub_CmpExcelPublish("log", 9, sMyName, "oWorkSheetRenameInfo = " & func_CM_ToString(oWorkSheetRenameInfo) )
                     
@@ -389,7 +389,7 @@ Class clsCompareExcel
         End If
 
         'サマリーシートのカラム位置変換用ハッシュマップ定義
-        Dim oStringToColumn : Set oStringToColumn = new_DictSetValues(Array("From", 1, "To", 2))
+        Dim oStringToColumn : Set oStringToColumn = new_DicWith(Array("From", 1, "To", 2))
         'サマリーシートに比較対象ファイルの情報を出力
         Dim lRow : Dim lColumn : Dim oItem
         lColumn = oStringToColumn.Item(asFromToString)
@@ -468,9 +468,9 @@ Class clsCompareExcel
         Call sub_CmpExcelPublish("log", 9, sMyName, "aoParams = " & func_CM_ToString(aoParams))
         
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
-        Dim oWorkbookForResults : Call sub_CM_Bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
-        Dim oFrom : Call sub_CM_Bind(oFrom, aoParams.Item("From"))
-        Dim oTo : Call sub_CM_Bind(oTo, aoParams.Item("To"))
+        Dim oWorkbookForResults : Call cf_bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
+        Dim oFrom : Call cf_bind(oFrom, aoParams.Item("From"))
+        Dim oTo : Call cf_bind(oTo, aoParams.Item("To"))
 
         Dim lCnt
         For lCnt = 0 To func_CM_MathMin(oFrom.Length, oTo.Length)-1
@@ -635,7 +635,7 @@ Class clsCompareExcel
     'Overview                    : TryCatchでエラー時の処理
     'Detailed Description        : 工事中
     'Argument
-    '     aoRet                  : func_CM_TryCatch()の戻り値
+    '     aoRet                  : cf_tryCatch()の戻り値
     '     asYourName             : 処理を実行した関数名
     'Return Value
     '     なし

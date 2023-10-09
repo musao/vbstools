@@ -323,7 +323,7 @@ Class clsCmCalendar
     Private Function func_CmCalendarDisplayAs( _
         byVal asFormat _
         )
-        Dim oConversionSettings : Set oConversionSettings = new_Dictionary()
+        Dim oConversionSettings : Set oConversionSettings = new_Dic()
         With oConversionSettings
             '変換テーブル定義
             .Add "YYYY", Array("UseDatePart()", "yyyy", False)

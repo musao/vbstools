@@ -397,7 +397,7 @@ Class clsCmBufferedWriter
         
         If PoWriteDateTime Is Nothing And PoRequestFirstDateTime Is Nothing Then
         '前回と初回の出力日時がない場合、本リクエスト（＝初回リクエスト）日時を取得して関数を抜ける
-            Set PoRequestFirstDateTime = new_clsCalGetNow()
+            Set PoRequestFirstDateTime = new_Now()
             func_CmBufferedWriterDetermineToWrite=boReturn
             Exit Function
         End If
@@ -411,7 +411,7 @@ Class clsCmBufferedWriter
         End If
         
         '出力日時の判定
-        If Abs(oForComparison.differenceFrom(new_clsCalGetNow()))>=PlWriteIntervalTime Then boReturn=True
+        If Abs(oForComparison.differenceFrom(new_Now()))>=PlWriteIntervalTime Then boReturn=True
         
         '戻り値を返す
         func_CmBufferedWriterDetermineToWrite=boReturn
@@ -442,7 +442,7 @@ Class clsCmBufferedWriter
         'バッファのクリア
         PsBuffer = ""
         '出力日時を記録
-        Set PoWriteDateTime = new_clsCalGetNow()
+        Set PoWriteDateTime = new_Now()
     End Sub
     
     '***************************************************************************************************

@@ -25,19 +25,19 @@ Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
 
-''Test func_CM_TryCatch()
+''Test cf_tryCatch()
 'Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
 '
 ''normal
 'Set oFuncTry = new_Func("a=>msgbox(""ok"")")
-'Call func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)           'ok
+'Call cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)           'ok
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
 '                                                                               '
 '
 ''normal2
 'Set oFuncTry = new_Func("a=>a(0)+a(1)")
 'oArguments = Array(1,2)
-'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>True,"Return"=>3,"Err"=><Nothing>}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -46,7 +46,7 @@ Call sub_Include("clsCmArray.vbs")
 'Set oFuncTry = new_Func("a=>a(0)+a(1)")
 'oArguments = Array(1,2)
 'Set oFuncFinary = new_Func("a=>""anser is ""&a")
-'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>True,"Return"=>"anser is 3","Err"=><Nothing>}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -56,7 +56,7 @@ Call sub_Include("clsCmArray.vbs")
 'Set oFuncTry = new_Func("a=>a(0)/a(1)")
 'oFuncFinary = empty
 'oArguments = Array(1,0)
-'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=><empty>,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -66,7 +66,7 @@ Call sub_Include("clsCmArray.vbs")
 'Set oFuncTry = new_Func("a=>a(0)/a(1)")
 'oArguments = Array(1,0)
 'Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
-'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=>1,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -77,7 +77,7 @@ Call sub_Include("clsCmArray.vbs")
 'oArguments = Array(1,0)
 'Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
 'Set oFuncFinary = new_Func("a=>""anser is ""&a")
-'Set oReturn = func_CM_TryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",func_CM_ToString(oReturn)                                       '{"Result"=>False,"Return"=>"anser is 1","Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -202,7 +202,7 @@ Call sub_Include("clsCmArray.vbs")
 dim arr5
 
 ''Test Concat()
-'Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6))
+'Set arr5 = new_ArrWith(Array(1,2,3,4,5,6))
 'Call msgbox(func_CM_ToString(arr5))
 'Call msgbox(func_CM_ToString(arr5.Concat(Array("a",9))))
 
@@ -216,7 +216,7 @@ dim arr5
 'private function EveryTestNg2(arg, i, a)
 '    EveryTestNg2 = (arg < 0)
 'end function
-'Set arr5 = new_ArraySetData(Array(1,2,3))
+'Set arr5 = new_ArrWith(Array(1,2,3))
 'Call msgbox(func_CM_ToString(arr5))
 'Call msgbox( arr5.Every(getref("EveryTestOk")) )     'True
 'Call msgbox( arr5.Every(getref("EveryTestNg")) )     'False
@@ -232,12 +232,12 @@ dim arr5
 'end function
 'Call msgbox( arr5.Some(getref("SomeTestNg")) )       'False
 'Call msgbox( arr5.Some(getref("SomeTestOk")) )       'True
-'Set arr5 = new_clsCmArray()
+'Set arr5 = new_Arr()
 'Call msgbox( arr5.Some(getref("SomeTestNg2")) )      'False
 
 
 ''Test Filter()
-'Set arr5 = new_ArraySetData(Array(1,2,3))
+'Set arr5 = new_ArrWith(Array(1,2,3))
 'Call msgbox(func_CM_ToString(arr5))                                       '[1,2,3]
 'Call msgbox( func_CM_ToString(arr5.Filter(new_Func("(e,i,a)=>(e>1)"))) )  '[2,3]
 
@@ -247,16 +247,16 @@ dim arr5
 '    Call msgbox(func_CM_ToString(i))
 '    Call msgbox(func_CM_ToString(a))
 'end function
-'Set arr5 = new_ArraySetData(Array(8, "Z"))
+'Set arr5 = new_ArrWith(Array(8, "Z"))
 'Call msgbox(func_CM_ToString(arr5))
 'arr5.ForEach getref("ForEachTest")
 
 ''Test IndexOf()
-'Dim IndexOfTest : Set IndexOfTest = new_DictSetValues(Array(4, "five"))
-'Set arr5 = new_clsCmArray()
+'Dim IndexOfTest : Set IndexOfTest = new_DicWith(Array(4, "five"))
+'Set arr5 = new_Arr()
 'Call msgbox( arr5.IndexOf("a") )          '-1
 'Set arr5 = Nothing
-'Set arr5 = new_ArraySetData(Array("a", 2, 3.14, IndexOfTest, "End"))
+'Set arr5 = new_ArrWith(Array("a", 2, 3.14, IndexOfTest, "End"))
 'Call msgbox(func_CM_ToString(arr5))
 'Call msgbox( arr5.IndexOf("a") )          '0
 'Call msgbox( arr5.IndexOf(IndexOfTest) )  '3
@@ -265,7 +265,7 @@ dim arr5
 'Call msgbox( arr5.IndexOf("2") )          '-1
 
 ''Test joinvbs()
-'Set arr5 = new_ArraySetData(Array(1, 2, 3.14, "Testing"))
+'Set arr5 = new_ArrWith(Array(1, 2, 3.14, "Testing"))
 'Call msgbox(func_CM_ToString(arr5))         '[1,2,3.14,"Testing"]
 'Call msgbox( arr5.joinvbs("") )             '"123.14Testing"
 'Call msgbox( arr5.joinvbs("+") )            '"1+2+3.14+Testing"
@@ -273,11 +273,11 @@ dim arr5
 'Call msgbox( arr5.Joinvbs("+") )            '"1+2+3.14+Testing"
 
 ''Test LastIndexOf()
-'Dim LastIndexOfTest : Set LastIndexOfTest = new_DictSetValues(Array(4, "five"))
-'Set arr5 = new_clsCmArray()
+'Dim LastIndexOfTest : Set LastIndexOfTest = new_DicWith(Array(4, "five"))
+'Set arr5 = new_Arr()
 'Call msgbox( arr5.LastIndexOf(LastIndexOfTest) )  '-1
 'Set arr5 = Nothing
-'Set arr5 = new_ArraySetData(Array("a", 2, 3.14, LastIndexOfTest, "End"))
+'Set arr5 = new_ArrWith(Array("a", 2, 3.14, LastIndexOfTest, "End"))
 'Call msgbox(func_CM_ToString(arr5))
 'Call msgbox( arr5.LastIndexOf("a") )          '0
 'Call msgbox( arr5.LastIndexOf(LastIndexOfTest) )  '3
@@ -286,16 +286,16 @@ dim arr5
 'Call msgbox( arr5.LastIndexOf("2") )          '-1
 
 ''Test Length(),Push(),Pop(),Shift(),Unshift()
-'Set arr5 = new_clsCmArray()
+'Set arr5 = new_Arr()
 'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '<clsCmArray> 0
 'Set arr5 = Nothing
-'Set arr5 = new_ArraySetData(Array("1", 2))
+'Set arr5 = new_ArrWith(Array("1", 2))
 'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 'arr5.Concat Array(3, "Four")
 'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 'arr5.Push Array("th", "ree")
 'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '["1",2,["th","ree"]] 3
-'arr5.Unshift new_DictSetValues(Array(4, "四"))
+'arr5.Unshift new_DicWith(Array(4, "四"))
 'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2,["th","ree"]] 4
 'Call msgbox( func_CM_ToString(arr5.Pop) )                        '["th","ree"]
 'Call msgbox( func_CM_ToString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2] 3
@@ -306,7 +306,7 @@ dim arr5
 'private function MapTest(arg, i, a)
 '    MapTest = arg*arg
 'end function
-'Set arr5 = new_ArraySetData(Array(1,2,3))
+'Set arr5 = new_ArrWith(Array(1,2,3))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.Map(getref("MapTest"))) )
 
@@ -314,7 +314,7 @@ dim arr5
 'private function ReduceTest(prev, current, i, a)
 '    ReduceTest = prev*current
 'end function
-'Set arr5 = new_ArraySetData(Array(1,2,3,4))
+'Set arr5 = new_ArrWith(Array(1,2,3,4))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( arr5.Reduce(getref("ReduceTest")) )
 
@@ -322,31 +322,31 @@ dim arr5
 'private function ReduceRightTest(prev, current, i, a)
 '    ReduceRightTest = prev/current
 'end function
-'Set arr5 = new_ArraySetData(Array(2,10,60))
+'Set arr5 = new_ArrWith(Array(2,10,60))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( arr5.ReduceRight(getref("ReduceRightTest")) )
 
 ''Test Reverse()
-'Set arr5 = new_ArraySetData(Array(1,2,3))
+'Set arr5 = new_ArrWith(Array(1,2,3))
 'Call msgbox( func_CM_ToString(arr5) )                  '[1.2.3]
 'arr5.Reverse
 'Call msgbox( func_CM_ToString(arr5) )                  '[3,2,1]
 
 ''Test Slice()
-'Set arr5 = new_ArraySetData(Array(1,2,3,4,5))
+'Set arr5 = new_ArrWith(Array(1,2,3,4,5))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.Slice(0,3)) )               '[1.2.3]
 'Call msgbox( func_CM_ToString(arr5.Slice(3, vbNullString)) )   '[4,5]
 'Call msgbox( func_CM_ToString(arr5.Slice(1, -1)) )             '[2,3,4]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( func_CM_ToString(arr5.Slice(-3, -3)) )            '<clsCmArray>
-'Set arr5 = new_ArraySetData(Array(1))
+'Set arr5 = new_ArrWith(Array(1))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.Slice(0,2)) )               '[1]
 
 
 'Test sort()
-Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+Set arr5 = new_ArrWith(Array(5,2,9,6,4,8,7,3,0,1))
 Call msgbox( func_CM_ToString(arr5) )
 Call msgbox( func_CM_ToString(arr5.sort(True)) )
 Call msgbox( func_CM_ToString(arr5.sort(False)) )
@@ -355,13 +355,13 @@ Call msgbox( func_CM_ToString(arr5.sort(False)) )
 'private function ArraySortTest(x,y)
 '    ArraySortTest = (x > y)
 'end function
-'Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+'Set arr5 = new_ArrWith(Array(5,2,9,6,4,8,7,3,0,1))
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.sortUsing(getref("ArraySortTest"))) )
 'Call msgbox( func_CM_ToString(arr5.sortUsing(new_Func("(x,y) => (x>y)"))) )
 
 ''Test Splice()
-'Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))
+'Set arr5 = new_ArrWith(Array(1,2,3,4,5,6,7,8))
 'Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,4,5,6,7,8]
 'Call msgbox( func_CM_ToString(arr5.splice(1,2,Nothing)) )      '[2,3]
 'Call msgbox( func_CM_ToString(arr5) )                          '[1,4,5,6,7,8]
@@ -402,14 +402,14 @@ private function test(arg, i, a)
 end function
 
 
-'dim arr2 : Set arr2 = new_clsCmArray()
-dim arr2 : Set arr2 = new_ArraySetData(Array(1,2,3,4,5,6))
+'dim arr2 : Set arr2 = new_Arr()
+dim arr2 : Set arr2 = new_ArrWith(Array(1,2,3,4,5,6))
 Call msgbox(func_CM_ToString(arr2.items))
 
 'Call Msgbox(arr2.Length)
 'Call Msgbox(arr2(2))
 'arr2(2) = 10
-'Set arr2(5) = new_clsCmArray()
+'Set arr2(5) = new_Arr()
 'Call Msgbox(arr2(2))
 
 dim arr3
@@ -481,13 +481,13 @@ Call Msgbox(func_CM_ToString("Hello world."))
 Call Msgbox(func_CM_ToString(#2009-03-07#))
 Call Msgbox(func_CM_ToString(Array("foo", "bar", "baz")))
 
-Dim oD : Set oD = new_Dictionary()
-Call sub_CM_BindAt(oD, "foo", 1)
-Call sub_CM_BindAt(oD, "bar", Nothing)
-Call sub_CM_BindAt(oD, "baz", Empty)
+Dim oD : Set oD = new_Dic()
+Call cf_bindAt(oD, "foo", 1)
+Call cf_bindAt(oD, "bar", Nothing)
+Call cf_bindAt(oD, "baz", Empty)
 Call Msgbox(func_CM_ToString(oD))
 
-Call Msgbox(func_CM_ToString(new_RegExp("foo", "i")))
+Call Msgbox(func_CM_ToString(new_Re("foo", "i")))
 
 wscript.quit
 
@@ -495,7 +495,7 @@ wscript.quit
 Dim sPatha
 sPatha = func_CM_FsGetPrivateLogFilePath()
 Dim bw
-Set bw = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPatha, 8, True, -2))
+Set bw = new_Writer(func_CM_FsOpenTextFile(sPatha, 8, True, -2))
 
 With bw
     .WriteBufferSize = 2
@@ -554,12 +554,12 @@ wscript.quit
 dim x : x = csng(-3.402823E38)
 Call msgbox(x)
 
-dim d : set d=new_clsCalGetNow()
+dim d : set d=new_Now()
 wscript.Sleep 1500
-dim d2 : set d2=new_clsCalGetNow()
+dim d2 : set d2=new_Now()
 
 
-'call msgbox(now() & vbnewline & cdbl(Fix(now())) & vbnewline & timer() & vbnewline & d.GetSerial() & vbnewline & new_clsCalGetNow().GetSerial())
+'call msgbox(now() & vbnewline & cdbl(Fix(now())) & vbnewline & timer() & vbnewline & d.GetSerial() & vbnewline & new_Now().GetSerial())
 call msgbox(d.DifferenceFrom(d2))
 call msgbox(d2.DifferenceFrom(d))
 
@@ -650,12 +650,12 @@ Call sub_Include("clsCompareExcel.vbs")
 Call sub_Include("clsCmCalendar.vbs")
 
 
-call msgbox(new_clsCalGetNow().DisplayAs("M/d/yyyy h:m:s.000000"))
+call msgbox(new_Now().displayAs("M/d/yyyy h:m:s.000000"))
 
-Dim hoge2 : Set hoge2 = new_clsCalGetNow()
+Dim hoge2 : Set hoge2 = new_Now()
 wscript.Sleep 3
 
-Call Msgbox(new_clsCalGetNow().DifferenceIsScondsFrom(hoge2))
+Call Msgbox(new_Now().differenceFrom(hoge2))
 
 wscript.quit
 
@@ -682,14 +682,14 @@ Dim oArray3(1)
 
 'Call Msgbox(func_CM_ArrayGetDimensionNumber(sArray))
 
-Dim oDic111 : Set oDic111 = new_Dictionary() : oDic111.Add 1, "Dic111"
-Dim oDic112 : Set oDic112 = new_Dictionary() : oDic112.Add 1, "Dic112"
-'Dim oDic121 : Set oDic121 = new_Dictionary() : oDic121.Add 1, "Dic121"
-'Dim oDic122 : Set oDic122 = new_Dictionary() : oDic122.Add 1, "Dic122"
-'Dim oDic211 : Set oDic211 = new_Dictionary() : oDic211.Add 1, "Dic211"
-'Dim oDic212 : Set oDic212 = new_Dictionary() : oDic212.Add 1, "Dic212"
-'Dim oDic221 : Set oDic221 = new_Dictionary() : oDic221.Add 1, "Dic221"
-'Dim oDic222 : Set oDic222 = new_Dictionary() : oDic222.Add 1, "Dic222"
+Dim oDic111 : Set oDic111 = new_Dic() : oDic111.Add 1, "Dic111"
+Dim oDic112 : Set oDic112 = new_Dic() : oDic112.Add 1, "Dic112"
+'Dim oDic121 : Set oDic121 = new_Dic() : oDic121.Add 1, "Dic121"
+'Dim oDic122 : Set oDic122 = new_Dic() : oDic122.Add 1, "Dic122"
+'Dim oDic211 : Set oDic211 = new_Dic() : oDic211.Add 1, "Dic211"
+'Dim oDic212 : Set oDic212 = new_Dic() : oDic212.Add 1, "Dic212"
+'Dim oDic221 : Set oDic221 = new_Dic() : oDic221.Add 1, "Dic221"
+'Dim oDic222 : Set oDic222 = new_Dic() : oDic222.Add 1, "Dic222"
 
 Set oArray3(0) = oDic111
 Set oArray3(1) = oDic112

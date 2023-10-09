@@ -27,7 +27,7 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        Set PoArr = new_Dictionary()
+        Set PoArr = new_Dic()
     End Sub
 
     '***************************************************************************************************
@@ -83,7 +83,7 @@ Class clsCmArray
     Public Default Property Get item( _
         byVal alIdx _
         )
-        Call sub_CM_Bind(item, func_CmArrayItem(alIdx))
+        Call cf_bind(item, func_CmArrayItem(alIdx))
     End Property
 
     '***************************************************************************************************
@@ -106,7 +106,7 @@ Class clsCmArray
         , byRef aoEle _
         )
         If func_CmArrayInspectIndex(alIdx) Then
-            Call sub_CM_BindAt(PoArr, alIdx, aoEle)
+            Call cf_bindAt(PoArr, alIdx, aoEle)
         End If
     End Property
 
@@ -130,7 +130,7 @@ Class clsCmArray
         , byRef aoEle _
         )
         If func_CmArrayInspectIndex(alIdx) Then
-            Call sub_CM_BindAt(PoArr, alIdx, aoEle)
+            Call cf_bindAt(PoArr, alIdx, aoEle)
         End If
     End Property
 
@@ -188,7 +188,7 @@ Class clsCmArray
     Public Function concat( _
         byRef avArr _
         )
-        Dim oArr : Set oArr = new_clsCmArray()
+        Dim oArr : Set oArr = new_Arr()
         oArr.pushMulti func_CmArrayConvArray(True)
         oArr.pushMulti avArr
         Set concat = oArr
@@ -261,7 +261,7 @@ Class clsCmArray
         , byVal aboInclude _
         , byVal alCompare _
         )
-        Set filterVbs = new_ArraySetData( Filter(func_CmArrayConvArray(True), asTarget, aboInclude, alCompare) )
+        Set filterVbs = new_ArrWith( Filter(func_CmArrayConvArray(True), asTarget, aboInclude, alCompare) )
     End Function
 
     '***************************************************************************************************
@@ -281,7 +281,7 @@ Class clsCmArray
     Public Function find( _
         byRef aoFunc _
         )
-        Call sub_CM_Bind(find, func_CmArrayFind(aoFunc))
+        Call cf_bind(find, func_CmArrayFind(aoFunc))
     End Function
 
     '***************************************************************************************************
@@ -381,7 +381,7 @@ Class clsCmArray
     Public Function map( _
         byRef aoFunc _
         )
-        Call sub_CM_Bind(map, func_CmArrayMap(aoFunc))
+        Call cf_bind(map, func_CmArrayMap(aoFunc))
     End Function
 
     '***************************************************************************************************
@@ -400,7 +400,7 @@ Class clsCmArray
     '***************************************************************************************************
     Public Function pop( _
         )
-        Call sub_CM_Bind(pop, func_CmArrayPop())
+        Call cf_bind(pop, func_CmArrayPop())
     End Function
 
     '***************************************************************************************************
@@ -460,7 +460,7 @@ Class clsCmArray
     Public Function reduce( _
         byRef aoFunc _
         )
-        Call sub_CM_Bind(reduce, func_CmArrayReduce(aoFunc, True))
+        Call cf_bind(reduce, func_CmArrayReduce(aoFunc, True))
     End Function
 
     '***************************************************************************************************
@@ -480,7 +480,7 @@ Class clsCmArray
     Public Function reduceRight( _
         byRef aoFunc _
         )
-        Call sub_CM_Bind(reduceRight, func_CmArrayReduce(aoFunc, False))
+        Call cf_bind(reduceRight, func_CmArrayReduce(aoFunc, False))
     End Function
 
     '***************************************************************************************************
@@ -518,7 +518,7 @@ Class clsCmArray
     '***************************************************************************************************
     Public Function shift( _
         )
-        Call sub_CM_Bind(shift, func_CmArrayShift())
+        Call cf_bind(shift, func_CmArrayShift())
     End Function
 
     '***************************************************************************************************
@@ -700,9 +700,9 @@ Class clsCmArray
         )
         Dim oEle : Set oEle = Nothing
         If PoArr.Count>0 Then
-            Call sub_CM_Bind(oEle, PoArr.Item(alIdx))
+            Call cf_bind(oEle, PoArr.Item(alIdx))
         End If
-        Call sub_CM_Bind(func_CmArrayItem, oEle)
+        Call cf_bind(func_CmArrayItem, oEle)
         Set oEle = Nothing
     End Function
 
@@ -779,15 +779,15 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             For lIdx=0 To lUb
-                Call sub_CM_Bind(oEle, vArr(lIdx))
+                Call cf_bind(oEle, vArr(lIdx))
                 If aoFunc(oEle, lIdx, vArr) Then
-                    Call sub_CM_Push(oRet, oEle)
+                    Call cf_push(oRet, oEle)
                 End If
             Next
         End If
 
         '作成した配列（ディクショナリ）で当クラスのインスタンスを生成して返却
-        Set func_CmArrayFilter = new_ArraySetData(oRet)
+        Set func_CmArrayFilter = new_ArrWith(oRet)
 
         Set oEle = Nothing
     End Function
@@ -822,16 +822,16 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             For lIdx=0 To lUb
-                Call sub_CM_Bind(oEle, vArr(lIdx))
+                Call cf_bind(oEle, vArr(lIdx))
                 If aoFunc(oEle, lIdx, vArr) Then
-                    Call sub_CM_Bind(oRet, oEle)
+                    Call cf_bind(oRet, oEle)
                     Exit For
                 End If
             Next
         End If
 
         '配列から抽出した要素を返却
-        Call sub_CM_Bind(func_CmArrayFind, oRet)
+        Call cf_bind(func_CmArrayFind, oRet)
 
         Set oEle = Nothing
         Set oRet = Nothing
@@ -914,7 +914,7 @@ Class clsCmArray
 
             boFlg = False
             For lIdx=lStart To lEnd Step lStep
-                Call sub_CM_Bind(oEle, vArr(lIdx))
+                Call cf_bind(oEle, vArr(lIdx))
 
                 If IsObject(avTarget) And IsObject(oEle) Then
                     If avTarget Is oEle Then boFlg = True
@@ -965,11 +965,11 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             For lIdx=0 To lUb
-                Call sub_CM_Push(vRet, aoFunc(vArr(lIdx), lIdx, vArr))
+                Call cf_push(vRet, aoFunc(vArr(lIdx), lIdx, vArr))
             Next
         End If
 
-        Call sub_CM_Bind(func_CmArrayMap, new_ArraySetData(vRet))
+        Call cf_bind(func_CmArrayMap, new_ArrWith(vRet))
     End Function
 
     '***************************************************************************************************
@@ -992,10 +992,10 @@ Class clsCmArray
         Set oEle = Nothing
         lCount = PoArr.Count
         If lCount>0 Then
-            Call sub_CM_Bind(oEle, PoArr.Item(lCount-1))
+            Call cf_bind(oEle, PoArr.Item(lCount-1))
             PoArr.Remove lCount-1
         End If
-        Call sub_CM_Bind(func_CmArrayPop, oEle)
+        Call cf_bind(func_CmArrayPop, oEle)
         Set oEle = Nothing
     End Function
 
@@ -1019,7 +1019,7 @@ Class clsCmArray
         If func_CM_ArrayIsAvailable(avArr) Then
             Dim oEle
             For Each oEle In avArr
-                Call sub_CM_BindAt(PoArr, PoArr.Count, oEle)
+                Call cf_bindAt(PoArr, PoArr.Count, oEle)
             Next
         End If
         func_CmArrayPushMulti = PoArr.Count
@@ -1056,13 +1056,13 @@ Class clsCmArray
             vArr = func_CmArrayConvArray(aboOrder)
             lUb = Ubound(vArr)
             
-            Call sub_CM_Bind(oRet, vArr(0))
+            Call cf_bind(oRet, vArr(0))
             For lIdx=1 To lUb
-                Call sub_CM_Bind(oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr))
+                Call cf_bind(oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr))
             Next
         End If
 
-        Call sub_CM_Bind(func_CmArrayReduce, oRet)
+        Call cf_bind(func_CmArrayReduce, oRet)
 
         Set oRet = Nothing
     End Function
@@ -1106,7 +1106,7 @@ Class clsCmArray
         )
         If PoArr.Count>0 Then
             '配列から取り除いた要素を返す
-            Call sub_CM_Bind(func_CmArrayShift, PoArr.Item(0))
+            Call cf_bind(func_CmArrayShift, PoArr.Item(0))
             '作成した配列（ディクショナリ）を置換え
             Set PoArr = func_CmArrayAddDictionary(func_CmArrayConvArray(True), 1)
         End If
@@ -1151,11 +1151,11 @@ Class clsCmArray
             End If
             
             For lIdx=lStart To lEnd
-                Call sub_CM_Push(vRet, vArr(lIdx))
+                Call cf_push(vRet, vArr(lIdx))
             Next
         End If
 
-        Set func_CmArraySlice = new_ArraySetData(vRet)
+        Set func_CmArraySlice = new_ArrWith(vRet)
     End Function
 
     '***************************************************************************************************
@@ -1191,30 +1191,30 @@ Class clsCmArray
             
             For lIdx = 0 To lStart - 1
             '開始位置までは今の配列のまま
-                Call sub_CM_Push(vArrayAft, vArr(lIdx))
+                Call cf_push(vArrayAft, vArr(lIdx))
             Next
             
             For lIdx = lStart To lStart + alDelCnt -1
             '開始位置から削除する要素数は戻り値の配列に移す
-                Call sub_CM_Push(vRet, vArr(lIdx))
+                Call cf_push(vRet, vArr(lIdx))
             Next
             
             If func_CM_ArrayIsAvailable(avArr) Then
             '追加する要素があれば追加する
                 For lIdx = 0 To Ubound(avArr)
                 '削除した要素以降は今の配列に残す
-                    Call sub_CM_Push(vArrayAft, avArr(lIdx))
+                    Call cf_push(vArrayAft, avArr(lIdx))
                 Next
             End If
             
             For lIdx = lStart + alDelCnt To lUb
             '削除した要素以降は今の配列に残す
-                Call sub_CM_Push(vArrayAft, vArr(lIdx))
+                Call cf_push(vArrayAft, vArr(lIdx))
             Next
             
             
             '配列から取り除いた要素を返す
-            Call sub_CM_Bind(func_CmArraySplice, new_ArraySetData(vRet))
+            Call cf_bind(func_CmArraySplice, new_ArrWith(vRet))
             '作成した配列（ディクショナリ）を置換え
             Set PoArr = func_CmArrayAddDictionary(vArrayAft, 0)
         End If
@@ -1238,7 +1238,7 @@ Class clsCmArray
         byRef avArr _
         )
         Dim oArr, oEle
-        Set oArr = new_Dictionary()
+        Set oArr = new_Dic()
 
         If func_CM_ArrayIsAvailable(avArr) Then
         '引数の要素を先頭に追加
@@ -1247,7 +1247,7 @@ Class clsCmArray
 
         '続いて今ある要素を追加
         For Each oEle In func_CmArrayConvArray(True)
-            Call sub_CM_BindAt(oArr, oArr.Count, oEle)
+            Call cf_bindAt(oArr, oArr.Count, oEle)
         Next
 
         '作成した配列（ディクショナリ）を置換え
@@ -1288,7 +1288,7 @@ Class clsCmArray
             End If
 
             For lIdx=lStt To lEnd Step lStep
-                Call sub_CM_Push(vRet, vArr(lIdx))
+                Call cf_push(vRet, vArr(lIdx))
             Next
         End If
 
@@ -1319,10 +1319,10 @@ Class clsCmArray
 
         lUb = Ubound(avArr)
         If alStart<0 Then lStart = lUb + alStart Else lStart = alStart
-        Set oArr = new_Dictionary()
+        Set oArr = new_Dic()
 
         For lIdx = alStart To lUb
-            Call sub_CM_BindAt(oArr, oArr.Count, avArr(lIdx))
+            Call cf_bindAt(oArr, oArr.Count, avArr(lIdx))
         Next
 
         '作成した配列（ディクショナリ）を返す

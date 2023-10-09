@@ -62,13 +62,12 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Dim sPath : sPath = func_CM_FsGetPrivateLogFilePath()
-    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
+    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath(), 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_clsCmPubSub()
+    Set PoPubSub = new_Pubsub()
     Call PoPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
     'パラメータ格納用汎用オブジェクト宣言
-    Dim oParams : Set oParams = new_Dictionary()
+    Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数取得
     Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, PoPubSub, "log")
@@ -119,7 +118,7 @@ Private Sub sub_CmpExcelGetParameters( _
     Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelGetParameters", func_CM_ToStringArguments()))
     
     'パラメータ格納用オブジェクトに設定
-    Call sub_CM_BindAt(aoParams, "Param", oArg.Item("Unnamed").Slice(0,2))
+    cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,2)
     
     Set oArg = Nothing
 End Sub
@@ -204,7 +203,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     Dim oParam : Set oParam = aoParams.Item("Param")
     
     'ファイルの最終更新日昇順に並べ替える
-    oParam.Sort new_Func("(c,n)=>new_clsCalSetDate(func_CM_FsGetFile(c).DateLastModified).compareTo(new_clsCalSetDate(func_CM_FsGetFile(n).DateLastModified))>0")
+    oParam.sortUsing new_Func("(c,n)=>new_CalAt(func_CM_FsGetFile(c).DateLastModified).compareTo(new_CalAt(func_CM_FsGetFile(n).DateLastModified))>0")
     '★ログ出力
     Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelCompareFiles", "aoParams sorted."))
     Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & func_CM_ToString(aoParams)))

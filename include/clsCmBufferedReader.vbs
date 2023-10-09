@@ -30,9 +30,9 @@ Class clsCmBufferedReader
         PlReadSize = 5000                 'デフォルトは5000バイト
         Set PoTextStream = Nothing
         Dim vArr : vArr = Array("line", Empty, "column", Empty, "atEndOfLine", Empty, "atEndOfStream", Empty)
-        Set PoOutbound = new_DictSetValues(vArr)
-        Set PoInbound = new_DictSetValues(vArr)
-        Set PoBuffer = new_DictSetValues(Array("buffer", Empty, "pointer", Empty, "length", Empty))
+        Set PoOutbound = new_DicWith(vArr)
+        Set PoInbound = new_DicWith(vArr)
+        Set PoBuffer = new_DicWith(Array("buffer", Empty, "pointer", Empty, "length", Empty))
     End Sub
     
     '***************************************************************************************************
@@ -367,7 +367,7 @@ Class clsCmBufferedReader
         PoBuffer.Item("pointer") = PoBuffer.Item("pointer")+Len(sRet)
         
         'アウトバウンドの情報を更新
-        Dim oArr : Set oArr = new_ArraySplit(Mid(PoBuffer.Item("buffer"), 1, PoBuffer.Item("pointer") - 1), vbLf)
+        Dim oArr : Set oArr = new_ArrSplit(Mid(PoBuffer.Item("buffer"), 1, PoBuffer.Item("pointer") - 1), vbLf)
         oArr.Reverse()
         With PoOutbound
             .Item("line") = oArr.length
@@ -554,7 +554,7 @@ Class clsCmBufferedReader
         )
         With PoTextStream
             'インバウンドの状態を取得する
-            Set PoInbound = new_DictSetValues(Array("line", .Line, "column", .Column, "atEndOfLine", .AtEndOfLine, "atEndOfStream", .AtEndOfStream))
+            Set PoInbound = new_DicWith(Array("line", .Line, "column", .Column, "atEndOfLine", .AtEndOfLine, "atEndOfStream", .AtEndOfStream))
         End With
     End Sub
     
@@ -577,7 +577,7 @@ Class clsCmBufferedReader
         With PoInbound
             'アウトバウンドの状態にインバウンドの状態をコピーする
             Dim sKey, oOutbound
-            Set oOutbound = new_Dictionary()
+            Set oOutbound = new_Dic()
             For Each sKey In Array("line", "column", "atEndOfLine", "atEndOfStream")
                 oOutbound.Add sKey, .Item(sKey)
             Next
@@ -607,7 +607,7 @@ Class clsCmBufferedReader
         'インバウンドの状態をアウトバウンドにコピーする
         Call sub_CmBufferedReaderCopyInboundStateToOutbound()
         'ポインタの初期化
-        Set PoBuffer = new_DictSetValues(Array("pointer", 1, "buffer", "", "length", 0))
+        Set PoBuffer = new_DicWith(Array("pointer", 1, "buffer", "", "length", 0))
     End Sub
     
 End Class

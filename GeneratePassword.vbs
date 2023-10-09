@@ -66,13 +66,12 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Dim sPath : sPath = func_CM_FsGetPrivateLogFilePath()
-    Set PoWriter = new_clsCmBufferedWriter(func_CM_FsOpenTextFile(sPath, 8, True, -2))
+    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_clsCmPubSub()
+    Set PoPubSub = new_Pubsub()
     Call PoPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
     'パラメータ格納用オブジェクト宣言
-    Dim oParams : Set oParams = new_Dictionary()
+    Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
     Call sub_CM_ExcuteSub("sub_GnrtPwGetParameters", oParams, PoPubSub, "log")
@@ -137,14 +136,14 @@ Private Sub sub_GnrtPwGetParameters( _
     Dim vAdd
     oKey = "Add"
     If oArg.Item("Named").Exists(oKey) Then 
-        vAdd = new_ArraySplit(oArg.Item("Named").Item(oKey), ",", vbBinaryCompare).Items
+        vAdd = new_ArrSplit(oArg.Item("Named").Item(oKey), ",", vbBinaryCompare).Items
     Else
         vAdd = Empty
     End If
     
     '文字の種類
     Dim oSetting, lSum, lType
-    Set oSetting = new_DictSetValues(Array("U", 1, "L", 2, "N", 4, "S", 8))
+    Set oSetting = new_DicWith(Array("U", 1, "L", 2, "N", 4, "S", 8))
     lSum = 0
     For Each oKey In oSetting.Keys
         If oArg.Item("Named").Exists(oKey) Then lSum = lSum + oSetting.Item(oKey)
@@ -152,10 +151,10 @@ Private Sub sub_GnrtPwGetParameters( _
     lType = lSum
     If lType = 0 And func_CM_ArrayIsAvailable(vAdd)<>True Then lType = 15
     
-    Dim oParam : Set oParam = new_DictSetValues(Array("Length", lLength, "Type", lType, "Additional", vAdd))
+    Dim oParam : Set oParam = new_DicWith(Array("Length", lLength, "Type", lType, "Additional", vAdd))
     
     'パラメータ格納用オブジェクトに設定
-    Call sub_CM_BindAt(aoParams, "Param", oParam)
+    cf_bindAt aoParams, "Param", oParam
     
     Set oParam = Nothing
     Set oArg = Nothing
@@ -182,9 +181,9 @@ Private Sub sub_GnrtPwGenerate( _
     'パスワード生成
     Dim lLength, lType, vAdd
     With aoParams.Item("Param")
-        Call sub_CM_Bind(lLength, .Item("Length"))
-        Call sub_CM_Bind(lType, .Item("Type"))
-        Call sub_CM_Bind(vAdd, .Item("Additional"))
+        cf_bind lLength, .Item("Length")
+        cf_bind lType, .Item("Type")
+        cf_bind vAdd, .Item("Additional")
     End With
     Dim sPw : sPw = func_CM_UtilGenerateRandomString(lLength, lType, vAdd)
     
@@ -194,7 +193,7 @@ Private Sub sub_GnrtPwGenerate( _
     'ダイアログのメッセージなどを作成
     Dim sMsg, sTitle
     sMsg = "パスワードを生成しました" & vbNewLine & "OKボタンを押下するとクリップボードにコピーします"
-    sTitle = new_clsCalGetNow() & " に作成"
+    sTitle = new_Now() & " に作成"
     
     '★ログ出力
     Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Display Inputbox."))
