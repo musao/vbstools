@@ -264,13 +264,13 @@ dim arr5
 'Call msgbox( arr5.IndexOf(2) )            '1
 'Call msgbox( arr5.IndexOf("2") )          '-1
 
-'Test Join()
-Set arr5 = new_ArraySetData(Array(1, 2, 3.14, "Testing"))
-Call msgbox(func_CM_ToString(arr5))         '[1,2,3.14,"Testing"]
-Call msgbox( arr5.JoinVbs("") )             '"123.14Testing"
-Call msgbox( arr5.JoinVbs("+") )            '"1+2+3.14+Testing"
-Call msgbox( arr5.Join("") )             '"123.14Testing"
-Call msgbox( arr5.Join("+") )            '"1+2+3.14+Testing"
+''Test joinvbs()
+'Set arr5 = new_ArraySetData(Array(1, 2, 3.14, "Testing"))
+'Call msgbox(func_CM_ToString(arr5))         '[1,2,3.14,"Testing"]
+'Call msgbox( arr5.joinvbs("") )             '"123.14Testing"
+'Call msgbox( arr5.joinvbs("+") )            '"1+2+3.14+Testing"
+'Call msgbox( arr5.joinvbs("") )             '"123.14Testing"
+'Call msgbox( arr5.Joinvbs("+") )            '"1+2+3.14+Testing"
 
 ''Test LastIndexOf()
 'Dim LastIndexOfTest : Set LastIndexOfTest = new_DictSetValues(Array(4, "five"))
@@ -344,14 +344,21 @@ Call msgbox( arr5.Join("+") )            '"1+2+3.14+Testing"
 'Call msgbox( func_CM_ToString(arr5) )
 'Call msgbox( func_CM_ToString(arr5.Slice(0,2)) )               '[1]
 
-''Test Sort()
+
+'Test sort()
+Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
+Call msgbox( func_CM_ToString(arr5) )
+Call msgbox( func_CM_ToString(arr5.sort(True)) )
+Call msgbox( func_CM_ToString(arr5.sort(False)) )
+
+''Test sortUsing()
 'private function ArraySortTest(x,y)
 '    ArraySortTest = (x > y)
 'end function
 'Set arr5 = new_ArraySetData(Array(5,2,9,6,4,8,7,3,0,1))
 'Call msgbox( func_CM_ToString(arr5) )
-'Call msgbox( func_CM_ToString(arr5.sort(getref("ArraySortTest"))) )
-'Call msgbox( func_CM_ToString(arr5.sort(new_Func("(x,y) => (x>y)"))) )
+'Call msgbox( func_CM_ToString(arr5.sortUsing(getref("ArraySortTest"))) )
+'Call msgbox( func_CM_ToString(arr5.sortUsing(new_Func("(x,y) => (x>y)"))) )
 
 ''Test Splice()
 'Set arr5 = new_ArraySetData(Array(1,2,3,4,5,6,7,8))

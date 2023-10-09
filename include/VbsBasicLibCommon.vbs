@@ -1516,6 +1516,70 @@ Private Function new_clsCmPubSub( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_clsCmArray()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 生成した同クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_clsCmArray( _
+    )
+    Set new_clsCmArray = (New clsCmArray)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ArraySetData()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
+'Argument
+'     avArr                  : 配列に追加する要素（配列）
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArraySetData( _
+    byRef avArr _
+    )
+    Dim oArr : Set oArr = new_clsCmArray()
+    oArr.PushMulti avArr
+    Set new_ArraySetData = oArr
+    Set oArr = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ArraySplit()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : vbscriptのSplit関数と同等の機能、同クラスのインスタンスを返す
+'Argument
+'     asTarget               : 部分文字列と区切り文字を含む文字列表現
+'     asDelimiter            : 区切り文字
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArraySplit( _
+    byVal asTarget _
+    , byVal asDelimiter _
+    )
+    Set new_ArraySplit = new_ArraySetData(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_Func()
 'Overview                    : 関数のインスタンスを生成する
 'Detailed Description        : javascriptの無名関数に準拠（vbscriptの仕様上仮の名前はつける）
