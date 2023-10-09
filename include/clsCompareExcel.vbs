@@ -52,7 +52,7 @@ Class clsCompareExcel
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Let PathFrom()
+    'Function/Sub Name           : Property Let pathFrom()
     'Overview                    : 比較元エクセルファイルのパスを設定する
     'Detailed Description        : 工事中
     'Argument
@@ -65,14 +65,14 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2022/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Let PathFrom( _
+    Public Property Let pathFrom( _
         byVal asPath _
         )
         If func_CM_FsFileExists(asPath) Then PsPathFrom = asPath Else PsPathFrom = ""
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get PathFrom()
+    'Function/Sub Name           : Property Get pathFrom()
     'Overview                    : 比較元エクセルファイルのパスを返す
     'Detailed Description        : 工事中
     'Argument
@@ -85,12 +85,12 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2022/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get PathFrom()
-        PathFrom = PsPathFrom
+    Public Property Get pathFrom()
+        pathFrom = PsPathFrom
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Let PathTo()
+    'Function/Sub Name           : Property Let pathTo()
     'Overview                    : 比較先エクセルファイルのパスを設定する
     'Detailed Description        : 工事中
     'Argument
@@ -103,14 +103,14 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2022/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Let PathTo( _
+    Public Property Let pathTo( _
         byVal asPath _
         )
         If func_CM_FsFileExists(asPath) Then PsPathTo = asPath Else PsPathTo = ""
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get PathTo()
+    'Function/Sub Name           : Property Get pathTo()
     'Overview                    : 比較先エクセルファイルのパスを返す
     'Detailed Description        : 工事中
     'Argument
@@ -123,16 +123,16 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2022/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get PathTo()
-        PathTo = PsPathTo
+    Public Property Get pathTo()
+        pathTo = PsPathTo
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Set PubSub()
-    'Overview                    : 出版-購読型（Publish/subscribe）クラスのオブジェクトを設定する
+    'Function/Sub Name           : Property Set pubsub()
+    'Overview                    : 出版-購読型（Publish/Subscribe）クラスのオブジェクトを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     aoPubSub               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
+    '     aoPubSub               : 出版-購読型（Publish/Subscribe）クラスのインスタンス
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -141,32 +141,32 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Set PubSub( _
+    Public Property Set pubsub( _
         byRef aoPubSub _
         )
         Set PoPubSub = aoPubSub
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get PubSub()
-    'Overview                    : 出版-購読型（Publish/subscribe）クラスのオブジェクトを返す
+    'Function/Sub Name           : Property Get pubsub()
+    'Overview                    : 出版-購読型（Publish/Subscribe）クラスのオブジェクトを返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     出版-購読型（Publish/subscribe）クラスのオブジェクト
+    '     出版-購読型（Publish/Subscribe）クラスのインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get PubSub()
-        Set PubSub = PoPubSub
+    Public Property Get pubsub()
+        Set pubsub = PoPubSub
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Compare()
+    'Function/Sub Name           : compare()
     'Overview                    : エクセルファイルを比較する
     'Detailed Description        : 工事中
     'Argument
@@ -179,14 +179,14 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2022/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function Compare( _
+    Public Function compare( _
         )
-        Dim sMyName : sMyName = "+Compare"
+        Dim sMyName : sMyName = "+compare"
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
         Call sub_CmpExcelPublish("log", 9, sMyName, "PsPathFrom = " & func_CM_ToString(PsPathFrom) & ", PsPathTo = " & func_CM_ToString(PsPathTo))
         
-        Compare = False
+        compare = False
         
         '比較結果用の新規ワークブックを作成
         With CreateObject("Excel.Application")
@@ -213,8 +213,12 @@ Class clsCompareExcel
         '終了
         Set oParams = Nothing
         Set oWorkbookForResults = Nothing
-        Compare = True
+        compare = True
     End Function
+    
+    
+    
+    
     
     '***************************************************************************************************
     'Function/Sub Name           : sub_CmpExcelCopyAllSheetsToWorkbookForResults()

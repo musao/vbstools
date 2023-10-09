@@ -495,20 +495,20 @@ With bw
     Call msgbox("WriteBufferSize()='" & .WriteBufferSize() & "'" & vbNewLine _
                 & "WriteIntervalTime()='" & .WriteIntervalTime() & "'" & vbNewLine _
                 & "CurrentBufferSize()='" & .CurrentBufferSize() & "'" & vbNewLine _
-                & "LastWriteDateTime()='" & .LastWriteDateTime() &"'" _
+                & "LastWriteTime()='" & .LastWriteTime() &"'" _
                 )
     .WriteContents("‚ ")
     .newLine()
     Call msgbox("WriteBufferSize()='" & .WriteBufferSize() & "'" & vbNewLine _
                 & "WriteIntervalTime()='" & .WriteIntervalTime() & "'" & vbNewLine _
                 & "CurrentBufferSize()='" & .CurrentBufferSize() & "'" & vbNewLine _
-                & "LastWriteDateTime()='" & .LastWriteDateTime() &"'" _
+                & "LastWriteTime()='" & .LastWriteTime() &"'" _
                 )
     .Flush()
     Call msgbox("WriteBufferSize()='" & .WriteBufferSize() & "'" & vbNewLine _
                 & "WriteIntervalTime()='" & .WriteIntervalTime() & "'" & vbNewLine _
                 & "CurrentBufferSize()='" & .CurrentBufferSize() & "'" & vbNewLine _
-                & "LastWriteDateTime()='" & .LastWriteDateTime() &"'" _
+                & "LastWriteTime()='" & .LastWriteTime() &"'" _
                 )
 End With
 
@@ -553,8 +553,8 @@ dim d2 : set d2=new_clsCalGetNow()
 
 
 'call msgbox(now() & vbnewline & cdbl(Fix(now())) & vbnewline & timer() & vbnewline & d.GetSerial() & vbnewline & new_clsCalGetNow().GetSerial())
-call msgbox(d.DifferenceInScondsFrom(d2))
-call msgbox(d2.DifferenceInScondsFrom(d))
+call msgbox(d.DifferenceFrom(d2))
+call msgbox(d2.DifferenceFrom(d))
 
 wscript.quit
 
@@ -643,7 +643,7 @@ Call sub_Include("clsCompareExcel.vbs")
 Call sub_Include("clsCmCalendar.vbs")
 
 
-call msgbox(new_clsCalGetNow().DisplayFormatAs("M/d/yyyy h:m:s.000000"))
+call msgbox(new_clsCalGetNow().DisplayAs("M/d/yyyy h:m:s.000000"))
 
 Dim hoge2 : Set hoge2 = new_clsCalGetNow()
 wscript.Sleep 3

@@ -8,27 +8,6 @@
 '----------         ----------------------   -------------------------------------------------------
 '2023/10/02         Y.Fujii                  First edition
 '***************************************************************************************************
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCmBufferedReader()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoTextStream           : テキストストリームオブジェクト
-'Return Value
-'     ファイル読込バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/02         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCmBufferedReader( _
-    byRef aoTextStream _
-    )
-    Set new_clsCmBufferedReader = (New clsCmBufferedReader).SetTextStream(aoTextStream)
-End Function
-
 Class clsCmBufferedReader
     'クラス内変数、定数
     Private PoTextStream, PoOutbound, PoInbound, PoBuffer, PlReadSize
@@ -50,10 +29,10 @@ Class clsCmBufferedReader
     Private Sub Class_Initialize()
         PlReadSize = 5000                 'デフォルトは5000バイト
         Set PoTextStream = Nothing
-        Dim vArr : vArr = Array("Line", Empty, "Column", Empty, "AtEndOfLine", Empty, "AtEndOfStream", Empty)
+        Dim vArr : vArr = Array("line", Empty, "column", Empty, "atEndOfLine", Empty, "atEndOfStream", Empty)
         Set PoOutbound = new_DictSetValues(vArr)
         Set PoInbound = new_DictSetValues(vArr)
-        Set PoBuffer = new_DictSetValues(Array("Buffer", Empty, "Pointer", Empty, "Length", Empty))
+        Set PoBuffer = new_DictSetValues(Array("buffer", Empty, "pointer", Empty, "length", Empty))
     End Sub
     
     '***************************************************************************************************
@@ -78,7 +57,7 @@ Class clsCmBufferedReader
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Let ReadSize()
+    'Function/Sub Name           : Property Let readSize()
     'Overview                    : 読込サイズを設定する
     'Detailed Description        : 読込要求時に読込バッファのサイズがこれを超えた場合
     '                              ファイルを読込む
@@ -92,7 +71,7 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Let ReadSize( _
+    Public Property Let readSize( _
         byVal alReadSize _
         )
         If func_CM_ValidationlIsWithinTheRangeOf(alReadSize, 2) Then
@@ -101,7 +80,7 @@ Class clsCmBufferedReader
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get ReadSize()
+    'Function/Sub Name           : Property Get readSize()
     'Overview                    : 読込サイズを返す
     'Detailed Description        : 工事中
     'Argument
@@ -114,12 +93,12 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get ReadSize()
-        ReadSize = PlReadSize
+    Public Property Get readSize()
+        readSize = PlReadSize
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get TextStream()
+    'Function/Sub Name           : Property Get textStream()
     'Overview                    : テキストストリームを返す
     'Detailed Description        : 工事中
     'Argument
@@ -132,12 +111,12 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get TextStream()
-        Set TextStream = aoTextStream
+    Public Property Get textStream()
+        Set textStream = aoTextStream
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get Line()
+    'Function/Sub Name           : Property Get line()
     'Overview                    : 現在の行番号を返す
     'Detailed Description        : 工事中
     'Argument
@@ -150,12 +129,12 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get Line()
-        Line = PoOutbound.Item("Line")
+    Public Property Get line()
+        line = PoOutbound.Item("line")
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get Column()
+    'Function/Sub Name           : Property Get column()
     'Overview                    : 現在の列番号を返す
     'Detailed Description        : 工事中
     'Argument
@@ -168,15 +147,15 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get Column()
-        Column = PoOutbound.Item("Column")
+    Public Property Get column()
+        column = PoOutbound.Item("column")
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get AtEndOfStream()
+    'Function/Sub Name           : Property Get atEndOfStream()
     'Overview                    : 行末の場合にTrueを返す
     'Detailed Description        : 現行末マーカーの直前にファイル ポインターがある場合は true を返し、
-    '                              そうでない場合は false を返します。
+    '                              そうでない場合は false を返す。
     'Argument
     '     なし
     'Return Value
@@ -187,15 +166,15 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get AtEndOfStream()
-        AtEndOfStream = PoOutbound.Item("AtEndOfStream")
+    Public Property Get atEndOfStream()
+        atEndOfStream = PoOutbound.Item("atEndOfStream")
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get AtEndOfLine()
+    'Function/Sub Name           : Property Get atEndOfLine()
     'Overview                    : ファイルの終端の場合にTrueを返す
     'Detailed Description        : 最後にファイル ポインターがある場合は true を返し、
-    '                              そうでない場合は false を返します。
+    '                              そうでない場合は false を返す。
     'Argument
     '     なし
     'Return Value
@@ -206,12 +185,12 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get AtEndOfLine()
-        AtEndOfLine = PoOutbound.Item("AtEndOfLine")
+    Public Property Get atEndOfLine()
+        atEndOfLine = PoOutbound.Item("atEndOfLine")
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : SetTextStream()
+    'Function/Sub Name           : setTextStream()
     'Overview                    : テキストストリームを設定する
     'Detailed Description        : 工事中
     'Argument
@@ -224,18 +203,18 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function SetTextStream( _
+    Public Function setTextStream( _
         byRef aoTextStream _
         )
         Set PoTextStream = aoTextStream
-        Set SetTextStream = Me
+        Set setTextStream = Me
         
         'Inbound、Outboundなどの情報を初期化する
         Call sub_CmBufferedReaderInitialize()
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : Read()
+    'Function/Sub Name           : read()
     'Overview                    : ファイルから指定した文字数だけ読み込む
     'Detailed Description        : func_CmBufferedReaderRead()に委譲する
     'Argument
@@ -248,14 +227,14 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function Read( _
+    Public Function read( _
         byVal alLength _
         )
-        Read = func_CmBufferedReaderRead(alLength)
+        read = func_CmBufferedReaderRead(alLength)
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : ReadLine()
+    'Function/Sub Name           : readLine()
     'Overview                    : ファイルから1行読み込む
     'Detailed Description        : func_CmBufferedReaderReadLine()に委譲する
     'Argument
@@ -268,13 +247,13 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function ReadLine( _
+    Public Function readLine( _
         )
-        ReadLine = func_CmBufferedReaderReadLine()
+        readLine = func_CmBufferedReaderReadLine()
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : ReadAll()
+    'Function/Sub Name           : readAll()
     'Overview                    : ファイル全体を読み込む
     'Detailed Description        : func_CmBufferedReaderReadAll()に委譲する
     'Argument
@@ -287,13 +266,13 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function ReadAll( _
+    Public Function readAll( _
         )
-        ReadAll = func_CmBufferedReaderReadAll()
+        readAll = func_CmBufferedReaderReadAll()
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : Skip()
+    'Function/Sub Name           : skip()
     'Overview                    : ファイルから指定した文字数だけスキップする
     'Detailed Description        : func_CmBufferedReaderRead()に委譲する
     'Argument
@@ -306,14 +285,14 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub Skip( _
+    Public Sub skip( _
         byVal alLength _
         )
         Call func_CmBufferedReaderRead(alLength)
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : SkipLine()
+    'Function/Sub Name           : skipLine()
     'Overview                    : ファイルから1行スキップする
     'Detailed Description        : func_CmBufferedReaderReadLine()に委譲する
     'Argument
@@ -326,13 +305,13 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub SkipLine( _
+    Public Sub skipLine( _
         )
         Call func_CmBufferedReaderReadLine()
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Close()
+    'Function/Sub Name           : close()
     'Overview                    : ファイル接続をクローズする
     'Detailed Description        : sub_CmBufferedReaderClose()に委譲する
     'Argument
@@ -345,7 +324,7 @@ Class clsCmBufferedReader
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub Close( _
+    Public Sub close( _
         )
         Call sub_CmBufferedReaderClose()
     End Sub
@@ -375,26 +354,26 @@ Class clsCmBufferedReader
         If PoTextStream Is Nothing Then Exit Function
         
         'バッファがなければファイルを読み取る
-        Do While PoInbound.Item("AtEndOfStream")=False And (PoBuffer.Item("Length")-PoBuffer.Item("Pointer")+1)<alLength
-        'インバウンドが読み出し可能（AtEndOfStream=False）かつバッファの未読み出し部分の長さが読み込む文字数未満の場合
+        Do While PoInbound.Item("atEndOfStream")=False And (PoBuffer.Item("length")-PoBuffer.Item("pointer")+1)<alLength
+        'インバウンドが読み出し可能（atEndOfStream=False）かつバッファの未読み出し部分の長さが読み込む文字数未満の場合
             '読込バッファサイズだけ読み取る
             Call func_CmBufferedReaderReadFile(False)
         Loop
         
         'バッファから指定した文字数取り出す
-        Dim sRet : sRet = Mid(PoBuffer.Item("Buffer"), PoBuffer.Item("Pointer"), alLength)
+        Dim sRet : sRet = Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), alLength)
         
         'ポインタを更新
-        PoBuffer.Item("Pointer") = PoBuffer.Item("Pointer")+Len(sRet)
+        PoBuffer.Item("pointer") = PoBuffer.Item("pointer")+Len(sRet)
         
         'アウトバウンドの情報を更新
-        Dim oArr : Set oArr = new_ArraySplit(Mid(PoBuffer.Item("Buffer"), 1, PoBuffer.Item("Pointer") - 1), vbLf)
+        Dim oArr : Set oArr = new_ArraySplit(Mid(PoBuffer.Item("buffer"), 1, PoBuffer.Item("pointer") - 1), vbLf)
         oArr.Reverse()
         With PoOutbound
-            .Item("Line") = oArr.Length
-            .Item("Column") = Len(oArr(0))+1
-            .Item("AtEndOfStream") = PoInbound.Item("AtEndOfStream") And (PoBuffer.Item("Pointer") > PoBuffer.Item("Length"))
-            .Item("AtEndOfLine") = .Item("AtEndOfStream") Or (StrComp(Mid(PoBuffer.Item("Buffer"), PoBuffer.Item("Pointer"), 1), vbLf, vbBinaryCompare)=0)
+            .Item("line") = oArr.length
+            .Item("column") = Len(oArr(0))+1
+            .Item("atEndOfStream") = PoInbound.Item("atEndOfStream") And (PoBuffer.Item("pointer") > PoBuffer.Item("length"))
+            .Item("atEndOfLine") = .Item("atEndOfStream") Or (StrComp(Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), 1), vbLf, vbBinaryCompare)=0)
         End With
         
         '戻り値を返す
@@ -421,45 +400,45 @@ Class clsCmBufferedReader
         If PoTextStream Is Nothing Then Exit Function
         
         'バッファがなければファイルを読み取る
-        Do While PoInbound.Item("AtEndOfStream")=False And InStr(PoBuffer.Item("Pointer"), PoBuffer.Item("Buffer"), vbLf, vbBinaryCompare)=0
-        'インバウンドが読み出し可能（AtEndOfStream=False）かつポインタのある行がバッファの最終行の場合
+        Do While PoInbound.Item("atEndOfStream")=False And InStr(PoBuffer.Item("pointer"), PoBuffer.Item("buffer"), vbLf, vbBinaryCompare)=0
+        'インバウンドが読み出し可能（atEndOfStream=False）かつポインタのある行がバッファの最終行の場合
             '読込バッファサイズだけ読み取る
             Call func_CmBufferedReaderReadFile(False)
         Loop
         
         '行末（vbLf）を検索する
-        Dim lPosRowEnd : lPosRowEnd = InStr(PoBuffer.Item("Pointer"), PoBuffer.Item("Buffer"), vbLf, vbBinaryCompare)
+        Dim lPosRowEnd : lPosRowEnd = InStr(PoBuffer.Item("pointer"), PoBuffer.Item("buffer"), vbLf, vbBinaryCompare)
         Dim sRet
         If lPosRowEnd=0 Then
         '行末（vbLf）が見つからなかった＝ファイルの終端の場合
             'ポインタ以降全ての文字を返す
-            sRet = Mid(PoBuffer.Item("Buffer"), PoBuffer.Item("Pointer"))
+            sRet = Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"))
             'ファイルの終端にポインタを更新
-            PoBuffer.Item("Pointer") = PoBuffer.Item("Length")+1
+            PoBuffer.Item("pointer") = PoBuffer.Item("length")+1
         Else
         '行末（vbLf）が見つかった＝ファイルの終端でない場合
             'ポインタから次の改行文字（vbLf）まで（改行文字を含まない）を返す
-            sRet = Mid(PoBuffer.Item("Buffer"), PoBuffer.Item("Pointer"), lPosRowEnd-PoBuffer.Item("Pointer"))
+            sRet = Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), lPosRowEnd-PoBuffer.Item("pointer"))
            '最後がvbCrの場合は削除する
            If StrComp(Right(sRet, 1), vbCr, vbBinaryCompare)=0 Then sRet = Mid(sRet, 1, Len(sRet)-1)
            '次の行の行頭（見つかった行末の位置+1）にポインタを更新
-           PoBuffer.Item("Pointer") = lPosRowEnd+1
+           PoBuffer.Item("pointer") = lPosRowEnd+1
         End If
         
         'アウトバウンドの情報を更新
         With PoOutbound
-            Dim boEof : If .Item("Line")+1>PoInbound.Item("Line") Then boEof = True Else boEof = False
-            If boEof Then
-            'ファイルの終端まで読み出した場合
+            Dim boFlg : If PoBuffer.Item("pointer")>PoBuffer.Item("length") Then boFlg = True Else boFlg = False
+            If boFlg Then
+            'ポインタがバッファの外にある場合
                 'インバウンドの状態をアウトバウンドにコピーする
                 Call sub_CmBufferedReaderCopyInboundStateToOutbound()
             Else
-            'ファイルの終端まで読み出してない場合
+            'ポインタがバッファ内にある場合
                 '次の行の行頭に更新する
-                .Item("Line") = .Item("Line")+1
-                .Item("Column") = 1
-                .Item("AtEndOfStream") = False
-                .Item("AtEndOfLine") = (StrComp(Mid(PoBuffer.Item("Buffer"), PoBuffer.Item("Pointer"), 1), vbLf, vbBinaryCompare)=0)
+                .Item("line") = .Item("line")+1
+                .Item("column") = 1
+                .Item("atEndOfStream") = False
+                .Item("atEndOfLine") = (StrComp(Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), 1), vbLf, vbBinaryCompare)=0)
             End If
         End With
         
@@ -491,7 +470,7 @@ Class clsCmBufferedReader
         'インバウンドの状態をアウトバウンドにコピーする
         Call sub_CmBufferedReaderCopyInboundStateToOutbound()
         'ポインタを更新
-        PoBuffer.Item("Pointer") = PoBuffer.Item("Length")+1
+        PoBuffer.Item("pointer") = PoBuffer.Item("length")+1
         
         '戻り値を返す
         func_CmBufferedReaderReadAll = sRet
@@ -526,8 +505,8 @@ Class clsCmBufferedReader
         End If
         'バッファの更新
         With PoBuffer
-            .Item("Buffer") = .Item("Buffer") & sText
-            .Item("Length") = Len(.Item("Buffer"))
+            .Item("buffer") = .Item("buffer") & sText
+            .Item("length") = Len(.Item("buffer"))
         End With
         'インバウンドの状態を取得する
         Call sub_CmBufferedReaderGetInboundStatus()
@@ -575,7 +554,7 @@ Class clsCmBufferedReader
         )
         With PoTextStream
             'インバウンドの状態を取得する
-            Set PoInbound = new_DictSetValues(Array("Line", .Line, "Column", .Column, "AtEndOfLine", .AtEndOfLine, "AtEndOfStream", .AtEndOfStream))
+            Set PoInbound = new_DictSetValues(Array("line", .Line, "column", .Column, "atEndOfLine", .AtEndOfLine, "atEndOfStream", .AtEndOfStream))
         End With
     End Sub
     
@@ -599,7 +578,7 @@ Class clsCmBufferedReader
             'アウトバウンドの状態にインバウンドの状態をコピーする
             Dim sKey, oOutbound
             Set oOutbound = new_Dictionary()
-            For Each sKey In Array("Line", "Column", "AtEndOfLine", "AtEndOfStream")
+            For Each sKey In Array("line", "column", "atEndOfLine", "atEndOfStream")
                 oOutbound.Add sKey, .Item(sKey)
             Next
         End With
@@ -628,7 +607,7 @@ Class clsCmBufferedReader
         'インバウンドの状態をアウトバウンドにコピーする
         Call sub_CmBufferedReaderCopyInboundStateToOutbound()
         'ポインタの初期化
-        Set PoBuffer = new_DictSetValues(Array("Pointer", 1, "Buffer", "", "Length", 0))
+        Set PoBuffer = new_DictSetValues(Array("pointer", 1, "buffer", "", "length", 0))
     End Sub
     
 End Class

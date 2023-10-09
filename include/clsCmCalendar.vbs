@@ -8,51 +8,9 @@
 '----------         ----------------------   -------------------------------------------------------
 '2023/01/04         Y.Fujii                  First edition
 '***************************************************************************************************
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCalGetNow()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 今の日付時刻で生成した同クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     日付クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/01/04         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCalGetNow( _
-    )
-    Set new_clsCalGetNow = (New clsCmCalendar).GetNow()
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCalSetDate()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 指定した日付時刻で生成した同クラスのインスタンスを返す
-'Argument
-'     avDateTime             : 設定する日付時刻
-'Return Value
-'     日付クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCalSetDate( _
-    ByVal avDateTime _
-    )
-    Set new_clsCalSetDate = (New clsCmCalendar).SetDateTime(avDateTime)
-End Function
-
 Class clsCmCalendar
     'クラス内変数、定数
-    Private PdtDateTime
-    Private PdbTimer
-    Private PsDefaultFormat
+    Private PdtDateTime, PdbTimer, PsDefaultFormat
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -92,9 +50,9 @@ Class clsCmCalendar
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get ToString()
+    'Function/Sub Name           : Property Get toString()
     'Overview                    : デフォルトの形式で表示する
-    'Detailed Description        : func_CmCalendarSetDisplayFormatAs()に委譲する
+    'Detailed Description        : func_CmCalendarDisplayAs()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -105,12 +63,12 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Default Property Get ToString()
-        ToString = func_CmCalendarSetDisplayFormatAs(PsDefaultFormat)
+    Public Default Property Get toString()
+        toString = func_CmCalendarDisplayAs(PsDefaultFormat)
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : GetNow()
+    'Function/Sub Name           : getNow()
     'Overview                    : 今の日付時刻を取得する
     'Detailed Description        : 工事中
     'Argument
@@ -123,13 +81,13 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function GetNow( _
+    Public Function getNow( _
         )
-        Set GetNow = func_CmCalendarGetNow()
+        Set getNow = func_CmCalendarGetNow()
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : SetDateTime()
+    'Function/Sub Name           : setDateTime()
     'Overview                    : 指定した日付時刻を設定する
     'Detailed Description        : 工事中
     'Argument
@@ -142,19 +100,19 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function SetDateTime( _
+    Public Function setDateTime( _
         ByVal avDateTime _
         )
-        Set SetDateTime = func_CmCalendarSetDate(avDateTime)
+        Set setDateTime = func_CmCalendarSetDate(avDateTime)
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : SetDateTimeWithFractionalSeconds()
-    'Overview                    : 指定した日付時刻およびミリ秒を設定する
+    'Function/Sub Name           : setDateTimeDetail()
+    'Overview                    : 指定した日付時刻（マイクロ秒まで）を設定する
     'Detailed Description        : 工事中
     'Argument
     '     avDateTime             : 設定する日付時刻
-    '     avTimer                : 設定するミリ秒（Timer()の値）
+    '     avTimer                : 午前0時からの経過秒数
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
@@ -163,17 +121,17 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function SetDateTimeWithFractionalSeconds( _
+    Public Function setDateTimeDetail( _
         ByVal avDateTime _
         , ByVal avTimer _
         )
-        Set SetDateTimeWithFractionalSeconds = func_CmCalendarSetDateWithFractionalSeconds(avDateTime, avTimer)
+        Set setDateTimeDetail = func_CmCalendarSetDateDetail(avDateTime, avTimer)
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : DisplayFormatAs()
+    'Function/Sub Name           : displayAs()
     'Overview                    : 日付を整形する
-    'Detailed Description        : func_CmCalendarSetDisplayFormatAs()に委譲する
+    'Detailed Description        : func_CmCalendarDisplayAs()に委譲する
     'Argument
     '     asFormat               : 表示形式
     'Return Value
@@ -184,14 +142,14 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function DisplayFormatAs( _
+    Public Function displayAs( _
         ByVal asFormat _
         )
-        DisplayFormatAs = func_CmCalendarSetDisplayFormatAs(asFormat)
+        displayAs = func_CmCalendarDisplayAs(asFormat)
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : GetSerial()
+    'Function/Sub Name           : getSerial()
     'Overview                    : シリアル値を返す
     'Detailed Description        : 工事中
     'Argument
@@ -204,13 +162,13 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/05         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function GetSerial( _
+    Public Function getSerial( _
         )
-       GetSerial = CDbl(Fix(PdtDateTime) + PdbTimer/(60*60*24))
+       getSerial = CDbl(Fix(PdtDateTime) + PdbTimer/(60*60*24))
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : DifferenceInScondsFrom()
+    'Function/Sub Name           : differenceFrom()
     'Overview                    : 差を秒数で返す
     'Detailed Description        : 工事中
     'Argument
@@ -223,14 +181,14 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/05         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function DifferenceInScondsFrom( _
+    Public Function differenceFrom( _
         byRef aoTarget _
         )
-        DifferenceInScondsFrom = CDbl((Me.GetSerial()-aoTarget.GetSerial())*60*60*24)
+        differenceFrom = CDbl((Me.getSerial()-aoTarget.getSerial())*60*60*24)
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : CompareTo()
+    'Function/Sub Name           : compareTo()
     'Overview                    : 日付の大小比較する
     'Detailed Description        : 下記比較結果を返す
     '                               0  引数と同値
@@ -246,16 +204,19 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/05         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function CompareTo( _
+    Public Function compareTo( _
         byRef aoTarget _
         )
-        Dim SerialMe : SerialMe = Me.GetSerial()
-        Dim SerialTg : SerialTg = aoTarget.GetSerial()
+        Dim SerialMe : SerialMe = Me.getSerial()
+        Dim SerialTg : SerialTg = aoTarget.getSerial()
         Dim lResult : lResult = 0
         If (SerialMe < SerialTg) Then lResult = -1
         If (SerialMe > SerialTg) Then lResult = 1
-        CompareTo = lResult
+        compareTo = lResult
     End Function
+    
+    
+    
     
     '***************************************************************************************************
     'Function/Sub Name           : func_CmCalendarGetNow()
@@ -306,12 +267,12 @@ Class clsCmCalendar
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCalendarSetDateWithFractionalSeconds()
-    'Overview                    : 指定した日付時刻とミリ秒を設定する
+    'Function/Sub Name           : func_CmCalendarSetDateDetail()
+    'Overview                    : 指定した日付時刻（マイクロ秒まで）を設定する
     'Detailed Description        : 工事中
     'Argument
     '     avDateTime             : 設定する日付時刻
-    '     avTimer                : 設定するミリ秒（Timer()の値）
+    '     avTimer                : 午前0時からの経過秒数
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
@@ -320,7 +281,7 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCalendarSetDateWithFractionalSeconds( _
+    Private Function func_CmCalendarSetDateDetail( _
         ByVal avDateTime _
         , ByVal avTimer _
         )
@@ -332,11 +293,11 @@ Class clsCmCalendar
             PdbTimer = 0
             Err.Clear
         End If
-        Set func_CmCalendarSetDateWithFractionalSeconds = Me
+        Set func_CmCalendarSetDateDetail = Me
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCalendarSetDisplayFormatAs()
+    'Function/Sub Name           : func_CmCalendarDisplayAs()
     'Overview                    : 日付を整形する
     'Detailed Description        : 下記設定値は日付の数値が入る、下記以外の値はそのまま使用する
     '                              なお、日付が8の場合に"DD"は"08"、"D"は"8"を表示する
@@ -359,7 +320,7 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCalendarSetDisplayFormatAs( _
+    Private Function func_CmCalendarDisplayAs( _
         byVal asFormat _
         )
         Dim oConversionSettings : Set oConversionSettings = new_Dictionary()
@@ -426,7 +387,7 @@ Class clsCmCalendar
             Loop
             
         End With
-        func_CmCalendarSetDisplayFormatAs = sResult
+        func_CmCalendarDisplayAs = sResult
         Set oConversionSettings = Nothing
     End Function
     

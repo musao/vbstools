@@ -288,7 +288,7 @@ Private Sub sub_BackupFileProcForOneFile( _
         End If
         
         'バックアップファイル名の作成
-        Dim sNewDate : sNewDate = new_clsCmDate().DisplayFormatAs("YYYYMMDD")
+        Dim sNewDate : sNewDate = new_clsCmDate().DisplaytAs("YYYYMMDD")
 '        Dim sNewDate : sNewDate = func_CM_GetDateAsYYYYMMDD(Now())
         Dim sNewSeq : sNewSeq = ""
         If (StrComp(sNewDate, .Item("BackupDate"), vbBinaryCompare)=0) Then

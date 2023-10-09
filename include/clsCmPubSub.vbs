@@ -1,6 +1,6 @@
 '***************************************************************************************************
 'FILENAME                    : clsCmPubSub.vbs
-'Overview                    : 出版-購読型（Publish/subscribe）処理を行うクラス
+'Overview                    : 出版-購読型（Publish/Subscribe）処理を行うクラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
 'Histroy
@@ -8,26 +8,6 @@
 '----------         ----------------------   -------------------------------------------------------
 '2022/12/02         Y.Fujii                  First edition
 '***************************************************************************************************
-
-'***************************************************************************************************
-'Function/Sub Name           : new_clsCmPubSub()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 同クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_clsCmPubSub( _
-    )
-    Set new_clsCmPubSub = (New clsCmPubSub)
-End Function
-
 Class clsCmPubSub
     'クラス内変数、定数
     Private PoTopics
@@ -69,7 +49,7 @@ Class clsCmPubSub
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Publish()
+    'Function/Sub Name           : publish()
     'Overview                    : 出版
     'Detailed Description        : 工事中
     'Argument
@@ -83,7 +63,7 @@ Class clsCmPubSub
     '----------         ----------------------   -------------------------------------------------------
     '2022/12/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub Publish( _
+    Public Sub publish( _
         ByVal asTopic _
         , ByRef avArgs _
         )
@@ -92,7 +72,7 @@ Class clsCmPubSub
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Subscribe()
+    'Function/Sub Name           : subscribe()
     'Overview                    : 購読
     'Detailed Description        : 工事中
     'Argument
@@ -106,7 +86,7 @@ Class clsCmPubSub
     '----------         ----------------------   -------------------------------------------------------
     '2022/12/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub Subscribe( _
+    Public Sub subscribe( _
         ByVal asTopic _
         , ByRef aoCbFunc _
         )
@@ -115,7 +95,7 @@ Class clsCmPubSub
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Subscribe()
+    'Function/Sub Name           : unsubscribe()
     'Overview                    : 購読解除
     'Detailed Description        : 工事中
     'Argument
@@ -128,7 +108,7 @@ Class clsCmPubSub
     '----------         ----------------------   -------------------------------------------------------
     '2022/12/02         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub Unsubscribe( _
+    Public Sub unsubscribe( _
         ByVal asTopic _
         )
         If PoTopics.Exists(asTopic) Then PoTopics.Remove asTopic
