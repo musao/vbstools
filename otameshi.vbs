@@ -24,6 +24,12 @@ Call sub_Include("clsCmCalendar.vbs")
 Call sub_Include("clsCmBufferedWriter.vbs")
 Call sub_Include("clsCmArray.vbs")
 
+'Test func_CM_UtilGetIpaddress
+inputbox "", "", func_CM_ToString(func_CM_UtilGetIpaddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+dim s : Set s = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress())
+inputbox "", "", func_CM_ToString(s)                                            '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+                                                                                '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+inputbox "", "", func_CM_ToString( new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress()).Items()(0) )
 
 ''Test cf_tryCatch()
 'Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
@@ -345,11 +351,11 @@ dim arr5
 'Call msgbox( func_CM_ToString(arr5.Slice(0,2)) )               '[1]
 
 
-'Test sort()
-Set arr5 = new_ArrWith(Array(5,2,9,6,4,8,7,3,0,1))
-Call msgbox( func_CM_ToString(arr5) )
-Call msgbox( func_CM_ToString(arr5.sort(True)) )
-Call msgbox( func_CM_ToString(arr5.sort(False)) )
+''Test sort()
+'Set arr5 = new_ArrWith(Array(5,2,9,6,4,8,7,3,0,1))
+'Call msgbox( func_CM_ToString(arr5) )
+'Call msgbox( func_CM_ToString(arr5.sort(True)) )
+'Call msgbox( func_CM_ToString(arr5.sort(False)) )
 
 ''Test sortUsing()
 'private function ArraySortTest(x,y)
@@ -369,7 +375,6 @@ Call msgbox( func_CM_ToString(arr5.sort(False)) )
 'Call msgbox( func_CM_ToString(arr5) )                          '[1,5,6,7,8]
 'Call msgbox( func_CM_ToString(arr5.splice(1,0,Array(2,3))) )   '[]
 'Call msgbox( func_CM_ToString(arr5) )                          '[1,2,3,5,6,7,8]
-
 
 wscript.quit
 

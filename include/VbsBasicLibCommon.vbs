@@ -2746,10 +2746,6 @@ Private Function func_CM_UtilGenerateRandomString( _
           , Array( Array("弌", "滌"), Array("漾", "熙") ) _
           )
 
-'          , Array( Array("、", "×"), Array("÷", "〓"), Array("∈", "∩"), Array("∧", "∃"), Array("∠", "∬"), Array("Å", "¶"), Array("◯", "◯") ) _
-'          , Array( Array("ァ", "ミ"), Array("ム", "ヶ") ) _
-'          , Array( Array("α", "ω"), Array("а", "н"), Array("о", "я") ) _
-
     Dim lType : lType = alType
     Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
     Dim oChars : Set oChars = new_Arr()
@@ -2815,7 +2811,10 @@ Private Sub sub_CM_UtilLogger( _
     byRef avParams _
     , byRef aoWriter _
     )
-    Dim oCont : Set oCont = new_ArrWith(Array(new_Now()))
+    Dim oCont, sIp
+    sIp = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress()).Items()(0).Item("v4")
+    Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
+    
     With aoWriter
         .Write(oCont.Concat(avParams).JoinVbs(vbTab))
         .newLine()
@@ -2904,4 +2903,74 @@ Private Function func_CM_UtilStoringArguments( _
     Set oEle = Nothing
     Set oTemp = Nothing
     Set oRet = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilGetIpaddress()
+'Overview                    : 自身のIPアドレスを取得する
+'Detailed Description        : IPアドレスを格納したオブジェクトを返す
+'Argument
+'     なし
+'Return Value
+'     IPアドレスを格納したオブジェクト
+'                              内容は以下のとおり
+'                               Key             Value                   例
+'                               --------------  ----------------------  ----------------------------
+'                               Adapter名       以下のオブジェクト      -
+'                              
+'                              IP Addressを格納したオブジェクト
+'                               Key             Value                   例
+'                               --------------  ----------------------  ----------------------------
+'                               "v4"            IP Address(v4)          192.168.11.52
+'                               "v6"            IP Address(v6)          fe80::ba87:1e93:59ab:28f7%18
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/10         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilGetIpaddress( _
+    )
+    Dim sMyComp, oAdapter, oAddress, oRet, oTemp
+    
+    sMyComp = "."
+    Set oRet = new_Dic()
+    For Each oAdapter in GetObject("winmgmts:\\"&sMyComp&"\root\cimv2").ExecQuery("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
+         Set oTemp = new_Dic()
+         For Each oAddress in oAdapter.IPAddress
+             If new_ArrSplit(oAddress, ".").length=4 Then
+             'IPv4
+                 oTemp.Add "v4", oAddress
+             Else
+             'IPv6
+                 oTemp.Add "v6", oAddress
+             End If
+         Next
+         oRet.Add oAdapter.Caption, oTemp
+    Next
+    Set func_CM_UtilGetIpaddress = oRet
+    
+    Set oAddress = Nothing
+    Set oAdapter = Nothing
+    Set oTemp = Nothing
+    Set oRet = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilGetComputerName()
+'Overview                    : 自身のコンピュータ名を取得する
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     自身のコンピュータ名
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/10         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilGetComputerName( _
+    )
+    func_CM_UtilGetComputerName = CreateObject("WScript.Network").ComputerName
 End Function
