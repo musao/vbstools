@@ -2,27 +2,28 @@ Option Explicit
 
 
 '定数
-Private Const Cs_FOLDER_INCLUDE = "include"
+Private Const Cs_FOLDER_LIB = "lib"
 Private Const Cs_FOLDER_TEMP = "tmp"
 
-'Include用関数定義
-Sub sub_Include( _
+'import定義
+Sub sub_import( _
     byVal asIncludeFileName _
     )
     With CreateObject("Scripting.FileSystemObject")
         Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
         Dim sIncludeFilePath
-        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_INCLUDE)
+        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_LIB)
         sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
         ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
     End With
 End Sub
-'Include
-Call sub_Include("VbsBasicLibCommon.vbs")
-Call sub_Include("clsCompareExcel.vbs")
-Call sub_Include("clsCmCalendar.vbs")
-Call sub_Include("clsCmBufferedWriter.vbs")
-Call sub_Include("clsCmArray.vbs")
+'import
+Call sub_import("clsCmArray.vbs")
+Call sub_import("clsCmBufferedWriter.vbs")
+Call sub_import("clsCmCalendar.vbs")
+Call sub_import("clsCmPubSub.vbs")
+Call sub_import("clsCompareExcel.vbs")
+Call sub_import("libCom.vbs")
 
 'Test func_CM_UtilGetIpaddress
 inputbox "", "", func_CM_ToString(func_CM_UtilGetIpaddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
@@ -637,22 +638,22 @@ wscript.quit
 
 '定数
 
-'Include用関数定義
-Sub sub_Include( _
+'import定義
+Sub sub_import( _
     byVal asIncludeFileName _
     )
     With CreateObject("Scripting.FileSystemObject")
         Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
         Dim sIncludeFilePath
-        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_INCLUDE)
+        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_LIB)
         sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
         ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
     End With
 End Sub
-'Include
-Call sub_Include("VbsBasicLibCommon.vbs")
-Call sub_Include("clsCompareExcel.vbs")
-Call sub_Include("clsCmCalendar.vbs")
+'import
+Call sub_import("libCom.vbs")
+Call sub_import("clsCompareExcel.vbs")
+Call sub_import("clsCmCalendar.vbs")
 
 
 call msgbox(new_Now().displayAs("M/d/yyyy h:m:s.000000"))
@@ -721,16 +722,16 @@ Next
 wscript.quit
 
 
-Call Msgbox(CreateObject("Scripting.FileSystemObject").GetFile("C:\Users\89585\Documents\dev\vbs\include\VbsBasicLibCommon.vbs").DateLastModified)
-Call Msgbox(CreateObject("Scripting.FileSystemObject").GetFile("C:\Users\89585\Documents\dev\vbs\include\VbsBasicLibCommon.vbs").Item(1))
+Call Msgbox(CreateObject("Scripting.FileSystemObject").GetFile("C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs").DateLastModified)
+Call Msgbox(CreateObject("Scripting.FileSystemObject").GetFile("C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs").Item(1))
 
 wscript.quit
 
 
 Dim sPath(3)
-sPath(1) = "C:\Users\89585\Documents\dev\vbs\include\VbsBasicLibCommon.vbs"
-sPath(2) = "C:\Users\89585\Documents\dev\vbs\include"
-sPath(3) = "C:\Users\89585\Documents\dev\vbs\include.abc"
+sPath(1) = "C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs"
+sPath(2) = "C:\Users\89585\Documents\dev\vbs\lib"
+sPath(3) = "C:\Users\89585\Documents\dev\vbs\lib.abc"
 
 'Dim lCnt
 For lCnt=1 To Ubound(sPath)

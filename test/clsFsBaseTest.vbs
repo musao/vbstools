@@ -15,23 +15,23 @@
 Option Explicit
 
 '定数
-Private Const Cs_FOLDER_INCLUDE = "include"
+Private Const Cs_FOLDER_LIB = "lib"
 Private Const Cs_UTLIB_FILE = "VbsUtLib.vbs"
 Private Const Cs_UTAST_FILE = "clsUtAssistant.vbs"
-Private Const Cs_COMMON_FILE = "VbsBasicLibCommon.vbs"
+Private Const Cs_COMMON_FILE = "libCom.vbs"
 Private Const Cs_TEST_FILE = "clsFsBase.vbs"
 
 With CreateObject("Scripting.FileSystemObject")
     '単体テスト用ライブラリ読み込み
-    Dim sIncludeFolderPath : sIncludeFolderPath = .BuildPath(.GetParentFolderName(WScript.ScriptFullName), Cs_FOLDER_INCLUDE)
+    Dim sIncludeFolderPath : sIncludeFolderPath = .BuildPath(.GetParentFolderName(WScript.ScriptFullName), Cs_FOLDER_LIB)
     ExecuteGlobal .OpenTextfile(.BuildPath(sIncludeFolderPath, Cs_UTLIB_FILE)).ReadAll
     ExecuteGlobal .OpenTextfile(.BuildPath(sIncludeFolderPath, Cs_UTAST_FILE)).ReadAll
     '共通ライブラリ読み込み
-    sIncludeFolderPath = .BuildPath(.GetParentFolderName(.GetParentFolderName(WScript.ScriptFullName)), Cs_FOLDER_INCLUDE)
+    sIncludeFolderPath = .BuildPath(.GetParentFolderName(.GetParentFolderName(WScript.ScriptFullName)), Cs_FOLDER_LIB)
     ExecuteGlobal .OpenTextfile(.BuildPath(sIncludeFolderPath, Cs_COMMON_FILE)).ReadAll
     '単体テスト対象ソース読み込み
     Dim sParentFolderPath : sParentFolderPath = .GetParentFolderName(.GetParentFolderName(WScript.ScriptFullName))
-    sIncludeFolderPath = .BuildPath(sParentFolderPath, Cs_FOLDER_INCLUDE)
+    sIncludeFolderPath = .BuildPath(sParentFolderPath, Cs_FOLDER_LIB)
     ExecuteGlobal .OpenTextfile(.BuildPath(sIncludeFolderPath, Cs_TEST_FILE)).ReadAll
 End With
 

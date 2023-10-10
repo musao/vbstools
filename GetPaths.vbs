@@ -15,28 +15,28 @@
 Option Explicit
 
 '定数
-Private Const Cs_FOLDER_INCLUDE = "include"
+Private Const Cs_FOLDER_LIB = "lib"
 Private PoWriter, PoPubSub
 
-'Include用関数定義
-Sub sub_Include( _
+'import定義
+Sub sub_import( _
     byVal asIncludeFileName _
     )
     With CreateObject("Scripting.FileSystemObject")
         Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
         Dim sIncludeFilePath
-        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_INCLUDE)
+        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_LIB)
         sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
         ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
     End With
 End Sub
-'Include
-Call sub_Include("clsCmArray.vbs")
-Call sub_Include("clsCmBufferedWriter.vbs")
-Call sub_Include("clsCmCalendar.vbs")
-Call sub_Include("clsCmPubSub.vbs")
-Call sub_Include("clsCompareExcel.vbs")
-Call sub_Include("VbsBasicLibCommon.vbs")
+'import
+Call sub_import("clsCmArray.vbs")
+Call sub_import("clsCmBufferedWriter.vbs")
+Call sub_import("clsCmCalendar.vbs")
+Call sub_import("clsCmPubSub.vbs")
+Call sub_import("clsCompareExcel.vbs")
+Call sub_import("libCom.vbs")
 
 'メイン関数実行
 Call Main()

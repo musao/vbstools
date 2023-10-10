@@ -1,5 +1,5 @@
 '***************************************************************************************************
-'FILENAME                    : VbsBasicLibCommon.vbs
+'FILENAME                    : libCom.vbs
 'Overview                    : ã§í ä÷êîÉâÉCÉuÉâÉä
 'Detailed Description        : çHéñíÜ
 '---------------------------------------------------------------------------------------------------
@@ -2816,7 +2816,7 @@ Private Sub sub_CM_UtilLogger( _
     Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
     
     With aoWriter
-        .Write(oCont.Concat(avParams).JoinVbs(vbTab))
+        .Write(oCont.Concat(avParams).joinVbs(vbTab))
         .newLine()
     End With
     Set oCont = Nothing
