@@ -153,7 +153,7 @@ Class clsCmBufferedWriter
     '2023/08/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get textStream()
-        Set textStream = aoTextStream
+        Set textStream = PoTextStream
     End Property
     
     '***************************************************************************************************
