@@ -26,6 +26,10 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
 
+msgbox Ubound(Split("abc", ":", -1, vbBinaryCompare))
+
+wscript.quit
+
 Dim a : Set a = new_Func("function(a,b){a+b"&vbNewLine&"a*b}")
 msgbox "a(1,2) = " & a(1,2)
 

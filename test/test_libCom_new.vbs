@@ -203,7 +203,7 @@ Sub Test_new_ArrWith
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
-    AssertEqual 3, a.Length
+    AssertEqual Ubound(ev)+1, a.Length
     AssertEqual ev(0), a(0)
     AssertSame ev(1), a(1)
     AssertEqual ev(2), a(2)
@@ -219,7 +219,7 @@ Sub Test_new_ArrSplit
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
-    AssertEqual 3, a.Length
+    AssertEqual Ubound(ev)+1, a.Length
     AssertEqual ev(0), a(0)
     AssertEqual ev(1), a(1)
     AssertEqual ev(2), a(2)
@@ -227,20 +227,210 @@ End Sub
 
 '###################################################################################################
 'new_Func()
-Sub Test_new_Func_Normal_Return
-    Dim e : e = 2
-    Dim a : Set a = new_Func("function (a,b) {return b}")
+Sub Test_new_Func_Normal_1Line_0Return
+    Dim code :  code = "function () {dim x}"
+    Dim e : e = Empty
+    Dim a : Set a = new_Func(code)
     
-    AssertEqual e, a(1,e)
+    AssertEqual e, a()
 End Sub
-'Sub Test_new_Func_Normal_NoReturn
-'    Dim e : e = Empty
-'    Dim a : Set a = new_Func("function(a,b){a+b"&vbNewLine&"a*b}")
-'    
-'    AssertEqual VarType(Getref("Test_new_Func_Normal_Return")), VarType(a)
-'    AssertEqual TypeName(Getref("Test_new_Func_Normal_Return")), TypeName(a)
-'    AssertEqual e, a(1,2)
-'End Sub
+Sub Test_new_Func_Normal_1Line_1Return
+    Dim code :  code = "function (a){return a}"
+    Dim e : e = 2
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(e)
+End Sub
+Sub Test_new_Func_Normal_nLine_0Return
+    Dim code :  code = "function (a,b) {dim y:y= _:a+b:y=a* _:b}"
+    Dim e : e = Empty
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(3,6)
+End Sub
+Sub Test_new_Func_Normal_nLine_1Return
+    Dim code :  code = "function (a,b) {dim y:y= _:a+b:return y* _:b}"
+    Dim e : e = 80
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(2,8)
+End Sub
+Sub Test_new_Func_Normal_nLine_nReturn
+    Dim code :  code = "function (a,b){ if a>b Then  :return b  :else:return a :  end if}"
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual 2, a(2,3)
+    AssertEqual 5, a(5,9)
+End Sub
+Sub Test_new_Func_Arrow_1Line_0Return
+    Dim code :  code = "=> vbNullString"
+    Dim e : e = vbNullString
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a()
+End Sub
+Sub Test_new_Func_Arrow_1Line_1Return
+    Dim code :  code = "a=>return _:  a^2"
+    Dim e : e = 9^2
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(9)
+End Sub
+Sub Test_new_Func_Arrow_nLine_0Return
+    Dim code :  code = "(a,b)=>{dim z:z=a^b}"
+    Dim e : e = Empty
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(1,2)
+End Sub
+Sub Test_new_Func_Arrow_nLine_1Return
+    Dim code :  code = "(a,b)=>{dim z:z=a^b:return z+1}"
+    Dim e : e = 10
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(3,2)
+End Sub
+Sub Test_new_Func_Arrow_nLine_nReturn
+    Dim code :  code = "(a,b)=>{if a>b Then  :return b  :else:return a :  end if}"
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual 2, a(2,3)
+    AssertEqual 5, a(5,9)
+End Sub
+
+'###################################################################################################
+'func_FuncAnalyze()
+Sub Test_func_FuncAnalyze_1Line
+    Dim code : code = "abc"
+    Dim ev : ev = Array("abc")
+    Dim a : a = func_FuncAnalyze(code)
+    
+    AssertEqual Ubound(ev), Ubound(a)
+    AssertEqual ev(0), a(0)
+End Sub
+Sub Test_func_FuncAnalyze_1Line_UnderLine
+    Dim code : code = " a_b c_d_ "
+    Dim ev : ev = Array("a_b c_d_")
+    Dim a : a = func_FuncAnalyze(code)
+    
+    AssertEqual Ubound(ev), Ubound(a)
+    AssertEqual ev(0), a(0)
+End Sub
+Sub Test_func_FuncAnalyze_nLine
+    Dim code : code = "a b:c_: d"
+    Dim ev : ev = Array("a b","c_","d")
+    Dim a : a = func_FuncAnalyze(code)
+    
+    AssertEqual Ubound(ev), Ubound(a)
+    AssertEqual ev(0), a(0)
+    AssertEqual ev(1), a(1)
+    AssertEqual ev(2), a(2)
+End Sub
+Sub Test_func_FuncAnalyze_nLine_UnderLine
+    Dim code : code = "a: b _:c d: e "
+    Dim ev : ev = Array("a","b c d", "e")
+    Dim a : a = func_FuncAnalyze(code)
+    
+    AssertEqual Ubound(ev), Ubound(a)
+    AssertEqual ev(0), a(0)
+    AssertEqual ev(1), a(1)
+    AssertEqual ev(2), a(2)
+End Sub
+
+'###################################################################################################
+'func_FuncRewriteReturnPhrase()
+Sub Test_func_FuncRewriteReturnPhrase_Normal_1Line_0Return
+    Dim fn : fn = "fn_normal"
+    Dim flg : flg = False
+    Dim code : code = Array("abc")
+    Dim e : e = "abc"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Normal_1Line_1Return
+    Dim fn : fn = "fn_normal"
+    Dim flg : flg = False
+    Dim code : code = Array("ab return c")
+    Dim e : e = "ab  cf_bind fn_normal, (c)"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Normal_nLine_0Return
+    Dim fn : fn = "fn_normal"
+    Dim flg : flg = False
+    Dim code : code = Array("a bC", "dEf", "Gh i")
+    Dim e : e = "a bC:dEf:Gh i"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Normal_nLine_1Return
+    Dim fn : fn = "fn_normal"
+    Dim flg : flg = False
+    Dim code : code = Array("aB c", "D ef", "g return h I")
+    Dim e : e = "aB c:D ef:g  cf_bind fn_normal, (h I)"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Normal_nLine_nReturn
+    Dim fn : fn = "fn_normal"
+    Dim flg : flg = False
+    Dim code : code = Array("Abc", "d return eF", "return g H i")
+    Dim e : e = "Abc:d  cf_bind fn_normal, (eF): cf_bind fn_normal, (g H i)"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Arrow_1Line_0Return
+    Dim fn : fn = "fn_arrow"
+    Dim flg : flg = True
+    Dim code : code = Array("abc")
+    Dim e : e = "cf_bind fn_arrow, (abc)"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Arrow_1Line_1Return
+    Dim fn : fn = "fn_arrow"
+    Dim flg : flg = True
+    Dim code : code = Array("a B return c")
+    Dim e : e = "a B  cf_bind fn_arrow, (c)"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Arrow_nLine_0Return
+    Dim fn : fn = "fn_arrow"
+    Dim flg : flg = True
+    Dim code : code = Array("a b  c", "DEF", "G h  I")
+    Dim e : e = "a b  c:DEF:G h  I"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Arrow_nLine_1Return
+    Dim fn : fn = "fn_arrow"
+    Dim flg : flg = True
+    Dim code : code = Array("return a Bc", "De f", "g  h I")
+    Dim e : e = " cf_bind fn_arrow, (a Bc):De f:g  h I"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+Sub Test_func_FuncRewriteReturnPhrase_Arrow_nLine_nReturn
+    Dim fn : fn = "fn_arrow"
+    Dim flg : flg = True
+    Dim code : code = Array("AB return c", "D return e f", "G   HI")
+    Dim e : e = "AB  cf_bind fn_arrow, (c):D  cf_bind fn_arrow, (e f):G   HI"
+    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    
+    AssertEqual e, a
+End Sub
+
+
 
 ' Local Variables:
 ' mode: Visual-Basic

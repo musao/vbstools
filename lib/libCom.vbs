@@ -471,7 +471,10 @@ Private Function new_Func( _
     byVal asSoruceCode _
     )
     '生成する関数のソースコードの改行を:に変換
-    Dim sSoruceCode : sSoruceCode = Replace(asSoruceCode, vbNewLine, ":")
+    Dim sSoruceCode
+    sSoruceCode = Replace(asSoruceCode, vbCrLf, ":")
+    sSoruceCode = Replace(sSoruceCode, vbLf, ":")
+    sSoruceCode = Replace(sSoruceCode, vbCr, ":")
     
     '関数名（仮名）を作る
     Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
@@ -479,13 +482,13 @@ Private Function new_Func( _
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
     sPattern = "function\s?\((.*)\)\s?{(.*)}"
-    Set oRegExp = new_Re(sPattern, "gm")
+    Set oRegExp = new_Re(sPattern, "igm")
     If oRegExp.Test(sSoruceCode) Then
         sArgStr = oRegExp.Replace(sSoruceCode, "$1")
         sProcStr = oRegExp.Replace(sSoruceCode, "$2")
         
-        '"return"句があれば関数名で書き換える
-        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
+        'return句があれば関数名で書き換える
+        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, False, func_FuncAnalyze(sProcStr) )
         
         '関数の生成
         Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
@@ -495,27 +498,19 @@ Private Function new_Func( _
     
     '生成する関数のソースコードの様式が「2.Arrow関数」の場合
     sPattern = "(.*)\s?=>\s?(.*)\s?"
-    Set oRegExp = new_Re(sPattern, "gm")
+    Set oRegExp = new_Re(sPattern, "igm")
     If oRegExp.Test(sSoruceCode) Then
         sArgStr = oRegExp.Replace(sSoruceCode, "$1")
         sProcStr = oRegExp.Replace(sSoruceCode, "$2")
         
         'それぞれ前後の括弧があれば除去
         sPattern = "\(\s?(.*)\s?\)"
-        Set oRegExp = new_Re(sPattern, "gm")
-        sArgStr = oRegExp.Replace(sArgStr, "$1")
+        sArgStr = new_Re(sPattern, "igm").Replace(sArgStr, "$1")
         sPattern = "{\s?(.*)\s?}"
-        Set oRegExp = new_Re(sPattern, "gm")
-        sProcStr = oRegExp.Replace(sProcStr, "$1")
+        sProcStr = new_Re(sPattern, "igm").Replace(sProcStr, "$1")
         
-        If Instr(sProcStr, ":") > 0 Then
-        '複数行ある場合
-            '"return"句があれば関数名で書き換える
-            sProcStr = func_FuncRewriteReturnPhrase(sFuncName, sProcStr)
-        Else
-        '1行だけの場合
-            sProcStr = "Call cf_bind(" & sFuncName & ", (" & sProcStr & ") )"
-        End If
+        'return句があれば関数名で書き換える
+        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, True, func_FuncAnalyze(sProcStr) )
         
         '関数の生成
         Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
@@ -524,12 +519,50 @@ Private Function new_Func( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_FuncRewriteReturnPhrase()
-'Overview                    : "return"句を書き換える
+'Function/Sub Name           : func_FuncAnalyze()
+'Overview                    : ソースコードを解釈する
 'Detailed Description        : new_Func()から使用する
+'                              _（アンダーライン）は行を結合する
+'Argument
+'     asCode                 : ソースコード
+'Return Value
+'     ソースコードを行ごとに分解した配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FuncAnalyze( _
+    byVal asCode _
+    )
+    Dim sRow, sPtn, vCode, sTemp
+    sTemp= ""
+    For Each sRow In Split(asCode, ":", -1, vbBinaryCompare)
+        If Len(Trim(sRow))>0 Then
+            sPtn = "^(.*\s+)_\s{0,}$"
+            If new_Re(sPtn, "ig").Test(sRow) Then
+                sTemp = sTemp & Trim(new_Re(sPtn, "ig").Replace(sRow, "$1"))
+            Else
+                sRow = sTemp & " " & Trim(sRow)
+                sTemp = ""
+                cf_push vCode, Trim(sRow)
+            End If
+        End If
+    Next
+    
+    func_FuncAnalyze = vCode
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FuncRewriteReturnPhrase()
+'Overview                    : return句を書き換える
+'Detailed Description        : new_Func()から使用する
+'                              Arrow関数で1行の場合はその行全体をreturnする
 'Argument
 '     asFuncName             : 関数名
-'     asProcStr              : ソースの処理内容部分のソースコード
+'     aboArrowFlg            : Arrow関数か否かのフラグ
+'     avCode                 : ソースコードを行ごとに分解した配列
 'Return Value
 '     書き換えたソースの処理内容部分のソースコード
 '---------------------------------------------------------------------------------------------------
@@ -540,14 +573,36 @@ End Function
 '***************************************************************************************************
 Private Function func_FuncRewriteReturnPhrase( _
     byVal asFuncName _
-    , byVal asProcStr _
+    , byVal aboArrowFlg _
+    , byRef avCode _
     )
-    Dim oRegExp : Set oRegExp = new_Re("(.*)return\s+(.*)", "gm")
-    Dim sRet : sRet = asProcStr
-    If oRegExp.Test(sRet) Then
-        sRet = oRegExp.Replace(sRet, "$1" & vbNewLine & "Call cf_bind(" & asFuncName & ", $2)")
+    Dim sPtnRet : sPtnRet = "^(.*\s+)?return\s+(.*)\s{0,}$"
+    
+    If Ubound(avCode)=0 And aboArrowFlg=True Then
+    'Arrow関数で1行の場合
+        Dim sCode : sCode = avCode(0)
+        If new_Re(sPtnRet, "ig").Test(sCode) Then
+        'return句がある場合
+            func_FuncRewriteReturnPhrase = new_Re(sPtnRet, "ig").Replace(sCode, "$1 cf_bind " & asFuncName & ", ($2)")
+        Else
+        'return句がない場合
+            func_FuncRewriteReturnPhrase = "cf_bind " & asFuncName & ", (" & sCode & ")"
+        End If
+        Exit Function
     End If
+    
+    Dim lCnt, sPtn, sRow
+    For lCnt=0 To Ubound(avCode)
+        sRow = avCode(lCnt)
+        If new_Re(sPtnRet, "ig").Test(sRow) Then
+            avCode(lCnt) = new_Re(sPtnRet, "ig").Replace(sRow, "$1 cf_bind " & asFuncName & ", ($2)")
+        End If
+    Next
+    
+    Dim sRet : sRet = ""
+    If func_CM_ArrayIsAvailable(avCode) Then sRet = Join(avCode, ":")
     func_FuncRewriteReturnPhrase = sRet
+    
 End Function
 
 '***************************************************************************************************
@@ -583,39 +638,6 @@ Private Function func_FuncGenerate( _
     ExecuteGlobal sCode
     Set func_FuncGenerate = Getref(asFuncName)
 End Function
-
-
-'###################################################################################################
-'オフィス全般
-'###################################################################################################
-
-'***************************************************************************************************
-'Function/Sub Name           : sub_CM_OfficeUnprotect()
-'Overview                    : 文書の保護を解除する
-'Detailed Description        : エラーは無視する
-'                              引数のパスワードを指定しない場合は、呼び出し側でvbNullStringを設定すること
-'Argument
-'     aoOffice               : オフィスのインスタンス、エクセルの場合はワークブック
-'     asPassword             : パスワード
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_OfficeUnprotect( _
-    byRef aoOffice _
-    , byVal asPassword _
-    )
-    On Error Resume Next
-    aoOffice.Unprotect(asPassword)
-'    If Err.Number Then
-'        Err.Clear
-'    End If
-End Sub
-
 
 
 '###################################################################################################
@@ -731,13 +753,15 @@ Private Function func_CM_FsDeleteFile( _
     byVal asPath _
     ) 
     If Not func_CM_FsFileExists(asPath) Then func_CM_FsDeleteFile = False
-    On Error Resume Next
-    CreateObject("Scripting.FileSystemObject").DeleteFile(asPath)
-    func_CM_FsDeleteFile = True
-    If Err.Number Then
-        Err.Clear
-        func_CM_FsDeleteFile = False
-    End If
+    func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(CreateObject("Scripting.FileSystemObject"), asPath), Empty, Empty).Item("Result")
+    
+'    On Error Resume Next
+'    CreateObject("Scripting.FileSystemObject").DeleteFile(asPath)
+'    func_CM_FsDeleteFile = True
+'    If Err.Number Then
+'        Err.Clear
+'        func_CM_FsDeleteFile = False
+'    End If
 End Function
 
 '***************************************************************************************************
@@ -1389,7 +1413,6 @@ Private Sub sub_CM_FsWriteFile( _
     On Error Resume Next
     'ファイルを開く（存在しない場合は作成する）
     With func_CM_FsOpenTextFile(asPath, 2, True, -2)
-'    With CreateObject("Scripting.FileSystemObject").OpenTextFile(asPath, 2, True)
         Call .WriteLine(asCont)
         Call .Close
     End With
