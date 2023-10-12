@@ -481,7 +481,7 @@ Private Function new_Func( _
     
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
-    sPattern = "function\s?\((.*)\)\s?{(.*)}"
+    sPattern = "function\s*\((.*)\)\s*{(.*)}"
     Set oRegExp = new_Re(sPattern, "igm")
     If oRegExp.Test(sSoruceCode) Then
         sArgStr = oRegExp.Replace(sSoruceCode, "$1")
@@ -497,7 +497,7 @@ Private Function new_Func( _
     End If
     
     '生成する関数のソースコードの様式が「2.Arrow関数」の場合
-    sPattern = "(.*)\s?=>\s?(.*)\s?"
+    sPattern = "(.*)\s*=>\s*(.*)\s*"
     Set oRegExp = new_Re(sPattern, "igm")
     If oRegExp.Test(sSoruceCode) Then
         sArgStr = oRegExp.Replace(sSoruceCode, "$1")
@@ -540,7 +540,7 @@ Private Function func_FuncAnalyze( _
     sTemp= ""
     For Each sRow In Split(asCode, ":", -1, vbBinaryCompare)
         If Len(Trim(sRow))>0 Then
-            sPtn = "^(.*\s+)_\s{0,}$"
+            sPtn = "^(.*)\s_\s*$"
             If new_Re(sPtn, "ig").Test(sRow) Then
                 sTemp = sTemp & Trim(new_Re(sPtn, "ig").Replace(sRow, "$1"))
             Else

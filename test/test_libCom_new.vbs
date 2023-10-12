@@ -249,7 +249,7 @@ Sub Test_new_Func_Normal_nLine_0Return
     AssertEqual e, a(3,6)
 End Sub
 Sub Test_new_Func_Normal_nLine_1Return
-    Dim code :  code = "function (a,b) {dim y:y= _:a+b:return y* _:b}"
+    Dim code :  code = "function (a,b)  {dim y:y= _:a+b:return y* _:b}"
     Dim e : e = 80
     Dim a : Set a = new_Func(code)
     
@@ -270,21 +270,21 @@ Sub Test_new_Func_Arrow_1Line_0Return
     AssertEqual e, a()
 End Sub
 Sub Test_new_Func_Arrow_1Line_1Return
-    Dim code :  code = "a=>return _:  a^2"
+    Dim code :  code = "a=>  return _:  a^2"
     Dim e : e = 9^2
     Dim a : Set a = new_Func(code)
     
     AssertEqual e, a(9)
 End Sub
 Sub Test_new_Func_Arrow_nLine_0Return
-    Dim code :  code = "(a,b)=>{dim z:z=a^b}"
+    Dim code :  code = "(a,b)  =>{dim z:z=a^b}"
     Dim e : e = Empty
     Dim a : Set a = new_Func(code)
     
     AssertEqual e, a(1,2)
 End Sub
 Sub Test_new_Func_Arrow_nLine_1Return
-    Dim code :  code = "(a,b)=>{dim z:z=a^b:return z+1}"
+    Dim code :  code = "(a,b) => {dim z:z=a^b:return z+1}"
     Dim e : e = 10
     Dim a : Set a = new_Func(code)
     
