@@ -1269,7 +1269,7 @@ Class clsCmArray
     Private Function func_CmArrayConvArray( _
         aboOrder _
         )
-        Dim lIdx, vArr, vRet, lStt, lEnd, lStep
+        Dim lIdx, vArr, vRet(), lStt, lEnd, lStep
 
         '”z—ñ‚Ì‘S‚Ä‚Ì—v‘f
         If PoArr.Count>0 Then

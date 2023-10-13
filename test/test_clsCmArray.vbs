@@ -95,17 +95,9 @@ Sub Test_clsCmArray_concat_Array
     Dim a1 : Set a1 = new_ArrWith(d1)
     Dim a2 : Set a2 = a1.concat(d2)
     
-    AssertEqual Ubound(e)+1, a2.length
-    AssertEqual e(0), a2(0)
-    AssertEqual e(1), a2(1)
-    AssertEqual e(2), a2(2)
-    AssertEqual e(3), a2(3)
-    AssertEqual e(4), a2(4)
+    assertAllElements e, a2
     
-    AssertEqual Ubound(d1)+1, a1.length
-    AssertEqual d1(0), a1(0)
-    AssertEqual d1(1), a1(1)
-    AssertEqual d1(2), a1(2)
+    assertAllElements d1, a1
 End Sub
 Sub Test_clsCmArray_concat_Variable
     Dim e : e = Array(1,2,3,5)
@@ -114,16 +106,9 @@ Sub Test_clsCmArray_concat_Variable
     Dim a1 : Set a1 = new_ArrWith(d1)
     Dim a2 : Set a2 = a1.concat(d2)
     
-    AssertEqual Ubound(e)+1, a2.length
-    AssertEqual e(0), a2(0)
-    AssertEqual e(1), a2(1)
-    AssertEqual e(2), a2(2)
-    AssertEqual e(3), a2(3)
+    assertAllElements e, a2
     
-    AssertEqual Ubound(d1)+1, a1.length
-    AssertEqual d1(0), a1(0)
-    AssertEqual d1(1), a1(1)
-    AssertEqual d1(2), a1(2)
+    assertAllElements d1, a1
 End Sub
 
 '###################################################################################################
@@ -134,10 +119,7 @@ Sub Test_clsCmArray_every_True
     
     Assert a.every(new_Func("(e,i,a)=>e<5"))
     
-    AssertEqual Ubound(d)+1, a.length
-    AssertEqual d(0), a(0)
-    AssertEqual d(1), a(1)
-    AssertEqual d(2), a(2)
+    assertAllElements d, a
 End Sub
 Sub Test_clsCmArray_every_False
     Dim d : d = Array(1,2,3)
@@ -145,10 +127,7 @@ Sub Test_clsCmArray_every_False
     
     Assert Not a.every(new_Func("(e,i,a)=>e<3"))
     
-    AssertEqual Ubound(d)+1, a.length
-    AssertEqual d(0), a(0)
-    AssertEqual d(1), a(1)
-    AssertEqual d(2), a(2)
+    assertAllElements d, a
 End Sub
 
 '###################################################################################################
@@ -159,14 +138,9 @@ Sub Test_clsCmArray_filter
     Dim a1 : Set a1 = new_ArrWith(d)
     Dim a2 : Set a2 = a1.filter(new_Func("(e,i,a)=>e>1"))
     
-    AssertEqual Ubound(e)+1, a2.length
-    AssertEqual e(0), a2(0)
-    AssertEqual e(1), a2(1)
+    assertAllElements e, a2
     
-    AssertEqual Ubound(d)+1, a1.length
-    AssertEqual d(0), a1(0)
-    AssertEqual d(1), a1(1)
-    AssertEqual d(2), a1(2)
+    assertAllElements d, a1
 End Sub
 
 '###################################################################################################
@@ -179,12 +153,7 @@ Sub Test_clsCmArray_find
     
     AssertEqual e, a2
     
-    AssertEqual Ubound(d)+1, a1.length
-    AssertEqual d(0), a1(0)
-    AssertEqual d(1), a1(1)
-    AssertEqual d(2), a1(2)
-    AssertEqual d(3), a1(3)
-    AssertEqual d(4), a1(4)
+    assertAllElements d, a1
 End Sub
 
 '###################################################################################################
@@ -194,10 +163,7 @@ Sub Test_clsCmArray_forEach
     Dim a : Set a = new_ArrWith(Array(1,2,3))
     a.forEach(new_Func("function(e,i,a) {a(i)=a(i)+1}"))
     
-    AssertEqual Ubound(e)+1, a.length
-    AssertEqual e(0), a(0)
-    AssertEqual e(1), a(1)
-    AssertEqual e(2), a(2)
+    assertAllElements e, a
 End Sub
 
 '###################################################################################################
@@ -241,15 +207,9 @@ Sub Test_clsCmArray_map
     Dim a1 : Set a1 = new_ArrWith(d)
     Dim a2 : Set a2 = a1.map(new_Func("(e,i,a)=>e*e"))
     
-    AssertEqual Ubound(e)+1, a2.length
-    AssertEqual e(0), a2(0)
-    AssertEqual e(1), a2(1)
-    AssertEqual e(2), a2(2)
+    assertAllElements e, a2
     
-    AssertEqual Ubound(d)+1, a1.length
-    AssertEqual d(0), a1(0)
-    AssertEqual d(1), a1(1)
-    AssertEqual d(2), a1(2)
+    assertAllElements d, a1
 End Sub
 
 '###################################################################################################
@@ -261,14 +221,10 @@ Sub Test_clsCmArray_pop_push_pushMulti
     e = Array("hoge", 2, "参", Nothing)
     AssertEqual 4, a.pushMulti(e)
     
-    AssertEqual Ubound(e)+1, a.length
-    AssertEqual e(0), a(0)
-    AssertEqual e(1), a(1)
-    AssertEqual e(2), a(2)
-    AssertSame e(3), a(3)
+    assertAllElements e, a
     
-    AssertSame a(3), a.pop
-    AssertEqual a(2), a.pop
+    AssertSame e(3), a.pop
+    AssertEqual e(2), a.pop
     
     AssertEqual 2, a.length
     AssertEqual e(0), a(0)
@@ -278,17 +234,12 @@ Sub Test_clsCmArray_pop_push_pushMulti
     AssertEqual 3, a.push(e(2))
     AssertEqual 4, a.push(e(3))
     
-    AssertEqual Ubound(e)+1, a.length
-    AssertEqual e(0), a(0)
-    AssertEqual e(1), a(1)
-    AssertEqual e(2), a(2)
-    AssertEqual e(3), a(3)
+    assertAllElements e, a
     
-    
-    AssertEqual a(3), a.pop
-    AssertEqual a(2), a.pop
-    AssertEqual a(1), a.pop
-    AssertEqual a(0), a.pop
+    AssertEqual e(3), a.pop
+    AssertEqual e(2), a.pop
+    AssertEqual e(1), a.pop
+    AssertEqual e(0), a.pop
     AssertEqual 0, a.length
 End Sub
 
@@ -302,11 +253,7 @@ Sub Test_clsCmArray_reduce
     
     AssertEqual e, a2
     
-    AssertEqual Ubound(d)+1, a1.length
-    AssertEqual d(0), a1(0)
-    AssertEqual d(1), a1(1)
-    AssertEqual d(2), a1(2)
-    AssertEqual d(3), a1(3)
+    assertAllElements d, a1
 End Sub
 
 '###################################################################################################
@@ -319,10 +266,69 @@ Sub Test_clsCmArray_reduceRight
     
     AssertEqual e, a2
     
-    AssertEqual Ubound(d)+1, a1.length
-    AssertEqual d(0), a1(0)
-    AssertEqual d(1), a1(1)
-    AssertEqual d(2), a1(2)
+    assertAllElements d, a1
+End Sub
+
+'###################################################################################################
+'clsCmArray.reverse()
+Sub Test_clsCmArray_reverse
+    Dim e : e = Array(3,Nothing,1)
+    Dim d : d = Array(1,Nothing,3)
+    Dim a : Set a = new_ArrWith(d)
+    a.reverse
+    
+    assertAllElements e, a
+End Sub
+
+'###################################################################################################
+'clsCmArray.shift()/.unshift()/unshiftMulti()
+Sub Test_clsCmArray_shift_unshift_unshiftMulti
+    Dim a,e
+    Set a = new clsCmArray
+    
+    e = Array("hoge", 2, "参", Nothing)
+    AssertEqual 1, a.unshift(e(3))
+    AssertEqual 2, a.unshift(e(2))
+    AssertEqual 3, a.unshift(e(1))
+    AssertEqual 4, a.unshift(e(0))
+    
+    assertAllElements e, a
+    
+    AssertEqual e(0), a.shift
+    AssertEqual e(1), a.shift
+    
+    AssertEqual 2, a.length
+    AssertEqual e(2), a(0)
+    AssertSame e(3), a(1)
+    
+    AssertEqual 4, a.unshiftMulti(Array(Empty, "四"))
+    
+    e = Array(Empty, "四", "参", Nothing)
+    assertAllElements e, a
+    
+    AssertEqual e(0), a.shift
+    AssertEqual e(1), a.shift
+    AssertEqual e(2), a.shift
+    AssertSame e(3), a.shift
+    AssertEqual 0, a.length
+End Sub
+
+
+
+
+
+'###################################################################################################
+'common
+Sub assertAllElements(e,a)
+    AssertEqual Ubound(e)+1, a.length
+    Dim i
+    For i=0 To Ubound(e)
+        If IsObject(e(i)) Then
+            AssertSame e(i), a(i)
+        Else
+            AssertEqual e(i), a(i)
+        End If
+    Next
 End Sub
 
 
