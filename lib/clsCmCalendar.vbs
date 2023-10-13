@@ -256,13 +256,13 @@ Class clsCmCalendar
     Private Function func_CmCalendarSetDate( _
         ByVal avDateTime _
         )
-        On Error Resume Next
+'        On Error Resume Next
         PdtDateTime = CDate(avDateTime)
         PdbTimer = 0
-        If Err.Number Then
-            PdtDateTime = 0
-            Err.Clear
-        End If
+'        If Err.Number Then
+'            PdtDateTime = 0
+'            Err.Clear
+'        End If
         Set func_CmCalendarSetDate = Me
     End Function
     

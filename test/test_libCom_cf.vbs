@@ -26,7 +26,6 @@ Sub Test_cf_bind_Object
     AssertSame obj, v
 End Sub
 
-
 '###################################################################################################
 'cf_bindAt()
 Sub Test_cf_bindAt_Value
@@ -63,8 +62,9 @@ End Sub
 '###################################################################################################
 'cf_tryCatch()
 Sub Test_cf_tryCatch_TryOnly_Normal
-    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, Nothing, Nothing)
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, Nothing, Empty)
     
+    AssertEqual 0, Err.Number
     AssertEqual True, oRet.Item("Result")
     AssertEqual 1/2, oRet.Item("Return")
     AssertSame Nothing, oRet.Item("Err")
@@ -72,27 +72,47 @@ End Sub
 Sub Test_cf_tryCatch_TryAndCatch_Normal
     Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, new_Func("(a,e)=>e.Item(""Description"")"), Nothing)
     
+    AssertEqual 0, Err.Number
     AssertEqual True, oRet.Item("Result")
     AssertEqual 1/2, oRet.Item("Return")
     AssertSame Nothing, oRet.Item("Err")
 End Sub
 Sub Test_cf_tryCatch_TryAndFinary_Normal
-    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, Nothing, new_Func("(a,r,e)=>1/2+r"))
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, Empty, new_Func("(a,r,e)=>1/2+r"))
     
+    AssertEqual 0, Err.Number
     AssertEqual True, oRet.Item("Result")
     AssertEqual 1/2+1/2, oRet.Item("Return")
     AssertSame Nothing, oRet.Item("Err")
+End Sub
+Sub Test_cf_tryCatch_TryAndFinary_Normal_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, Empty, new_Func("(a,r,e)=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "Œ^‚ªˆê’v‚µ‚Ü‚¹‚ñB", Err.Description
+    AssertEqual Empty, oRet
 End Sub
 Sub Test_cf_tryCatch_TryAndCatchAndFinary_Normal
     Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, new_Func("(a,e)=>e.Item(""Description"")"), new_Func("(a,r,e)=>1/2+r"))
     
+    AssertEqual 0, Err.Number
     AssertEqual True, oRet.Item("Result")
     AssertEqual 1/2+1/2, oRet.Item("Return")
     AssertSame Nothing, oRet.Item("Err")
 End Sub
-Sub Test_cf_tryCatch_TryOnly_Err
-    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, Nothing, Nothing)
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Normal_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 2, new_Func("(a,e)=>e.Item(""Description"")"), new_Func("(a,r,e)=>r(0)"))
     
+    AssertEqual 13, Err.Number
+    AssertEqual "Œ^‚ªˆê’v‚µ‚Ü‚¹‚ñB", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryOnly_Err
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, Empty, Empty)
+    
+    AssertEqual 0, Err.Number
     AssertEqual False, oRet.Item("Result")
     AssertEqual Empty, oRet.Item("Return")
     AssertEqual 11, oRet.Item("Err").Item("Number")
@@ -100,31 +120,66 @@ Sub Test_cf_tryCatch_TryOnly_Err
     AssertEqual "Microsoft VBScript ÀsƒGƒ‰[", oRet.Item("Err").Item("Source")
 End Sub
 Sub Test_cf_tryCatch_TryAndCatch_Err
-    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, new_Func("(a,e)=>e.Item(""Description"")"), Nothing)
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, new_Func("(a,e)=>e.Item(""Description"")"), Empty)
     
+    AssertEqual 0, Err.Number
     AssertEqual False, oRet.Item("Result")
     AssertEqual oRet.Item("Err").Item("Description"), oRet.Item("Return")
     AssertEqual 11, oRet.Item("Err").Item("Number")
     AssertEqual "0 ‚ÅœZ‚µ‚Ü‚µ‚½B", oRet.Item("Err").Item("Description")
     AssertEqual "Microsoft VBScript ÀsƒGƒ‰[", oRet.Item("Err").Item("Source")
 End Sub
+Sub Test_cf_tryCatch_TryAndCatch_Err_CatchErr
+    On Error Resume Next
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, new_Func("(a,e)=>a(0)"), Empty)
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "Œ^‚ªˆê’v‚µ‚Ü‚¹‚ñB", Err.Description
+    AssertEqual Empty, oRet
+End Sub
 Sub Test_cf_tryCatch_TryAndFinary_Err
     Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, Nothing, new_Func("(a,r,e)=>2+a"))
     
+    AssertEqual 0, Err.Number
     AssertEqual False, oRet.Item("Result")
     AssertEqual 2+0, oRet.Item("Return")
     AssertEqual 11, oRet.Item("Err").Item("Number")
     AssertEqual "0 ‚ÅœZ‚µ‚Ü‚µ‚½B", oRet.Item("Err").Item("Description")
     AssertEqual "Microsoft VBScript ÀsƒGƒ‰[", oRet.Item("Err").Item("Source")
 End Sub
+Sub Test_cf_tryCatch_TryAndFinary_Err_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, Nothing, new_Func("(a,r,e)=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "Œ^‚ªˆê’v‚µ‚Ü‚¹‚ñB", Err.Description
+    AssertEqual Empty, oRet
+End Sub
 Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err
     Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, new_Func("(a,e)=>e.Item(""Source"")"), new_Func("(a,r,e)=>2+a"))
     
+    AssertEqual 0, Err.Number
     AssertEqual False, oRet.Item("Result")
     AssertEqual 2+0, oRet.Item("Return")
     AssertEqual 11, oRet.Item("Err").Item("Number")
     AssertEqual "0 ‚ÅœZ‚µ‚Ü‚µ‚½B", oRet.Item("Err").Item("Description")
     AssertEqual "Microsoft VBScript ÀsƒGƒ‰[", oRet.Item("Err").Item("Source")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err_CatchErr
+    On Error Resume Next
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, new_Func("(a,e)=>a(0)"), new_Func("(a,r,e)=>2+a"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "Œ^‚ªˆê’v‚µ‚Ü‚¹‚ñB", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>1/a"), 0, new_Func("(a,e)=>e.Item(""Source"")"), new_Func("(a,r,e)=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "Œ^‚ªˆê’v‚µ‚Ü‚¹‚ñB", Err.Description
+    AssertEqual Empty, oRet
 End Sub
 
 ' Local Variables:

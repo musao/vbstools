@@ -352,7 +352,7 @@ Class clsFsBase
     '***************************************************************************************************
     Private Function func_FsBaseGetFso( _
         )
-        If PoFso Is Nothing Then Set PoFso = CreateObject("Scripting.FileSystemObject")
+        If PoFso Is Nothing Then Set PoFso = new_Fso()
         Set func_FsBaseGetFso = PoFso
     End Function
 

@@ -50,6 +50,16 @@ Sub Test_new_DicWith_OddNumber
 End Sub
 
 '###################################################################################################
+'new_Fso()
+Sub Test_new_Fso
+    Dim e : Set e = CreateObject("Scripting.FileSystemObject")
+    Dim a : Set a = new_Fso()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
 'new_Re()
 Sub Test_new_Re_Normal
     Dim e : Set e = New RegExp
@@ -105,7 +115,7 @@ End Sub
 'new_Reader()
 Sub Test_new_Reader
     Dim e : Set e = New clsCmBufferedReader
-    Dim ts : Set ts =  CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName)
+    Dim ts : Set ts =  new_Fso().OpenTextFile(WScript.ScriptFullName)
     Dim a : Set a = new_Reader(ts)
     
     AssertEqual VarType(e), VarType(a)
@@ -122,12 +132,20 @@ Sub Test_new_ReaderFrom
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
+Sub Test_new_ReaderFrom_Err
+    On Error Resume Next
+    Dim a : Set a = new_ReaderFrom(vbNullString)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
+End Sub
 
 '###################################################################################################
 'new_Writer()
 Sub Test_new_Writer
     Dim e : Set e = New clsCmBufferedWriter
-    Dim ts : Set ts =  CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName)
+    Dim ts : Set ts =  new_Fso().OpenTextFile(WScript.ScriptFullName)
     Dim a : Set a = new_Writer(ts)
     
     AssertEqual VarType(e), VarType(a)
@@ -143,6 +161,14 @@ Sub Test_new_WriterTo
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_WriterTo_Err
+    On Error Resume Next
+    Dim a : Set a = new_WriterTo(vbNullString, 8, False, -2)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
 End Sub
 
 '###################################################################################################
@@ -172,6 +198,14 @@ Sub Test_new_CalAt
     AssertEqual Cstr(DatePart("m", ed)), a.displayAs("M")
     AssertEqual Cstr(DatePart("d", ed)), a.displayAs("D")
 End Sub
+Sub Test_new_CalAt_Err
+    On Error Resume Next
+    Dim a : Set a = new_CalAt(vbNullString)
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, a
+End Sub
 
 '###################################################################################################
 'new_Pubsub()
@@ -196,7 +230,7 @@ End Sub
 
 '###################################################################################################
 'new_ArrWith()
-Sub Test_new_ArrWith
+Sub Test_new_ArrWith_Array
     Dim e : Set e = New clsCmArray
     Dim ev : ev = Array(1,Nothing,"三")
     Dim a : Set a = new_ArrWith(ev)
@@ -207,6 +241,13 @@ Sub Test_new_ArrWith
     AssertEqual ev(0), a(0)
     AssertSame ev(1), a(1)
     AssertEqual ev(2), a(2)
+End Sub
+Sub Test_new_ArrWith_Variable
+    Dim ev : ev = "abc"
+    Dim a : Set a = new_ArrWith(ev)
+    
+    AssertEqual 1, a.Length
+    AssertEqual "abc", a(0)
 End Sub
 
 '###################################################################################################

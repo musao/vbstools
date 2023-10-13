@@ -113,23 +113,30 @@ Private Function cf_tryCatch( _
     , byRef aoCatch _
     , byRef aoFinary _
     )
+    Dim oRet, oErr, boFlg
+    Set oErr = Nothing : boFlg = True
+    
     On Error Resume Next
-    Dim boFlg : boFlg = True
-    Dim oErr : Set oErr = Nothing
-    Dim oRet
     'tryブロックの処理
-    Call cf_bind(oRet, aoTry(aoArgs))
-    'catchブロックの処理
+    cf_bind oRet, aoTry(aoArgs)
     If Err.Number<>0 Then
         boFlg = False
         Set oErr = func_CM_UtilStoringErr()
         Err.Clear
-        Call cf_bind(oRet, aoCatch(aoArgs, oErr))
+    End If
+    On Error GoTo 0
+    'catchブロックの処理
+    If boFlg = False Then
+        If IsObject(aoCatch) Then
+            If Not aoCatch Is Nothing Then
+                cf_bind oRet, aoCatch(aoArgs, oErr)
+            End If
+        End If
     End If
     'finaryブロックの処理
     If IsObject(aoFinary) Then
         If Not aoFinary Is Nothing Then
-            Call cf_bind(oRet, aoFinary(aoArgs, oRet, oErr))
+            cf_bind oRet, aoFinary(aoArgs, oRet, oErr)
         End If
     End If
     '結果を返却
@@ -197,6 +204,25 @@ Private Function new_DicWith( _
     
     Set new_DicWith = oDict
     Set oDict = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Fso()
+'Overview                    : FileSystemObjectオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したFileSystemObjectオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/13         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Fso( _
+    )
+    Set new_Fso = CreateObject("Scripting.FileSystemObject")
 End Function
 
 '***************************************************************************************************
@@ -753,10 +779,10 @@ Private Function func_CM_FsDeleteFile( _
     byVal asPath _
     ) 
     If Not func_CM_FsFileExists(asPath) Then func_CM_FsDeleteFile = False
-    func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(CreateObject("Scripting.FileSystemObject"), asPath), Empty, Empty).Item("Result")
+    func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(new_Fso(), asPath), Empty, Empty).Item("Result")
     
 '    On Error Resume Next
-'    CreateObject("Scripting.FileSystemObject").DeleteFile(asPath)
+'    new_Fso().DeleteFile(asPath)
 '    func_CM_FsDeleteFile = True
 '    If Err.Number Then
 '        Err.Clear
@@ -783,7 +809,7 @@ Private Function func_CM_FsDeleteFolder( _
     ) 
     If Not func_CM_FsFolderExists(asPath) Then func_CM_FsDeleteFolder = False
     On Error Resume Next
-    CreateObject("Scripting.FileSystemObject").DeleteFolder(asPath)
+    new_Fso().DeleteFolder(asPath)
     func_CM_FsDeleteFolder = True
     If Err.Number Then
         Err.Clear
@@ -834,7 +860,7 @@ Private Function func_CM_FsCopyFile( _
     ) 
     If Not func_CM_FsFileExists(asPathFrom) Then func_CM_FsCopyFile = False
     On Error Resume Next
-    Call CreateObject("Scripting.FileSystemObject").CopyFile(asPathFrom, asPathTo)
+    Call new_Fso().CopyFile(asPathFrom, asPathTo)
     func_CM_FsCopyFile = True
     If Err.Number Then
         Err.Clear
@@ -863,7 +889,7 @@ Private Function func_CM_FsCopyFolder( _
     ) 
     If Not func_CM_FsFolderExists(asPathFrom) Then func_CM_FsCopyFolder = False
     On Error Resume Next
-    Call CreateObject("Scripting.FileSystemObject").CopyFolder(asPathFrom, asPathTo)
+    Call new_Fso().CopyFolder(asPathFrom, asPathTo)
     func_CM_FsCopyFolder = True
     If Err.Number Then
         Err.Clear
@@ -916,7 +942,7 @@ Private Function func_CM_FsMoveFile( _
     ) 
     If Not func_CM_FsFileExists(asPathFrom) Then func_CM_FsMoveFile = False
     On Error Resume Next
-    Call CreateObject("Scripting.FileSystemObject").MoveFile(asPathFrom, asPathTo)
+    Call new_Fso().MoveFile(asPathFrom, asPathTo)
     func_CM_FsMoveFile = True
     If Err.Number Then
         Err.Clear
@@ -945,7 +971,7 @@ Private Function func_CM_FsMoveFolder( _
     ) 
     If Not func_CM_FsFolderExists(asPathFrom) Then func_CM_FsMoveFolder = False
     On Error Resume Next
-    Call CreateObject("Scripting.FileSystemObject").MoveFolder(asPathFrom, asPathTo)
+    Call new_Fso().MoveFolder(asPathFrom, asPathTo)
     func_CM_FsMoveFolder = True
     If Err.Number Then
         Err.Clear
@@ -994,7 +1020,7 @@ End Function
 Private Function func_CM_FsGetParentFolderPath( _
     byVal asPath _
     ) 
-    func_CM_FsGetParentFolderPath = CreateObject("Scripting.FileSystemObject").GetParentFolderName(asPath)
+    func_CM_FsGetParentFolderPath = new_Fso().GetParentFolderName(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1014,7 +1040,7 @@ End Function
 Private Function func_CM_FsGetGetBaseName( _
     byVal asPath _
     ) 
-    func_CM_FsGetGetBaseName = CreateObject("Scripting.FileSystemObject").GetBaseName(asPath)
+    func_CM_FsGetGetBaseName = new_Fso().GetBaseName(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1034,7 +1060,7 @@ End Function
 Private Function func_CM_FsGetGetExtensionName( _
     byVal asPath _
     ) 
-    func_CM_FsGetGetExtensionName = CreateObject("Scripting.FileSystemObject").GetExtensionName(asPath)
+    func_CM_FsGetGetExtensionName = new_Fso().GetExtensionName(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1056,7 +1082,7 @@ Private Function func_CM_FsBuildPath( _
     byVal asFolderPath _
     , byVal asItemName _
     ) 
-    func_CM_FsBuildPath = CreateObject("Scripting.FileSystemObject").BuildPath(asFolderPath, asItemName)
+    func_CM_FsBuildPath = new_Fso().BuildPath(asFolderPath, asItemName)
 End Function
 
 '***************************************************************************************************
@@ -1076,7 +1102,7 @@ End Function
 Private Function func_CM_FsFileExists( _
     byVal asPath _
     ) 
-    func_CM_FsFileExists = CreateObject("Scripting.FileSystemObject").FileExists(asPath)
+    func_CM_FsFileExists = new_Fso().FileExists(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1096,7 +1122,7 @@ End Function
 Private Function func_CM_FsFolderExists( _
     byVal asPath _
     ) 
-    func_CM_FsFolderExists = CreateObject("Scripting.FileSystemObject").FolderExists(asPath)
+    func_CM_FsFolderExists = new_Fso().FolderExists(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1116,7 +1142,7 @@ End Function
 Private Function func_CM_FsGetFile( _
     byVal asPath _
     ) 
-    Set func_CM_FsGetFile = CreateObject("Scripting.FileSystemObject").GetFile(asPath)
+    Set func_CM_FsGetFile = new_Fso().GetFile(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1136,7 +1162,7 @@ End Function
 Private Function func_CM_FsGetFolder( _
     byVal asPath _
     ) 
-    Set func_CM_FsGetFolder = CreateObject("Scripting.FileSystemObject").GetFolder(asPath)
+    Set func_CM_FsGetFolder = new_Fso().GetFolder(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1178,7 +1204,7 @@ End Function
 Private Function func_CM_FsGetFiles( _
     byVal asPath _
     ) 
-    Set func_CM_FsGetFiles = CreateObject("Scripting.FileSystemObject").GetFolder(asPath).Files
+    Set func_CM_FsGetFiles = new_Fso().GetFolder(asPath).Files
 End Function
 
 '***************************************************************************************************
@@ -1198,7 +1224,7 @@ End Function
 Private Function func_CM_FsGetFolders( _
     byVal asPath _
     ) 
-    Set func_CM_FsGetFolders = CreateObject("Scripting.FileSystemObject").GetFolder(asPath).SubFolders
+    Set func_CM_FsGetFolders = new_Fso().GetFolder(asPath).SubFolders
 End Function
 
 '***************************************************************************************************
@@ -1244,7 +1270,7 @@ End Function
 '2022/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_FsGetTempFileName()
-    func_CM_FsGetTempFileName = CreateObject("Scripting.FileSystemObject").GetTempName()
+    func_CM_FsGetTempFileName = new_Fso().GetTempName()
 End Function
 
 '***************************************************************************************************
@@ -1355,7 +1381,7 @@ End Function
 Private Function func_CM_FsCreateFolder( _
     byVal asPath _
     )
-    func_CM_FsCreateFolder = CreateObject("Scripting.FileSystemObject").CreateFolder(asPath)
+    func_CM_FsCreateFolder = new_Fso().CreateFolder(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1382,7 +1408,7 @@ Private Function func_CM_FsOpenTextFile( _
     , byVal alFileFormat _
     )
     'ファイルを開く
-    Set func_CM_FsOpenTextFile = CreateObject("Scripting.FileSystemObject").OpenTextFile( _
+    Set func_CM_FsOpenTextFile = new_Fso().OpenTextFile( _
                                                               asPath _
                                                               , alIomode _
                                                               , aboCreate _

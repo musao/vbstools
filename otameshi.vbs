@@ -25,6 +25,27 @@ Call sub_import("clsCmPubSub.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
+Private Function anonymous_MUW6LMT_WG(e,i,a)
+    a(i)=a(i)+1
+'    anonymous_MUW6LMT_WG = (a(i)=a(i)+1)
+End Function
+
+dim ay : ay = array(1,2,3)
+dim idx
+for idx=0 to ubound(ay)
+    call anonymous_MUW6LMT_WG(ay(idx), idx, ay)
+next
+inputbox "", "", func_CM_ToString(ay)
+
+wscript.quit
+
+on error resume next
+dim ax(2)
+dim b : b= ax(3)
+inputbox "","",func_CM_ToStringErr()
+
+wscript.quit
+
 
 msgbox Ubound(Split("abc", ":", -1, vbBinaryCompare))
 
@@ -740,8 +761,8 @@ Next
 wscript.quit
 
 
-Call Msgbox(CreateObject("Scripting.FileSystemObject").GetFile("C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs").DateLastModified)
-Call Msgbox(CreateObject("Scripting.FileSystemObject").GetFile("C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs").Item(1))
+Call Msgbox(new_Fso().GetFile("C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs").DateLastModified)
+Call Msgbox(new_Fso().GetFile("C:\Users\89585\Documents\dev\vbs\lib\libCom.vbs").Item(1))
 
 wscript.quit
 

@@ -83,7 +83,7 @@ Class clsCmArray
     Public Default Property Get item( _
         byVal alIdx _
         )
-        Call cf_bind(item, func_CmArrayItem(alIdx))
+        cf_bind item, func_CmArrayItem(alIdx)
     End Property
 
     '***************************************************************************************************
@@ -237,34 +237,6 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : filterVbs()
-    'Overview                    : 引数で指定した条件に合致する要素だけの配列を作成する
-    'Detailed Description        : vbscriptのFilter関数と同等の機能
-    'Argument
-    '     asTarget               : 検索する文字列
-    '     aboInclude             : 検索する文字列を検索対象とするか否かの区分
-    '                                True :検索する文字列を検索対象とする
-    '                                False:検索する文字列以外を検索対象とする
-    '     alCompare              : 比較方法
-    '                                0(vbBinaryCompare):バイナリ比較
-    '                                1(vbTextCompare):テキスト比較
-    'Return Value
-    '     同クラスの別インスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/09/08         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function filterVbs( _
-        byVal asTarget _
-        , byVal aboInclude _
-        , byVal alCompare _
-        )
-        Set filterVbs = new_ArrWith( Filter(func_CmArrayConvArray(True), asTarget, aboInclude, alCompare) )
-    End Function
-
-    '***************************************************************************************************
     'Function/Sub Name           : find()
     'Overview                    : 引数の関数で抽出した最初の要素を返す
     'Detailed Description        : func_CmArrayFind()に委譲する
@@ -281,7 +253,7 @@ Class clsCmArray
     Public Function find( _
         byRef aoFunc _
         )
-        Call cf_bind(find, func_CmArrayFind(aoFunc))
+        cf_bind find, func_CmArrayFind(aoFunc)
     End Function
 
     '***************************************************************************************************
@@ -343,6 +315,26 @@ Class clsCmArray
         )
         joinVbs = Join(func_CmArrayConvArray(True), asDelimiter)
     End Function
+'
+'    '***************************************************************************************************
+'    'Function/Sub Name           : join()
+'    'Overview                    : 配列の各要素を連結した文字列を作成する
+'    'Detailed Description        : 工事中
+'    'Argument
+'    '     asDelimiter            : 区切り文字
+'    'Return Value
+'    '     配列の各要素を連結した文字列
+'    '---------------------------------------------------------------------------------------------------
+'    'Histroy
+'    'Date               Name                     Reason for Changes
+'    '----------         ----------------------   -------------------------------------------------------
+'    '2023/10/13         Y.Fujii                  First edition
+'    '***************************************************************************************************
+'    Public Function join( _
+'        byVal asDelimiter _
+'        )
+'        join = func_CmArrayReduce(new_Func("(p,c,i,a)=>p&"&asDelimiter&"&c"), True)
+'    End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : lastIndexOf()
@@ -381,7 +373,7 @@ Class clsCmArray
     Public Function map( _
         byRef aoFunc _
         )
-        Call cf_bind(map, func_CmArrayMap(aoFunc))
+        cf_bind map, func_CmArrayMap(aoFunc)
     End Function
 
     '***************************************************************************************************
@@ -425,7 +417,7 @@ Class clsCmArray
 
     '***************************************************************************************************
     'Function/Sub Name           : pushMulti()
-    'Overview                    : 配列の末尾に要素を1つ追加する
+    'Overview                    : 配列の末尾に要素を複数追加する
     'Detailed Description        : func_CmArrayPushMulti()に委譲する
     'Argument
     '     avArr                  : 配列の末尾に追加する要素（配列）
@@ -460,7 +452,7 @@ Class clsCmArray
     Public Function reduce( _
         byRef aoFunc _
         )
-        Call cf_bind(reduce, func_CmArrayReduce(aoFunc, True))
+        cf_bind reduce, func_CmArrayReduce(aoFunc, True)
     End Function
 
     '***************************************************************************************************
@@ -480,7 +472,7 @@ Class clsCmArray
     Public Function reduceRight( _
         byRef aoFunc _
         )
-        Call cf_bind(reduceRight, func_CmArrayReduce(aoFunc, False))
+        cf_bind reduceRight, func_CmArrayReduce(aoFunc, False)
     End Function
 
     '***************************************************************************************************
@@ -696,14 +688,13 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function func_CmArrayItem( _
-        ByVal alIdx _
+        byVal alIdx _
         )
-        Dim oEle : Set oEle = Nothing
-        If PoArr.Count>0 Then
-            Call cf_bind(oEle, PoArr.Item(alIdx))
+        If PoArr.Exists(alIdx) Then
+            cf_bind func_CmArrayItem, PoArr.Item(alIdx)
+        Else
+            Err.Raise 9, "clsCmArray.vbs:clsCmArray-func_CmArrayItem()", "インデックスが有効範囲にありません。"
         End If
-        Call cf_bind(func_CmArrayItem, oEle)
-        Set oEle = Nothing
     End Function
 
     '***************************************************************************************************
@@ -867,6 +858,7 @@ Class clsCmArray
             For lIdx=0 To lUb
                 Call aoFunc(vArr(lIdx), lIdx, vArr)
             Next
+            Set PoArr = func_CmArrayAddDictionary(vArr, 0)
         End If
     End Function
 
@@ -1019,8 +1011,10 @@ Class clsCmArray
         If func_CM_ArrayIsAvailable(avArr) Then
             Dim oEle
             For Each oEle In avArr
-                Call cf_bindAt(PoArr, PoArr.Count, oEle)
+                cf_bindAt PoArr, PoArr.Count, oEle
             Next
+        Else
+            cf_bindAt PoArr, PoArr.Count, avArr
         End If
         func_CmArrayPushMulti = PoArr.Count
         Set oEle = Nothing
@@ -1056,9 +1050,9 @@ Class clsCmArray
             vArr = func_CmArrayConvArray(aboOrder)
             lUb = Ubound(vArr)
             
-            Call cf_bind(oRet, vArr(0))
+            cf_bind oRet, vArr(0)
             For lIdx=1 To lUb
-                Call cf_bind(oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr))
+                cf_bind oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr)
             Next
         End If
 
