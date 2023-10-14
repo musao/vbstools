@@ -1811,12 +1811,15 @@ Private Function func_CM_ArrayIsAvailable( _
     func_CM_ArrayIsAvailable = False
     On Error Resume Next
     If IsArray(avArray) And (Not IsEmpty(avArray)) Then
+'        Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>ubound(a)"), avArray, Empty, Empty)
         Ubound(avArray)
+'        If oRet.Item("Result") Then
         If Err.Number=0 Then
             func_CM_ArrayIsAvailable = True
         Else
             Err.Clear
         End If
+'        Set oRet = Nothing
     End If
 End Function
 
