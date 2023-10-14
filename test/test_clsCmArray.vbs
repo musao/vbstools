@@ -494,7 +494,7 @@ Sub Test_clsCmArray_slice_Limit_Upper
     Set a1 = a.slice(-1,-1)
     AssertEqual 0, a1.length
 End Sub
-Sub Test_clsCmArray_sliceLimit_Lower
+Sub Test_clsCmArray_slice_Limit_Lower
     Dim e,a,a1,d
     d = Array(1,2,3,4,5)
     Set a = new_ArrWith(d)
@@ -658,7 +658,7 @@ Sub Test_clsCmArray_splice_Normal
     
     e = Array(1,5,6,7,8)
     e1 = Array(4)
-    Set a1 = a.splice(1,2,Nothing)
+    Set a1 = a.splice(1,1,Nothing)
     assertAllElements e, a
     assertAllElements e1, a1
     
@@ -666,6 +666,98 @@ Sub Test_clsCmArray_splice_Normal
     Set a1 = a.splice(1,0,Array(2,3))
     assertAllElements e, a
     AssertEqual 0, a1.length
+End Sub
+Sub Test_clsCmArray_splice_Limit_Upper
+    Dim e,e1,a,a1,d
+    d = Array(1,2,3,4,5,6,7,8)
+    
+    Set a = new_ArrWith(d)
+    e = d
+    Set a1 = a.splice(7,0,Empty)
+    assertAllElements e, a
+    AssertEqual 0, a1.length
+    
+    Set a = new_ArrWith(d)
+    e = Array(1,2,3,4,5,6,7)
+    e1 = Array(8)
+    Set a1 = a.splice(-1,1,Nothing)
+    assertAllElements e, a
+    assertAllElements e1, a1
+    
+    Set a = new_ArrWith(d)
+    e = d
+    Set a1 = a.splice(8,1,vbNullString)
+    assertAllElements e, a
+    AssertEqual 0, a1.length
+    
+    Set a = new_ArrWith(d)
+    e = Array(1,2,3,4,5,6,7,11,12)
+    e1 = Array(8)
+    Set a1 = a.splice(7,2,Array(11,12))
+    assertAllElements e, a
+    assertAllElements e1, a1
+    
+    Set a = new_ArrWith(d)
+    e = Array(1,2,3,4,5,6,7,8,21,22,23)
+    Set a1 = a.splice(8,1,Array(21,22,23))
+    assertAllElements e, a
+    AssertEqual 0, a1.length
+End Sub
+Sub Test_clsCmArray_splice_Limit_Lower
+    Dim e,e1,a,a1,d
+    d = Array(1,2,3,4,5,6,7,8)
+    
+    Set a = new_ArrWith(d)
+    e = d
+    Set a1 = a.splice(0,0,Empty)
+    assertAllElements e, a
+    AssertEqual 0, a1.length
+    
+    Set a = new_ArrWith(d)
+    e = Array(2,3,4,5,6,7,8)
+    e1 = Array(1)
+    Set a1 = a.splice(-8,1,Nothing)
+    assertAllElements e, a
+    assertAllElements e1, a1
+    
+    Set a = new_ArrWith(d)
+    e = Array(11,12,1,2,3,4,5,6,7,8)
+    Set a1 = a.splice(-9,0,Array(11,12))
+    assertAllElements e, a
+    AssertEqual 0, a1.length
+    
+    Set a = new_ArrWith(d)
+    e = Array(21,22,23)
+    e1 = d
+    Set a1 = a.splice(-8,9,Array(21,22,23))
+    assertAllElements e, a
+    assertAllElements e1, a1
+    
+    Set a = new_ArrWith(d)
+    e = Array(21,22,23)
+    e1 = d
+    Set a1 = a.splice(-9,8,Array(21,22,23))
+    assertAllElements e, a
+    assertAllElements e1, a1
+End Sub
+Sub Test_clsCmArray_splice_Empty
+    Dim a,a1,e
+    Set a = new_Arr()
+    AssertEqual 0, a.length
+    
+    Set a1 = a.splice(1,2,Empty)
+    AssertEqual 0, a.length
+    AssertEqual 0, a1.length
+    
+    Set a1 = a.splice(1,1,Nothing)
+    AssertEqual 0, a.length
+    AssertEqual 0, a1.length
+    
+    e = Array(2,3)
+    Set a1 = a.splice(1,0,Array(2,3))
+    assertAllElements e, a
+    AssertEqual 0, a1.length
+    
 End Sub
 
 

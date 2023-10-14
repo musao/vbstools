@@ -1214,42 +1214,51 @@ Class clsCmArray
         , byVal alDelCnt _
         , byRef avArr _
         )
-        Dim lIdx, vArr, lUb, vArrayAft, vRet(), lStart
+        Dim lIdx, vArr, lUb, vArrayAft(), vRet(), lStart
 
         If PoArr.Count>0 Then
             vArr = func_CmArrayConvArray(True)
             lUb = Ubound(vArr)
             
-            If alStart<0 Then lStart = PoArr.Count + alStart Else lStart = alStart
+            If alStart<0 Then lStart=lUb+1 Else lStart=0
+            lStart = func_CM_MathMax(lStart+alStart,0)
+            lStart = func_CM_MathMin(lStart,lUb+1)
             
             For lIdx = 0 To lStart - 1
             '開始位置までは今の配列のまま
-                Call cf_push(vArrayAft, vArr(lIdx))
+                cf_push vArrayAft, vArr(lIdx)
             Next
             
-            For lIdx = lStart To lStart + alDelCnt -1
+            For lIdx = lStart To func_CM_MathMin(lStart+alDelCnt-1, lUb)
             '開始位置から削除する要素数は戻り値の配列に移す
-                Call cf_push(vRet, vArr(lIdx))
+                cf_push vRet, vArr(lIdx)
             Next
-            
-            If func_CM_ArrayIsAvailable(avArr) Then
-            '追加する要素があれば追加する
-                For lIdx = 0 To Ubound(avArr)
-                '削除した要素以降は今の配列に残す
-                    Call cf_push(vArrayAft, avArr(lIdx))
-                Next
-            End If
-            
-            For lIdx = lStart + alDelCnt To lUb
+        End If
+        
+        If func_CM_ArrayIsAvailable(avArr) Then
+        '追加する要素があれば追加する
+            For lIdx = 0 To Ubound(avArr)
+                cf_push vArrayAft, avArr(lIdx)
+            Next
+        End If
+        
+        If PoArr.Count>0 Then
+            For lIdx = lStart+alDelCnt To lUb
             '削除した要素以降は今の配列に残す
-                Call cf_push(vArrayAft, vArr(lIdx))
+                cf_push vArrayAft, vArr(lIdx) 
             Next
-            
-            
-            '配列から取り除いた要素を返す
-            Call cf_bind(func_CmArraySplice, new_ArrWith(vRet))
+        End If
+        
+        If func_CM_ArrayIsAvailable(vArrayAft) Then
             '作成した配列（ディクショナリ）を置換え
             Set PoArr = func_CmArrayAddDictionary(vArrayAft, 0)
+        End If
+        
+        '配列から取り除いた要素を返す
+        If func_CM_ArrayIsAvailable(vRet) Then
+            Set func_CmArraySplice = new_ArrWith(vRet)
+        Else
+            Set func_CmArraySplice = new_Arr()
         End If
     End Function
 
