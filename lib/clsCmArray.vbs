@@ -130,7 +130,7 @@ Class clsCmArray
         , byRef aoEle _
         )
         If func_CmArrayInspectIndex(alIdx) Then
-            Call cf_bindAt(PoArr, alIdx, aoEle)
+            cf_bindAt PoArr, alIdx, aoEle
         End If
     End Property
 
@@ -189,7 +189,9 @@ Class clsCmArray
         byRef avArr _
         )
         Dim oArr : Set oArr = new_Arr()
-        oArr.pushMulti func_CmArrayConvArray(True)
+        If PoArr.Count>0 Then
+            oArr.pushMulti func_CmArrayConvArray(True)
+        End If
         oArr.pushMulti avArr
         Set concat = oArr
 
@@ -561,7 +563,7 @@ Class clsCmArray
     '***************************************************************************************************
     'Function/Sub Name           : sort()
     'Overview                    : 配列の要素をソートする
-    'Detailed Description        : func_CM_UtilSortHeap()に委譲する
+    'Detailed Description        : func_CmArraySort()に委譲する
     'Argument
     '     aboOrder               : True:昇順 / False:降順
     'Return Value
@@ -575,17 +577,13 @@ Class clsCmArray
     Public Function sort( _
         byVal aboOrder _
         )
-        Set PoArr = func_CmArrayAddDictionary(func_CM_UtilSortHeap(func_CmArrayConvArray(True), new_Func("(c,n)=>c>n"), aboOrder), 0)
-        Set sort = Me
+        Set sort = func_CmArraySort(new_Func("(c,n)=>c>n"), aboOrder)
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : sortUsing()
     'Overview                    : 指定した関数を使って配列の要素をソートする
-    'Detailed Description        : func_CM_UtilSortHeap()に委譲する
-    '                              引数の関数の引数は以下のとおり
-    '                                currentValue :配列の要素
-    '                                nextValue    :次の配列の要素
+    'Detailed Description        : func_CmArraySort()に委譲する
     'Argument
     '     aoFunc                 : 判定する関数
     'Return Value
@@ -599,8 +597,7 @@ Class clsCmArray
     Public Function sortUsing( _
         byRef aoFunc _
         )
-        Set PoArr = func_CmArrayAddDictionary(func_CM_UtilSortHeap(func_CmArrayConvArray(True), aoFunc, True), 0)
-        Set sortUsing = Me
+        Set sortUsing = func_CmArraySort(aoFunc, True)
     End Function
 
     '***************************************************************************************************
@@ -762,7 +759,7 @@ Class clsCmArray
     Private Function func_CmArrayFilter( _
         byRef aoFunc _
         )
-        Dim oEle, lIdx, vArr, lUb, oRet
+        Dim lIdx, vArr, lUb, vRet
 
         '引数の関数で抽出した要素だけの配列を作成
         If PoArr.Count>0 Then
@@ -770,17 +767,19 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             For lIdx=0 To lUb
-                Call cf_bind(oEle, vArr(lIdx))
-                If aoFunc(oEle, lIdx, vArr) Then
-                    Call cf_push(oRet, oEle)
+                If aoFunc(vArr(lIdx), lIdx, vArr) Then
+                    cf_push vRet, vArr(lIdx)
                 End If
             Next
         End If
-
+        
         '作成した配列（ディクショナリ）で当クラスのインスタンスを生成して返却
-        Set func_CmArrayFilter = new_ArrWith(oRet)
-
-        Set oEle = Nothing
+        If func_CM_ArrayIsAvailable(vRet) Then
+            Set func_CmArrayFilter = new_ArrWith(vRet)
+        Else
+            Set func_CmArrayFilter = new_Arr()
+        End If
+        
     End Function
 
     '***************************************************************************************************
@@ -804,8 +803,8 @@ Class clsCmArray
     Private Function func_CmArrayFind( _
         byRef aoFunc _
         )
-        Dim oEle, lIdx, vArr, lUb, oRet
-        Set oRet = Nothing
+        Dim lIdx, vArr, lUb, oRet
+        oRet = Empty
 
         '引数の関数で抽出できる最初の要素を検索
         If PoArr.Count>0 Then
@@ -813,18 +812,16 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             For lIdx=0 To lUb
-                Call cf_bind(oEle, vArr(lIdx))
-                If aoFunc(oEle, lIdx, vArr) Then
-                    Call cf_bind(oRet, oEle)
+                If aoFunc(vArr(lIdx), lIdx, vArr) Then
+                    cf_bind oRet, vArr(lIdx)
                     Exit For
                 End If
             Next
         End If
 
         '配列から抽出した要素を返却
-        Call cf_bind(func_CmArrayFind, oRet)
+        cf_bind func_CmArrayFind, oRet
 
-        Set oEle = Nothing
         Set oRet = Nothing
     End Function
 
@@ -957,11 +954,15 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             For lIdx=0 To lUb
-                Call cf_push(vRet, aoFunc(vArr(lIdx), lIdx, vArr))
+                cf_push vRet, aoFunc(vArr(lIdx), lIdx, vArr)
             Next
         End If
-
-        Call cf_bind(func_CmArrayMap, new_ArrWith(vRet))
+        
+        If func_CM_ArrayIsAvailable(vRet) Then
+            Set func_CmArrayMap = new_ArrWith(vRet)
+        Else
+            Set func_CmArrayMap = new_Arr()
+        End If
     End Function
 
     '***************************************************************************************************
@@ -1013,11 +1014,11 @@ Class clsCmArray
             For Each oEle In avArr
                 cf_bindAt PoArr, PoArr.Count, oEle
             Next
+            Set oEle = Nothing
         Else
             cf_bindAt PoArr, PoArr.Count, avArr
         End If
         func_CmArrayPushMulti = PoArr.Count
-        Set oEle = Nothing
     End Function
 
     '***************************************************************************************************
@@ -1044,6 +1045,7 @@ Class clsCmArray
         , byVal aboOrder _
         )
         Dim lIdx, vArr, lUb, oRet
+        oRet = Empty
 
         '配列の全ての要素について引数の関数の処理を行う
         If PoArr.Count>0 Then
@@ -1054,11 +1056,13 @@ Class clsCmArray
             For lIdx=1 To lUb
                 cf_bind oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr)
             Next
+            
+            cf_bind func_CmArrayReduce, oRet
+            Set oRet = Nothing
+        Else
+            Err.Raise 9, "clsCmArray.vbs:clsCmArray-func_CmArrayReduce()", "配列の初期値がありません。"
         End If
 
-        Call cf_bind(func_CmArrayReduce, oRet)
-
-        Set oRet = Nothing
     End Function
 
     '***************************************************************************************************
@@ -1135,21 +1139,56 @@ Class clsCmArray
             vArr = func_CmArrayConvArray(True)
             lUb = Ubound(vArr)
             
-            If alStart<0 Then lStart = func_CM_MathMin(PoArr.Count + alStart, 0) Else lStart = func_CM_MathMin(alStart, lUb)
-'            If alStart<0 Then lStart = PoArr.Count + alStart Else lStart = alStart
-            If alEnd = vbNullString Then
+            If alStart<0 Then lStart=lUb+1 Else lStart=0
+            lStart = func_CM_MathMax(lStart+alStart,0)
+            lStart = func_CM_MathMin(lStart,lUb+1)
+            
+            if alEnd=vbNullString Then
                 lEnd = lUb
             Else
-                If alEnd<0 Then lEnd = func_CM_MathMin(lUb + alEnd, 0) Else lEnd = func_CM_MathMin(alEnd - 1, lUb)
-'                If alEnd<0 Then lEnd = lUb + alEnd Else lEnd = alEnd - 1
+                If alEnd<0 Then lEnd=lUb Else lEnd=-1
+                lEnd = func_CM_MathMax(lEnd+alEnd,-1)
+                lEnd = func_CM_MathMin(lEnd,lUb)
             End If
             
             For lIdx=lStart To lEnd
-                Call cf_push(vRet, vArr(lIdx))
+                cf_push vRet, vArr(lIdx)
             Next
         End If
+        
+        If func_CM_ArrayIsAvailable(vRet) Then
+            Set func_CmArraySlice = new_ArrWith(vRet)
+        Else
+            Set func_CmArraySlice = new_Arr()
+        End If
+    End Function
 
-        Set func_CmArraySlice = new_ArrWith(vRet)
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArraySort()
+    'Overview                    : 指定した関数を使って配列の要素をソートする
+    'Detailed Description        : ソート処理はfunc_CM_UtilSortHeap()に委譲する
+    '                              引数の関数の引数は以下のとおり
+    '                                currentValue :配列の要素
+    '                                nextValue    :次の配列の要素
+    'Argument
+    '     aoFunc                 : 関数
+    '     aboOrder               : True:昇順 / False:降順
+    'Return Value
+    '     ソート後の自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/14         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArraySort( _
+        byRef aoFunc _
+        , byVal aboOrder _
+        )
+        If PoArr.Count>0 Then
+            Set PoArr = func_CmArrayAddDictionary(func_CM_UtilSortHeap(func_CmArrayConvArray(True), aoFunc, aboOrder), 0)
+        End If
+        Set func_CmArraySort = Me
     End Function
 
     '***************************************************************************************************

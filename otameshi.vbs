@@ -25,51 +25,13 @@ Call sub_import("clsCmPubSub.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
-Private Function anonymous_MUW6LMT_WG(e,i,a)
-    a(i)=a(i)+1
-'    anonymous_MUW6LMT_WG = (a(i)=a(i)+1)
-End Function
 
-dim ay : ay = array(1,2,3)
-dim idx
-for idx=0 to ubound(ay)
-    call anonymous_MUW6LMT_WG(ay(idx), idx, ay)
-next
-inputbox "", "", func_CM_ToString(ay)
-
-wscript.quit
-
-on error resume next
-dim ax(2)
-dim b : b= ax(3)
-inputbox "","",func_CM_ToStringErr()
-
-wscript.quit
-
-
-msgbox Ubound(Split("abc", ":", -1, vbBinaryCompare))
-
-wscript.quit
-
-Dim a : Set a = new_Func("function(a,b){a+b"&vbNewLine&"a*b}")
-msgbox "a(1,2) = " & a(1,2)
-
-wscript.quit
-
-function aaa
-    aaa = empty
-end function
-msgbox "VarType(Getref('aaa')) = " & VarType(Getref("aaa")) & vbNewLine & "TypeName(Getref('aaa')) = " & TypeName(Getref("aaa"))
-msgbox "VarType(Getref('strcomp')) = " & VarType(Getref("strcomp")) & vbNewLine & "TypeName(Getref('strcomp')) = " & TypeName(Getref("strcomp"))
-
-wscript.quit
-
-'Test func_CM_UtilGetIpaddress
-inputbox "", "", func_CM_ToString(func_CM_UtilGetIpaddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
-dim s : Set s = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress())
-inputbox "", "", func_CM_ToString(s)                                            '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
-                                                                                '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
-inputbox "", "", func_CM_ToString( new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress()).Items()(0) )
+''Test func_CM_UtilGetIpaddress
+'inputbox "", "", func_CM_ToString(func_CM_UtilGetIpaddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+'dim s : Set s = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress())
+'inputbox "", "", func_CM_ToString(s)                                            '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+'                                                                                '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+'inputbox "", "", func_CM_ToString( new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress()).Items()(0) )
 
 ''Test cf_tryCatch()
 'Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
@@ -207,9 +169,12 @@ inputbox "", "", func_CM_ToString( new_Func("a=>dim x,i:set x=new_dic():for each
 '
 'wscript.quit
 
-''Test func_CM_UtilSort`()
+'Test func_CM_UtilSort`()
 'Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
-''Dim vArray : vArray = Array("C","$","b","Š¿","a","B","‚ ","A","c","0")
+Dim vArray : vArray = Array("C","$","b","Š¿","a","B","‚ ","A","c","0")
+inputbox "","",func_CM_ToString( func_CM_UtilSortHeap(vArray, new_Func("(c,n)=>c>n"), True) )
+inputbox "","",func_CM_ToString( func_CM_UtilSortHeap(vArray, new_Func("(c,n)=>c>n"), False) )
+wscript.quit
 'Call msgbox( func_CM_ToString(vArray) )  '[5,2,9,6,4,8,7,3,0,1]
 'private function SortTest(x,y)
 '    SortTest = (x > y)

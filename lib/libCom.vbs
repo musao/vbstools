@@ -2390,11 +2390,12 @@ End Sub
 'Function/Sub Name           : func_CM_UtilSortBubble()
 'Overview                    : バブルソート
 'Detailed Description        : 計算回数はO(N^2)
+'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
 '                              引数の関数の引数は以下のとおり
 '                                currentValue :配列の要素
 '                                nextValue    :次の配列の要素
 'Argument
-'     avArray                : 配列
+'     avArr                  : 配列
 '     aoFunc                 : 関数
 '     aboFlg                 : 判定方法
 '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
@@ -2408,36 +2409,38 @@ End Sub
 '2023/09/18         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_UtilSortBubble( _
-    byRef avArray _
+    byRef avArr _
     , byRef aoFunc _
     , byVal aboFlg _
     )
-    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
-    If Ubound(avArray)=0 Then Exit Function
+    func_CM_UtilSortBubble = avArr
+    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Ubound(avArr)=0 Then Exit Function
     
     Dim lEnd, lPos
-    lEnd = Ubound(avArray)
+    lEnd = Ubound(avArr)
     Do While lEnd>0
         For lPos=0 To lEnd-1
-            If aoFunc(avArray(lPos), avArray(lPos+1))=aboFlg Then
+            If aoFunc(avArr(lPos), avArr(lPos+1))=aboFlg Then
             'lPos番目の要素と(lPos+1)番目の要素を入れ替える
-                Call sub_CM_Swap(avArray(lPos), avArray(lPos+1))
+                Call sub_CM_Swap(avArr(lPos), avArr(lPos+1))
             End If
         Next
         lEnd = lEnd-1
     Loop
-    func_CM_UtilSortBubble = avArray
+    func_CM_UtilSortBubble = avArr
 End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilSortQuick()
 'Overview                    : クイックソート
 'Detailed Description        : 計算回数は平均O(N*logN)、最悪はO(N^2)
+'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
 '                              引数の関数の引数は以下のとおり
 '                                currentValue :配列の要素
 '                                nextValue    :次の配列の要素
 'Argument
-'     avArray                : 配列
+'     avArr                  : 配列
 '     aoFunc                 : 関数
 '     aboFlg                 : 判定方法
 '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
@@ -2451,25 +2454,24 @@ End Function
 '2023/09/18         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_UtilSortQuick( _
-    byRef avArray _
+    byRef avArr _
     , byRef aoFunc _
     , byVal aboFlg _
     )
-    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
-    
-    func_CM_UtilSortQuick = avArray
-    If Ubound(avArray)=0 Then Exit Function
+    func_CM_UtilSortQuick = avArr
+    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Ubound(avArr)=0 Then Exit Function
     
     '0番目の要素をピボットに決める
-    Dim oPivot : Call cf_bind(oPivot, avArray(0))
+    Dim oPivot : Call cf_bind(oPivot, avArr(0))
     
     'ピボットと要素を関数で判定し判定方法に合致するグループをRight、そうでないグループをLeftとする
     Dim lPos, vRight, vLeft
-    For lPos=1 To Ubound(avArray)
-        If aoFunc(avArray(lPos), oPivot)=aboFlg Then
-            Call cf_push(vRight, avArray(lPos))
+    For lPos=1 To Ubound(avArr)
+        If aoFunc(avArr(lPos), oPivot)=aboFlg Then
+            Call cf_push(vRight, avArr(lPos))
         Else
-            Call cf_push(vLeft, avArray(lPos))
+            Call cf_push(vLeft, avArr(lPos))
         End If
     Next
     
@@ -2493,9 +2495,10 @@ End Function
 'Function/Sub Name           : func_CM_UtilSortMerge()
 'Overview                    : マージソート
 'Detailed Description        : 計算回数はO(N*logN)
+'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
 '                              マージ処理はfunc_CM_UtilSortMergeMerge()に委譲する
 'Argument
-'     avArray                : 配列
+'     avArr                  : 配列
 '     aoFunc                 : 関数
 '     aboFlg                 : 判定方法
 '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
@@ -2509,25 +2512,24 @@ End Function
 '2023/09/18         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_UtilSortMerge( _
-    byRef avArray _
+    byRef avArr _
     , byRef aoFunc _
     , byVal aboFlg _
     )
-    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
-    
-    func_CM_UtilSortMerge = avArray
-    If Ubound(avArray)=0 Then Exit Function
+    func_CM_UtilSortMerge = avArr
+    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Ubound(avArr)=0 Then Exit Function
     
     '2つの配列に分解する
     Dim lLength, lMedian
-    lLength = Ubound(avArray) - Lbound(avArray) + 1
+    lLength = Ubound(avArr) - Lbound(avArr) + 1
     lMedian = func_CM_MathRoundup(lLength/2, 1)
     Dim lPos, vFirst, vSecond
-    For lPos=Lbound(avArray) To lMedian-1
-        Call cf_push(vFirst, avArray(lPos))
+    For lPos=Lbound(avArr) To lMedian-1
+        Call cf_push(vFirst, avArr(lPos))
     Next
-    For lPos=lMedian To Ubound(avArray)
-        Call cf_push(vSecond, avArray(lPos))
+    For lPos=lMedian To Ubound(avArr)
+        Call cf_push(vSecond, avArr(lPos))
     Next
     
     '再帰処理で配列の要素が1つになるまで分解する
@@ -2605,8 +2607,9 @@ End Function
 'Function/Sub Name           : func_CM_UtilSortHeap()
 'Overview                    : ヒープソート
 'Detailed Description        : 計算回数はO(N*logN)
+'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
 'Argument
-'     avArray                : 配列
+'     avArr                  : 配列
 '     aoFunc                 : 関数
 '     aboFlg                 : 判定方法
 '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
@@ -2620,32 +2623,34 @@ End Function
 '2023/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_UtilSortHeap( _
-    byRef avArray _
+    byRef avArr _
     , byRef aoFunc _
     , byVal aboFlg _
     )
-    If Not func_CM_ArrayIsAvailable(avArray) Then Exit Function
+    func_CM_UtilSortHeap = avArr
+    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Ubound(avArr)=0 Then Exit Function
     
     'ヒープの作成
     Dim lLb, lUb, lSize, lParent
-    lLb = Lbound(avArray) : lUb = Ubound(avArray)
+    lLb = Lbound(avArr) : lUb = Ubound(avArr)
     lSize = lUb - lLb + 1
     '子を持つ最下部のノードから上位に向けて順番にノード単位の処理を行う
     For lParent=lSize\2-1 To lLb Step -1
-        Call sub_CM_UtilSortHeapPerNodeProc(avArray, lSize, lParent, aoFunc, aboFlg)
+        Call sub_CM_UtilSortHeapPerNodeProc(avArr, lSize, lParent, aoFunc, aboFlg)
     Next
     
     'ヒープの先頭（最大/最小値）を順番に取り出す
     Do While lSize>0
         'ヒープの先頭と末尾を入れ替える
-        Call sub_CM_Swap(avArray(lLb), avArray(lSize-1))
+        Call sub_CM_Swap(avArr(lLb), avArr(lSize-1))
         'ヒープサイズを１つ減らして再作成
         lSize = lSize - 1
-        Call sub_CM_UtilSortHeapPerNodeProc(avArray, lSize, 0, aoFunc, aboFlg)
+        Call sub_CM_UtilSortHeapPerNodeProc(avArr, lSize, 0, aoFunc, aboFlg)
     Loop
     
     'ソート済の配列を返す
-    func_CM_UtilSortHeap = avArray
+    func_CM_UtilSortHeap = avArr
     
 End Function
 
@@ -2657,7 +2662,7 @@ End Function
 '                                currentValue :配列の要素
 '                                nextValue    :次の配列の要素
 'Argument
-'     avArray                : 配列
+'     avArr                  : 配列
 '     alSize                 : ヒープのサイズ
 '     alParent               : ノードの親の配列番号
 '     aoFunc                 : 関数
@@ -2673,7 +2678,7 @@ End Function
 '2023/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Sub sub_CM_UtilSortHeapPerNodeProc( _
-    byRef avArray _
+    byRef avArr _
     , byVal alSize _
     , byVal alParent _
     , byRef aoFunc _
@@ -2686,7 +2691,7 @@ Private Sub sub_CM_UtilSortHeapPerNodeProc( _
     
     If lRight<alSize Then
     '右側の子がある場合
-        If aoFunc(avArray(lRight), avArray(alParent))=aboFlg Then
+        If aoFunc(avArr(lRight), avArr(alParent))=aboFlg Then
         '親と右側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
             lToSwap = lRight
         End If
@@ -2694,7 +2699,7 @@ Private Sub sub_CM_UtilSortHeapPerNodeProc( _
     
     If lLeft<alSize Then
     '左側の子がある場合
-        If aoFunc(avArray(lLeft), avArray(lToSwap))=aboFlg Then
+        If aoFunc(avArr(lLeft), avArr(lToSwap))=aboFlg Then
         '親と右側の子の勝者と左側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
             lToSwap = lLeft
         End If
@@ -2702,9 +2707,9 @@ Private Sub sub_CM_UtilSortHeapPerNodeProc( _
     
     If lToSwap<>alParent Then
         '親と子の要素を入れ替える
-        Call sub_CM_Swap(avArray(alParent), avArray(lToSwap))
+        Call sub_CM_Swap(avArr(alParent), avArr(lToSwap))
         '入れ替えた子の要素以下のノードを再処理する
-        Call sub_CM_UtilSortHeapPerNodeProc(avArray, alSize, lToSwap, aoFunc, aboFlg)
+        Call sub_CM_UtilSortHeapPerNodeProc(avArr, alSize, lToSwap, aoFunc, aboFlg)
     End If
     
 End Sub
