@@ -293,7 +293,7 @@ Sub Test_clsCmArray_map_Empty
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : Set a2 = a1.map(new_Func("(e,i,a)=>e*e"))
     
-'    AssertEqual 0, a2.length
+    AssertEqual 0, a2.length
     
     AssertEqual 0, a1.length
 End Sub

@@ -106,7 +106,7 @@ Class clsCmArray
         , byRef aoEle _
         )
         If func_CmArrayInspectIndex(alIdx) Then
-            Call cf_bindAt(PoArr, alIdx, aoEle)
+            cf_bindAt PoArr, alIdx, aoEle
         End If
     End Property
 
@@ -317,26 +317,6 @@ Class clsCmArray
         )
         joinVbs = Join(func_CmArrayConvArray(True), asDelimiter)
     End Function
-'
-'    '***************************************************************************************************
-'    'Function/Sub Name           : join()
-'    'Overview                    : 配列の各要素を連結した文字列を作成する
-'    'Detailed Description        : 工事中
-'    'Argument
-'    '     asDelimiter            : 区切り文字
-'    'Return Value
-'    '     配列の各要素を連結した文字列
-'    '---------------------------------------------------------------------------------------------------
-'    'Histroy
-'    'Date               Name                     Reason for Changes
-'    '----------         ----------------------   -------------------------------------------------------
-'    '2023/10/13         Y.Fujii                  First edition
-'    '***************************************************************************************************
-'    Public Function join( _
-'        byVal asDelimiter _
-'        )
-'        join = func_CmArrayReduce(new_Func("(p,c,i,a)=>p&"&asDelimiter&"&c"), True)
-'    End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : lastIndexOf()
@@ -394,7 +374,7 @@ Class clsCmArray
     '***************************************************************************************************
     Public Function pop( _
         )
-        Call cf_bind(pop, func_CmArrayPop())
+        cf_bind pop, func_CmArrayPop()
     End Function
 
     '***************************************************************************************************
@@ -512,7 +492,7 @@ Class clsCmArray
     '***************************************************************************************************
     Public Function shift( _
         )
-        Call cf_bind(shift, func_CmArrayShift())
+        cf_bind shift, func_CmArrayShift()
     End Function
 
     '***************************************************************************************************
@@ -785,7 +765,7 @@ Class clsCmArray
     '***************************************************************************************************
     'Function/Sub Name           : func_CmArrayFind()
     'Overview                    : 引数の関数で抽出した最初の要素を返す
-    'Detailed Description        : 抽出できない場合はNothingを返す
+    'Detailed Description        : 抽出できない場合はEmptyを返す
     '                              引数の関数の引数は以下のとおり
     '                                element :配列の要素
     '                                index   :インデックス
@@ -903,7 +883,7 @@ Class clsCmArray
 
             boFlg = False
             For lIdx=lStart To lEnd Step lStep
-                Call cf_bind(oEle, vArr(lIdx))
+                cf_bind oEle, vArr(lIdx)
 
                 If IsObject(avTarget) And IsObject(oEle) Then
                     If avTarget Is oEle Then boFlg = True
@@ -985,10 +965,10 @@ Class clsCmArray
         Set oEle = Nothing
         lCount = PoArr.Count
         If lCount>0 Then
-            Call cf_bind(oEle, PoArr.Item(lCount-1))
+            cf_bind oEle, PoArr.Item(lCount-1)
             PoArr.Remove lCount-1
         End If
-        Call cf_bind(func_CmArrayPop, oEle)
+        cf_bind func_CmArrayPop, oEle
         Set oEle = Nothing
     End Function
 
@@ -1104,7 +1084,7 @@ Class clsCmArray
         )
         If PoArr.Count>0 Then
             '配列から取り除いた要素を返す
-            Call cf_bind(func_CmArrayShift, PoArr.Item(0))
+            cf_bind func_CmArrayShift, PoArr.Item(0)
             '作成した配列（ディクショナリ）を置換え
             Set PoArr = func_CmArrayAddDictionary(func_CmArrayConvArray(True), 1)
         End If
@@ -1289,7 +1269,7 @@ Class clsCmArray
 
         '続いて今ある要素を追加
         For Each oEle In func_CmArrayConvArray(True)
-            Call cf_bindAt(oArr, oArr.Count, oEle)
+            cf_bindAt oArr, oArr.Count, oEle
         Next
 
         '作成した配列（ディクショナリ）を置換え
@@ -1330,7 +1310,7 @@ Class clsCmArray
             End If
 
             For lIdx=lStt To lEnd Step lStep
-                Call cf_push(vRet, vArr(lIdx))
+                cf_push vRet, vArr(lIdx)
             Next
         End If
 
@@ -1364,7 +1344,7 @@ Class clsCmArray
         Set oArr = new_Dic()
 
         For lIdx = alStart To lUb
-            Call cf_bindAt(oArr, oArr.Count, avArr(lIdx))
+            cf_bindAt oArr, oArr.Count, avArr(lIdx)
         Next
 
         '作成した配列（ディクショナリ）を返す

@@ -2799,7 +2799,7 @@ Private Function func_CM_UtilGenerateRandomString( _
           , Array( Array("亜", "腕") ) _
           , Array( Array("弌", "滌"), Array("漾", "熙") ) _
           )
-
+    
     Dim lType : lType = alType
     Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
     Dim oChars : Set oChars = new_Arr()
@@ -2866,7 +2866,7 @@ Private Sub sub_CM_UtilLogger( _
     , byRef aoWriter _
     )
     Dim oCont, sIp
-    sIp = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress()).Items()(0).Item("v4")
+    sIp = new_ArrWith(func_CM_UtilGetIpaddress()).filter(new_Func("(e,i,a)=>left(e.item(""Ip"").item(""V4""),3)<>""172"""))(0).Item("Ip").Item("V4")
     Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
     
     With aoWriter
@@ -2966,17 +2966,18 @@ End Function
 'Argument
 '     なし
 'Return Value
-'     IPアドレスを格納したオブジェクト
+'     IPアドレスを格納したオブジェクトの配列
 '                              内容は以下のとおり
 '                               Key             Value                   例
 '                               --------------  ----------------------  ----------------------------
-'                               Adapter名       以下のオブジェクト      -
+'                               "Caption"       Adapter名               -
+'                               "Ip"            以下オブジェクト        -
 '                              
 '                              IP Addressを格納したオブジェクト
 '                               Key             Value                   例
 '                               --------------  ----------------------  ----------------------------
-'                               "v4"            IP Address(v4)          192.168.11.52
-'                               "v6"            IP Address(v6)          fe80::ba87:1e93:59ab:28f7%18
+'                               "V4"            IP Address(v4)          192.168.11.52
+'                               "V6"            IP Address(v6)          fe80::ba87:1e93:59ab:28f7%18
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -2985,28 +2986,26 @@ End Function
 '***************************************************************************************************
 Private Function func_CM_UtilGetIpaddress( _
     )
-    Dim sMyComp, oAdapter, oAddress, oRet, oTemp
+    Dim sMyComp, oAdapter, oAddress, oRet, oIpv4, oIpv6
     
     sMyComp = "."
-    Set oRet = new_Dic()
+    Set oRet = new_Arr()
     For Each oAdapter in GetObject("winmgmts:\\"&sMyComp&"\root\cimv2").ExecQuery("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
-         Set oTemp = new_Dic()
          For Each oAddress in oAdapter.IPAddress
              If new_ArrSplit(oAddress, ".").length=4 Then
              'IPv4
-                 oTemp.Add "v4", oAddress
+                 cf_bind oIpv4, oAddress
              Else
              'IPv6
-                 oTemp.Add "v6", oAddress
+                 cf_bind oIpv6, oAddress
              End If
          Next
-         oRet.Add oAdapter.Caption, oTemp
+         oRet.push new_DicWith(Array("Caption", oAdapter.Caption, "Ip", new_DicWith(Array("V4", oIpv4, "V6", oIpv6))))
     Next
-    Set func_CM_UtilGetIpaddress = oRet
+    func_CM_UtilGetIpaddress = oRet.items
     
     Set oAddress = Nothing
     Set oAdapter = Nothing
-    Set oTemp = Nothing
     Set oRet = Nothing
 End Function
 
