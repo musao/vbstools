@@ -2337,7 +2337,6 @@ End Function
 '     asSubName              : 実行する関数名
 '     aoArgument             : 実行する関数に渡す引数
 '     aoPubSub               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
-'     asTopic                : トピック
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -2350,35 +2349,36 @@ Private Sub sub_CM_ExcuteSub( _
     byVal asSubName _
     , byRef aoArgument _
     , byRef aoPubSub _
-    , byVal asTopic _
     )
-    On Error Resume Next
+    Const Cs_TOPIC = "log"
     
     '出版（Publish） 開始
     If Not aoPubSub Is Nothing Then
-        Call aoPubSub.Publish(asTopic, Array(5 ,asSubName ,"Start"))
-        Call aoPubSub.Publish(asTopic, Array(9 ,asSubName ,func_CM_ToString(aoArgument)))
+        aoPubSub.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
+        aoPubSub.Publish Cs_TOPIC, Array(9 ,asSubName ,func_CM_ToString(aoArgument))
     End If
     
     '関数の実行
-    Dim oFunc : Set oFunc = GetRef(asSubName)
+    Dim oFunc, oRet
+    Set oFunc = GetRef(asSubName)
     If aoArgument Is Nothing Then
-        Call oFunc()
+        Set oRet = cf_tryCatch( new_Func("function(a){a()}"), oFunc, Empty, Empty )
     Else
-        Call oFunc(aoArgument)
+        Set oRet = cf_tryCatch( new_Func("function(a){a(0)(a(1))}"), Array(oFunc, aoArgument), Empty, Empty )
     End If
     
     If Not aoPubSub Is Nothing Then
-        If Err.Number <> 0 Then
+        If oRet.Item("Result")=False Then
         'エラー
-            Call aoPubSub.Publish(asTopic, Array(1, asSubName, func_CM_ToStringErr()))
+            aoPubSub.Publish Cs_TOPIC, Array(1, asSubName, func_CM_ToString(oRet.Item("Err")))
         Else
         '正常
-            Call aoPubSub.Publish(asTopic, Array(5, asSubName, "End"))
+            aoPubSub.Publish Cs_TOPIC, Array(5, asSubName, "End")
         End If
-        Call aoPubSub.Publish(asTopic, Array(9, asSubName, func_CM_ToString(aoArgument)))
+        aoPubSub.Publish Cs_TOPIC, Array(9, asSubName, func_CM_ToString(aoArgument))
     End If
     
+    Set oRet = Nothing
     Set oFunc = Nothing
 End Sub
 

@@ -70,13 +70,13 @@ Sub Main()
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数取得
-    Call sub_CM_ExcuteSub("sub_CmpExcelGetParameters", oParams, PoPubSub, "log")
+    sub_CM_ExcuteSub "sub_CmpExcelGetParameters", oParams, PoPubSub
     
     '比較対象ファイル入力画面の表示と取得
-    Call sub_CM_ExcuteSub("sub_CmpExcelDispInputFiles", oParams, PoPubSub, "log")
+    sub_CM_ExcuteSub "sub_CmpExcelDispInputFiles", oParams, PoPubSub
     
     'エクセルファイルを比較する
-    Call sub_CM_ExcuteSub("sub_CmpExcelCompareFiles", oParams, PoPubSub, "log")
+    sub_CM_ExcuteSub "sub_CmpExcelCompareFiles", oParams, PoPubSub
     
     'ファイル接続をクローズする
     PoWriter.Close
@@ -115,7 +115,7 @@ Private Sub sub_CmpExcelGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelGetParameters", func_CM_ToStringArguments()))
+    sub_CmpExcelLogger Array(9, "sub_CmpExcelGetParameters", func_CM_ToStringArguments())
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,2)
@@ -150,7 +150,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
     If oParam.Length > 1 Then
     'パラメータが2個以上だったら関数を抜ける
         '★ログ出力
-        Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelDispInputFiles", "No dialog required."))
+        sub_CmpExcelLogger Array(3, "sub_CmpExcelDispInputFiles", "No dialog required.")
         Exit Sub
     End If
     
@@ -164,7 +164,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
             If sPath = False Then
             'ファイル選択キャンセルの場合は当スクリプトを終了する
                 '★ログ出力
-                Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelDispInputFiles", "Dialog input canceled."))
+                sub_CmpExcelLogger Array(3, "sub_CmpExcelDispInputFiles", "Dialog input canceled.")
                 
                 PoWriter.Close
                 Set oParam = Nothing
@@ -205,8 +205,8 @@ Private Sub sub_CmpExcelCompareFiles( _
     'ファイルの最終更新日昇順に並べ替える
     oParam.sortUsing new_Func("(c,n)=>new_CalAt(func_CM_FsGetFile(c).DateLastModified).compareTo(new_CalAt(func_CM_FsGetFile(n).DateLastModified))>0")
     '★ログ出力
-    Call sub_CmpExcelLogger(Array(3, "sub_CmpExcelCompareFiles", "aoParams sorted."))
-    Call sub_CmpExcelLogger(Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & func_CM_ToString(aoParams)))
+    sub_CmpExcelLogger Array(3, "sub_CmpExcelCompareFiles", "aoParams sorted.")
+    sub_CmpExcelLogger Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & func_CM_ToString(aoParams))
     
     '比較
     With New clsCompareExcel

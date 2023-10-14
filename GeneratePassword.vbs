@@ -22,7 +22,7 @@ Option Explicit
 
 '定数
 Private Const Cs_FOLDER_LIB = "lib"
-Private PoWriter, PoPubSub
+Private PoWriter
 
 'import定義
 Sub sub_import( _
@@ -68,23 +68,23 @@ Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_Pubsub()
-    Call PoPubSub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
+    Dim oPubsub : Set oPubsub = new_Pubsub()
+    Call oPubsub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    Call sub_CM_ExcuteSub("sub_GnrtPwGetParameters", oParams, PoPubSub, "log")
+    sub_CM_ExcuteSub "sub_GnrtPwGetParameters", oParams, oPubsub
     
     'パスワードを生成する
-    Call sub_CM_ExcuteSub("sub_GnrtPwGenerate", oParams, PoPubSub, "log")
+    sub_CM_ExcuteSub "sub_GnrtPwGenerate", oParams, oPubsub
     
     'ファイル接続をクローズする
-    Call PoWriter.Close()
+    PoWriter.Close()
     
     'オブジェクトを開放
     Set oParams = Nothing
-    Set PoPubSub = Nothing
+    Set oPubsub = Nothing
     Set PoWriter = Nothing
 End Sub
 
