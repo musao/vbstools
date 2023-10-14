@@ -2364,9 +2364,10 @@ Private Sub sub_CM_ExcuteSub( _
     If aoArgument Is Nothing Then
         Set oRet = cf_tryCatch( new_Func("function(a){a()}"), oFunc, Empty, Empty )
     Else
-        Set oRet = cf_tryCatch( new_Func("function(a){a(0)(a(1))}"), Array(oFunc, aoArgument), Empty, Empty )
+        Set oRet = cf_tryCatch( oFunc, aoArgument, Empty, Empty )
     End If
     
+    '出版（Publish） 終了
     If Not aoPubSub Is Nothing Then
         If oRet.Item("Result")=False Then
         'エラー

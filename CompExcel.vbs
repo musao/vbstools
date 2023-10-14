@@ -65,7 +65,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath(), 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Set PoPubSub = new_Pubsub()
-    Call PoPubSub.Subscribe("log", GetRef("sub_CmpExcelLogger"))
+    PoPubSub.subscribe "log", GetRef("sub_CmpExcelLogger")
     'パラメータ格納用汎用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -147,7 +147,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
     byRef aoParams _
     )
     Dim oParam : Set oParam = aoParams.Item("Param")
-    If oParam.Length > 1 Then
+    If oParam.length > 1 Then
     'パラメータが2個以上だったら関数を抜ける
         '★ログ出力
         sub_CmpExcelLogger Array(3, "sub_CmpExcelDispInputFiles", "No dialog required.")
@@ -166,12 +166,12 @@ Private Sub sub_CmpExcelDispInputFiles( _
                 '★ログ出力
                 sub_CmpExcelLogger Array(3, "sub_CmpExcelDispInputFiles", "Dialog input canceled.")
                 
-                PoWriter.Close
+                PoWriter.close
                 Set oParam = Nothing
                 Wscript.Quit
             End If
             '選択したファイルのパスを取得
-            oParam.Push sPath
+            oParam.push sPath
         Loop
         
         .Quit
@@ -210,10 +210,10 @@ Private Sub sub_CmpExcelCompareFiles( _
     
     '比較
     With New clsCompareExcel
-        Set .PubSub = PoPubSub
-        .PathFrom = oParam(0)
-        .PathTo = oParam(1)
-        .Compare()
+        Set .pubsub = PoPubSub
+        .pathFrom = oParam(0)
+        .pathTo = oParam(1)
+        .compare()
     End With
     
     'オブジェクトを開放
@@ -238,5 +238,5 @@ End Sub
 Private Sub sub_CmpExcelLogger( _
     byRef avParams _
     )
-    Call sub_CM_UtilLogger(avParams, PoWriter)
+    sub_CM_UtilLogger avParams, PoWriter
 End Sub

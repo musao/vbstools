@@ -69,7 +69,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Dim oPubsub : Set oPubsub = new_Pubsub()
-    Call oPubsub.Subscribe("log", GetRef("sub_GnrtPwLogger"))
+    oPubsub.Subscribe "log", GetRef("sub_GnrtPwLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -123,7 +123,7 @@ Private Sub sub_GnrtPwGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    Call sub_GnrtPwLogger(Array(9, "sub_GnrtPwGetParameters", func_CM_ToStringArguments()))
+    sub_GnrtPwLogger Array(9, "sub_GnrtPwGetParameters", func_CM_ToStringArguments())
     
     '引数の内容を解析
     
@@ -188,7 +188,7 @@ Private Sub sub_GnrtPwGenerate( _
     Dim sPw : sPw = func_CM_UtilGenerateRandomString(lLength, lType, vAdd)
     
     '★ログ出力
-    Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw))
+    sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw)
     
     'ダイアログのメッセージなどを作成
     Dim sMsg, sTitle
@@ -196,18 +196,18 @@ Private Sub sub_GnrtPwGenerate( _
     sTitle = new_Now() & " に作成"
     
     '★ログ出力
-    Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Display Inputbox."))
+    sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "Display Inputbox.")
     '一時ファイルのパスを作成
     Dim sPath : sPath = func_CM_FsGetTempFilePath()
     Do Until Inputbox(sMsg, sTitle, sPw)=False
         '一時ファイルに生成したパスワードを出力
-        Call sub_CM_FsWriteFile(sPath, sPw)
+        sub_CM_FsWriteFile sPath, sPw
         'クリップボードに一時ファイルの内容を出力
-        Call CreateObject("Wscript.Shell").Run("cmd /c clip <""" & sPath & """", 0, True)
+        CreateObject("Wscript.Shell").Run "cmd /c clip <""" & sPath & """", 0, True
         '一時ファイルを削除
-        Call func_CM_FsDeleteFile(sPath)
+        func_CM_FsDeleteFile sPath
         '★ログ出力
-        Call sub_GnrtPwLogger(Array(3, "sub_GnrtPwGenerate", "Copied to clipboard."))
+        sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "Copied to clipboard.")
     Loop
     
     
@@ -231,5 +231,5 @@ End Sub
 Private Sub sub_GnrtPwLogger( _
     byRef avParams _
     )
-    Call sub_CM_UtilLogger(avParams, PoWriter)
+    sub_CM_UtilLogger avParams, PoWriter
 End Sub

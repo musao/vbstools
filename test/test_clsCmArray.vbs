@@ -24,7 +24,7 @@ End Sub
 
 '###################################################################################################
 'clsCmArray.item()
-Sub Test_clsCmArray_item
+Sub Test_clsCmArray_get_item
     Dim ev : ev = "hoge"
     Dim eo : Set eo = CreateObject("Scripting.Dictionary")
     Dim a : Set a = new clsCmArray
@@ -37,7 +37,7 @@ Sub Test_clsCmArray_item
     AssertSame eo, a.item(1)
     AssertSame eo, a(1)
 End Sub
-Sub Test_clsCmArray_item_OutOfRangeLarge
+Sub Test_clsCmArray_get_item_OutOfRangeLarge
     On Error Resume Next
     Dim a : Set a = new clsCmArray
     a.push "hoge"
@@ -48,7 +48,7 @@ Sub Test_clsCmArray_item_OutOfRangeLarge
     AssertEqual "インデックスが有効範囲にありません。", Err.Description
     AssertEqual Empty, x
 End Sub
-Sub Test_clsCmArray_item_OutOfRangeSmall
+Sub Test_clsCmArray_get_item_OutOfRangeSmall
     On Error Resume Next
     Dim a : Set a = new clsCmArray
     a.push "hoge"
@@ -59,7 +59,43 @@ Sub Test_clsCmArray_item_OutOfRangeSmall
     AssertEqual "インデックスが有効範囲にありません。", Err.Description
     AssertEqual Empty, x
 End Sub
-
+Sub Test_clsCmArray_set_let_item
+    Dim ev : ev = "hoge"
+    Dim eo : Set eo = CreateObject("Scripting.Dictionary")
+    Dim a : Set a = new clsCmArray
+    
+    a.push "fuga"
+    a.push "foo"
+    set a.item(0) = eo
+    a(1) = ev
+    
+    AssertSame eo, a.item(0)
+    AssertSame eo, a(0)
+    AssertEqual ev, a.item(1)
+    AssertEqual ev, a(1)
+End Sub
+Sub Test_clsCmArray_set_let_item_OutOfRangeLarge
+    On Error Resume Next
+    Dim a : Set a = new clsCmArray
+    a.push "hoge"
+    a.push CreateObject("Scripting.Dictionary")
+    a(2) = "fuga"
+    
+    AssertEqual 9, Err.Number
+    AssertEqual "インデックスが有効範囲にありません。", Err.Description
+    AssertEqual 2, a.length
+End Sub
+Sub Test_clsCmArray_set_let_item_OutOfRangeSmall
+    On Error Resume Next
+    Dim a : Set a = new clsCmArray
+    a.push "hoge"
+    a.push CreateObject("Scripting.Dictionary")
+    a(-1) = "fuga"
+    
+    AssertEqual 9, Err.Number
+    AssertEqual "インデックスが有効範囲にありません。", Err.Description
+    AssertEqual 2, a.length
+End Sub
 '###################################################################################################
 'clsCmArray.items()
 Sub Test_clsCmArray_items

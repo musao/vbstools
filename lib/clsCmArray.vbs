@@ -107,6 +107,8 @@ Class clsCmArray
         )
         If func_CmArrayInspectIndex(alIdx) Then
             cf_bindAt PoArr, alIdx, aoEle
+        Else
+            Err.Raise 9, "clsCmArray.vbs:clsCmArray+item()", "インデックスが有効範囲にありません。"
         End If
     End Property
 
@@ -131,6 +133,8 @@ Class clsCmArray
         )
         If func_CmArrayInspectIndex(alIdx) Then
             cf_bindAt PoArr, alIdx, aoEle
+        Else
+            Err.Raise 9, "clsCmArray.vbs:clsCmArray+item()", "インデックスが有効範囲にありません。"
         End If
     End Property
 

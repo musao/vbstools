@@ -63,7 +63,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Dim oPubsub : Set oPubsub = new_Pubsub()
-    Call oPubsub.Subscribe("log", GetRef("sub_GetPathsLogger"))
+    oPubsub.Subscribe "log", GetRef("sub_GetPathsLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -74,7 +74,7 @@ Sub Main()
     sub_CM_ExcuteSub "sub_GetPathsProc", oParams, oPubsub
     
     'ファイル接続をクローズする
-    PoWriter.Close()
+    PoWriter.close()
     
     'オブジェクトを開放
     Set oParams = Nothing
@@ -105,7 +105,7 @@ Private Sub sub_GetPathsGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    Call sub_GetPathsLogger(Array(9, "sub_GetPathsGetParameters", func_CM_ToStringArguments()))
+    sub_GetPathsLogger Array(9, "sub_GetPathsGetParameters", func_CM_ToStringArguments())
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,vbNullString)
@@ -136,11 +136,11 @@ Private Sub sub_GetPathsProc( _
     
     '一時ファイルに連結した引数を出力
     Dim sTempFilePaths : sTempFilePaths = func_CM_FsGetTempFilePath() 
-    Call sub_CM_FsWriteFile(sTempFilePaths, oParam.JoinVbs(vbNewLine))
-    Call CreateObject("Wscript.Shell").Run("cmd /c clip <""" & sTempFilePaths & """", 0, True)
+    sub_CM_FsWriteFile sTempFilePaths, oParam.joinVbs(vbNewLine)
+    CreateObject("Wscript.Shell").Run "cmd /c clip <""" & sTempFilePaths & """", 0, True
     
     '一時ファイルを削除
-    Call func_CM_FsDeleteFile(sTempFilePaths)
+    func_CM_FsDeleteFile sTempFilePaths
     
     Set oParam = Nothing
 End Sub
@@ -163,5 +163,5 @@ End Sub
 Private Sub sub_GetPathsLogger( _
     byRef avParams _
     )
-    Call sub_CM_UtilLogger(avParams, PoWriter)
+    sub_CM_UtilLogger avParams, PoWriter
 End Sub
