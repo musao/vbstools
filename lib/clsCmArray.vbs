@@ -283,6 +283,27 @@ Class clsCmArray
     End Sub
 
     '***************************************************************************************************
+    'Function/Sub Name           : hasElements()
+    'Overview                    : 配列が要素を含むか検査する
+    'Detailed Description        : func_CmArrayHasElement()に委譲する
+    '                              初期状態の配列はFalseを返す
+    'Argument
+    '     acArr                  : 配列
+    'Return Value
+    '     結果 True:要素を含む / False:要素を含まない
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function hasElement( _
+        byRef acArr _
+        )
+        hasElement = func_CmArrayHasElement(acArr)
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : indexOf()
     'Overview                    : 条件に合致する要素を正順に探し最初に見つかったインデックス番号を返す
     'Detailed Description        : func_CmArrayIndexOf()に委譲する
@@ -767,7 +788,7 @@ Class clsCmArray
         End If
         
         '作成した配列（ディクショナリ）で当クラスのインスタンスを生成して返却
-        If func_CM_ArrayIsAvailable(vRet) Then
+        If func_CmArrayHasElement(vRet) Then
             Set func_CmArrayFilter = new_ArrWith(vRet)
         Else
             Set func_CmArrayFilter = new_Arr()
@@ -850,6 +871,35 @@ Class clsCmArray
             Next
             Set PoArr = func_CmArrayAddDictionary(vArr, 0)
         End If
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArrayHasElement()
+    'Overview                    : 配列が要素を含むか検査する
+    'Detailed Description        : 初期状態の配列はFalseを返す
+    'Argument
+    '     acArr                  : 配列
+    'Return Value
+    '     結果 True:要素を含む / False:要素を含まない
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArrayHasElement( _
+        byRef acArr _
+        )
+        func_CmArrayHasElement = False
+        If IsArray(acArr) Then
+            On Error Resume Next
+            Ubound(acArr)
+            If Err.Number=0 Then func_CmArrayHasElement = True
+            On Error Goto 0
+        End If
+
+'        func_CmArrayHasElement = False
+'        If IsArray(avArray) Then func_CmArrayHasElement = cf_tryCatch(Getref("func_CM_ArrayUbound"), avArray, Empty, Empty).Item("Result")
     End Function
 
     '***************************************************************************************************
@@ -951,7 +1001,7 @@ Class clsCmArray
             Next
         End If
         
-        If func_CM_ArrayIsAvailable(vRet) Then
+        If func_CmArrayHasElement(vRet) Then
             Set func_CmArrayMap = new_ArrWith(vRet)
         Else
             Set func_CmArrayMap = new_Arr()
@@ -1002,7 +1052,7 @@ Class clsCmArray
     Private Function func_CmArrayPushMulti( _
         byRef avArr _
         )
-        If func_CM_ArrayIsAvailable(avArr) Then
+        If func_CmArrayHasElement(avArr) Then
             Dim oEle
             For Each oEle In avArr
                 cf_bindAt PoArr, PoArr.Count, oEle
@@ -1149,7 +1199,7 @@ Class clsCmArray
             Next
         End If
         
-        If func_CM_ArrayIsAvailable(vRet) Then
+        If func_CmArrayHasElement(vRet) Then
             Set func_CmArraySlice = new_ArrWith(vRet)
         Else
             Set func_CmArraySlice = new_Arr()
@@ -1228,7 +1278,7 @@ Class clsCmArray
             Next
         End If
         
-        If func_CM_ArrayIsAvailable(avArr) Then
+        If func_CmArrayHasElement(avArr) Then
         '追加する要素があれば追加する
             For lIdx = 0 To Ubound(avArr)
                 cf_push vArrayAft, avArr(lIdx)
@@ -1242,13 +1292,13 @@ Class clsCmArray
             Next
         End If
         
-        If func_CM_ArrayIsAvailable(vArrayAft) Then
+        If func_CmArrayHasElement(vArrayAft) Then
             '作成した配列（ディクショナリ）を置換え
             Set PoArr = func_CmArrayAddDictionary(vArrayAft, 0)
         End If
         
         '配列から取り除いた要素を返す
-        If func_CM_ArrayIsAvailable(vRet) Then
+        If func_CmArrayHasElement(vRet) Then
             Set func_CmArraySplice = new_ArrWith(vRet)
         Else
             Set func_CmArraySplice = new_Arr()
@@ -1275,7 +1325,7 @@ Class clsCmArray
         Dim oArr, oEle
         Set oArr = new_Dic()
 
-        If func_CM_ArrayIsAvailable(avArr) Then
+        If func_CmArrayHasElement(avArr) Then
         '引数の要素を先頭に追加
             Set oArr = func_CmArrayAddDictionary(avArr, 0)
         End If

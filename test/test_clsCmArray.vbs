@@ -1,4 +1,4 @@
-' clsCmArray.vbs: new_* procedure test.
+' clsCmArray.vbs: test.
 ' @import ../lib/clsCmArray.vbs
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
@@ -258,6 +258,62 @@ Sub Test_clsCmArray_forEach_Empty
     a.forEach(new_Func("function(e,i,a) {a(i)=a(i)+1}"))
     
     AssertEqual 0, a.length
+End Sub
+
+'###################################################################################################
+'clsCmArray.hasElement()
+Sub Test_clsCmArray_hasElement_Ok
+    Dim a
+    Set a = new_Arr()
+    
+    Dim d1(0)
+    AssertEqual True, a.hasElement(d1)
+    
+    Dim d2(1)
+    AssertEqual True, a.hasElement(d2)
+    
+    Dim d3
+    d3 = Array(1)
+    AssertEqual True, a.hasElement(d3)
+    
+    d3 = Array(1,2)
+    AssertEqual True, a.hasElement(d3)
+    
+    Redim d4(1)
+    AssertEqual True, a.hasElement(d4)
+    
+    Redim Preserve d4(2)
+    AssertEqual True, a.hasElement(d4)
+    
+    Redim d4(0)
+    AssertEqual True, a.hasElement(d4)
+End Sub
+Sub Test_clsCmArray_hasElement_Ng_Variable
+    Dim a
+    Set a = new_Arr()
+    
+    Dim d
+    d = Empty
+    AssertEqual False, a.hasElement(d)
+    
+    d = vbNullString
+    AssertEqual False, a.hasElement(d)
+    
+    Set d = Nothing
+    AssertEqual False, a.hasElement(d)
+    
+    d = "abc"
+    AssertEqual False, a.hasElement(d)
+    
+    d = 123
+    AssertEqual False, a.hasElement(d)
+End Sub
+Sub Test_clsCmArray_hasElement_Ng_Array
+    Dim a
+    Set a = new_Arr()
+    
+    Dim d()
+    AssertEqual False, a.hasElement(d)
 End Sub
 
 '###################################################################################################

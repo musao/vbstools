@@ -149,7 +149,8 @@ Private Sub sub_GnrtPwGetParameters( _
         If oArg.Item("Named").Exists(oKey) Then lSum = lSum + oSetting.Item(oKey)
     Next
     lType = lSum
-    If lType = 0 And func_CM_ArrayIsAvailable(vAdd)<>True Then lType = 15
+    If lType = 0 And new_Arr().hasElement(vAdd)<>True Then lType = 15
+'    If lType = 0 And func_CM_ArrayIsAvailable(vAdd)<>True Then lType = 15
     
     Dim oParam : Set oParam = new_DicWith(Array("Length", lLength, "Type", lType, "Additional", vAdd))
     

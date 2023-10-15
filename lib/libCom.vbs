@@ -82,7 +82,8 @@ Private Sub cf_push( _
     byRef avArr _ 
     , byRef aoEle _ 
     )
-    If func_CM_ArrayIsAvailable(avArr) Then
+    If new_Arr().hasElement(avArr) Then
+'    If func_CM_ArrayIsAvailable(avArr) Then
         Redim Preserve avArr(Ubound(avArr)+1)
     Else
         Redim avArr(0)
@@ -1795,35 +1796,35 @@ End Function
 '配列系
 '###################################################################################################
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ArrayIsAvailable()
-'Overview                    : 有効な配列か検査する
-'Detailed Description        : 初期状態ではなく要素を1つ以上含む配列
-'Argument
-'     avArray                : 検査対象の配列
-'Return Value
-'     結果 True:有効 / False:無効
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ArrayIsAvailable( _
-    byRef avArray _
-    )
-    func_CM_ArrayIsAvailable = False
-    If IsArray(avArray) Then
-        On Error Resume Next
-        Ubound(avArray)
-        If Err.Number=0 Then func_CM_ArrayIsAvailable = True
-        On Error Goto 0
-    End If
-
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ArrayIsAvailable()
+''Overview                    : 有効な配列か検査する
+''Detailed Description        : 初期状態ではなく要素を1つ以上含む配列
+''Argument
+''     avArray                : 検査対象の配列
+''Return Value
+''     結果 True:有効 / False:無効
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/18         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ArrayIsAvailable( _
+'    byRef avArray _
+'    )
 '    func_CM_ArrayIsAvailable = False
-'    If IsArray(avArray) Then func_CM_ArrayIsAvailable = cf_tryCatch(Getref("func_CM_ArrayUbound"), avArray, Empty, Empty).Item("Result")
-
-End Function
+'    If IsArray(avArray) Then
+'        On Error Resume Next
+'        Ubound(avArray)
+'        If Err.Number=0 Then func_CM_ArrayIsAvailable = True
+'        On Error Goto 0
+'    End If
+'
+''    func_CM_ArrayIsAvailable = False
+''    If IsArray(avArray) Then func_CM_ArrayIsAvailable = cf_tryCatch(Getref("func_CM_ArrayUbound"), avArray, Empty, Empty).Item("Result")
+'
+'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_ArrayGetDimensionNumber()
@@ -2481,7 +2482,8 @@ Private Function func_CM_UtilSortBubble( _
     , byVal aboFlg _
     )
     func_CM_UtilSortBubble = avArr
-    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Not new_Arr().hasElement(avArr) Then Exit Function
+'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     Dim lEnd, lPos
@@ -2526,7 +2528,8 @@ Private Function func_CM_UtilSortQuick( _
     , byVal aboFlg _
     )
     func_CM_UtilSortQuick = avArr
-    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Not new_Arr().hasElement(avArr) Then Exit Function
+'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     '0番目の要素をピボットに決める
@@ -2548,7 +2551,8 @@ Private Function func_CM_UtilSortQuick( _
     
     'Leftにピボット＋Rightを結合する
     Call cf_push(vLeft, oPivot)
-    If func_CM_ArrayIsAvailable(vRight) Then
+    If new_Arr().hasElement(vRight) Then
+'    If func_CM_ArrayIsAvailable(vRight) Then
         For lPos=0 To Ubound(vRight)
             Call cf_push(vLeft, vRight(lPos))
         Next
@@ -2584,7 +2588,8 @@ Private Function func_CM_UtilSortMerge( _
     , byVal aboFlg _
     )
     func_CM_UtilSortMerge = avArr
-    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Not new_Arr().hasElement(avArr) Then Exit Function
+'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     '2つの配列に分解する
@@ -2695,7 +2700,8 @@ Private Function func_CM_UtilSortHeap( _
     , byVal aboFlg _
     )
     func_CM_UtilSortHeap = avArr
-    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
+    If Not new_Arr().hasElement(avArr) Then Exit Function
+'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     'ヒープの作成
