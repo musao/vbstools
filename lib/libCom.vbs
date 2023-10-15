@@ -88,6 +88,10 @@ Private Sub cf_push( _
         Redim avArr(0)
     End If
     cf_bind avArr(Ubound(avArr)), aoEle
+
+'    cf_tryCatch Getref("func_CM_ArrayAddElement"), avArr, Getref("func_CM_ArrayInitialize"), Empty
+'    cf_bind avArr(Ubound(avArr)), aoEle
+
 End Sub
 
 '***************************************************************************************************
@@ -1809,13 +1813,16 @@ Private Function func_CM_ArrayIsAvailable( _
     byRef avArray _
     )
     func_CM_ArrayIsAvailable = False
-    If IsArray(avArray) And (Not IsEmpty(avArray)) Then
-'        func_CM_ArrayIsAvailable = cf_tryCatch(new_Func("a=>ubound(a)"), avArray, Empty, Empty).Item("Result")
+    If IsArray(avArray) Then
         On Error Resume Next
         Ubound(avArray)
         If Err.Number=0 Then func_CM_ArrayIsAvailable = True
         On Error Goto 0
     End If
+
+'    func_CM_ArrayIsAvailable = False
+'    If IsArray(avArray) Then func_CM_ArrayIsAvailable = cf_tryCatch(Getref("func_CM_ArrayUbound"), avArray, Empty, Empty).Item("Result")
+
 End Function
 
 '***************************************************************************************************
@@ -1847,6 +1854,67 @@ Private Function func_CM_ArrayGetDimensionNumber( _
    func_CM_ArrayGetDimensionNumber = lNum - 1
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ArrayAddElement()
+'Overview                    : 配列の要素を追加する
+'Detailed Description        : 工事中
+'Argument
+'     avArr                  : 配列
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ArrayAddElement( _
+    byRef avArr _
+    )
+    Redim Preserve avArr(Ubound(avArr)+1)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ArrayInitialize()
+'Overview                    : 配列を初期化する
+'Detailed Description        : 工事中
+'Argument
+'     avArr                  : 配列
+'     avErr                  : エラー情報
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ArrayInitialize( _
+    byRef avArr _
+    , byRef avErr _
+    )
+    Redim avArr(0)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_ArrayUbound()
+'Overview                    : 配列のインデックスの最大数を返す
+'Detailed Description        : 工事中
+'Argument
+'     avArr                  : 配列
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_ArrayUbound( _
+    byRef avArr _
+    )
+    func_CM_ArrayUbound = Ubound(avArr)
+End Function
 
 '###################################################################################################
 'チェック系
@@ -2824,7 +2892,8 @@ Private Function func_CM_UtilGenerateRandomString( _
     Dim lType : lType = alType
     Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
     Dim oChars : Set oChars = new_Dic()
-    Dim lQuotient,lDivide, vSetting, vItem, bCode, sCodeHex
+    Dim lQuotient,lDivide, vSetting, vItem, bCode
+'    Dim lQuotient,lDivide, vSetting, vItem, bCode, sCodeHex
     Do Until lPowerOf2<0
         lDivide = 2^lPowerOf2
         lQuotient = lType \ lDivide
@@ -2834,10 +2903,11 @@ Private Function func_CM_UtilGenerateRandomString( _
             vSetting = vSettings(lPowerOf2)
             For Each vItem In vSetting
                 For bCode = Asc(vItem(0)) To Asc(vItem(1))
-                    sCodeHex = Right(Hex(bCode),2)
-                    If bCode>0 Or (sCodeHex<>"7F" And ("3F"<sCodeHex And sCodeHex<"FD")) Then
-                        oChars.Add bCode, Chr(bCode)
-                    End If
+                    oChars.Add bCode, Chr(bCode)
+'                    sCodeHex = Right(Hex(bCode),2)
+'                    If bCode>0 Or (sCodeHex<>"7F" And ("3F"<sCodeHex And sCodeHex<"FD")) Then
+'                        oChars.Add bCode, Chr(bCode)
+'                    End If
                 Next
             Next
         End If
@@ -2857,6 +2927,17 @@ Private Function func_CM_UtilGenerateRandomString( _
         End If
     End If
     
+    'sjis使用範囲外のコードを除外する
+    Dim sCodeHex
+    For Each bCode In oChars.Keys()
+        If bCode<0 Then
+            sCodeHex = Right(Hex(bCode),2)
+            If sCodeHex="7F" Or ("3F"=<sCodeHex And sCodeHex=<"FD") Then
+                oChars.Remove bCode
+            End If
+        End If
+    Next
+
     '上述で作成した文字のリストを使ってランダムな文字列を生成する
     Dim lPos, sRet
     sRet = ""
@@ -2893,7 +2974,6 @@ Private Sub sub_CM_UtilLogger( _
     
     With aoWriter
         .Write(oCont.Concat(avParams).join(vbTab))
-'        .Write(oCont.Concat(avParams).joinVbs(vbTab))
         .newLine()
     End With
     Set oCont = Nothing

@@ -26,6 +26,18 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
 
+'Dim a
+'inputbox "", "", "vartype(a) = " & vartype(a) & vbnewline & "typename(a) = " & typename(a) & vbnewline & "isarray(a) = " & isarray(a) & vbnewline & "isempty(a) = " & isempty(a) & vbnewline & "isobject(a) = " & isobject(a)
+''vartype(a) = 0 typename(a) = Empty isarray(a) = False isempty(a) = True isobject(a) = False
+'
+'Dim b()
+'inputbox "", "", "vartype(b) = " & vartype(b) & vbnewline & "typename(b) = " & typename(b) & vbnewline & "isarray(b) = " & isarray(b) & vbnewline & "isempty(b) = " & isempty(b) & vbnewline & "isobject(b) = " & isobject(b)
+''vartype(b) = 8204 typename(b) = Variant() isarray(b) = True isempty(b) = False isobject(b) = False
+'
+'a = array(1,2,3)
+'inputbox "", "", "Vartype(a) = " & vartype(a) & vbnewline & "typename(a) = " & typename(a) & vbnewline & "ubound(a) = " & Ubound(a) & vbnewline & "isarray(a) = " & isarray(a) & vbnewline & "isempty(a) = " & isempty(a) & vbnewline & "isobject(a) = " & isobject(a)
+''Vartype(a) = 8204 typename(a) = Variant() ubound(a) = 2 isarray(a) = True isempty(a) = False isobject(a) = False
+
 ''Test func_CM_UtilGetIpaddress
 'inputbox "", "", func_CM_ToString(func_CM_UtilGetIpaddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
 'dim s : Set s = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress())
@@ -153,21 +165,21 @@ Call sub_import("libCom.vbs")
 '
 'wscript.quit
 
-''Test func_CM_UtilGenerateRandomString
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 15, Nothing) )        '大小数記
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 8, Nothing)  )        '　　　記
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 7, Nothing)  )        '大小数
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 3, Nothing)  )        '大小
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 2, Nothing)  )        '　小
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 1, Nothing)  )        '大
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数　
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
-'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
-'
-'
-'wscript.quit
+'Test func_CM_UtilGenerateRandomString
+Call msgbox( func_CM_UtilGenerateRandomString(50, 15, Nothing) )        '大小数記
+Call msgbox( func_CM_UtilGenerateRandomString(50, 8, Nothing)  )        '　　　記
+Call msgbox( func_CM_UtilGenerateRandomString(50, 7, Nothing)  )        '大小数
+Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数
+Call msgbox( func_CM_UtilGenerateRandomString(50, 3, Nothing)  )        '大小
+Call msgbox( func_CM_UtilGenerateRandomString(50, 2, Nothing)  )        '　小
+Call msgbox( func_CM_UtilGenerateRandomString(50, 1, Nothing)  )        '大
+Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数　
+Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
+Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
+Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
+
+
+wscript.quit
 
 'Test func_CM_UtilSort～()
 'Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)

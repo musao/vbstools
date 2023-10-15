@@ -73,7 +73,7 @@ Sub Main()
     '引数のファイルパスをクリップボードに出力する
     sub_CM_ExcuteSub "sub_GetPathsProc", oParams, oPubsub
     
-    'ファイル接続をクローズする
+    'ログ出力をクローズ
     PoWriter.close()
     
     'オブジェクトを開放

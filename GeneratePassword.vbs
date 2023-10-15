@@ -79,8 +79,8 @@ Sub Main()
     'パスワードを生成する
     sub_CM_ExcuteSub "sub_GnrtPwGenerate", oParams, oPubsub
     
-    'ファイル接続をクローズする
-    PoWriter.Close()
+    'ログ出力をクローズ
+    PoWriter.close()
     
     'オブジェクトを開放
     Set oParams = Nothing

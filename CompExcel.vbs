@@ -18,7 +18,7 @@ Option Explicit
 
 '定数
 Private Const Cs_FOLDER_LIB = "lib"
-Private PoWriter, PoPubSub
+Private PoWriter, PoPubsub
 
 'import定義
 Sub sub_import( _
@@ -64,26 +64,26 @@ Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath(), 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Set PoPubSub = new_Pubsub()
-    PoPubSub.subscribe "log", GetRef("sub_CmpExcelLogger")
+    Set PoPubsub = new_Pubsub()
+    PoPubsub.subscribe "log", GetRef("sub_CmpExcelLogger")
     'パラメータ格納用汎用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数取得
-    sub_CM_ExcuteSub "sub_CmpExcelGetParameters", oParams, PoPubSub
+    sub_CM_ExcuteSub "sub_CmpExcelGetParameters", oParams, PoPubsub
     
     '比較対象ファイル入力画面の表示と取得
-    sub_CM_ExcuteSub "sub_CmpExcelDispInputFiles", oParams, PoPubSub
+    sub_CM_ExcuteSub "sub_CmpExcelDispInputFiles", oParams, PoPubsub
     
     'エクセルファイルを比較する
-    sub_CM_ExcuteSub "sub_CmpExcelCompareFiles", oParams, PoPubSub
+    sub_CM_ExcuteSub "sub_CmpExcelCompareFiles", oParams, PoPubsub
     
-    'ファイル接続をクローズする
-    PoWriter.Close
+    'ログ出力をクローズ
+    PoWriter.close
     
     'オブジェクトを開放
     Set oParams = Nothing
-    Set PoPubSub = Nothing
+    Set PoPubsub = Nothing
     Set PoWriter = Nothing
 End Sub
 
@@ -210,7 +210,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     
     '比較
     With New clsCompareExcel
-        Set .pubsub = PoPubSub
+        Set .pubsub = PoPubsub
         .pathFrom = oParam(0)
         .pathTo = oParam(1)
         .compare()
