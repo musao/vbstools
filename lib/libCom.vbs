@@ -2892,7 +2892,8 @@ Private Sub sub_CM_UtilLogger( _
     Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
     
     With aoWriter
-        .Write(oCont.Concat(avParams).joinVbs(vbTab))
+        .Write(oCont.Concat(avParams).join(vbTab))
+'        .Write(oCont.Concat(avParams).joinVbs(vbTab))
         .newLine()
     End With
     Set oCont = Nothing

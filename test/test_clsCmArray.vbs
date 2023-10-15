@@ -277,17 +277,17 @@ Sub Test_clsCmArray_indexOf_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.joinVbs()
-Sub Test_clsCmArray_joinVbs
+'clsCmArray.join()
+Sub Test_clsCmArray_join
     Dim d : d = Array(1,2,3,"testing")
     Dim e : e = Join(d, "+")
-    Dim a : a = new_ArrWith(d).joinVbs("+")
+    Dim a : a = new_ArrWith(d).join("+")
     
     AssertEqual e, a
 End Sub
-Sub Test_clsCmArray_joinVbs_Empty
+Sub Test_clsCmArray_join_Empty
     Dim e : e = ""
-    Dim a : a = new_Arr().joinVbs("+")
+    Dim a : a = new_Arr().join("+")
     
     AssertEqual e, a
 End Sub
