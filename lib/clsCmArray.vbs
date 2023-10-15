@@ -561,7 +561,7 @@ Class clsCmArray
     Public Function sort( _
         byVal aboOrder _
         )
-        Set sort = func_CmArraySort(new_Func("(c,n)=>c>n"), aboOrder)
+        Set sort = func_CmArraySort(Getref("func_CM_UtilSortDefaultFunc"), aboOrder)
     End Function
 
     '***************************************************************************************************

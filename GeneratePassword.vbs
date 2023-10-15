@@ -69,7 +69,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
     Dim oPubsub : Set oPubsub = new_Pubsub()
-    oPubsub.Subscribe "log", GetRef("sub_GnrtPwLogger")
+    oPubsub.subscribe "log", GetRef("sub_GnrtPwLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     

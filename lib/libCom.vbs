@@ -87,7 +87,7 @@ Private Sub cf_push( _
     Else
         Redim avArr(0)
     End If
-    Call cf_bind(avArr(Ubound(avArr)), aoEle)
+    cf_bind avArr(Ubound(avArr)), aoEle
 End Sub
 
 '***************************************************************************************************
@@ -194,10 +194,10 @@ Private Function new_DicWith( _
     
     For Each vItem In avParams
         If boIsKey Then
-            Call cf_bind(vKey, vItem)
-            Call cf_bindAt(oDict, vKey, Empty)
+            cf_bind vKey, vItem
+            cf_bindAt oDict, vKey, Empty
         Else
-            Call cf_bindAt(oDict, vKey, vItem)
+            cf_bindAt oDict, vKey, vItem
         End If
         boIsKey = Not boIsKey
     Next
@@ -562,7 +562,8 @@ End Function
 Private Function func_FuncAnalyze( _
     byVal asCode _
     )
-    Dim sRow, sPtn, vCode, sTemp
+    Dim sRow, sPtn, oCode, sTemp
+    Set oCode = new_Dic()
     sTemp= ""
     For Each sRow In Split(asCode, ":", -1, vbBinaryCompare)
         If Len(Trim(sRow))>0 Then
@@ -572,12 +573,13 @@ Private Function func_FuncAnalyze( _
             Else
                 sRow = sTemp & " " & Trim(sRow)
                 sTemp = ""
-                cf_push vCode, Trim(sRow)
+                oCode.Add oCode.Count, Trim(sRow)
             End If
         End If
     Next
     
-    func_FuncAnalyze = vCode
+    func_FuncAnalyze = oCode.Items()
+    Set oCode = Nothing
 End Function
 
 '***************************************************************************************************
@@ -625,9 +627,7 @@ Private Function func_FuncRewriteReturnPhrase( _
         End If
     Next
     
-    Dim sRet : sRet = ""
-    If func_CM_ArrayIsAvailable(avCode) Then sRet = Join(avCode, ":")
-    func_FuncRewriteReturnPhrase = sRet
+    func_FuncRewriteReturnPhrase = Join(avCode, ":")
     
 End Function
 
@@ -1809,17 +1809,12 @@ Private Function func_CM_ArrayIsAvailable( _
     byRef avArray _
     )
     func_CM_ArrayIsAvailable = False
-    On Error Resume Next
     If IsArray(avArray) And (Not IsEmpty(avArray)) Then
-'        Dim oRet : Set oRet = cf_tryCatch(new_Func("a=>ubound(a)"), avArray, Empty, Empty)
+'        func_CM_ArrayIsAvailable = cf_tryCatch(new_Func("a=>ubound(a)"), avArray, Empty, Empty).Item("Result")
+        On Error Resume Next
         Ubound(avArray)
-'        If oRet.Item("Result") Then
-        If Err.Number=0 Then
-            func_CM_ArrayIsAvailable = True
-        Else
-            Err.Clear
-        End If
-'        Set oRet = Nothing
+        If Err.Number=0 Then func_CM_ArrayIsAvailable = True
+        On Error Goto 0
     End If
 End Function
 
@@ -2719,6 +2714,28 @@ Private Sub sub_CM_UtilSortHeapPerNodeProc( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilSortDefaultFunc()
+'Overview                    : 要素の比較結果を返す
+'Detailed Description        : ソート関数群で使うデフォルトの関数
+'Argument
+'     aoCurrentValue         : 配列の要素
+'     aoNextValue            : 次の配列の要素
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilSortDefaultFunc( _
+    byRef aoCurrentValue _
+    , byRef aoNextValue _
+    )
+    func_CM_UtilSortDefaultFunc = aoCurrentValue>aoNextValue
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilGenerateRandomNumber()
 'Overview                    : 乱数を生成する
 'Detailed Description        : 工事中
@@ -2806,7 +2823,7 @@ Private Function func_CM_UtilGenerateRandomString( _
     
     Dim lType : lType = alType
     Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
-    Dim oChars : Set oChars = new_Arr()
+    Dim oChars : Set oChars = new_Dic()
     Dim lQuotient,lDivide, vSetting, vItem, bCode, sCodeHex
     Do Until lPowerOf2<0
         lDivide = 2^lPowerOf2
@@ -2819,7 +2836,7 @@ Private Function func_CM_UtilGenerateRandomString( _
                 For bCode = Asc(vItem(0)) To Asc(vItem(1))
                     sCodeHex = Right(Hex(bCode),2)
                     If bCode>0 Or (sCodeHex<>"7F" And ("3F"<sCodeHex And sCodeHex<"FD")) Then
-                        oChars.Push Chr(bCode)
+                        oChars.Add bCode, Chr(bCode)
                     End If
                 Next
             Next
@@ -2829,24 +2846,25 @@ Private Function func_CM_UtilGenerateRandomString( _
     Loop
     
     '配列で指定する文字種（avAdditional）を追加する
-    If func_CM_ArrayIsAvailable(avAdditional) Then
-        Dim sChar
-        For Each sChar In avAdditional
-            If oChars.IndexOf(sChar)<0 Then
-                oChars.Push sChar
-            End If
-        Next
+    If Not IsObject(avAdditional) Then
+        If IsArray(avAdditional) And (Not IsEmpty(avAdditional)) Then
+            Dim sChar
+            For Each sChar In avAdditional
+                If Not oChars.Exists(Asc(sChar)) Then
+                    oChars.Add Asc(sChar), sChar
+                End If
+            Next
+        End If
     End If
     
     '上述で作成した文字のリストを使ってランダムな文字列を生成する
-    Dim lPos, oRet
-    Set oRet = new_Arr()
+    Dim lPos, sRet
+    sRet = ""
     For lPos = 1 To alLength
-        oRet.Push oChars( func_CM_UtilGenerateRandomNumber(0, oChars.Length - 1, 1) )
+        sRet = sRet & oChars.Items()( func_CM_UtilGenerateRandomNumber(0, oChars.Count - 1, 1) )
     Next
-    func_CM_UtilGenerateRandomString = oRet.JoinVbs("")
+    func_CM_UtilGenerateRandomString = sRet
     
-    Set oRet = Nothing
     Set oChars = Nothing
 End Function
 
