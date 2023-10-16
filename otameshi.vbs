@@ -25,6 +25,10 @@ Call sub_import("clsCmPubSub.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
+Dim e : Set e =  new_Fso().OpenTextFile(WScript.ScriptFullName, 1, False, -2)
+inputbox "","",vartype(e) & " " & typename(e)
+
+wscript.quit
 
 'Dim a
 'inputbox "", "", "vartype(a) = " & vartype(a) & vbnewline & "typename(a) = " & typename(a) & vbnewline & "isarray(a) = " & isarray(a) & vbnewline & "isempty(a) = " & isempty(a) & vbnewline & "isobject(a) = " & isobject(a)
@@ -165,18 +169,18 @@ Call sub_import("libCom.vbs")
 '
 'wscript.quit
 
-'Test func_CM_UtilGenerateRandomString
-Call msgbox( func_CM_UtilGenerateRandomString(50, 15, Nothing) )        '大小数記
-Call msgbox( func_CM_UtilGenerateRandomString(50, 8, Nothing)  )        '　　　記
-Call msgbox( func_CM_UtilGenerateRandomString(50, 7, Nothing)  )        '大小数
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数
-Call msgbox( func_CM_UtilGenerateRandomString(50, 3, Nothing)  )        '大小
-Call msgbox( func_CM_UtilGenerateRandomString(50, 2, Nothing)  )        '　小
-Call msgbox( func_CM_UtilGenerateRandomString(50, 1, Nothing)  )        '大
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数　
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
-Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
+''Test func_CM_UtilGenerateRandomString
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 15, Nothing) )        '大小数記
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 8, Nothing)  )        '　　　記
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 7, Nothing)  )        '大小数
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 3, Nothing)  )        '大小
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 2, Nothing)  )        '　小
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 1, Nothing)  )        '大
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Nothing)  )        '　　数　
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("0", "9") ) )  '　　数　
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("a", "Z") ) )  '　　数　＋"a","Z"
+'Call msgbox( func_CM_UtilGenerateRandomString(50, 4, Array("\", "$") ) )  '　　数　＋"\","$"
 
 
 wscript.quit

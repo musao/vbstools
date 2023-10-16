@@ -74,8 +74,17 @@ Class clsCmBufferedReader
     Public Property Let readSize( _
         byVal alReadSize _
         )
+        Dim boFlg : boFlg = False
         If func_CM_ValidationlIsWithinTheRangeOf(alReadSize, 2) Then
+            If CLng(alReadSize)>0 Then
+                boFlg = True
+            End If
+        End If
+        
+        If boFlg Then
             PlReadSize = CLng(alReadSize)
+        Else
+            Err.Raise 1031, "clsCmBufferedReader.vbs:clsCmBufferedReader+readSize()", "不正な数字です。"
         End If
     End Property
     
@@ -206,9 +215,13 @@ Class clsCmBufferedReader
     Public Function setTextStream( _
         byRef aoTextStream _
         )
+        If Vartype(aoTextStream)<>9 Or Strcomp(Typename(aoTextStream),"TextStream",vbBinaryCompare)<>0 Then
+            Err.Raise 438, "clsCmBufferedReader.vbs:clsCmBufferedReader+setTextStream()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
+            Exit Function
+        End If
+
         Set PoTextStream = aoTextStream
         Set setTextStream = Me
-        
         'Inbound、Outboundなどの情報を初期化する
         Call sub_CmBufferedReaderInitialize()
     End Function
@@ -367,14 +380,22 @@ Class clsCmBufferedReader
         PoBuffer.Item("pointer") = PoBuffer.Item("pointer")+Len(sRet)
         
         'アウトバウンドの情報を更新
-        Dim oArr : Set oArr = new_ArrSplit(Mid(PoBuffer.Item("buffer"), 1, PoBuffer.Item("pointer") - 1), vbLf)
-        oArr.Reverse()
-        With PoOutbound
-            .Item("line") = oArr.length
-            .Item("column") = Len(oArr(0))+1
-            .Item("atEndOfStream") = PoInbound.Item("atEndOfStream") And (PoBuffer.Item("pointer") > PoBuffer.Item("length"))
-            .Item("atEndOfLine") = .Item("atEndOfStream") Or (StrComp(Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), 1), vbLf, vbBinaryCompare)=0)
-        End With
+        Dim boFlg : If PoBuffer.Item("pointer")>PoBuffer.Item("length") Then boFlg = True Else boFlg = False
+        If boFlg Then
+        'ポインタがバッファの外にある場合
+            'インバウンドの状態をアウトバウンドにコピーする
+            Call sub_CmBufferedReaderCopyInboundStateToOutbound()
+        Else
+        'ポインタがバッファ内にある場合
+            Dim oArr : Set oArr = new_ArrSplit(Mid(PoBuffer.Item("buffer"), 1, PoBuffer.Item("pointer") - 1), vbLf)
+            oArr.Reverse()
+            With PoOutbound
+                .Item("line") = oArr.length
+                .Item("column") = Len(oArr(0))+1
+                .Item("atEndOfStream") = PoInbound.Item("atEndOfStream") And (PoBuffer.Item("pointer") > PoBuffer.Item("length"))
+                .Item("atEndOfLine") = .Item("atEndOfStream") Or (StrComp(Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), 1), vbLf, vbBinaryCompare)=0)
+            End With
+        End If
         
         '戻り値を返す
         func_CmBufferedReaderRead = sRet
@@ -426,21 +447,21 @@ Class clsCmBufferedReader
         End If
         
         'アウトバウンドの情報を更新
-        With PoOutbound
-            Dim boFlg : If PoBuffer.Item("pointer")>PoBuffer.Item("length") Then boFlg = True Else boFlg = False
-            If boFlg Then
-            'ポインタがバッファの外にある場合
-                'インバウンドの状態をアウトバウンドにコピーする
-                Call sub_CmBufferedReaderCopyInboundStateToOutbound()
-            Else
-            'ポインタがバッファ内にある場合
+        Dim boFlg : If PoBuffer.Item("pointer")>PoBuffer.Item("length") Then boFlg = True Else boFlg = False
+        If boFlg Then
+        'ポインタがバッファの外にある場合
+            'インバウンドの状態をアウトバウンドにコピーする
+            Call sub_CmBufferedReaderCopyInboundStateToOutbound()
+        Else
+        'ポインタがバッファ内にある場合
+            With PoOutbound
                 '次の行の行頭に更新する
                 .Item("line") = .Item("line")+1
                 .Item("column") = 1
                 .Item("atEndOfStream") = False
                 .Item("atEndOfLine") = (StrComp(Mid(PoBuffer.Item("buffer"), PoBuffer.Item("pointer"), 1), vbLf, vbBinaryCompare)=0)
-            End If
-        End With
+            End With
+        End If
         
         '戻り値を返す
         func_CmBufferedReaderReadLine = sRet
