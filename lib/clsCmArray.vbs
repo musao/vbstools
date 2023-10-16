@@ -929,7 +929,7 @@ Class clsCmArray
         , byVal aboOrder _
         )
         func_CmArrayIndexOf = -1
-        Dim oEle, lIdx, vArr, lUb, boFlg, lStart, lEnd, lStep
+        Dim lIdx, vArr, lUb, lStart, lEnd, lStep
 
         '配列の全ての要素について引数の関数の処理を行う
         If PoArr.Count>0 Then
@@ -944,29 +944,13 @@ Class clsCmArray
             If aboOrder Then lEnd=lUb Else lEnd=0
             If aboOrder Then lStep=1 Else lStep=-1
 
-            boFlg = False
             For lIdx=lStart To lEnd Step lStep
-                cf_bind oEle, vArr(lIdx)
-
-                If IsObject(avTarget) And IsObject(oEle) Then
-                    If avTarget Is oEle Then boFlg = True
-                ElseIf Not IsObject(avTarget) And Not IsObject(oEle) Then
-                    If VarType(avTarget) = vbString And VarType(oEle) = vbString Then
-                        If Strcomp(avTarget, oEle, alCompare)=0 Then boFlg = True
-                    Else
-                        If avTarget = oEle Then boFlg = True
-                    End If
-                End If
-
-                If boFlg Then
+                If func_CM_UtilIsSame(avTarget, vArr(lIdx)) Then
                     func_CmArrayIndexOf = lIdx
                     Exit For
                 End If
-
             Next
         End If
-
-        Set oEle = Nothing
     End Function
 
     '***************************************************************************************************

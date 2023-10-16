@@ -25,8 +25,7 @@ Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
-Dim e : Set e =  new_Fso().OpenTextFile(WScript.ScriptFullName, 1, False, -2)
-inputbox "","",vartype(e) & " " & typename(e)
+inputbox "","", asc(" ")
 
 wscript.quit
 

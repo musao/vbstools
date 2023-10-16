@@ -121,29 +121,25 @@ Private Function cf_tryCatch( _
     Dim oRet, oErr, boFlg
     Set oErr = Nothing : boFlg = True
     
-    On Error Resume Next
     'tryブロックの処理
+    On Error Resume Next
     cf_bind oRet, aoTry(aoArgs)
     If Err.Number<>0 Then
         boFlg = False
         Set oErr = func_CM_UtilStoringErr()
-        Err.Clear
     End If
     On Error GoTo 0
+
     'catchブロックの処理
-    If boFlg = False Then
-        If IsObject(aoCatch) Then
-            If Not aoCatch Is Nothing Then
-                cf_bind oRet, aoCatch(aoArgs, oErr)
-            End If
-        End If
+    If Not boFlg And func_CM_UtilIsAvailableObject(aoCatch) Then
+        cf_bind oRet, aoCatch(aoArgs, oErr)
     End If
+    
     'finaryブロックの処理
-    If IsObject(aoFinary) Then
-        If Not aoFinary Is Nothing Then
-            cf_bind oRet, aoFinary(aoArgs, oRet, oErr)
-        End If
+    If func_CM_UtilIsAvailableObject(aoFinary) Then
+        cf_bind oRet, aoFinary(aoArgs, oRet, oErr)
     End If
+    
     '結果を返却
     Set cf_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
     Set oRet = Nothing
@@ -2921,6 +2917,17 @@ Private Function func_CM_UtilGenerateRandomString( _
         lPowerOf2 = lPowerOf2 - 1
     Loop
     
+    'sjis使用範囲外のコードを除外する
+    Dim sCodeHex
+    For Each bCode In oChars.Keys()
+        If bCode<0 Then
+            sCodeHex = Right(Hex(bCode),2)
+            If sCodeHex="7F" Or sCodeHex<="3F" Or "FD"<=sCodeHex Then
+                oChars.Remove bCode
+            End If
+        End If
+    Next
+    
     '配列で指定する文字種（avAdditional）を追加する
     If Not IsObject(avAdditional) Then
         If IsArray(avAdditional) And (Not IsEmpty(avAdditional)) Then
@@ -2932,17 +2939,6 @@ Private Function func_CM_UtilGenerateRandomString( _
             Next
         End If
     End If
-    
-    'sjis使用範囲外のコードを除外する
-    Dim sCodeHex
-    For Each bCode In oChars.Keys()
-        If bCode<0 Then
-            sCodeHex = Right(Hex(bCode),2)
-            If sCodeHex="7F" Or ("3F"=<sCodeHex And sCodeHex=<"FD") Then
-                oChars.Remove bCode
-            End If
-        End If
-    Next
 
     '上述で作成した文字のリストを使ってランダムな文字列を生成する
     Dim lPos, sRet
@@ -3135,4 +3131,60 @@ End Function
 Private Function func_CM_UtilGetComputerName( _
     )
     func_CM_UtilGetComputerName = CreateObject("WScript.Network").ComputerName
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilIsSame()
+'Overview                    : 同一か判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoA                    : 比較対象
+'     aoB                    : 比較対象
+'Return Value
+'     結果 True:同一 / False:同一でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilIsSame( _
+    byRef aoA _
+    , byRef aoB _
+)
+    Dim boFlg : boFlg = False
+    If IsObject(aoA) And IsObject(aoB) Then
+        If aoA Is aoB Then boFlg = True
+    ElseIf Not IsObject(aoA) And Not IsObject(aoB) Then
+        If VarType(aoA) = vbString And VarType(aoB) = vbString Then
+            If Strcomp(aoA, aoB, vbBinaryCompare)=0 Then boFlg = True
+        Else
+            If aoA = aoB Then boFlg = True
+        End If
+    End If
+    func_CM_UtilIsSame = boFlg
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilIsAvailableObject()
+'Overview                    : オブジェクトが利用可能か判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoObj                  : オブジェクト
+'Return Value
+'     結果 True:利用可能 / False:利用不可
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilIsAvailableObject( _
+    byRef aoObj _
+)
+    Dim boFlg : boFlg = False
+    If IsObject(aoObj) Then
+        If Not aoObj Is Nothing Then boFlg = True
+    End If
+    func_CM_UtilIsAvailableObject = boFlg
 End Function
