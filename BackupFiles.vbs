@@ -34,7 +34,7 @@ End Sub
 Call sub_import("clsCmArray.vbs")
 Call sub_import("clsCmBufferedWriter.vbs")
 Call sub_import("clsCmCalendar.vbs")
-Call sub_import("clsCmPubSub.vbs")
+Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 

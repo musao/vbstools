@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class clsCompareExcel
     'クラス内変数、定数
-    Private PsPathFrom, PsPathTo, PoPubSub
+    Private PsPathFrom, PsPathTo, PoBroker
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -30,7 +30,7 @@ Class clsCompareExcel
         '初期化
         PsPathFrom = ""
         PsPathTo = ""
-        Set PoPubSub = Nothing
+        Set PoBroker = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -48,7 +48,7 @@ Class clsCompareExcel
     '2023/09/03         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        Set PoPubSub = Nothing
+        Set PoBroker = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -128,11 +128,11 @@ Class clsCompareExcel
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Set pubsub()
+    'Function/Sub Name           : Property Set broker()
     'Overview                    : 出版-購読型（Publish/Subscribe）クラスのオブジェクトを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     aoPubSub               : 出版-購読型（Publish/Subscribe）クラスのインスタンス
+    '     aoBroker               : 出版-購読型（Publish/Subscribe）クラスのインスタンス
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -141,14 +141,14 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Set pubsub( _
-        byRef aoPubSub _
+    Public Property Set broker( _
+        byRef aoBroker _
         )
-        Set PoPubSub = aoPubSub
+        Set PoBroker = aoBroker
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get pubsub()
+    'Function/Sub Name           : Property Get broker()
     'Overview                    : 出版-購読型（Publish/Subscribe）クラスのオブジェクトを返す
     'Detailed Description        : 工事中
     'Argument
@@ -161,8 +161,8 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get pubsub()
-        Set pubsub = PoPubSub
+    Public Property Get broker()
+        Set broker = PoBroker
     End Property
     
     '***************************************************************************************************
@@ -677,8 +677,8 @@ Class clsCompareExcel
         , byVal asFuncName _
         , byVal asCont _
         )
-        If PoPubSub Is Nothing Then Exit Sub
-        Call PoPubSub.Publish(asTopic, Array(alLevel, TypeName(Me)&asFuncName, asCont))
+        If PoBroker Is Nothing Then Exit Sub
+        Call PoBroker.Publish(asTopic, Array(alLevel, TypeName(Me)&asFuncName, asCont))
     End Sub
     
 End Class

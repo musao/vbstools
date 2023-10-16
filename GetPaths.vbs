@@ -16,7 +16,7 @@ Option Explicit
 
 '定数
 Private Const Cs_FOLDER_LIB = "lib"
-Private PoWriter, PoPubSub
+Private PoWriter, PoBroker
 
 'import定義
 Sub sub_import( _
@@ -34,7 +34,7 @@ End Sub
 Call sub_import("clsCmArray.vbs")
 Call sub_import("clsCmBufferedWriter.vbs")
 Call sub_import("clsCmCalendar.vbs")
-Call sub_import("clsCmPubSub.vbs")
+Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
@@ -62,23 +62,23 @@ Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Dim oPubsub : Set oPubsub = new_Pubsub()
-    oPubsub.subscribe "log", GetRef("sub_GetPathsLogger")
+    Dim oBroker : Set oBroker = new_Broker()
+    oBroker.subscribe "log", GetRef("sub_GetPathsLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    sub_CM_ExcuteSub "sub_GetPathsGetParameters", oParams, oPubsub
+    sub_CM_ExcuteSub "sub_GetPathsGetParameters", oParams, oBroker
     
     '引数のファイルパスをクリップボードに出力する
-    sub_CM_ExcuteSub "sub_GetPathsProc", oParams, oPubsub
+    sub_CM_ExcuteSub "sub_GetPathsProc", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
     
     'オブジェクトを開放
     Set oParams = Nothing
-    Set oPubsub = Nothing
+    Set oBroker = Nothing
     Set PoWriter = Nothing
 End Sub
 

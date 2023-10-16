@@ -40,7 +40,7 @@ End Sub
 Call sub_import("clsCmArray.vbs")
 Call sub_import("clsCmBufferedWriter.vbs")
 Call sub_import("clsCmCalendar.vbs")
-Call sub_import("clsCmPubSub.vbs")
+Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
@@ -68,23 +68,23 @@ Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
     '出版-購読型（Publish/subscribe）インスタンスの設定
-    Dim oPubsub : Set oPubsub = new_Pubsub()
-    oPubsub.subscribe "log", GetRef("sub_GnrtPwLogger")
+    Dim oBroker : Set oBroker = new_Broker()
+    oBroker.subscribe "log", GetRef("sub_GnrtPwLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    sub_CM_ExcuteSub "sub_GnrtPwGetParameters", oParams, oPubsub
+    sub_CM_ExcuteSub "sub_GnrtPwGetParameters", oParams, oBroker
     
     'パスワードを生成する
-    sub_CM_ExcuteSub "sub_GnrtPwGenerate", oParams, oPubsub
+    sub_CM_ExcuteSub "sub_GnrtPwGenerate", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
     
     'オブジェクトを開放
     Set oParams = Nothing
-    Set oPubsub = Nothing
+    Set oBroker = Nothing
     Set PoWriter = Nothing
 End Sub
 

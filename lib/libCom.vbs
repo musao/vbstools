@@ -392,7 +392,7 @@ Private Function new_CalAt( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_Pubsub()
+'Function/Sub Name           : new_Broker()
 'Overview                    : インスタンス生成関数
 'Detailed Description        : 出版-購読型（Publish/Subscribe）クラスのインスタンスを返す
 'Argument
@@ -405,9 +405,9 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_Pubsub( _
+Private Function new_Broker( _
     )
-    Set new_Pubsub = (New clsCmPubSub)
+    Set new_Broker = (New clsCmBroker)
 End Function
 
 '***************************************************************************************************
@@ -2403,7 +2403,7 @@ End Function
 'Argument
 '     asSubName              : 実行する関数名
 '     aoArgument             : 実行する関数に渡す引数
-'     aoPubSub               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
+'     aoBroker               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -2415,14 +2415,14 @@ End Function
 Private Sub sub_CM_ExcuteSub( _
     byVal asSubName _
     , byRef aoArgument _
-    , byRef aoPubSub _
+    , byRef aoBroker _
     )
     Const Cs_TOPIC = "log"
     
     '出版（Publish） 開始
-    If Not aoPubSub Is Nothing Then
-        aoPubSub.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
-        aoPubSub.Publish Cs_TOPIC, Array(9 ,asSubName ,func_CM_ToString(aoArgument))
+    If Not aoBroker Is Nothing Then
+        aoBroker.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
+        aoBroker.Publish Cs_TOPIC, Array(9 ,asSubName ,func_CM_ToString(aoArgument))
     End If
     
     '関数の実行
@@ -2435,15 +2435,15 @@ Private Sub sub_CM_ExcuteSub( _
     End If
     
     '出版（Publish） 終了
-    If Not aoPubSub Is Nothing Then
+    If Not aoBroker Is Nothing Then
         If oRet.Item("Result")=False Then
         'エラー
-            aoPubSub.Publish Cs_TOPIC, Array(1, asSubName, func_CM_ToString(oRet.Item("Err")))
+            aoBroker.Publish Cs_TOPIC, Array(1, asSubName, func_CM_ToString(oRet.Item("Err")))
         Else
         '正常
-            aoPubSub.Publish Cs_TOPIC, Array(5, asSubName, "End")
+            aoBroker.Publish Cs_TOPIC, Array(5, asSubName, "End")
         End If
-        aoPubSub.Publish Cs_TOPIC, Array(9, asSubName, func_CM_ToString(aoArgument))
+        aoBroker.Publish Cs_TOPIC, Array(9, asSubName, func_CM_ToString(aoArgument))
     End If
     
     Set oRet = Nothing

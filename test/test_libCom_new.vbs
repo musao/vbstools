@@ -3,7 +3,7 @@
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
 ' @import ../lib/clsCmCalendar.vbs
-' @import ../lib/clsCmPubSub.vbs
+' @import ../lib/clsCmBroker.vbs
 ' @import ../lib/clsCompareExcel.vbs
 ' @import ../lib/clsFsBase.vbs
 ' @import ../lib/libCom.vbs
@@ -208,10 +208,10 @@ Sub Test_new_CalAt_Err
 End Sub
 
 '###################################################################################################
-'new_Pubsub()
-Sub Test_new_Pubsub
-    Dim e : Set e = New clsCmPubSub
-    Dim a : Set a = new_Pubsub()
+'new_Broker()
+Sub Test_new_Broker
+    Dim e : Set e = New clsCmBroker
+    Dim a : Set a = new_Broker()
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)

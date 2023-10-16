@@ -3,7 +3,7 @@
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
 ' @import ../lib/clsCmCalendar.vbs
-' @import ../lib/clsCmPubSub.vbs
+' @import ../lib/clsCmBroker.vbs
 ' @import ../lib/clsCompareExcel.vbs
 ' @import ../lib/clsFsBase.vbs
 ' @import ../lib/libCom.vbs
