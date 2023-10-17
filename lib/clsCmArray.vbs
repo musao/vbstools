@@ -328,7 +328,7 @@ Class clsCmArray
     'Overview                    : 配列の各要素を連結した文字列を作成する
     'Detailed Description        : vbscriptのJoin関数と同等の機能
     'Argument
-    '     asDelimiter            : 区切り文字
+    '     asDel                  : 区切り文字
     'Return Value
     '     配列の各要素を連結した文字列
     '---------------------------------------------------------------------------------------------------
@@ -337,16 +337,11 @@ Class clsCmArray
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
-'    Public Function joinVbs( _
-'        byVal asDelimiter _
-'        )
-'        joinVbs = Join(func_CmArrayConvArray(True), asDelimiter)
-'    End Function
     Public Function join( _
-        byVal asDelimiter _
+        byVal asDel _
         )
         If PoArr.Count>0 Then
-            join = func_CmArrayReduce(new_Func("(p,c,i,a)=>p&"""&asDelimiter&"""&c"), True)
+            join = func_CM_UtilJoin(func_CmArrayConvArray(True), asDel)
         Else
             join = ""
         End If

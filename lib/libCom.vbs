@@ -3210,3 +3210,25 @@ Private Function func_CM_UtilIsTextStream( _
     If Vartype(aoObj)=9 And Strcomp(Typename(aoObj),"TextStream",vbBinaryCompare)=0 Then boFlg = True
     func_CM_UtilIsTextStream = boFlg
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilJoin()
+'Overview                    : Join関数
+'Detailed Description        : vbscriptのJoin関数と同等の機能
+'Argument
+'     avArr                  : 配列
+'     asDel                  : 区切り文字
+'Return Value
+'     配列の各要素を連結した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/17         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilJoin( _
+    byRef avArr _
+    , byVal asDel _
+)
+    func_CM_UtilJoin = Join(avArr, asDel)
+End Function
