@@ -32,10 +32,13 @@ End Sub
 
 '###################################################################################################
 'clsCmBufferedReader.write/writeBlankLines/writeLine()
-Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_1
-    writer_testCommon getref("operations_write_writeBlankLines_writeLine_1"), "Write"
+Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_Normal_Write
+    writer_testCommon getref("operations_write_writeBlankLines_writeLine_Normal"), "Write"
 End Sub
-Sub operations_write_writeBlankLines_writeLine_1(o,r)
+Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_Normal_Append
+    writer_testCommon getref("operations_write_writeBlankLines_writeLine_Normal"), "Appending"
+End Sub
+Sub operations_write_writeBlankLines_writeLine_Normal(o,r)
     o.write("‚ ‚¢‚¤‚¦‚¨")
     cf_push r, takeSnapshot(o)
 
@@ -49,6 +52,31 @@ Sub operations_write_writeBlankLines_writeLine_1(o,r)
     cf_push r, takeSnapshot(o)
 
     o.write("‚©F‚«g‚­hI‚¯‚±k")
+    cf_push r, takeSnapshot(o)
+
+    o.Close
+End Sub
+
+Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_NewLineOnly_Write
+    writer_testCommon getref("operations_write_writeBlankLines_writeLine_NewLineOnly"), "Write"
+End Sub
+Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_NewLineOnly_Append
+    writer_testCommon getref("operations_write_writeBlankLines_writeLine_NewLineOnly"), "Appending"
+End Sub
+Sub operations_write_writeBlankLines_writeLine_NewLineOnly(o,r)
+    o.write(vbCr)
+    cf_push r, takeSnapshot(o)
+
+    o.writeBlankLines(2)
+    cf_push r, takeSnapshot(o)
+
+    o.writeLine(vbLf)
+    cf_push r, takeSnapshot(o)
+
+    o.writeBlankLines(1)
+    cf_push r, takeSnapshot(o)
+
+    o.write(vbCrLf)
     cf_push r, takeSnapshot(o)
 
     o.Close
@@ -69,10 +97,14 @@ Sub writer_testCommon(f,p)
         For i=0 To 1
             If strcomp(p, "Write", vbBinaryCompare)=0 Then
                 pt = PsPathForWriting
-                Set eo = new_Fso().OpenTextFile(PsPathForWriting, ForWriting, True, -2)
+                Set eo = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
             Else
                 pt = PsPathForAppending
-                Set eo = new_Fso().OpenTextFile(PsPathForAppending, ForAppending, False, -2)
+                With func_CM_FsOpenTextFile(pt, ForWriting, True, -2)
+                    .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
+                    .Close
+                End With
+                Set eo = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
             End If
             If flg Then
                 f eo,er
@@ -86,7 +118,7 @@ Sub writer_testCommon(f,p)
             End If
             flg=Not flg
         Next
-'        AssertEqualWithMessage ev, av, "writeBufferSize="&rs(j)&" "&i&"operation"
+        AssertEqualWithMessage ev, av, "writeBufferSize="&rs(j)&" "&i&"operation"
         For i=0 To Ubound(er)
             assertAll er(i), ar(i)
         Next

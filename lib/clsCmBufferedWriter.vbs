@@ -557,7 +557,11 @@ Class clsCmBufferedWriter
         oArr.reverse()
         With PoOutbound
             .Item("line") = .Item("line") + oArr.length-1
-            .Item("column") = Len(oArr(0))+1
+            If oArr.length=1 Then
+                .Item("column") = .Item("column") + Len(oArr(0))
+            Else
+                .Item("column") = Len(oArr(0))+1
+            End If
         End With
 
         Set oArr = Nothing

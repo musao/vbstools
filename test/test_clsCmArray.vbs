@@ -11,6 +11,14 @@
 Option Explicit
 
 '###################################################################################################
+'clsCmArray
+Sub Test_clsCmArray
+    Dim a : Set a = new clsCmArray
+    AssertEqual 9, VarType(a)
+    AssertEqual "clsCmArray", TypeName(a)
+End Sub
+
+'###################################################################################################
 'clsCmArray.count()
 Sub Test_clsCmArray_count
     Dim a : Set a = new clsCmArray
