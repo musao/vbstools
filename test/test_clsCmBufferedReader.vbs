@@ -106,6 +106,8 @@ Sub Test_clsCmBufferedReader_textStream_setTextStream
     
     AssertSame e, a.textStream
     assertAll takeSnapshot(e), takeSnapshot(a)
+    
+    e.Close
 End Sub
 Sub Test_clsCmBufferedReader_textStream_setTextStream_Err_Value
     On Error Resume Next

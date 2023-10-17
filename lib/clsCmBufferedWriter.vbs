@@ -11,7 +11,6 @@
 Class clsCmBufferedWriter
     'クラス内変数、定数
     Private PoTextStream, PlWriteBufferSize, PlWriteIntervalTime, PoOutbound, PoInbound, PoBuffer
-'    Private PoTextStream, PoWriteDateTime, PoRequestFirstDateTime, PlWriteBufferSize, PlWriteIntervalTime, PsBuffer
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -31,11 +30,8 @@ Class clsCmBufferedWriter
         Set PoTextStream = Nothing
         PlWriteBufferSize = 5000                 'デフォルトは5000バイト
         PlWriteIntervalTime = 0                  'デフォルトは0秒
-'        Set PoWriteDateTime = Nothing
-'        Set PoRequestFirstDateTime = Nothing
-'        PsBuffer = ""
         
-        Dim vArr : vArr = Array("line", Empty, "column")
+        Dim vArr : vArr = Array("line", Empty, "column", Empty)
         Set PoOutbound = new_DicWith(vArr)
         Set PoInbound = new_DicWith(vArr)
         Set PoBuffer = new_DicWith(Array("buffer", Empty, "length", Empty, "lastWriteTime", Empty, "firstRequestTime", Empty))
@@ -60,10 +56,6 @@ Class clsCmBufferedWriter
         Set PoOutbound = Nothing
         Set PoInbound = Nothing
         Set PoBuffer = Nothing
-
-'        Call sub_CmBufferedWriterClose()
-'        Set PoWriteDateTime = Nothing
-'        Set PoRequestFirstDateTime = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -129,6 +121,8 @@ Class clsCmBufferedWriter
         )
         If func_CM_ValidationlIsWithinTheRangeOf(alWriteIntervalTime, 2) Then
             PlWriteIntervalTime = CLng(alWriteIntervalTime)
+        Else
+            Err.Raise 1031, "clsCmBufferedWriter.vbs:clsCmBufferedWriter+writeIntervalTime()", "不正な数字です。"
         End If
     End Property
     
@@ -169,6 +163,42 @@ Class clsCmBufferedWriter
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get line()
+    'Overview                    : 現在の行番号を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     現在の行番号
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get line()
+        line = PoOutbound.Item("line")
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get column()
+    'Overview                    : 現在の列番号を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     現在の列番号
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get column()
+        column = PoOutbound.Item("column")
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get currentBufferSize()
     'Overview                    : 今のバッファサイズを返す
     'Detailed Description        : 工事中
@@ -184,7 +214,6 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Public Property Get currentBufferSize()
         currentBufferSize = PoBuffer.Item("length")
-'        currentBufferSize = func_CM_StrLen(PsBuffer)
     End Property
     
     '***************************************************************************************************
@@ -203,11 +232,9 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Public Property Get lastWriteTime()
         If IsEmpty(PoBuffer.Item("lastWriteTime")) Then
-'        If PoWriteDateTime Is Nothing Then
-            lastWriteTime=""
+            lastWriteTime = Empty
         Else
             lastWriteTime = PoBuffer.Item("lastWriteTime")
-'            lastWriteTime = PoWriteDateTime
         End If
     End Property
     
@@ -235,6 +262,10 @@ Class clsCmBufferedWriter
 
         Set PoTextStream = aoTextStream
         Set setTextStream = Me
+        'Inbound、Outboundを最新化する
+        sub_CmBufferedWriterUpdateStatus
+        'バッファの初期化
+        Set PoBuffer = new_DicWith(Array("buffer", "", "length", 0, "lastWriteTime", Empty, "firstRequestTime", Empty))
     End Function
     
     '***************************************************************************************************
@@ -256,8 +287,6 @@ Class clsCmBufferedWriter
         )
         sub_CmBufferedWriterWriteBuffer asCont
         sub_CmBufferedWriterWrite
-'        PsBuffer = PsBuffer & asContents
-'        Call sub_CmBufferedWriterWrite()
     End Sub
     
     '***************************************************************************************************
@@ -277,10 +306,13 @@ Class clsCmBufferedWriter
     Public Sub writeBlankLines( _
         byVal alLines _
         )
-        sub_CmBufferedWriterWriteBuffer String(alLines, vbNewLine)
+        Dim sTmp, lIdx
+        sTmp = ""
+        For lIdx=1 To alLines 
+            sTmp = sTmp & vbNewLine
+        Next
+        sub_CmBufferedWriterWriteBuffer sTmp
         sub_CmBufferedWriterWrite
-'        PsBuffer = PsBuffer & String(alLines, vbNewLine)
-'        Call sub_CmBufferedWriterWrite()
     End Sub
     
     '***************************************************************************************************
@@ -302,8 +334,6 @@ Class clsCmBufferedWriter
         )
         sub_CmBufferedWriterWriteBuffer asCont & vbNewLine
         sub_CmBufferedWriterWrite
-'        PsBuffer = PsBuffer & asContents & vbNewLine
-'        Call sub_CmBufferedWriterWrite()
     End Sub
     
     '***************************************************************************************************
@@ -324,8 +354,6 @@ Class clsCmBufferedWriter
         )
         sub_CmBufferedWriterWriteBuffer vbNewLine
         sub_CmBufferedWriterWrite
-'        PsBuffer = PsBuffer & vbNewLine
-'        Call sub_CmBufferedWriterWrite()
     End Sub
     
     '***************************************************************************************************
@@ -345,7 +373,6 @@ Class clsCmBufferedWriter
     Public Sub flush( _
         )
         sub_CmBufferedWriterWriteFile
-'        Call sub_CmBufferedWriterWriteFile()
     End Sub
     
     '***************************************************************************************************
@@ -364,7 +391,7 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Public Sub close( _
         )
-        Call sub_CmBufferedWriterClose()
+        sub_CmBufferedWriterClose
     End Sub
     
     
@@ -388,11 +415,11 @@ Class clsCmBufferedWriter
     Private Sub sub_CmBufferedWriterWrite( _
         )
         'ファイル出力判定＆ファイル出力
-        If func_CmBufferedWriterDetermineToWrite() Then Call sub_CmBufferedWriterWriteFile()
+        If func_CmBufferedWriterDecideToWrite() Then Call sub_CmBufferedWriterWriteFile()
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmBufferedWriterDetermineToWrite()
+    'Function/Sub Name           : func_CmBufferedWriterDecideToWrite()
     'Overview                    : ファイル出力するか判断する
     'Detailed Description        : 以下の条件で判断する
     '                              ・バッファのサイズが出力バッファサイズを超える
@@ -407,9 +434,9 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmBufferedWriterDetermineToWrite( _
+    Private Function func_CmBufferedWriterDecideToWrite( _
         )
-        func_CmBufferedWriterDetermineToWrite=False
+        func_CmBufferedWriterDecideToWrite=False
         If PoTextStream Is Nothing Then Exit Function
         
         '戻り値の初期化
@@ -422,37 +449,28 @@ Class clsCmBufferedWriter
         
         'バッファサイズの判定
         If PoBuffer.Item("length")>=PlWriteBufferSize Then boRet=True
-'        If func_CM_StrLen(PsBuffer)>=PlWriteBufferSize Then boRet=True
         
         If boRet Or PlWriteIntervalTime<=0 Then
         'バッファのサイズが出力バッファサイズを超えたか出力日時から出力間隔時間（秒）が0以下（＝不要）の場合は関数を抜ける
-            func_CmBufferedWriterDetermineToWrite=boRet
+            func_CmBufferedWriterDecideToWrite=boRet
             Exit Function
         End If
         
-'        If PoWriteDateTime Is Nothing And PoRequestFirstDateTime Is Nothing Then
-'        '前回と初回の出力日時がない場合、本リクエスト（＝初回リクエスト）日時を取得して関数を抜ける
-'            Set PoRequestFirstDateTime = new_Now()
-'            func_CmBufferedWriterDetermineToWrite=boRet
-'            Exit Function
-'        End If
-        
         '比較用日時の取得
         Dim oForComparison
-        Set oForComparison = PoBuffer.Item("lastWriteTime")
-        If IsEmpty(oForComparison) Then
-'        Set oForComparison = PoWriteDateTime
-'        If oForComparison Is Nothing Then
+        If IsEmpty(PoBuffer.Item("lastWriteTime")) Then
         '前回の出力日時がない場合、初回リクエスト日時を使用する
             Set oForComparison = PoBuffer.Item("firstRequestTime")
-'            Set oForComparison = PoRequestFirstDateTime
+        Else
+        '前回の出力日時がある場合、最終ファイル出力日時を使用する
+            Set oForComparison = PoBuffer.Item("lastWriteTime")
         End If
         
         '出力日時の判定
         If Abs(oForComparison.differenceFrom(new_Now()))>=PlWriteIntervalTime Then boRet=True
         
         '戻り値を返す
-        func_CmBufferedWriterDetermineToWrite=boRet
+        func_CmBufferedWriterDecideToWrite=boRet
         
         Set oForComparison = Nothing
     End Function
@@ -477,13 +495,13 @@ Class clsCmBufferedWriter
         
         'ファイルに出力
         PoTextStream.Write PoBuffer.Item("buffer")
-'        Call PoTextStream.Write(PsBuffer)
-        'バッファのクリア
-        PoBuffer.Item("buffer") = ""
-'        PsBuffer = ""
-        '出力日時を記録
-        Set PoBuffer.Item("lastWriteTime") = new_Now()
-'        Set PoWriteDateTime = new_Now()
+        'Inbound、Outboundを最新化する
+        sub_CmBufferedWriterUpdateStatus
+        With PoBuffer
+            .Item("buffer") = ""                      'バッファのクリア
+            .Item("length") = 0                       'バッファ長を0にする
+            Set .Item("lastWriteTime") = new_Now()    '出力日時を記録
+        End With
     End Sub
     
     '***************************************************************************************************
@@ -506,9 +524,8 @@ Class clsCmBufferedWriter
         
         'バッファが残っていたら出力する
         If PoBuffer.Item("length")<>0 Then Call sub_CmBufferedWriterWriteFile()
-'        If func_CM_StrLen(PsBuffer)<>0 Then Call sub_CmBufferedWriterWriteFile()
         'テキストストリームをクローズする
-        Call PoTextStream.Close
+        PoTextStream.Close
         Set PoTextStream = Nothing
     End Sub
     
@@ -529,8 +546,93 @@ Class clsCmBufferedWriter
     Private Sub sub_CmBufferedWriterWriteBuffer( _
         byVal asCont _
         )
-        PoBuffer.Item("buffer") = PoBuffer.Item("buffer") & asCont
-        PoBuffer.Item("length") = func_CM_StrLen(PoBuffer.Item("buffer"))
-    End Sub
+        Dim oArr
 
+        With PoBuffer
+            .Item("buffer") = .Item("buffer") & asCont
+            .Item("length") = func_CM_StrLen(.Item("buffer"))
+        End With
+
+        Set oArr = new_ArrSplit(asCont, vbLf)
+        oArr.reverse()
+        With PoOutbound
+            .Item("line") = .Item("line") + oArr.length-1
+            .Item("column") = Len(oArr(0))+1
+        End With
+
+        Set oArr = Nothing
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmBufferedWriterGetInboundStatus()
+    'Overview                    : インバウンドの状態を取得する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmBufferedWriterGetInboundStatus( _
+        )
+        With PoTextStream
+            'インバウンドの状態を取得する
+            Set PoInbound = new_DicWith(Array("line", .Line, "column", .Column))
+        End With
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmBufferedWriterCopyInboundStateToOutbound()
+    'Overview                    : インバウンドの状態をアウトバウンドにコピーする
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmBufferedWriterCopyInboundStateToOutbound( _
+        )
+        With PoInbound
+            'アウトバウンドの状態にインバウンドの状態をコピーする
+            Dim sKey, oOutbound
+            Set oOutbound = new_Dic()
+            For Each sKey In Array("line", "column")
+                oOutbound.Add sKey, .Item(sKey)
+            Next
+        End With
+        Set PoOutbound = oOutbound
+        Set oOutbound = Nothing
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmBufferedWriterUpdateStatus()
+    'Overview                    : Inbound、Outboundを最新化する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmBufferedWriterUpdateStatus( _
+        )
+        'インバウンドの状態を取得する
+        sub_CmBufferedWriterGetInboundStatus
+        'インバウンドの状態をアウトバウンドにコピーする
+        sub_CmBufferedWriterCopyInboundStateToOutbound
+    End Sub
+    
 End Class

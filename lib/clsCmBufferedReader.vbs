@@ -50,7 +50,7 @@ Class clsCmBufferedReader
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        Call sub_CmBufferedReaderClose()
+        sub_CmBufferedReaderClose
         Set PoOutbound = Nothing
         Set PoInbound = Nothing
         Set PoBuffer = Nothing
@@ -223,7 +223,7 @@ Class clsCmBufferedReader
         Set PoTextStream = aoTextStream
         Set setTextStream = Me
         'Inbound、Outboundなどの情報を初期化する
-        Call sub_CmBufferedReaderInitialize()
+        sub_CmBufferedReaderInitialize
     End Function
     
     '***************************************************************************************************
@@ -301,7 +301,7 @@ Class clsCmBufferedReader
     Public Sub skip( _
         byVal alLength _
         )
-        Call func_CmBufferedReaderRead(alLength)
+        func_CmBufferedReaderRead alLength
     End Sub
     
     '***************************************************************************************************
@@ -320,7 +320,7 @@ Class clsCmBufferedReader
     '***************************************************************************************************
     Public Sub skipLine( _
         )
-        Call func_CmBufferedReaderReadLine()
+        func_CmBufferedReaderReadLine
     End Sub
     
     '***************************************************************************************************
@@ -339,7 +339,7 @@ Class clsCmBufferedReader
     '***************************************************************************************************
     Public Sub close( _
         )
-        Call sub_CmBufferedReaderClose()
+        sub_CmBufferedReaderClose
     End Sub
     
     
@@ -370,7 +370,7 @@ Class clsCmBufferedReader
         Do While PoInbound.Item("atEndOfStream")=False And (PoBuffer.Item("length")-PoBuffer.Item("pointer")+1)<alLength
         'インバウンドが読み出し可能（atEndOfStream=False）かつバッファの未読み出し部分の長さが読み込む文字数未満の場合
             '読込バッファサイズだけ読み取る
-            Call func_CmBufferedReaderReadFile(False)
+            func_CmBufferedReaderReadFile False
         Loop
         
         'バッファから指定した文字数取り出す
@@ -384,7 +384,7 @@ Class clsCmBufferedReader
         If boFlg Then
         'ポインタがバッファの外にある場合
             'インバウンドの状態をアウトバウンドにコピーする
-            Call sub_CmBufferedReaderCopyInboundStateToOutbound()
+            sub_CmBufferedReaderCopyInboundStateToOutbound
         Else
         'ポインタがバッファ内にある場合
             Dim oArr : Set oArr = new_ArrSplit(Mid(PoBuffer.Item("buffer"), 1, PoBuffer.Item("pointer") - 1), vbLf)
@@ -424,7 +424,7 @@ Class clsCmBufferedReader
         Do While PoInbound.Item("atEndOfStream")=False And InStr(PoBuffer.Item("pointer"), PoBuffer.Item("buffer"), vbLf, vbBinaryCompare)=0
         'インバウンドが読み出し可能（atEndOfStream=False）かつポインタのある行がバッファの最終行の場合
             '読込バッファサイズだけ読み取る
-            Call func_CmBufferedReaderReadFile(False)
+            func_CmBufferedReaderReadFile False
         Loop
         
         '行末（vbLf）を検索する
@@ -451,7 +451,7 @@ Class clsCmBufferedReader
         If boFlg Then
         'ポインタがバッファの外にある場合
             'インバウンドの状態をアウトバウンドにコピーする
-            Call sub_CmBufferedReaderCopyInboundStateToOutbound()
+            sub_CmBufferedReaderCopyInboundStateToOutbound
         Else
         'ポインタがバッファ内にある場合
             With PoOutbound
@@ -489,7 +489,7 @@ Class clsCmBufferedReader
         Dim sRet : sRet = func_CmBufferedReaderReadFile(True)
         
         'インバウンドの状態をアウトバウンドにコピーする
-        Call sub_CmBufferedReaderCopyInboundStateToOutbound()
+        sub_CmBufferedReaderCopyInboundStateToOutbound
         'ポインタを更新
         PoBuffer.Item("pointer") = PoBuffer.Item("length")+1
         
@@ -530,7 +530,7 @@ Class clsCmBufferedReader
             .Item("length") = Len(.Item("buffer"))
         End With
         'インバウンドの状態を取得する
-        Call sub_CmBufferedReaderGetInboundStatus()
+        sub_CmBufferedReaderGetInboundStatus
         '戻り値を返す
         func_CmBufferedReaderReadFile = sText
     End Function
@@ -553,7 +553,7 @@ Class clsCmBufferedReader
         )
         If PoTextStream Is Nothing Then Exit Sub
         
-        Call PoTextStream.Close
+        PoTextStream.Close
         Set PoTextStream = Nothing
     End Sub
     
@@ -624,9 +624,9 @@ Class clsCmBufferedReader
     Private Sub sub_CmBufferedReaderInitialize( _
         )
         'インバウンドの状態を取得する
-        Call sub_CmBufferedReaderGetInboundStatus()
+        sub_CmBufferedReaderGetInboundStatus
         'インバウンドの状態をアウトバウンドにコピーする
-        Call sub_CmBufferedReaderCopyInboundStateToOutbound()
+        sub_CmBufferedReaderCopyInboundStateToOutbound
         'ポインタの初期化
         Set PoBuffer = new_DicWith(Array("pointer", 1, "buffer", "", "length", 0))
     End Sub

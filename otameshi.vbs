@@ -36,10 +36,19 @@ Function takeSnapshot(o)
     Set takeSnapshot = ret
 End Function
 
+msgbox Asc(left(vbNewLine,1)) &" "& Asc(right(vbNewLine,1)) &" "& len(vbnewline)
+msgbox Len(String(2, vbNewLine))
+wscript.quit
+
 ' for fso.OpenTextFile
 Const ForReading = 1, ForWriting = 2, ForAppending = 8
-Dim e : Set e = takeSnapshot(new_Fso().OpenTextFile(WScript.ScriptFullName, ForAppending, False, -2))
-inputbox "","",func_CM_ToString(e)
+'Dim e : Set e = new_Fso().OpenTextFile("C:\Users\89585\Documents\dev\vbs\tmp\test.txt", ForWriting, True, -2)
+Dim e : Set e = new_Fso().OpenTextFile(func_CM_FsGetPrivateFilePath("tmp", "test.txt"), ForWriting, True, -2)
+with e
+    .write("‚ ‚¢‚¤‚¦‚¨")
+inputbox "","",func_CM_ToString(takeSnapshot(e))
+    .close
+end with
 
 wscript.quit
 
