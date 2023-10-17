@@ -215,7 +215,7 @@ Class clsCmBufferedReader
     Public Function setTextStream( _
         byRef aoTextStream _
         )
-        If Vartype(aoTextStream)<>9 Or Strcomp(Typename(aoTextStream),"TextStream",vbBinaryCompare)<>0 Then
+        If Not func_CM_UtilIsTextStream(aoTextStream) Then
             Err.Raise 438, "clsCmBufferedReader.vbs:clsCmBufferedReader+setTextStream()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
             Exit Function
         End If

@@ -3151,7 +3151,7 @@ End Function
 Private Function func_CM_UtilIsSame( _
     byRef aoA _
     , byRef aoB _
-)
+    )
     Dim boFlg : boFlg = False
     If IsObject(aoA) And IsObject(aoB) Then
         If aoA Is aoB Then boFlg = True
@@ -3181,10 +3181,32 @@ End Function
 '***************************************************************************************************
 Private Function func_CM_UtilIsAvailableObject( _
     byRef aoObj _
-)
+    )
     Dim boFlg : boFlg = False
     If IsObject(aoObj) Then
         If Not aoObj Is Nothing Then boFlg = True
     End If
     func_CM_UtilIsAvailableObject = boFlg
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilIsTextStream()
+'Overview                    : オブジェクトがTextStreamか判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoObj                  : オブジェクト
+'Return Value
+'     結果 True:TextStreamである / False:TextStreamでない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilIsTextStream( _
+    byRef aoObj _
+    )
+    Dim boFlg : boFlg = False
+    If Vartype(aoObj)=9 And Strcomp(Typename(aoObj),"TextStream",vbBinaryCompare)=0 Then boFlg = True
+    func_CM_UtilIsTextStream = boFlg
 End Function

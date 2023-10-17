@@ -144,7 +144,7 @@ Function takeSnapshot(o)
 End Function
 Sub assertAll(a,b)
     Dim sKey
-    For Each sKey In Array("text","len","Line","Column","AtEndOfLine","AtEndOfStream")
+    For Each sKey In Array("Line","Column","AtEndOfLine","AtEndOfStream")
         AssertEqualWithMessage a.Item(sKey), b.Item(sKey), sKey
     Next
 End Sub

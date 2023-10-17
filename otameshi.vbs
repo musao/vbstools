@@ -25,7 +25,21 @@ Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
-inputbox "","", asc(" ")
+Function takeSnapshot(o)
+    Dim ret : Set ret = new_Dic()
+    with o
+        ret.add "Line", .Line
+        ret.add "Column", .Column
+'        ret.add "AtEndOfLine", .AtEndOfLine
+'        ret.add "AtEndOfStream", .AtEndOfStream
+    end with
+    Set takeSnapshot = ret
+End Function
+
+' for fso.OpenTextFile
+Const ForReading = 1, ForWriting = 2, ForAppending = 8
+Dim e : Set e = takeSnapshot(new_Fso().OpenTextFile(WScript.ScriptFullName, ForAppending, False, -2))
+inputbox "","",func_CM_ToString(e)
 
 wscript.quit
 
