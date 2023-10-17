@@ -18,12 +18,12 @@ Dim PsPathTempFolder,PsPathData1,PsPathData2
 'SetUp()/TearDown()
 Sub SetUp()
     PsPathTempFolder = func_CM_FsBuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedReader_regression")
-    PsPathData1 = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().displayAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathData1 = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With func_CM_FsOpenTextFile(PsPathData1, ForWriting, True, -2)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCrLf & vbCr & "abcde" & vbLf & vbLf & "12" & vbCr & "345")
         .Close
     End With
-    PsPathData2 = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().displayAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathData2 = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With func_CM_FsOpenTextFile(PsPathData2, ForWriting, True, -2)
         .Write("‚©‚«‚­‚¯‚±" & vbCr)
         .Close

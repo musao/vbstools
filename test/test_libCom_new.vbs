@@ -180,9 +180,9 @@ Sub Test_new_Now
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
-    AssertEqual Cstr(DatePart("yyyy", ed)), a.displayAs("YYYY")
-    AssertEqual Cstr(DatePart("m", ed)), a.displayAs("M")
-    AssertEqual Cstr(DatePart("d", ed)), a.displayAs("D")
+    AssertEqual Cstr(DatePart("yyyy", ed)), a.formatAs("YYYY")
+    AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
+    AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
 End Sub
 
 '###################################################################################################
@@ -194,9 +194,9 @@ Sub Test_new_CalAt
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
-    AssertEqual Cstr(DatePart("yyyy", ed)), a.displayAs("YYYY")
-    AssertEqual Cstr(DatePart("m", ed)), a.displayAs("M")
-    AssertEqual Cstr(DatePart("d", ed)), a.displayAs("D")
+    AssertEqual Cstr(DatePart("yyyy", ed)), a.formatAs("YYYY")
+    AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
+    AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
 End Sub
 Sub Test_new_CalAt_Err
     On Error Resume Next

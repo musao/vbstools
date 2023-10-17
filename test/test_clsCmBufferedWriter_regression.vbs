@@ -18,12 +18,12 @@ Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 'SetUp()/TearDown()
 Sub SetUp()
     PsPathTempFolder = func_CM_FsBuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedWriter")
-    PsPathForAppending = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().displayAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathForAppending = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With func_CM_FsOpenTextFile(PsPathForAppending, ForWriting, True, -2)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
         .Close
     End With
-    PsPathForWriting = func_CM_FsBuildPath(PsPathTempFolder, new_Now().displayAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathForWriting = func_CM_FsBuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
 End Sub
 Sub TearDown()
     func_CM_FsDeleteFolder PsPathTempFolder

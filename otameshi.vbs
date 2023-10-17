@@ -36,8 +36,11 @@ Function takeSnapshot(o)
     Set takeSnapshot = ret
 End Function
 
-msgbox Asc(left(vbNewLine,1)) &" "& Asc(right(vbNewLine,1)) &" "& len(vbnewline)
-msgbox Len(String(2, vbNewLine))
+inputbox "","", cdbl(now)  '45216.9009953704
+inputbox "","", timer      '77860.62
+
+inputbox "","", cdate(45216.9009953704)  '2023/10/17 21:37:26
+
 wscript.quit
 
 ' for fso.OpenTextFile
