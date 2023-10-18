@@ -261,7 +261,7 @@ Class clsCmCalendar
     Private Function func_CmCalendarSetDate( _
         ByVal avDateTime _
         )
-        Dim sPtn : sPtn = "^([^.]+)\.([^.]+)$"
+        Dim sPtn : sPtn = "^([^.]+)\.(\d+)$"
         If new_Re(sPtn, "").Test(avDateTime) Then
             PdtDate = Cdate(new_Re(sPtn, "").Replace(avDateTime, "$1"))
             PdbFractionalSec = Cdbl("0." & new_Re(sPtn, "").Replace(avDateTime, "$2"))
@@ -324,6 +324,8 @@ Class clsCmCalendar
             .Add "s", Array("UseDatePart()", "s", False)
             .Add ".000000", Array("GetFractionalSeconds")
             .Add ".000", Array("GetFractionalSeconds")
+'            .Add "000000", Array("GetFractionalSeconds")
+'            .Add "000", Array("GetFractionalSeconds")
             
             Dim lPos : lPos=1
             Dim sResult : sResult=""
@@ -347,8 +349,10 @@ Class clsCmCalendar
                         'ïbêîÇÃè¨êîïîÇéÊÇËèoÇ∑èÍçá
                             If Not IsEmpty(PdbFractionalSec) Then
                                 sItemValue = "." & func_CM_FillInTheCharacters(Fix(PdbFractionalSec*10^(lKeyLen-1)), lKeyLen-1, "0", False, True)
+'                                sItemValue = func_CM_FillInTheCharacters(Fix(PdbFractionalSec*10^(lKeyLen-1)), lKeyLen, "0", False, True)
                             Else
                                 sItemValue = "." & func_CM_FillInTheCharacters("0", lKeyLen-1, "0", False, True)
+'                                sItemValue = func_CM_FillInTheCharacters("0", lKeyLen, "0", False, True)
                             End If
                         End If
                         boIsMatch = True : Exit For
