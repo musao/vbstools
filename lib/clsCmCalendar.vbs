@@ -284,8 +284,8 @@ Class clsCmCalendar
     '                               h{h]      時
     '                               m{m]      分
     '                               s{s]      秒
-    '                               .000      ミリ秒まで
-    '                               .000000   マイクロ秒まで
+    '                               000       ミリ秒まで
+    '                               000000    マイクロ秒まで
     'Argument
     '     asFormat               : 表示形式
     'Return Value
@@ -322,10 +322,8 @@ Class clsCmCalendar
             .Add "ss", Array("UseDatePart()", "s", False)
             .Add "S", Array("UseDatePart()", "s", False)
             .Add "s", Array("UseDatePart()", "s", False)
-            .Add ".000000", Array("GetFractionalSeconds")
-            .Add ".000", Array("GetFractionalSeconds")
-'            .Add "000000", Array("GetFractionalSeconds")
-'            .Add "000", Array("GetFractionalSeconds")
+            .Add "000000", Array("GetFractionalSeconds")
+            .Add "000", Array("GetFractionalSeconds")
             
             Dim lPos : lPos=1
             Dim sResult : sResult=""
@@ -347,13 +345,9 @@ Class clsCmCalendar
                             sItemValue = func_CM_FillInTheCharacters(DatePart(vItem(1), PdtDate), lKeyLen, "0", vItem(2), True)
                         Else
                         '秒数の小数部を取り出す場合
-                            If Not IsEmpty(PdbFractionalSec) Then
-                                sItemValue = "." & func_CM_FillInTheCharacters(Fix(PdbFractionalSec*10^(lKeyLen-1)), lKeyLen-1, "0", False, True)
-'                                sItemValue = func_CM_FillInTheCharacters(Fix(PdbFractionalSec*10^(lKeyLen-1)), lKeyLen, "0", False, True)
-                            Else
-                                sItemValue = "." & func_CM_FillInTheCharacters("0", lKeyLen-1, "0", False, True)
-'                                sItemValue = func_CM_FillInTheCharacters("0", lKeyLen, "0", False, True)
-                            End If
+                            Dim dbFractionalSec : dbFractionalSec =0
+                            If Not IsEmpty(PdbFractionalSec) Then dbFractionalSec = PdbFractionalSec
+                            sItemValue = func_CM_FillInTheCharacters(Fix(dbFractionalSec*10^lKeyLen), lKeyLen, "0", False, True)
                         End If
                         boIsMatch = True : Exit For
                     End If

@@ -25,18 +25,12 @@ Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
-Function takeSnapshot(o)
-    Dim ret : Set ret = new_Dic()
-    with o
-        ret.add "Line", .Line
-        ret.add "Column", .Column
-'        ret.add "AtEndOfLine", .AtEndOfLine
-'        ret.add "AtEndOfStream", .AtEndOfStream
-    end with
-    Set takeSnapshot = ret
-End Function
+dim dbFractionalSec : dbFractionalSec = 0.1234567
+dim lKeyLen : lKeyLen = 3
+dim a
+a = func_CM_FillInTheCharacters(Fix(dbFractionalSec*10^(lKeyLen)), lKeyLen, "0", False, True)
 
-inputbox "","", cdate(1)
+inputbox "","", a
 
 wscript.quit
 
