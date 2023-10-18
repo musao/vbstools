@@ -36,6 +36,10 @@ Function takeSnapshot(o)
     Set takeSnapshot = ret
 End Function
 
+inputbox "","", cdate(1)
+
+wscript.quit
+
 inputbox "","", cdbl(now)  '45216.9009953704
 inputbox "","", timer      '77860.62
 

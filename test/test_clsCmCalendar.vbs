@@ -20,7 +20,7 @@ End Sub
 
 '###################################################################################################
 'clsCmCalendar.getNow()/toString()
-Sub Test_clsCmArray_getNow_toString
+Sub Test_clsCmCalendar_getNow_toString
     Dim y,m,d,h,mm,s
     y = Right("000" & Year(now()), 4)
     m = Right("0" & Month(now()), 2)
@@ -37,20 +37,20 @@ End Sub
 
 '###################################################################################################
 'clsCmCalendar.setDateTime()/toString()
-Sub Test_clsCmArray_setDateTime_toString
+Sub Test_clsCmCalendar_setDateTime_toString
     Dim e : e = "2024/02/29 00:59:30"
     Dim a : Set a = (new clsCmCalendar).setDateTime(e)
 
     AssertMatch e & ".000", a.toString()
     AssertMatch e & ".000", a
 End Sub
-Sub Test_clsCmArray_setDateTime_WithDecimal_toString
+Sub Test_clsCmCalendar_setDateTime_WithDecimal_toString
     Dim e : e = "2023/12/31 23:30:59.123456"
     Dim a : Set a = (new clsCmCalendar).setDateTime(e)
 
     AssertMatch mid(e,1,Len(a.toString())), a.toString()
 End Sub
-Sub Test_clsCmArray_setDateTime_toString_Err
+Sub Test_clsCmCalendar_setDateTime_toString_Err
     On Error Resume Next
     Dim e : e = "2022/02/29 00:59:30"
     Dim a : Set a = (new clsCmCalendar).setDateTime(e)

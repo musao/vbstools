@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class clsCmCalendar
     'クラス内変数、定数
-    Private PdtDateTime, PdbTimer, PsDefaultFormat
+    Private PdtDate, PdbFractionalSec, PsDefaultFormat
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -27,8 +27,8 @@ Class clsCmCalendar
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        PdtDateTime = 0
-        PdbTimer = 0
+        PdtDate = Empty
+        PdbFractionalSec = Empty
         PsDefaultFormat = "YYYY/MM/DD hh:mm:ss.000"
     End Sub
     
@@ -64,7 +64,9 @@ Class clsCmCalendar
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get serial()
-       serial = CDbl(Fix(PdtDateTime) + PdbTimer/(60*60*24))
+       Dim dbFractionalSec : dbFractionalSec = 0
+       If Not IsEmpty(PdbFractionalSec) Then dbFractionalSec = PdbFractionalSec/(60*60*24)
+       serial = Cdbl(PdtDate) + dbFractionalSec
     End Property
     
     '***************************************************************************************************
@@ -84,8 +86,10 @@ Class clsCmCalendar
     Public Property Let serial( _
         byVal adbSerial _
         )
-        PdtDateTime = Fix(adbSerial)
-        PdbTimer = adbSerial - Fix(adbSerial)
+        PdtDate = Cdate(adbSerial)
+
+        Dim dbSec : dbSec = (adbSerial - Fix(adbSerial))*60*60*24
+        PdbFractionalSec = dbSec - Fix(dbSec)
     End Property
     
     '***************************************************************************************************
@@ -232,8 +236,11 @@ Class clsCmCalendar
     '***************************************************************************************************
     Private Function func_CmCalendarGetNow( _
         )
-        PdtDateTime = Now()
-        PdbTimer = Timer()
+        PdtDate = Now()
+        
+        Dim dbTimer : dbTimer = Timer()
+        PdbFractionalSec = dbTimer - Fix(dbTimer)
+
         Set func_CmCalendarGetNow = Me
     End Function
     
@@ -256,13 +263,11 @@ Class clsCmCalendar
         )
         Dim sPtn : sPtn = "^([^.]+)\.([^.]+)$"
         If new_Re(sPtn, "").Test(avDateTime) Then
-            Dim dtDate : dtDate = new_Re(sPtn, "").Replace(avDateTime, "$1")
-            Dim dbTimer : dbTimer = "0." & new_Re(sPtn, "").Replace(avDateTime, "$2")
-            PdtDateTime = CDate(dtDate)
-            PdbTimer = CDate(dtDate) - Fix(CDate(dtDate)) + CDbl(dbTimer)
+            PdtDate = Cdate(new_Re(sPtn, "").Replace(avDateTime, "$1"))
+            PdbFractionalSec = Cdbl("0." & new_Re(sPtn, "").Replace(avDateTime, "$2"))
         Else
-            PdtDateTime = CDate(avDateTime)
-            PdbTimer = 0
+            PdtDate = Cdate(avDateTime)
+            PdbFractionalSec = Empty
         End If
         Set func_CmCalendarSetDate = Me
     End Function
@@ -336,11 +341,15 @@ Class clsCmCalendar
                     '変換テーブルにある文字と一致した場合
                         vItem = .Item(sKey)
                         If vItem(0)="UseDatePart()" Then
-                        'PdtDateTimeからDatePart()で値を取り出す場合
-                            sItemValue = func_CM_FillInTheCharacters(DatePart(vItem(1), PdtDateTime), lKeyLen, "0", vItem(2), True)
+                        'PdtDateからDatePart()で値を取り出す場合
+                            sItemValue = func_CM_FillInTheCharacters(DatePart(vItem(1), PdtDate), lKeyLen, "0", vItem(2), True)
                         Else
-                        'PdbTimerからミリ秒をを取り出す場合
-                            sItemValue = "." & func_CM_FillInTheCharacters(Fix((PdbTimer-Fix(PdbTimer))*10^(lKeyLen-1)), lKeyLen-1, "0", False, True)
+                        '秒数の小数部を取り出す場合
+                            If Not IsEmpty(PdbFractionalSec) Then
+                                sItemValue = "." & func_CM_FillInTheCharacters(Fix(PdbFractionalSec*10^(lKeyLen-1)), lKeyLen-1, "0", False, True)
+                            Else
+                                sItemValue = "." & func_CM_FillInTheCharacters("0", lKeyLen-1, "0", False, True)
+                            End If
                         End If
                         boIsMatch = True : Exit For
                     End If
