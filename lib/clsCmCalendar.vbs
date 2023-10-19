@@ -86,10 +86,9 @@ Class clsCmCalendar
     Public Property Let serial( _
         byVal adbSerial _
         )
-        PdtDate = Cdate(adbSerial)
-
         Dim dbSec : dbSec = (adbSerial - Fix(adbSerial))*60*60*24
         PdbFractionalSec = dbSec - Fix(dbSec)
+        PdtDate = Cdate(adbSerial - PdbFractionalSec/60/60/24)
     End Property
     
     '***************************************************************************************************
@@ -130,6 +129,11 @@ Class clsCmCalendar
     Public Function compareTo( _
         byRef aoTarget _
         )
+        If Strcomp(TypeName(Me), TypeName(aoTarget), vbBinaryCompare<>0 Then
+            Err.Raise 438, "clsCmCalendar.vbs:clsCmCalendar+compareTo()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
+            Exit Function
+        End If
+
         Dim SerialMe : SerialMe = Me.serial()
         Dim SerialTg : SerialTg = aoTarget.serial()
         Dim lResult : lResult = 0
