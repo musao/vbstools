@@ -129,7 +129,7 @@ Class clsCmCalendar
     Public Function compareTo( _
         byRef aoTarget _
         )
-        If Strcomp(TypeName(Me), TypeName(aoTarget), vbBinaryCompare<>0 Then
+        If Strcomp(TypeName(Me), TypeName(aoTarget), vbBinaryCompare)<>0 Then
             Err.Raise 438, "clsCmCalendar.vbs:clsCmCalendar+compareTo()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
             Exit Function
         End If
@@ -159,7 +159,13 @@ Class clsCmCalendar
     Public Function differenceFrom( _
         byRef aoTarget _
         )
-        differenceFrom = CDbl((Me.serial()-aoTarget.serial())*60*60*24)
+        If Strcomp(TypeName(Me), TypeName(aoTarget), vbBinaryCompare)<>0 Then
+            Err.Raise 438, "clsCmCalendar.vbs:clsCmCalendar+differenceFrom()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
+            Exit Function
+        End If
+
+'        differenceFrom = Me.serial()*60*60*24-aoTarget.serial()*60*60*24
+        differenceFrom = func_CM_MathRoundDown(Me.serial()*60*60*24-aoTarget.serial()*60*60*24, 7)
     End Function
     
     '***************************************************************************************************

@@ -1697,7 +1697,7 @@ End Function
 'Detailed Description        : 工事中
 'Argument
 '     adbNumber              : 数値
-'     aiPlace                : 切り上げする小数点以下の桁数
+'     alPlace                : 切り上げする小数点以下の桁数
 'Return Value
 '     切り上げした値
 '---------------------------------------------------------------------------------------------------
@@ -1708,9 +1708,9 @@ End Function
 '***************************************************************************************************
 Private Function func_CM_MathRoundUp( _
     byVal adbNumber _ 
-    , byVal aiPlace _
+    , byVal alPlace _
     )
-    func_CM_MathRoundUp = func_CM_MathRound(adbNumber, aiPlace, 9)
+    func_CM_MathRoundUp = func_CM_MathRound(adbNumber, alPlace, 9)
 End Function
 
 '***************************************************************************************************
@@ -1719,7 +1719,7 @@ End Function
 'Detailed Description        : 工事中
 'Argument
 '     adbNumber              : 数値
-'     aiPlace                : 四捨五入する小数点以下の桁数
+'     alPlace                : 四捨五入する小数点以下の桁数
 'Return Value
 '     四捨五入した値
 '---------------------------------------------------------------------------------------------------
@@ -1730,9 +1730,9 @@ End Function
 '***************************************************************************************************
 Private Function func_CM_MathRoundOff( _
     byVal adbNumber _ 
-    , byVal aiPlace _
+    , byVal alPlace _
     )
-    func_CM_MathRoundOff = func_CM_MathRound(adbNumber, aiPlace, 5)
+    func_CM_MathRoundOff = func_CM_MathRound(adbNumber, alPlace, 5)
 End Function
 
 '***************************************************************************************************
@@ -1741,7 +1741,7 @@ End Function
 'Detailed Description        : 工事中
 'Argument
 '     adbNumber              : 数値
-'     aiPlace                : 切り捨てする小数点以下の桁数
+'     alPlace                : 切り捨てする小数点以下の桁数
 'Return Value
 '     切り捨てした値
 '---------------------------------------------------------------------------------------------------
@@ -1752,9 +1752,9 @@ End Function
 '***************************************************************************************************
 Private Function func_CM_MathRoundDown( _
     byVal adbNumber _ 
-    , byVal aiPlace _
+    , byVal alPlace _
     )
-    func_CM_MathRoundDown = func_CM_MathRound(adbNumber, aiPlace, 0)
+    func_CM_MathRoundDown = func_CM_MathRound(adbNumber, alPlace, 0)
 End Function
 
 '***************************************************************************************************
@@ -1762,8 +1762,8 @@ End Function
 'Overview                    : 数値を丸める
 'Detailed Description        : 工事中
 'Argument
-'     adbNumber              : 数値
-'     aiPlace                : 丸める小数点以下の桁数
+'     adbNum                 : 数値
+'     alPlace                : 丸める小数点以下の桁数
 '     alThreshold            : 閾値
 '                               0：切り捨て
 '                               5：四捨五入
@@ -1777,14 +1777,17 @@ End Function
 '2022/09/24         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_MathRound( _
-    byVal adbNumber _ 
-    , byVal aiPlace _
+    byVal adbNum _ 
+    , byVal alPlace _
     , byVal alThreshold _
     )
-    Dim lMultiply, lReverse
-    lReverse = 10^(aiPlace-1)
-    lMultiply = 10^(-1*aiPlace)
-    func_CM_MathRound = Int((adbNumber + alThreshold*lMultiply)*lReverse)/lReverse
+'    func_CM_MathRound = Int((adbNum+alThreshold*10^(-1*alPlace))*10^alPlace)/10^alPlace
+'    func_CM_MathRound = Int((adbNum+alThreshold*10^(-1*(alPlace-1)))*10^(alPlace-1))/10^(alPlace-1)
+    func_CM_MathRound = Int((adbNum+alThreshold*10^(-1*(alPlace-2)))*10^(alPlace-1))/10^(alPlace-1)
+'    Dim lMultiply, lReverse
+'    lReverse = 10^(alPlace-1)
+'    lMultiply = 10^(-1*alPlace)
+'    func_CM_MathRound = Int((adbNumber + alThreshold*lMultiply)*lReverse)/lReverse
 End Function
 
 
@@ -2812,7 +2815,7 @@ End Function
 'Argument
 '     adbMin                 : 生成する乱数の最小値
 '     adbMax                 : 生成する乱数の最大値
-'     aiPlace                : 切り上げする小数点以下の桁数
+'     alPlace                : 切り上げする小数点以下の桁数
 'Return Value
 '     生成した乱数
 '---------------------------------------------------------------------------------------------------
@@ -2824,7 +2827,7 @@ End Function
 Private Function func_CM_UtilGenerateRandomNumber( _
     byVal adbMin _
     , byVal adbMax _
-    , byVal aiPlace _
+    , byVal alPlace _
     )
     Randomize
     func_CM_UtilGenerateRandomNumber = func_CM_MathRoundDown( (adbMax - adbMin + 1) * Rnd + adbMin, 1 )

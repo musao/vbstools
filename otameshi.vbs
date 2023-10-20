@@ -25,12 +25,8 @@ Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
-dim dbFractionalSec : dbFractionalSec = 0.1234567
-dim lKeyLen : lKeyLen = 3
-dim a
-a = func_CM_FillInTheCharacters(Fix(dbFractionalSec*10^(lKeyLen)), lKeyLen, "0", False, True)
 
-inputbox "","", a
+inputbox "","", func_CM_MathRound(98765.4321, 1, 0)
 
 wscript.quit
 

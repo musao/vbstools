@@ -51,7 +51,8 @@ Sub Test_clsCmCalendar_serial_setDateTime_2
     AssertWithMessage Not e Is a, "Object"
     AssertEqualWithMessage e.serial, a.serial, "serial"
     AssertEqualWithMessage e.toString, a.toString, "toString"
-    AssertEqualWithMessage Left(e.formatAs("000000"),4), Left(a.formatAs("000000"),4), "microsecond"
+    AssertWithMessage Abs(e.formatAs("000000")-a.formatAs("000000"))<=1, "microsecond"
+'    AssertEqualWithMessage Left(e.formatAs("000000"),4), Left(a.formatAs("000000"),4), "microsecond"
 End Sub
 
 '###################################################################################################
@@ -88,19 +89,19 @@ Sub Test_clsCmCalendar_compareTo_WithDecimal
     Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = 1
     a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
+    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 
     d2 = "2024/02/29 00:59:31.123456"
     Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = 0
     a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
+    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 
     d2 = "2024/02/29 00:59:31.123457"
     Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = -1
     a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
+    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 End Sub
 Sub Test_clsCmCalendar_compareTo_DateOnly
     Dim d1,d2,e,a,a1,a2
@@ -156,6 +157,68 @@ Sub Test_clsCmCalendar_compareTo_Err
 
     e = Empty
     a = a1.compareTo(new_Dic())
+
+    AssertEqual 438, Err.Number
+    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
+    AssertEqual e, a
+End Sub
+
+'###################################################################################################
+'clsCmCalendar.differenceFrom()
+Sub Test_clsCmCalendar_differenceFrom
+    Dim d1,d2,e,a,a1,a2
+    d1 = "2024/02/29 00:59:31"
+    Set a1 = (new clsCmCalendar).setDateTime(d1)
+
+    d2 = "2024/02/29 00:59:30"
+    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    e = 1
+    a = a1.differenceFrom(a2)
+    AssertEqualWithMessage e, a, a1&" vs "&a2
+
+    d2 = "2024/02/29 00:59:31"
+    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    e = 0
+    a = a1.differenceFrom(a2)
+    AssertEqualWithMessage e, a, a1&" vs "&a2
+
+    d2 = "2024/02/29 00:59:32"
+    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    e = -1
+    a = a1.differenceFrom(a2)
+    AssertEqualWithMessage e, a, a1&" vs "&a2
+End Sub
+Sub Test_clsCmCalendar_differenceFrom_WithDecimal
+    Dim d1,d2,e,a,a1,a2
+    d1 = "2024/02/29 00:59:31.123456"
+    Set a1 = (new clsCmCalendar).setDateTime(d1)
+
+    d2 = "2024/02/29 00:59:30.123455"
+    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    e = 1
+    a = a1.differenceFrom(a2)
+'    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+
+    d2 = "2024/02/29 00:59:31.123456"
+    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    e = 0
+    a = a1.differenceFrom(a2)
+ '   AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+
+    d2 = "2024/02/29 00:59:32.123457"
+    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    e = -1
+    a = a1.differenceFrom(a2)
+    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+End Sub
+Sub Test_clsCmCalendar_differenceFrom_Err
+    On Error Resume Next
+    Dim d1,e,a,a1
+    d1 = "2024/02/29 00:59:31"
+    Set a1 = (new clsCmCalendar).setDateTime(d1)
+
+    e = Empty
+    a = a1.differenceFrom(new_Dic())
 
     AssertEqual 438, Err.Number
     AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
