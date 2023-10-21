@@ -473,7 +473,7 @@ Class clsCompareExcel
         Dim oTo : Call cf_bind(oTo, aoParams.Item("To"))
 
         Dim lCnt
-        For lCnt = 0 To func_CM_MathMin(oFrom.Length, oTo.Length)-1
+        For lCnt = 0 To math_min(oFrom.Length, oTo.Length)-1
         '比較元先の各シートに差分が分かる書式設定をする
             '★ログ出力
             Call sub_CmpExcelPublish("log", 3, sMyName, "Comparison of " & lCnt+1 & "th sheets.")

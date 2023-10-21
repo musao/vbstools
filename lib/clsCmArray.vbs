@@ -1162,15 +1162,15 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             If alStart<0 Then lStart=lUb+1 Else lStart=0
-            lStart = func_CM_MathMax(lStart+alStart,0)
-            lStart = func_CM_MathMin(lStart,lUb+1)
+            lStart = math_max(lStart+alStart,0)
+            lStart = math_min(lStart,lUb+1)
             
             if alEnd=vbNullString Then
                 lEnd = lUb
             Else
                 If alEnd<0 Then lEnd=lUb Else lEnd=-1
-                lEnd = func_CM_MathMax(lEnd+alEnd,-1)
-                lEnd = func_CM_MathMin(lEnd,lUb)
+                lEnd = math_max(lEnd+alEnd,-1)
+                lEnd = math_min(lEnd,lUb)
             End If
             
             For lIdx=lStart To lEnd
@@ -1243,15 +1243,15 @@ Class clsCmArray
             lUb = Ubound(vArr)
             
             If alStart<0 Then lStart=lUb+1 Else lStart=0
-            lStart = func_CM_MathMax(lStart+alStart,0)
-            lStart = func_CM_MathMin(lStart,lUb+1)
+            lStart = math_max(lStart+alStart,0)
+            lStart = math_min(lStart,lUb+1)
             
             For lIdx = 0 To lStart - 1
             '開始位置までは今の配列のまま
                 cf_push vArrayAft, vArr(lIdx)
             Next
             
-            For lIdx = lStart To func_CM_MathMin(lStart+alDelCnt-1, lUb)
+            For lIdx = lStart To math_min(lStart+alDelCnt-1, lUb)
             '開始位置から削除する要素数は戻り値の配列に移す
                 cf_push vRet, vArr(lIdx)
             Next

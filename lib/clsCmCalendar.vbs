@@ -164,8 +164,8 @@ Class clsCmCalendar
             Exit Function
         End If
 
-'        differenceFrom = Me.serial()*60*60*24-aoTarget.serial()*60*60*24
-        differenceFrom = func_CM_MathRoundDown(Me.serial()*60*60*24-aoTarget.serial()*60*60*24, 7)
+        differenceFrom = math_roundDown(Me.serial()*60*60*24-aoTarget.serial()*60*60*24, 5)
+
     End Function
     
     '***************************************************************************************************

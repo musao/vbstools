@@ -148,7 +148,7 @@ End Function
 
 
 '###################################################################################################
-'インスタンス生成系
+'インスタンス生成関数
 '###################################################################################################
 
 '***************************************************************************************************
@@ -664,6 +664,166 @@ Private Function func_FuncGenerate( _
     '関数の生成
     ExecuteGlobal sCode
     Set func_FuncGenerate = Getref(asFuncName)
+End Function
+
+'###################################################################################################
+'数学系の関数
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : math_min()
+'Overview                    : 最小値を求める
+'Detailed Description        : 工事中
+'Argument
+'     al1                    : 数値1
+'     al2                    : 数値2
+'Return Value
+'     al1とal2の値が小さい方
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_min( _
+    byVal al1 _ 
+    , byVal al2 _
+    )
+    Dim lRet
+    If al1 < al2 Then lRet = al1 Else lRet = al2
+    math_min = lRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_max()
+'Overview                    : 最大値を求める
+'Detailed Description        : 工事中
+'Argument
+'     al1                    : 数値1
+'     al2                    : 数値2
+'Return Value
+'     al1とal2の値が大きい方
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_max( _
+    byVal al1 _ 
+    , byVal al2 _
+    )
+    Dim lRet
+    If al1 > al2 Then lRet = al1 Else lRet = al2
+    math_max = lRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_roundUp()
+'Overview                    : 切り上げする
+'Detailed Description        : func_MathRound()に委譲する
+'Argument
+'     adbNum                 : 数値
+'     alPlace                : 小数の位、切り上げする端数の位置を小数の位で表す
+'Return Value
+'     切り上げした値
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_roundUp( _
+    byVal adbNum _ 
+    , byVal alPlace _
+    )
+    math_roundUp = func_MathRound(adbNum, alPlace, 9)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_round()
+'Overview                    : 四捨五入する
+'Detailed Description        : func_MathRound()に委譲する
+'Argument
+'     adbNum                 : 数値
+'     alPlace                : 小数の位、四捨五入する端数の位置を小数の位で表す
+'Return Value
+'     四捨五入した値
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_round( _
+    byVal adbNum _ 
+    , byVal alPlace _
+    )
+    math_round = func_MathRound(adbNum, alPlace, 5)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_roundDown()
+'Overview                    : 切り捨てする
+'Detailed Description        : func_MathRound()に委譲する
+'Argument
+'     adbNum                 : 数値
+'     alPlace                : 小数の位、切り捨てする端数の位置を小数の位で表す
+'Return Value
+'     切り捨てした値
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_roundDown( _
+    byVal adbNum _ 
+    , byVal alPlace _
+    )
+    math_roundDown = func_MathRound(adbNum, alPlace, 0)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_MathRound()
+'Overview                    : 数値を丸める
+'Detailed Description        : 符号を無視して絶対値を丸める
+'                              引数のalPlaceは丸めたい小数の位を指定する、例えば第一位を場合は0を指定する
+'                              小数第二位を四捨五入する場合、alPlaceに1、alThresholdに5を指定する
+'                              一の位、十の位、・・・の場合は-1,-2,…のように負値を指定する
+'                                例）１８２．７３２
+'                                　　↑　　↑　↑　 ↑
+'                                   -3  -1　0　 2
+'                              なお、正数の場合と増減を同じ向きに丸める場合は最後の行のFixをIntに変更する
+'                              ことで対応できる
+'Argument
+'     adbNum                 : 数値
+'     alPlace                : 小数の位、処理する端数の位置を小数の位で表す
+'     alThreshold            : 閾値
+'                               0：切り捨て
+'                               5：四捨五入
+'                               9：切り上げ
+'Return Value
+'     丸めた値
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_MathRound( _
+    byVal adbNum _ 
+    , byVal alPlace _
+    , byVal alThreshold _
+    )
+    Dim lThreshold : lThreshold = alThreshold
+    If adbNum<0 Then lThreshold = -1*lThreshold
+
+    Dim dbTemp
+    dbTemp = Cstr((adbNum+lThreshold*10^(-1*(alPlace+1))) * 10^(alPlace))
+
+    func_MathRound = Cdbl( Cstr( Fix(dbTemp) * 10^(-1*alPlace) ) )
+'    func_MathRound = Cdbl( Cstr( Int(dbTemp) * 10^(-1*alPlace) ) )
 End Function
 
 
@@ -1638,159 +1798,6 @@ Private Function func_CM_StrLen( _
     func_CM_StrLen = lLength
 End Function
 
-
-'###################################################################################################
-'数学系
-'###################################################################################################
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_MathMin()
-'Overview                    : 最小値を求める
-'Detailed Description        : 工事中
-'Argument
-'     al1                    : 数値1
-'     al2                    : 数値2
-'Return Value
-'     al1とal2の値が小さい方
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_MathMin( _
-    byVal al1 _ 
-    , byVal al2 _
-    )
-    Dim lRet
-    If al1 < al2 Then lRet = al1 Else lRet = al2
-    func_CM_MathMin = lRet
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_MathMax()
-'Overview                    : 最大値を求める
-'Detailed Description        : 工事中
-'Argument
-'     al1                    : 数値1
-'     al2                    : 数値2
-'Return Value
-'     al1とal2の値が大きい方
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_MathMax( _
-    byVal al1 _ 
-    , byVal al2 _
-    )
-    Dim lRet
-    If al1 > al2 Then lRet = al1 Else lRet = al2
-    func_CM_MathMax = lRet
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_MathRoundUp()
-'Overview                    : 切り上げする
-'Detailed Description        : 工事中
-'Argument
-'     adbNumber              : 数値
-'     alPlace                : 切り上げする小数点以下の桁数
-'Return Value
-'     切り上げした値
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_MathRoundUp( _
-    byVal adbNumber _ 
-    , byVal alPlace _
-    )
-    func_CM_MathRoundUp = func_CM_MathRound(adbNumber, alPlace, 9)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_MathRoundOff()
-'Overview                    : 四捨五入する
-'Detailed Description        : 工事中
-'Argument
-'     adbNumber              : 数値
-'     alPlace                : 四捨五入する小数点以下の桁数
-'Return Value
-'     四捨五入した値
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_MathRoundOff( _
-    byVal adbNumber _ 
-    , byVal alPlace _
-    )
-    func_CM_MathRoundOff = func_CM_MathRound(adbNumber, alPlace, 5)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_MathRoundDown()
-'Overview                    : 切り捨てする
-'Detailed Description        : 工事中
-'Argument
-'     adbNumber              : 数値
-'     alPlace                : 切り捨てする小数点以下の桁数
-'Return Value
-'     切り捨てした値
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_MathRoundDown( _
-    byVal adbNumber _ 
-    , byVal alPlace _
-    )
-    func_CM_MathRoundDown = func_CM_MathRound(adbNumber, alPlace, 0)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_MathRound()
-'Overview                    : 数値を丸める
-'Detailed Description        : 工事中
-'Argument
-'     adbNum                 : 数値
-'     alPlace                : 丸める小数点以下の桁数
-'     alThreshold            : 閾値
-'                               0：切り捨て
-'                               5：四捨五入
-'                               9：切り上げ
-'Return Value
-'     丸めた値
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_MathRound( _
-    byVal adbNum _ 
-    , byVal alPlace _
-    , byVal alThreshold _
-    )
-'    func_CM_MathRound = Int((adbNum+alThreshold*10^(-1*alPlace))*10^alPlace)/10^alPlace
-'    func_CM_MathRound = Int((adbNum+alThreshold*10^(-1*(alPlace-1)))*10^(alPlace-1))/10^(alPlace-1)
-    func_CM_MathRound = Int((adbNum+alThreshold*10^(-1*(alPlace-2)))*10^(alPlace-1))/10^(alPlace-1)
-'    Dim lMultiply, lReverse
-'    lReverse = 10^(alPlace-1)
-'    lMultiply = 10^(-1*alPlace)
-'    func_CM_MathRound = Int((adbNumber + alThreshold*lMultiply)*lReverse)/lReverse
-End Function
-
-
 '###################################################################################################
 '配列系
 '###################################################################################################
@@ -2594,7 +2601,8 @@ Private Function func_CM_UtilSortMerge( _
     '2つの配列に分解する
     Dim lLength, lMedian
     lLength = Ubound(avArr) - Lbound(avArr) + 1
-    lMedian = func_CM_MathRoundup(lLength/2, 1)
+    lMedian = math_roundUp(lLength/2, 0)
+'    lMedian = math_roundUp(lLength/2, 1)
     Dim lPos, vFirst, vSecond
     For lPos=Lbound(avArr) To lMedian-1
         Call cf_push(vFirst, avArr(lPos))
@@ -2815,7 +2823,7 @@ End Function
 'Argument
 '     adbMin                 : 生成する乱数の最小値
 '     adbMax                 : 生成する乱数の最大値
-'     alPlace                : 切り上げする小数点以下の桁数
+'     alPlace                : 小数の位、切り上げする端数の位置を小数の位で表す
 'Return Value
 '     生成した乱数
 '---------------------------------------------------------------------------------------------------
@@ -2830,7 +2838,7 @@ Private Function func_CM_UtilGenerateRandomNumber( _
     , byVal alPlace _
     )
     Randomize
-    func_CM_UtilGenerateRandomNumber = func_CM_MathRoundDown( (adbMax - adbMin + 1) * Rnd + adbMin, 1 )
+    func_CM_UtilGenerateRandomNumber = math_roundDown( (adbMax - adbMin + 1) * Rnd + adbMin, alPlace )
 End Function
 
 '***************************************************************************************************
@@ -2947,7 +2955,7 @@ Private Function func_CM_UtilGenerateRandomString( _
     Dim lPos, sRet
     sRet = ""
     For lPos = 1 To alLength
-        sRet = sRet & oChars.Items()( func_CM_UtilGenerateRandomNumber(0, oChars.Count - 1, 1) )
+        sRet = sRet & oChars.Items()( func_CM_UtilGenerateRandomNumber(0, oChars.Count - 1, 0) )
     Next
     func_CM_UtilGenerateRandomString = sRet
     

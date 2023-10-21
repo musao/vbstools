@@ -26,7 +26,12 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
 
-inputbox "","", func_CM_MathRound(98765.4321, 1, 0)
+'inputbox "","", math_roundDown(-1.00000190734863, 5)       '-1.00001
+'                                     -1.00001
+
+inputbox "","", Cstr(-1.00000190734863*10^5)
+inputbox "","", Int(Cstr(-1.00000190734863*10^5))
+inputbox "","", Fix(Cstr(-1.00000190734863*10^5))
 
 wscript.quit
 
@@ -165,7 +170,7 @@ wscript.quit
 '
 'wscript.quit
 
-''Test func_CM_MathRound()
+''Test func_MathRound()
 'Dim dbPlus0, dbPlus1, dbPlus5 ,dbMinas0 ,dbMinas2 ,dbMinas5
 'dbPlus0=14.555555
 'dbPlus1=14.456789
@@ -173,18 +178,18 @@ wscript.quit
 'dbMinas0=-14.555555
 'dbMinas2=-14.501234
 'dbMinas5=-14.432154
-'call MsgBox( func_CM_MathRound(dbPlus5, 0, 5) )      '14.4321
-'call MsgBox( func_CM_MathRound(dbPlus0, 5, 0) )      '10
-'call MsgBox( func_CM_MathRound(dbPlus1, 5, 1) )      '14
-'call MsgBox( func_CM_MathRound(dbPlus0, 9, 0) )      '20
-'call MsgBox( func_CM_MathRound(dbPlus1, 9, 1) )      '15
-'call MsgBox( func_CM_MathRound(dbPlus5, 9, 5) )      '14.4322
-'call MsgBox( func_CM_MathRound(dbMinas5, 0, 5) )      '-14.4322
-'call MsgBox( func_CM_MathRound(dbMinas0, 5, 0) )      '-10
-'call MsgBox( func_CM_MathRound(dbMinas2, 5, 2) )      '-14.5
-'call MsgBox( func_CM_MathRound(dbMinas0, 9, 0) )      '-10
-'call MsgBox( func_CM_MathRound(dbMinas2, 9, 2) )      '-14.5
-'call MsgBox( func_CM_MathRound(dbMinas5, 9, 5) )      '-14.4321
+'call MsgBox( func_MathRound(dbPlus5, 0, 5) )      '14.4321
+'call MsgBox( func_MathRound(dbPlus0, 5, 0) )      '10
+'call MsgBox( func_MathRound(dbPlus1, 5, 1) )      '14
+'call MsgBox( func_MathRound(dbPlus0, 9, 0) )      '20
+'call MsgBox( func_MathRound(dbPlus1, 9, 1) )      '15
+'call MsgBox( func_MathRound(dbPlus5, 9, 5) )      '14.4322
+'call MsgBox( func_MathRound(dbMinas5, 0, 5) )      '-14.4322
+'call MsgBox( func_MathRound(dbMinas0, 5, 0) )      '-10
+'call MsgBox( func_MathRound(dbMinas2, 5, 2) )      '-14.5
+'call MsgBox( func_MathRound(dbMinas0, 9, 0) )      '-10
+'call MsgBox( func_MathRound(dbMinas2, 9, 2) )      '-14.5
+'call MsgBox( func_MathRound(dbMinas5, 9, 5) )      '-14.4321
 '
 'wscript.quit
 

@@ -197,13 +197,13 @@ Sub Test_clsCmCalendar_differenceFrom_WithDecimal
     Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = 1
     a = a1.differenceFrom(a2)
-'    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 
     d2 = "2024/02/29 00:59:31.123456"
     Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = 0
     a = a1.differenceFrom(a2)
- '   AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 
     d2 = "2024/02/29 00:59:32.123457"
     Set a2 = (new clsCmCalendar).setDateTime(d2)
