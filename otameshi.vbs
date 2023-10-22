@@ -29,9 +29,9 @@ Call sub_import("libCom.vbs")
 'inputbox "","", math_roundDown(-1.00000190734863, 5)       '-1.00001
 '                                     -1.00001
 
-inputbox "","", Cstr(-1.00000190734863*10^5)
-inputbox "","", Int(Cstr(-1.00000190734863*10^5))
-inputbox "","", Fix(Cstr(-1.00000190734863*10^5))
+inputbox "","", "math_max(-3,-2) ="&math_max(-3,-2)                  'math_max(-3,-2) =-2
+inputbox "","", "math_max(0.2,0.3) ="&math_max(0.2,0.3)              'math_max(0.2,0.3) =0.3
+inputbox "","", "math_max(-0.015,-0.009) ="&math_max(-0.015,-0.009)  'math_max(-0.015,-0.009) =-0.009
 
 wscript.quit
 
