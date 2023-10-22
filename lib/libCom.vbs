@@ -2046,30 +2046,6 @@ Private Sub sub_CM_Swap( _
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_IsSame()
-'Overview                    : 変数の値が等しいか
-'Detailed Description        : 比較する変数がオブジェクトか否かによるVBS構文の違い（Setの有無）を吸収する
-'Argument
-'     avA                    : 比較元
-'     avB                    : 比較先
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/06         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_IsSame( _
-    byRef avA _
-    , byRef avB _
-    )
-    Dim boReturn : boReturn = False
-    If IsObject(avB) Then boReturn = (avA Is avB) Else boReturn = (avA = avB)
-    func_CM_IsSame = boReturn
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_FillInTheCharacters()
 'Overview                    : 文字を埋める
 'Detailed Description        : 対象文字の不足桁を指定したアライメントで指定した文字の1文字目で埋める
