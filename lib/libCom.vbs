@@ -502,6 +502,8 @@ Private Function new_Func( _
     sSoruceCode = Replace(asSoruceCode, vbCrLf, ":")
     sSoruceCode = Replace(sSoruceCode, vbLf, ":")
     sSoruceCode = Replace(sSoruceCode, vbCr, ":")
+    '生成する関数のソースコードの'（シングルクォーテーション）を"（ダブルクォーテーション）に変換
+    sSoruceCode = Replace(sSoruceCode, "'", """")
     
     '関数名（仮名）を作る
     Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))

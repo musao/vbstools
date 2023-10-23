@@ -283,11 +283,12 @@ Sub Test_new_Func_Normal_1Line_0Return
     AssertEqual e, a()
 End Sub
 Sub Test_new_Func_Normal_1Line_1Return
-    Dim code :  code = "function (a){return a}"
-    Dim e : e = 2
+    Dim code :  code = "function (a){return 'ans='&a}"
+    Dim d : d = 2
+    Dim e : e = "ans="&d
     Dim a : Set a = new_Func(code)
     
-    AssertEqual e, a(e)
+    AssertEqual e, a(d)
 End Sub
 Sub Test_new_Func_Normal_nLine_0Return
     Dim code :  code = "function (a,b) {dim y:y= _:a+b:y=a* _:b}"

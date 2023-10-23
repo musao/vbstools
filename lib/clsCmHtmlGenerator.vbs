@@ -67,6 +67,24 @@ Class clsCmHtmlGenerator
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get content()
+    'Overview                    : 内容（オブジェクトの配列）を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     内容（オブジェクトの配列）を返す
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get content()
+        content = PoTagInfo.Item("content").Items()
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Let element()
     'Overview                    : 要素を設定する
     'Detailed Description        : 工事中
@@ -103,6 +121,31 @@ Class clsCmHtmlGenerator
     Public Property Get element()
         element = PoTagInfo.Item("element")
     End Property
+        
+    '***************************************************************************************************
+    'Function/Sub Name           : addContent()
+    'Overview                    : 属性を追加する
+    'Detailed Description        : 工事中
+    'Argument
+    '     avCont                 : 追加する内容
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Sub addContent( _
+        byRef avCont _
+        )
+        If IsEmpty(PoTagInfo.Item("content")) Then
+            Set PoTagInfo.Item("content") = new_ArrWith(avCont)
+        Else
+            PoTagInfo.Item("content").push avCont
+        End If
+        Set oNewAttr = Nothing
+    End Sub
         
     '***************************************************************************************************
     'Function/Sub Name           : addAttribute()
@@ -181,7 +224,7 @@ Class clsCmHtmlGenerator
         If Not IsEmpty(PoTagInfo.Item("attribute")) Then
         'attributeが空でない場合
             Dim oFunc : Set oFunc = new_Func( _
-            "function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:return e.Item(""key"") & ""="""""" & e.Item(""value"") & """""""":End If}" _
+            "function(e,i,a){If IsEmpty(e.Item('value')) Then:return e.Item('key'):Else:return e.Item('key') & '=''' & e.Item('value') & '''':End If}" _
             )
             sRet = sRet & " " & PoTagInfo.Item("attribute").map(oFunc).join(" ")
         End If

@@ -49,6 +49,33 @@ Sub Test_clsCmHtmlGenerator_attribute_addAttribute_SecondTimes
 End Sub
 
 '###################################################################################################
+'clsCmHtmlGenerator.content/addcontent()
+Sub Test_clsCmHtmlGenerator_content_addcontent_FirstTime
+    Dim ao,a,d1,e1
+    Set ao = new clsCmHtmlGenerator
+    
+    d1 = "hoge"
+    e1 = d1
+    ao.addcontent d1
+    a = ao.content
+    AssertEqualWithMessage 0, Ubound(a), "Ubound"
+    AssertEqualWithMessage e1, a(0), "1"
+End Sub
+Sub Test_clsCmHtmlGenerator_content_addcontent_SecondTimes
+    Dim ao,a,d1,d2,e1,e2
+    Set ao = new clsCmHtmlGenerator
+    
+    d1 = "hoge" : Set d2 = new_Dic()
+    e1 = d1 : Set e2 = d2
+    ao.addcontent d1
+    ao.addcontent d2
+    a = ao.content
+    AssertEqualWithMessage 1, Ubound(a), "Ubound"
+    AssertEqualWithMessage e1, a(0), "1"
+    AssertSameWithMessage e2, a(1), "2"
+End Sub
+
+'###################################################################################################
 'clsCmHtmlGenerator.element()
 Sub Test_clsCmHtmlGenerator_element
     Dim ao,a,d,e
