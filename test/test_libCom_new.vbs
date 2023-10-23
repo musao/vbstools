@@ -242,6 +242,13 @@ Sub Test_new_ArrWith_Array
     AssertSame ev(1), a(1)
     AssertEqual ev(2), a(2)
 End Sub
+Sub Test_new_ArrWith_Array_0
+    Dim e : Set e = New clsCmArray
+    Dim ev : ev = Array()
+    Dim a : Set a = new_ArrWith(ev)
+    
+    AssertEqual 0, a.Length
+End Sub
 Sub Test_new_ArrWith_Variable
     Dim ev : ev = "abc"
     Dim a : Set a = new_ArrWith(ev)

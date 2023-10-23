@@ -1037,7 +1037,7 @@ Class clsCmArray
                 cf_bindAt PoArr, PoArr.Count, oEle
             Next
             Set oEle = Nothing
-        Else
+        Elseif Not IsArray(avArr) Then
             cf_bindAt PoArr, PoArr.Count, avArr
         End If
         func_CmArrayPushMulti = PoArr.Count

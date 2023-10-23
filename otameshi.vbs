@@ -25,13 +25,11 @@ Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 
-
-'inputbox "","", math_roundDown(-1.00000190734863, 5)       '-1.00001
-'                                     -1.00001
-
-inputbox "","", "math_max(-3,-2) ="&math_max(-3,-2)                  'math_max(-3,-2) =-2
-inputbox "","", "math_max(0.2,0.3) ="&math_max(0.2,0.3)              'math_max(0.2,0.3) =0.3
-inputbox "","", "math_max(-0.015,-0.009) ="&math_max(-0.015,-0.009)  'math_max(-0.015,-0.009) =-0.009
+Dim oFunc : Set oFunc = new_Func( _
+"function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:return e.Item(""key"") & ""="""""" & e.Item(""value"") & """":End If}" _
+)
+'"function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:End If}" _
+'"function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:return e.Item(""key"") & ""="""""" & e.Item(""value"") & """":End If}" _
 
 wscript.quit
 
