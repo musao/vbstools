@@ -114,22 +114,57 @@ End Sub
 Sub Test_clsCmHtmlGenerator_generate_ElementAndAttribute
     Dim ao,a,de,dak1,dak2,dav1,dav2,e
     Set ao = new clsCmHtmlGenerator
-    
-    de = "hoge"
+    de = "hoge" : ao.element = de
+
     dak1 = "foo" : dav1 = "bar"
     e = "<hoge foo=" & Chr(34) & "bar" & Chr(34) & " />"
-    ao.element = de
     ao.addAttribute dak1,dav1
     a = ao.generate
     AssertEqualWithMessage e, a, "1"
     
-    de = "hoge"
     dak2 = "woo" : dav2 = Empty
     e = "<hoge foo=" & Chr(34) & "bar" & Chr(34) & " woo />"
-    ao.element = de
     ao.addAttribute dak2,dav2
     a = ao.generate
     AssertEqualWithMessage e, a, "2"
+End Sub
+Sub Test_clsCmHtmlGenerator_generate_ElementAndContent
+    Dim ao,a,de,dc1,dc2,e
+    Set ao = new clsCmHtmlGenerator
+    de = "hoge" : ao.element = de
+
+    dc1 = "fuga"
+    e = "<hoge>fuga</hoge>"
+    ao.addContent dc1
+    a = ao.generate
+    AssertEqualWithMessage e, a, "1"
+    
+    Set dc2 = new clsCmHtmlGenerator
+    dc2.element = "foo"
+    dc2.addContent "bar"
+    e = "<hoge>fuga<foo>bar</foo></hoge>"
+    ao.addContent dc2
+    a = ao.generate
+    AssertEqualWithMessage e, a, "2"
+End Sub
+Sub Test_clsCmHtmlGenerator_generate_All
+    Dim ao,a,de,dx,e
+    Set dx = new clsCmHtmlGenerator
+    dx.element = "fuga2"
+    dx.addAttribute "foo2","bar2"
+    dx.addAttribute "woo2",Empty
+    dx.addContent "wao2"
+
+    Set ao = new clsCmHtmlGenerator
+    ao.element = "hoge"
+    ao.addAttribute "foo1","bar1"
+    ao.addAttribute "woo1",Empty
+    ao.addContent "wao1"
+    ao.addContent dx
+
+    e = "<hoge foo1="&Chr(34)&"bar1"&Chr(34)&" woo1>wao1<fuga2 foo2="&Chr(34)&"bar2"&Chr(34)&" woo2>wao2</fuga2></hoge>"
+    a = ao.generate
+    AssertEqualWithMessage e, a, "1"
 End Sub
 Sub Test_clsCmHtmlGenerator_generate_Err
     Dim ao

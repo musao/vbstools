@@ -219,21 +219,29 @@ Class clsCmHtmlGenerator
         End If
 
         Dim sRet : sRet = "<" & PoTagInfo.Item("element")
+        Dim vAttr, vArr
 
         '属性（attribute）の編集
         If Not IsEmpty(PoTagInfo.Item("attribute")) Then
         'attributeが空でない場合
-            Dim oFunc : Set oFunc = new_Func( _
-            "function(e,i,a){If IsEmpty(e.Item('value')) Then:return e.Item('key'):Else:return e.Item('key') & '=''' & e.Item('value') & '''':End If}" _
-            )
-            sRet = sRet & " " & PoTagInfo.Item("attribute").map(oFunc).join(" ")
+            Set vAttr = new_Arr()
+            Set vArr = PoTagInfo.Item("attribute").slice(0,vbNullString)
+            Do While vArr.length>0
+                vAttr.push func_CmHtmlEditAttribute(vArr.shift)
+            Loop
+            sRet = sRet & " " & vAttr.join(" ")
         End If
         
         '内容（content）の編集
         If Not IsEmpty(PoTagInfo.Item("content")) Then
         'contentが空でない場合
             sRet = sRet & ">"
-            sRet = sRet & new_ArrWith(PoTagInfo.Item("content")).map(getref("func_CmHtmlEditContents")).join("")
+            Set vAttr = new_Arr()
+            Set vArr = PoTagInfo.Item("content").slice(0,vbNullString)
+            Do While vArr.length>0
+                vAttr.push func_CmHtmlEditContent(vArr.shift)
+            Loop
+            sRet = sRet & vAttr.join("")
             sRet = sRet & "</" & PoTagInfo.Item("element") & ">"
         Else
         'contentが空の場合
@@ -242,62 +250,62 @@ Class clsCmHtmlGenerator
 
         '生成したHTMLを返却
         func_CmHtmlGenGenerate = sRet
+
+        Set vAttr = Nothing
+        Set vArr = Nothing
     End Function
 
-'    '***************************************************************************************************
-'    'Function/Sub Name           : func_CmHtmlEditAttributes()
-'    'Overview                    : 属性（attribute）の編集
-'    'Detailed Description        : 工事中
-'    'Argument
-'    '     aoEle                  : 配列の要素
-'    '     alIdx                  : インデックス
-'    '     avArr                  : 配列
-'    'Return Value
-'    '     生成したHTML
-'    '---------------------------------------------------------------------------------------------------
-'    'Histroy
-'    'Date               Name                     Reason for Changes
-'    '----------         ----------------------   -------------------------------------------------------
-'    '2023/10/23         Y.Fujii                  First edition
-'    '***************************************************************************************************
-'    Private Function func_CmHtmlEditAttributes( _
-'        byRef aoEle _
-'        , byVal alIdx _
-'        , byRef avArr _
-'        )
-'        If IsEmpty(aoEle.Item("value")) Then
-'            func_CmHtmlEditAttributes = aoEle.Item("key")
-'        Else
-'            func_CmHtmlEditAttributes = aoEle.Item("key") & "=""" & aoEle.Item("value") & """"
-'        End If
-'    End Function
-
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlEditContents()
-    'Overview                    : 内容（content）の編集
+    'Function/Sub Name           : func_CmHtmlEditAttribute()
+    'Overview                    : 属性（attribute）の編集処理
     'Detailed Description        : 工事中
     'Argument
-    '     aoEle                  : 配列の要素
-    '     alIdx                  : インデックス
-    '     avArr                  : 配列
+    '     aoAttr                 : 編集する属性（attribute）
     'Return Value
-    '     生成したHTML
+    '     編集結果
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
+    '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlEditContents( _
-        byRef aoEle _
-        , byVal alIdx _
-        , byRef avArr _
+    Private Function func_CmHtmlEditAttribute( _
+        byRef aoAttr _
         )
-        If func_CM_UtilIsSame(TypeName(aoEle), TypeName(Me)) Then
-            func_CmHtmlEditContents = aoEle.generate()
+        Dim sRet
+        If IsEmpty(aoAttr.Item("value")) Then
+            sRet = aoAttr.Item("key")
         Else
-            func_CmHtmlEditContents = aoEle
+            sRet = aoAttr.Item("key") & "=" & Chr(34) & aoAttr.Item("value") & Chr(34)
         End If
+        func_CmHtmlEditAttribute = sRet
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmHtmlEditContent()
+    'Overview                    : 内容（content）の編集処理
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoCont                 : 編集する内容（content）
+    'Return Value
+    '     編集結果
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/10/22         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmHtmlEditContent( _
+        byRef aoCont _
+        )
+        Dim sRet
+        On Error Resume Next
+        sRet = aoCont.generate()
+        If Err.Number<>0 Then
+            sRet = aoCont
+        End If
+        On Error GoTo 0
+        func_CmHtmlEditContent = sRet
     End Function
 
 End Class
