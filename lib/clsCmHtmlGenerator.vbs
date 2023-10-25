@@ -124,7 +124,7 @@ Class clsCmHtmlGenerator
         
     '***************************************************************************************************
     'Function/Sub Name           : addContent()
-    'Overview                    : 属性を追加する
+    'Overview                    : 内容を追加する
     'Detailed Description        : 工事中
     'Argument
     '     avCont                 : 追加する内容
@@ -219,29 +219,29 @@ Class clsCmHtmlGenerator
         End If
 
         Dim sRet : sRet = "<" & PoTagInfo.Item("element")
-        Dim vAttr, vArr
+        Dim vNewArr, vArr
 
         '属性（attribute）の編集
         If Not IsEmpty(PoTagInfo.Item("attribute")) Then
         'attributeが空でない場合
-            Set vAttr = new_Arr()
+            Set vNewArr = new_Arr()
             Set vArr = PoTagInfo.Item("attribute").slice(0,vbNullString)
             Do While vArr.length>0
-                vAttr.push func_CmHtmlEditAttribute(vArr.shift)
+                vNewArr.push func_CmHtmlGenEditAttribute(vArr.shift)
             Loop
-            sRet = sRet & " " & vAttr.join(" ")
+            sRet = sRet & " " & vNewArr.join(" ")
         End If
         
         '内容（content）の編集
         If Not IsEmpty(PoTagInfo.Item("content")) Then
         'contentが空でない場合
             sRet = sRet & ">"
-            Set vAttr = new_Arr()
+            Set vNewArr = new_Arr()
             Set vArr = PoTagInfo.Item("content").slice(0,vbNullString)
             Do While vArr.length>0
-                vAttr.push func_CmHtmlEditContent(vArr.shift)
+                vNewArr.push func_CmHtmlGenEditContent(vArr.shift)
             Loop
-            sRet = sRet & vAttr.join("")
+            sRet = sRet & vNewArr.join("")
             sRet = sRet & "</" & PoTagInfo.Item("element") & ">"
         Else
         'contentが空の場合
@@ -251,12 +251,12 @@ Class clsCmHtmlGenerator
         '生成したHTMLを返却
         func_CmHtmlGenGenerate = sRet
 
-        Set vAttr = Nothing
+        Set vNewArr = Nothing
         Set vArr = Nothing
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlEditAttribute()
+    'Function/Sub Name           : func_CmHtmlGenEditAttribute()
     'Overview                    : 属性（attribute）の編集処理
     'Detailed Description        : 工事中
     'Argument
@@ -269,7 +269,7 @@ Class clsCmHtmlGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlEditAttribute( _
+    Private Function func_CmHtmlGenEditAttribute( _
         byRef aoAttr _
         )
         Dim sRet
@@ -278,11 +278,11 @@ Class clsCmHtmlGenerator
         Else
             sRet = aoAttr.Item("key") & "=" & Chr(34) & aoAttr.Item("value") & Chr(34)
         End If
-        func_CmHtmlEditAttribute = sRet
+        func_CmHtmlGenEditAttribute = sRet
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlEditContent()
+    'Function/Sub Name           : func_CmHtmlGenEditContent()
     'Overview                    : 内容（content）の編集処理
     'Detailed Description        : 工事中
     'Argument
@@ -295,7 +295,7 @@ Class clsCmHtmlGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlEditContent( _
+    Private Function func_CmHtmlGenEditContent( _
         byRef aoCont _
         )
         Dim sRet
@@ -305,7 +305,7 @@ Class clsCmHtmlGenerator
             sRet = aoCont
         End If
         On Error GoTo 0
-        func_CmHtmlEditContent = sRet
+        func_CmHtmlGenEditContent = sRet
     End Function
 
 End Class
