@@ -117,7 +117,9 @@ Sub Test_math_rand
             new_DicWith(Array(  "No",1 ,"min",5 ,"max",10 ,"place",0 )) _
             , new_DicWith(Array(  "No",2 ,"min",-10 ,"max",-5 ,"place",0 )) _
             , new_DicWith(Array(  "No",3 ,"min",-5 ,"max",5 ,"place",0 )) _
-            , new_DicWith(Array(  "No",4 ,"min",12.345 ,"max",3.14 ,"place",5 )) _
+            , new_DicWith(Array(  "No",4 ,"min",3.14 ,"max",12.345 ,"place",5 )) _
+            , new_DicWith(Array(  "No",5 ,"min",-100.12345 ,"max",-1.23456 ,"place",5 )) _
+            , new_DicWith(Array(  "No",6 ,"min",-10.246 ,"max",100.357 ,"place",3 )) _
             )
     For Each i In d
         n = i.Item("min")
@@ -153,7 +155,7 @@ Sub Test_func_MathRound_d0
     For Each i In d
         dp = i.Item("Place")
         e = i.Item("Expected")
-        a = func_MathRound(dn,dp,dt)
+        a = func_MathRound(dn,dp,dt,True)
         AssertEqualWithMessage e, a, "PositiveNumber No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
     Next
 
@@ -161,7 +163,7 @@ Sub Test_func_MathRound_d0
     For Each i In d
         dp = i.Item("Place")
         e = -1 * i.Item("Expected")
-        a = func_MathRound(dn,dp,dt)
+        a = func_MathRound(dn,dp,dt,True)
         AssertEqualWithMessage e, a, "NegativeNumber No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
     Next
 End Sub
@@ -182,7 +184,7 @@ Sub Test_func_MathRound_d5
     For Each i In d
         dp = i.Item("Place")
         e = i.Item("Expected")
-        a = func_MathRound(dn,dp,dt)
+        a = func_MathRound(dn,dp,dt,True)
         AssertEqualWithMessage e, a, "PositiveNumber No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
         If dp>=0 Then AssertEqualWithMessage Round(dn, dp), a, "PositiveNumber Regression No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
     Next
@@ -191,7 +193,7 @@ Sub Test_func_MathRound_d5
     For Each i In d
         dp = i.Item("Place")
         e = -1 * i.Item("Expected")
-        a = func_MathRound(dn,dp,dt)
+        a = func_MathRound(dn,dp,dt,True)
         AssertEqualWithMessage e, a, "NegativeNumber No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
         If dp>=0 Then AssertEqualWithMessage Round(dn, dp), a, "NegativeNumber Regression No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
     Next
@@ -213,7 +215,7 @@ Sub Test_func_MathRound_d9
     For Each i In d
         dp = i.Item("Place")
         e = i.Item("Expected")
-        a = func_MathRound(dn,dp,dt)
+        a = func_MathRound(dn,dp,dt,True)
         AssertEqualWithMessage e, a, "PositiveNumber No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
     Next
 
@@ -221,7 +223,7 @@ Sub Test_func_MathRound_d9
     For Each i In d
         dp = i.Item("Place")
         e = -1 * i.Item("Expected")
-        a = func_MathRound(dn,dp,dt)
+        a = func_MathRound(dn,dp,dt,True)
         AssertEqualWithMessage e, a, "NegativeNumber PositiveNumber No = "&i.Item("No")& ", dn = "&dn&", dp = "&dp&", dt = "&dt
     Next
 End Sub

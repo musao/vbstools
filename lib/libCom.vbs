@@ -739,7 +739,7 @@ Private Function math_roundUp( _
     byVal adbNum _ 
     , byVal alPlace _
     )
-    math_roundUp = func_MathRound(adbNum, alPlace, 9)
+    math_roundUp = func_MathRound(adbNum, alPlace, 9, True)
 End Function
 
 '***************************************************************************************************
@@ -761,7 +761,7 @@ Private Function math_round( _
     byVal adbNum _ 
     , byVal alPlace _
     )
-    math_round = func_MathRound(adbNum, alPlace, 5)
+    math_round = func_MathRound(adbNum, alPlace, 5, True)
 End Function
 
 '***************************************************************************************************
@@ -783,7 +783,7 @@ Private Function math_roundDown( _
     byVal adbNum _ 
     , byVal alPlace _
     )
-    math_roundDown = func_MathRound(adbNum, alPlace, 0)
+    math_roundDown = func_MathRound(adbNum, alPlace, 0, True)
 End Function
 
 '***************************************************************************************************
@@ -808,7 +808,7 @@ Private Function math_rand( _
     , byVal alPlace _
     )
     Randomize
-    math_rand = math_roundDown( (adbMax - adbMin + 1) * Rnd + adbMin, alPlace )
+    math_rand = func_MathRound( ((adbMax-adbMin)*(10^alPlace)+1)*Rnd, 0, 0, False )*10^(-1*alPlace) + adbMin
 End Function
 
 '***************************************************************************************************
@@ -821,8 +821,6 @@ End Function
 '                                例）１８２．７３２
 '                                　　↑　　↑　↑　 ↑
 '                                   -3  -1　0　 2
-'                              なお、正数の場合と増減を同じ向きに丸める場合は最後の行のFixをIntに変更する
-'                              ことで対応できる
 'Argument
 '     adbNum                 : 数値
 '     alPlace                : 小数の位、処理する端数の位置を小数の位で表す
@@ -830,6 +828,10 @@ End Function
 '                               0：切り捨て
 '                               5：四捨五入
 '                               9：切り上げ
+'     aboMode                : 端数処理の方法
+'                               True  ：符号を無視して絶対値を丸める（正負で丸める方向が異なる）
+'                               False ：正数の場合と増減を同じ向きに丸める
+'                              https://ja.wikipedia.org/wiki/%E7%AB%AF%E6%95%B0%E5%87%A6%E7%90%86
 'Return Value
 '     丸めた値
 '---------------------------------------------------------------------------------------------------
@@ -842,6 +844,7 @@ Private Function func_MathRound( _
     byVal adbNum _ 
     , byVal alPlace _
     , byVal alThreshold _
+    , byVal aboMode _
     )
     Dim lThreshold : lThreshold = alThreshold
     If adbNum<0 Then lThreshold = -1*lThreshold
@@ -849,8 +852,11 @@ Private Function func_MathRound( _
     Dim dbTemp
     dbTemp = Cstr((adbNum+lThreshold*10^(-1*(alPlace+1))) * 10^(alPlace))
 
-    func_MathRound = Cdbl( Cstr( Fix(dbTemp) * 10^(-1*alPlace) ) )
-'    func_MathRound = Cdbl( Cstr( Int(dbTemp) * 10^(-1*alPlace) ) )
+    If aboMode Then
+        func_MathRound = Cdbl( Cstr( Fix(dbTemp) * 10^(-1*alPlace) ) )
+    Else
+        func_MathRound = Cdbl( Cstr( Int(dbTemp) * 10^(-1*alPlace) ) )
+    End If
 End Function
 
 
