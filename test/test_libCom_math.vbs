@@ -110,6 +110,31 @@ Sub Test_math_roundDwon
 End Sub
 
 '###################################################################################################
+'math_rand()
+Sub Test_math_rand
+    dim d,m,n,p,a,i,j
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"min",5 ,"max",10 ,"place",0 )) _
+            , new_DicWith(Array(  "No",2 ,"min",-10 ,"max",-5 ,"place",0 )) _
+            , new_DicWith(Array(  "No",3 ,"min",-5 ,"max",5 ,"place",0 )) _
+            , new_DicWith(Array(  "No",4 ,"min",12.345 ,"max",3.14 ,"place",5 )) _
+            )
+    For Each i In d
+        n = i.Item("min")
+        m = i.Item("max")
+        p = i.Item("place")
+        j=0
+        Do While j<1000
+            a = math_rand(n,m,p)
+            If (a<n or m<a) Then
+                AssertFailWithMessage "No="&i.Item("No")&", min="&n&", max="&m&", Place="&p&", math_rand(n,m,p)="&a&", j="&j
+            End If
+            j = j + 1
+        Loop
+    Next
+End Sub
+
+'###################################################################################################
 'func_MathRound()
 Sub Test_func_MathRound_d0
     dim a,e,d,i,dn,dp,dt

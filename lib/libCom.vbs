@@ -787,6 +787,31 @@ Private Function math_roundDown( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : math_rand()
+'Overview                    : 乱数を生成する
+'Detailed Description        : 工事中
+'Argument
+'     adbMin                 : 生成する乱数の最小値
+'     adbMax                 : 生成する乱数の最大値
+'     alPlace                : 小数の位、切り上げする端数の位置を小数の位で表す
+'Return Value
+'     生成した乱数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_rand( _
+    byVal adbMin _
+    , byVal adbMax _
+    , byVal alPlace _
+    )
+    Randomize
+    math_rand = math_roundDown( (adbMax - adbMin + 1) * Rnd + adbMin, alPlace )
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_MathRound()
 'Overview                    : 数値を丸める
 'Detailed Description        : 符号を無視して絶対値を丸める
@@ -2795,31 +2820,6 @@ Private Function func_CM_UtilSortDefaultFunc( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilGenerateRandomNumber()
-'Overview                    : 乱数を生成する
-'Detailed Description        : 工事中
-'Argument
-'     adbMin                 : 生成する乱数の最小値
-'     adbMax                 : 生成する乱数の最大値
-'     alPlace                : 小数の位、切り上げする端数の位置を小数の位で表す
-'Return Value
-'     生成した乱数
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilGenerateRandomNumber( _
-    byVal adbMin _
-    , byVal adbMax _
-    , byVal alPlace _
-    )
-    Randomize
-    func_CM_UtilGenerateRandomNumber = math_roundDown( (adbMax - adbMin + 1) * Rnd + adbMin, alPlace )
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilGenerateRandomString()
 'Overview                    : ランダムな文字列を生成する
 'Detailed Description        : 指定した長さ、文字の種類でランダムな文字列を生成する
@@ -2933,7 +2933,7 @@ Private Function func_CM_UtilGenerateRandomString( _
     Dim lPos, sRet
     sRet = ""
     For lPos = 1 To alLength
-        sRet = sRet & oChars.Items()( func_CM_UtilGenerateRandomNumber(0, oChars.Count - 1, 0) )
+        sRet = sRet & oChars.Items()( math_rand(0, oChars.Count - 1, 0) )
     Next
     func_CM_UtilGenerateRandomString = sRet
     
