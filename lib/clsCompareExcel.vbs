@@ -581,19 +581,30 @@ Class clsCompareExcel
         Call sub_CmpExcelPublish("log", 3, sMyName, "Cell comparison complete.")
 
         'オートシェイプの比較
-        Dim oAutoshapeA : Dim oAutoshapeB
+        Dim oAutoshapeA, oAutoshapeB, oRet, sTextA
         For Each oAutoshapeA In aoWorkbookForResults.Worksheets(asSheetNameA).Shapes
-            Set oAutoshapeB = func_CM_GetObjectByIdFromCollection(aoWorkbookForResults.Worksheets(asSheetNameA).Shapes, oAutoshapeA.Id)
-            If Trim(func_CM_ExcelGetTextFromAutoshape(oAutoshapeA)) _
-               = Trim(func_CM_ExcelGetTextFromAutoshape(oAutoshapeB)) Then
-            'オートシェイプのIDとテキストが一致する（差異がない）場合は灰色にする
-                Call sub_CmpExcelSetAutoshapeColor(oAutoshapeA)
+            Set oRet = cf_tryCatch(Getref("func_CM_GetObjectByNameFromCollection"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
+            If oRet.Item("Result") Then
+                Set oAutoshapeB = oRet.Item("Return")
+                Set oRet = cf_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA, Empty, Empty)
+                If oRet.Item("Result") Then
+                    sTextA = oRet.Item("Return")
+                    Set oRet = cf_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB, Empty, Empty)
+                End If
+                If oRet.Item("Result") Then
+                    If func_CM_UtilIsSame(sTextA, oRet.Item("Return")) Then
+                    'オートシェイプの名前とテキストが一致する（差異がない）場合は灰色にする
+                        sub_CmpExcelSetAutoshapeColor oAutoshapeA
+                    End If
+                End If
             End If
         Next
+
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "AutoShape comparison complete.")
 
         'オブジェクトを開放
+        Set oRet = Nothing
         Set oAutoshapeA = Nothing
         Set oAutoshapeB = Nothing
         Set oExcel = Nothing

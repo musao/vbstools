@@ -943,11 +943,7 @@ End Function
 Private Function func_CM_ExcelGetTextFromAutoshape( _
     byRef aoAutoshape _
     )
-    On Error Resume Next
     func_CM_ExcelGetTextFromAutoshape = aoAutoshape.TextFrame.Characters.Text
-    If Err.Number Then
-        Err.Clear
-    End If
 End Function
 
 
@@ -2019,12 +2015,11 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_GetObjectByIdFromCollection()
-'Overview                    : コレクションから指定したIDのメンバーを取得する
-'Detailed Description        : エラーは無視する
+'Function/Sub Name           : func_CM_GetObjectByNameFromCollection()
+'Overview                    : コレクションから指定したnameのメンバーを取得する
+'Detailed Description        : エラー処理は行わない
 'Argument
-'     aoClloection           : コレクション
-'     asId                   : ID
+'     aoArr                  : 0番目　コレクション、1番目　name
 'Return Value
 '     該当するメンバー
 '---------------------------------------------------------------------------------------------------
@@ -2033,23 +2028,10 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2022/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_CM_GetObjectByIdFromCollection( _
-    byRef aoClloection _
-    , byVal asId _
+Private Function func_CM_GetObjectByNameFromCollection( _
+    byRef aoArr _
     )
-    On Error Resume Next
-    Dim oItem
-    For Each oItem In aoClloection
-        If oItem.Id = asId Then
-            Set func_CM_GetObjectByIdFromCollection = oItem
-            Exit Function
-        End If
-    Next
-    Set func_CM_GetObjectByIdFromCollection = Nothing
-    If Err.Number Then
-        Err.Clear
-    End If
-    Set oItem = Nothing
+    cf_bind func_CM_GetObjectByNameFromCollection, aoArr(0).Item(aoArr(1))
 End Function
 
 '***************************************************************************************************
