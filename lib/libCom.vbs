@@ -808,7 +808,7 @@ Private Function math_rand( _
     , byVal alPlace _
     )
     Randomize
-    math_rand = func_MathRound( ((adbMax-adbMin)*(10^alPlace)+1)*Rnd, 0, 0, False )*10^(-1*alPlace) + adbMin
+    math_rand = adbMin + Fix( ((adbMax-adbMin)*(10^alPlace)+1)*Rnd )*10^(-1*alPlace)
 End Function
 
 '***************************************************************************************************
