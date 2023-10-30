@@ -630,7 +630,7 @@ Class clsCompareExcel
         On Error Resume Next
         With aoAutoshape.Fill
             .Visible = True                          'msoTrue
-            .ForeColor.ObjectTjemeColor = 14         '背景１テーマの色 msoThemeColorBackground1
+            .ForeColor.ObjectThemeColor = 14         '背景１テーマの色 msoThemeColorBackground1
             .ForeColor.TintAndShade = 0              '色を明るくするかまたは暗くする単精度浮動小数点型 (Single) の値
             .ForeColor.Brightness = -0.150000006     '明度
             .Transparency = 0                        '塗りつぶしの透明度を示す 0.0 (不透明) から 1.0 (透明) までの値
