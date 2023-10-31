@@ -636,9 +636,7 @@ Class clsCompareExcel
             .Transparency = 0                        '塗りつぶしの透明度を示す 0.0 (不透明) から 1.0 (透明) までの値
             .Solid                                   '塗りつぶしを均一な色に設定
         End With
-        If Err.Number Then
-            Err.Clear
-        End If
+        On Error Goto 0
     End Sub
 
     '***************************************************************************************************
@@ -661,8 +659,8 @@ Class clsCompareExcel
         , byVal asYourName _
         )
         If aoRet.Item("Result") Then Exit Sub
-        Call sub_CmpExcelPublish("log", 3, asYourName, "It couldn't." )
-        Call sub_CmpExcelPublish("log", 9, asYourName, "<Err> " & func_CM_ToString(aoRet.Item("Err")) )
+        sub_CmpExcelPublish "log", 3, asYourName, "It couldn't."
+        sub_CmpExcelPublish "log", 9, asYourName, "<Err> " & func_CM_ToString(aoRet.Item("Err"))
     End Sub
 
     '***************************************************************************************************
@@ -689,7 +687,7 @@ Class clsCompareExcel
         , byVal asCont _
         )
         If PoBroker Is Nothing Then Exit Sub
-        Call PoBroker.Publish(asTopic, Array(alLevel, TypeName(Me)&asFuncName, asCont))
+        PoBroker.Publish asTopic, Array(alLevel, TypeName(Me)&asFuncName, asCont)
     End Sub
     
 End Class

@@ -471,6 +471,25 @@ Private Function new_ArrSplit( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_Char()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 文字種類管理クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     文字種類管理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/31         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Char( _
+    )
+    Set new_Char = (New clsCmCharacterType)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_Func()
 'Overview                    : 関数のインスタンスを生成する
 'Detailed Description        : javascriptの無名関数に準拠（vbscriptの仕様上仮の名前はつける）
@@ -1692,7 +1711,7 @@ Private Function func_CM_StrConvOnlyAlphabet( _
         '変換対象の1文字を取得
         sChar = Mid(asTargetNew, lPos, 1)
         
-        If func_CM_StrDetermineCharacterType(sChar, 1) Then
+        If new_Char().whatType(sChar)<3 Then
         '変換対象が英字の場合のみ変換する
             asTargetTmp = ""
             
@@ -1720,37 +1739,6 @@ Private Function func_CM_StrConvOnlyAlphabet( _
     
     func_CM_StrConvOnlyAlphabet = asTargetNew
     
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_StrDetermineCharacterType()
-'Overview                    : 文字種を判定する
-'Detailed Description        : 工事中
-'Argument
-'     asChar                 : 文字種を判定する文字
-'     alType                 : 文字種 1:半角のAlphabet
-'Return Value
-'     結果 True:合致する / False:合致しない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_StrDetermineCharacterType( _
-    byVal asChar _
-    , byVal alType _
-    )
-    func_CM_StrDetermineCharacterType = False
-    Select Case alType
-        Case 1:
-            If _
-                    Asc("A") <= Asc(asChar) And Asc(asChar) <= Asc("Z") _
-                Or Asc("a") <= Asc(asChar) And Asc(asChar) <= Asc("z")  _
-                Then
-                func_CM_StrDetermineCharacterType = True
-            End If
-    End Select
 End Function
 
 '***************************************************************************************************
@@ -1830,36 +1818,6 @@ End Function
 '###################################################################################################
 '配列系
 '###################################################################################################
-
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_ArrayIsAvailable()
-''Overview                    : 有効な配列か検査する
-''Detailed Description        : 初期状態ではなく要素を1つ以上含む配列
-''Argument
-''     avArray                : 検査対象の配列
-''Return Value
-''     結果 True:有効 / False:無効
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2023/09/18         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_ArrayIsAvailable( _
-'    byRef avArray _
-'    )
-'    func_CM_ArrayIsAvailable = False
-'    If IsArray(avArray) Then
-'        On Error Resume Next
-'        Ubound(avArray)
-'        If Err.Number=0 Then func_CM_ArrayIsAvailable = True
-'        On Error Goto 0
-'    End If
-'
-''    func_CM_ArrayIsAvailable = False
-''    If IsArray(avArray) Then func_CM_ArrayIsAvailable = cf_tryCatch(Getref("func_CM_ArrayUbound"), avArray, Empty, Empty).Item("Result")
-'
-'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_ArrayGetDimensionNumber()

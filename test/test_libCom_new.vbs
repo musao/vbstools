@@ -3,6 +3,7 @@
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
 ' @import ../lib/clsCmCalendar.vbs
+' @import ../lib/clsCmCharacterType.vbs
 ' @import ../lib/clsCmBroker.vbs
 ' @import ../lib/clsCompareExcel.vbs
 ' @import ../lib/clsFsBase.vbs
@@ -271,6 +272,16 @@ Sub Test_new_ArrSplit
     AssertEqual ev(0), a(0)
     AssertEqual ev(1), a(1)
     AssertEqual ev(2), a(2)
+End Sub
+
+'###################################################################################################
+'new_Char()
+Sub Test_new_Char
+    Dim e : Set e = New clsCmCharacterType
+    Dim a : Set a = new_Char()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
 End Sub
 
 '###################################################################################################

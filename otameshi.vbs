@@ -24,33 +24,21 @@ Call sub_import("clsCmCalendar.vbs")
 Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
+Call sub_import("clsCmCharacterType.vbs")
 
-Dim oFunc : Set oFunc = new_Func( _
-"function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:return e.Item(""key"") & ""="""""" & e.Item(""value"") & """":End If}" _
-)
-'"function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:End If}" _
-'"function(e,i,a){If IsEmpty(e.Item(""value"")) Then:return e.Item(""key""):Else:return e.Item(""key"") & ""="""""" & e.Item(""value"") & """":End If}" _
 
-wscript.quit
+dim s : s = "C:\Users\89585\Documents\dev\vbs\otameshi.vbs"
+dim t : t = "C:\Users\89585\Documents\dev\vbs\"
 
-inputbox "","", cdbl(now)  '45216.9009953704
-inputbox "","", timer      '77860.62
-
-inputbox "","", cdate(45216.9009953704)  '2023/10/17 21:37:26
+call msgbox(func_CM_FsIsSame(s,t))                                     'false
+call msgbox(func_CM_FsIsSame(s,func_CM_StrConvOnlyAlphabet(s, 2)))     'true
+call msgbox(func_CM_FsIsSame(func_CM_StrConvOnlyAlphabet(t, 1),t))     'true
+call msgbox(func_CM_FsIsSame("",t))                                    'false
 
 wscript.quit
 
-' for fso.OpenTextFile
-Const ForReading = 1, ForWriting = 2, ForAppending = 8
-'Dim e : Set e = new_Fso().OpenTextFile("C:\Users\89585\Documents\dev\vbs\tmp\test.txt", ForWriting, True, -2)
-Dim e : Set e = new_Fso().OpenTextFile(func_CM_FsGetPrivateFilePath("tmp", "test.txt"), ForWriting, True, -2)
-with e
-    .write("Ç†Ç¢Ç§Ç¶Ç®")
-inputbox "","",func_CM_ToString(takeSnapshot(e))
-    .close
-end with
 
-wscript.quit
+'inputbox "","",func_CM_ToString(takeSnapshot(e))
 
 'Dim a
 'inputbox "", "", "vartype(a) = " & vartype(a) & vbnewline & "typename(a) = " & typename(a) & vbnewline & "isarray(a) = " & isarray(a) & vbnewline & "isempty(a) = " & isempty(a) & vbnewline & "isobject(a) = " & isobject(a)
@@ -664,19 +652,6 @@ call msgbox(oBufferedWriter.FileFormat)
 
 
 wscript.quit
-
-
-'dim s : s = "C:\Users\89585\Documents\dev\vbs\otameshi.vbs"
-dim t : t = "C:\Users\89585\Documents\dev\vbs\"
-
-call msgbox(func_CM_FsIsSame(s,t))
-call msgbox(func_CM_FsIsSame(s,func_CM_StrConvOnlyAlphabet(s, 2)))
-call msgbox(func_CM_FsIsSame(func_CM_StrConvOnlyAlphabet(t, 1),t))
-call msgbox(func_CM_FsIsSame("",t))
-
-wscript.quit
-
-
 
 'íËêî
 

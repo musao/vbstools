@@ -10,6 +10,7 @@
 '***************************************************************************************************
 Class clsCmCharacterType
     'ƒNƒ‰ƒX“à•Ï”A’è”
+    Private PvSettings
     Private PoChar2Type
     Private PoType2Chars
     
@@ -28,7 +29,27 @@ Class clsCmCharacterType
     '2023/10/28         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        sub_CmCharTypeCreateCharData
+        PvSettings = Array( _
+              Array( Array("A", "Z") ) _
+              , Array( Array("a", "z") ) _
+              , Array( Array("0", "9") ) _
+              , Array( Array(" ", "/"), Array(":", "@"), Array("[", "`"), Array("{", "~") ) _
+              , Array( Array("¦", "¯"), Array("±", "ß") ) _
+              , Array( Array("¡", "¥"), Array("°", "°") ) _
+              , Array( Array("‚`", "‚y") ) _
+              , Array( Array("‚", "‚š") ) _
+              , Array( Array("‚O", "‚X") ) _
+              , Array( Array("A", "¬"), Array("¸", "¿"), Array("È", "Î"), Array("Ú", "è"), Array("ğ", "÷"), Array("ü", "ü") ) _
+              , Array( Array("‚Ÿ", "‚ñ") ) _
+              , Array( Array("ƒ@", "ƒ–") ) _
+              , Array( Array("ƒŸ", "ƒ¶"), Array("„@", "„`") ) _
+              , Array( Array("ƒ¿", "ƒÖ"), Array("„p", "„‘") ) _
+              , Array( Array("„Ÿ", "„¾") ) _
+              , Array( Array("ˆŸ", "˜r") ) _
+              , Array( Array("˜Ÿ", "Ÿü"), Array("à@", "ê¤") ) _
+              )
+        Set PoChar2Type = new_Dic()
+        Set PoType2Chars = new_Dic()
     End Sub
     
     '***************************************************************************************************
@@ -70,7 +91,21 @@ Class clsCmCharacterType
         Dim bCode : bCode = Asc(asChar)
         If PoChar2Type.Exists(bCode) Then
             whatType = PoChar2Type.Item(bCode)
+            Exit Function
         End If
+
+        Const Cl_MAX_POWER_OF_2 = 16          '2^16 = 65536 <= Type‚ÌÅ‘å’l
+        Dim lPowerOf2 : lPowerOf2 = 0
+        Do While lPowerOf2 <= Cl_MAX_POWER_OF_2
+            If Not PoType2Chars.Exists(2^lPowerOf2) Then
+                sub_CmCharTypeCreateDefinitionsByCharacterType lPowerOf2
+                If PoChar2Type.Exists(bCode) Then
+                    whatType = PoChar2Type.Item(bCode)
+                    Exit Function
+                End If
+            End If
+            lPowerOf2 = lPowerOf2+1
+        Loop
     End Function
     
     '***************************************************************************************************
@@ -116,6 +151,9 @@ Class clsCmCharacterType
             lQuotient = lType \ lDivide
             lType = lType Mod lDivide
             If lQuotient>0 Then
+                If Not PoType2Chars.Exists(lDivide) Then
+                    sub_CmCharTypeCreateDefinitionsByCharacterType lPowerOf2
+                End If
                 vRet.pushMulti PoType2Chars.Item(lDivide)
             End If
             lPowerOf2 = lPowerOf2 - 1
@@ -124,69 +162,39 @@ Class clsCmCharacterType
     End Function
     
 
-
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmCharTypeCreateCharData()
-    'Overview                    : •¶š‚Ìí—Ş‚Ì’è‹`‚ğì¬‚·‚é
+    'Function/Sub Name           : sub_CmCharTypeCreateDefinitionsByCharacterType
+    'Overview                    : w’è‚µ‚½•¶ší—Ş‚Ì’è‹`‚ğì¬‚·‚é
     'Detailed Description        : H–’†
     'Argument
-    '     ‚È‚µ
+    '     alPowerOf2             : •¶š‚Ìí—Şi“à—e‚ÍgetCharList()‚Ìˆø”ialTypej‚Æ“¯‚¶j‚ğ2^n‚Æ‚µ‚½ê‡‚Ìn
     'Return Value
     '     ‚È‚µ
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/28         Y.Fujii                  First edition
+    '2023/10/30         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmCharTypeCreateCharData( _
+    Private Sub sub_CmCharTypeCreateDefinitionsByCharacterType( _
+        byVal alPowerOf2 _
         )
-        '’è‹`
-        Dim vSettings : vSettings = Array( _
-              Array( Array("A", "Z") ) _
-              , Array( Array("a", "z") ) _
-              , Array( Array("0", "9") ) _
-              , Array( Array(" ", "/"), Array(":", "@"), Array("[", "`"), Array("{", "~") ) _
-              , Array( Array("¦", "¯"), Array("±", "ß") ) _
-              , Array( Array("¡", "¥"), Array("°", "°") ) _
-              , Array( Array("‚`", "‚y") ) _
-              , Array( Array("‚", "‚š") ) _
-              , Array( Array("‚O", "‚X") ) _
-              , Array( Array("A", "¬"), Array("¸", "¿"), Array("È", "Î"), Array("Ú", "è"), Array("ğ", "÷"), Array("ü", "ü") ) _
-              , Array( Array("‚Ÿ", "‚ñ") ) _
-              , Array( Array("ƒ@", "ƒ–") ) _
-              , Array( Array("ƒŸ", "ƒ¶"), Array("„@", "„`") ) _
-              , Array( Array("ƒ¿", "ƒÖ"), Array("„p", "„‘") ) _
-              , Array( Array("„Ÿ", "„¾") ) _
-              , Array( Array("ˆŸ", "˜r") ) _
-              , Array( Array("˜Ÿ", "Ÿü"), Array("à@", "ê¤") ) _
-              )
-        
-        Dim oChar2Type : Set oChar2Type = new_Dic()
-        Dim oType2Chars : Set oType2Chars = new_Dic()
+        Dim lType : lType = 2^alPowerOf2
+        If PoType2Chars.Exists(lType) Then Exit Sub
 
-        Const Cl_MAX_POWER_OF_2 = 16          '2^16 = 65536 <= Type‚ÌÅ‘å’l
-        Dim lPowerOf2 : lPowerOf2 = 0
-        Dim lType, vSetting, vEle, bCode, vArr, sCodeHex
-        Do While lPowerOf2 <= Cl_MAX_POWER_OF_2
-            lType = 2^lPowerOf2
-            vSetting = vSettings(lPowerOf2)
-            vArr = Array()
-            For Each vEle In vSetting
-                For bCode = Asc(vEle(0)) To Asc(vEle(1))
-                    sCodeHex = "" : If bCode<0 Then sCodeHex = Right(Hex(bCode),2)
-                    If bCode>=0 Or (sCodeHex<>"7F" And "3F"<sCodeHex And sCodeHex<"FD" ) Then
-                        oChar2Type.Add bCode, lType
-                        cf_push vArr, bCode
-                    End If
-                Next
+        Dim vArr : vArr = Array()
+        Dim vSetting : vSetting = PvSettings(alPowerOf2)
+        Dim vEle, bCode, sCodeHex
+        For Each vEle In vSetting
+            For bCode = Asc(vEle(0)) To Asc(vEle(1))
+                sCodeHex = "" : If bCode<0 Then sCodeHex = Right(Hex(bCode),2)
+                If bCode>=0 Or (sCodeHex<>"7F" And "3F"<sCodeHex And sCodeHex<"FD" ) Then
+                    PoChar2Type.Add bCode, lType
+                    cf_push vArr, bCode
+                End If
             Next
-            oType2Chars.Add lType, vArr
-            lPowerOf2 = lPowerOf2+1
-        Loop
-
-        Set PoChar2Type = oChar2Type
-        Set PoType2Chars = oType2Chars
+        Next
+        PoType2Chars.Add lType, vArr
     End Sub
     
 End Class
