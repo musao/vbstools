@@ -10,6 +10,7 @@
 '***************************************************************************************************
 Class clsCmCharacterType
     'クラス内変数、定数
+    Private Cl_MAX_POWER_OF_2
     Private PvSettings
     Private PoChar2Type
     Private PoType2Chars
@@ -29,6 +30,7 @@ Class clsCmCharacterType
     '2023/10/28         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
+        Cl_MAX_POWER_OF_2 = 16          '2^16 = 65536 <= Typeの最大値
         PvSettings = Array( _
               Array( Array("A", "Z") ) _
               , Array( Array("a", "z") ) _
@@ -39,7 +41,7 @@ Class clsCmCharacterType
               , Array( Array("Ａ", "Ｚ") ) _
               , Array( Array("ａ", "ｚ") ) _
               , Array( Array("０", "９") ) _
-              , Array( Array("、", "〓"), Array("∈", "∩"), Array("∧", "∃"), Array("∠", "∬"), Array("Å", "¶"), Array("◯", "◯") ) _
+              , Array( Array("　", "〓"), Array("∈", "∩"), Array("∧", "∃"), Array("∠", "∬"), Array("Å", "¶"), Array("◯", "◯") ) _
               , Array( Array("ぁ", "ん") ) _
               , Array( Array("ァ", "ヶ") ) _
               , Array( Array("Α", "Ω"), Array("А", "Я") ) _
@@ -94,7 +96,6 @@ Class clsCmCharacterType
             Exit Function
         End If
 
-        Const Cl_MAX_POWER_OF_2 = 16          '2^16 = 65536 <= Typeの最大値
         Dim lPowerOf2 : lPowerOf2 = 0
         Do While lPowerOf2 <= Cl_MAX_POWER_OF_2
             If Not PoType2Chars.Exists(2^lPowerOf2) Then
@@ -143,7 +144,7 @@ Class clsCmCharacterType
         byVal alType _
         )
         Dim lType : lType = alType
-        Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
+        Dim lPowerOf2 : lPowerOf2 = Cl_MAX_POWER_OF_2
         Dim vRet : Set vRet = new_Arr()
         Dim lQuotient,lDivide
         Do Until lPowerOf2<0
@@ -190,7 +191,7 @@ Class clsCmCharacterType
                 sCodeHex = "" : If bCode<0 Then sCodeHex = Right(Hex(bCode),2)
                 If bCode>=0 Or (sCodeHex<>"7F" And "3F"<sCodeHex And sCodeHex<"FD" ) Then
                     PoChar2Type.Add bCode, lType
-                    cf_push vArr, bCode
+                    cf_push vArr, Chr(bCode)
                 End If
             Next
         Next

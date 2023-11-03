@@ -1,12 +1,13 @@
-' clsCmCalendar.vbs: test.
+' clsCmCharacterType.vbs: test.
 ' @import ../lib/clsCmArray.vbs
+' @import ../lib/clsCmBroker.vbs
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
 ' @import ../lib/clsCmCalendar.vbs
-' @import ../lib/clsCmBroker.vbs
-' @import ../lib/clsCompareExcel.vbs
 ' @import ../lib/clsCmCharacterType.vbs
-' @import ../lib/clsFsBase.vbs
+' @import ../lib/clsCmCssGenerator.vbs
+' @import ../lib/clsCmHtmlGenerator.vbs
+' @import ../lib/clsCompareExcel.vbs
 ' @import ../lib/libCom.vbs
 
 Option Explicit
@@ -79,8 +80,8 @@ Sub Test_clsCmCharacterType_getCharList
         d = 2^i
         For Each j In ao.getCharList(d)
             e = d
-            a = ao.whatType(Chr(j))
-            AssertEqualWithMessage e, a, "No="&i&", Type="&(2^i)&", Char="&Chr(j)
+            a = ao.whatType(j)
+            AssertEqualWithMessage e, a, "No="&i&", Type="&(2^i)&", Char="&j
         Next
     Next
 End Sub

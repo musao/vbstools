@@ -1,11 +1,13 @@
 ' libCom.vbs: cf_* procedure test.
 ' @import ../lib/clsCmArray.vbs
+' @import ../lib/clsCmBroker.vbs
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
 ' @import ../lib/clsCmCalendar.vbs
-' @import ../lib/clsCmBroker.vbs
+' @import ../lib/clsCmCharacterType.vbs
+' @import ../lib/clsCmCssGenerator.vbs
+' @import ../lib/clsCmHtmlGenerator.vbs
 ' @import ../lib/clsCompareExcel.vbs
-' @import ../lib/clsFsBase.vbs
 ' @import ../lib/libCom.vbs
 
 Option Explicit
@@ -57,6 +59,43 @@ Sub Test_cf_push_NotAvailable
     
     AssertEqual 0, Ubound(a)
     AssertEqual "NewValue", a(0)
+End Sub
+
+'###################################################################################################
+'cf_pushMulti()
+Sub Test_cf_pushMulti_AddIsArray_ArrAvailable
+    Dim a,d,e
+    Redim a(0)
+    d = Array(1,2)
+    e = Array(Empty,1,2)
+    cf_pushMulti a, d
+    
+    assertAllElements e, a
+End Sub
+Sub Test_cf_pushMulti_AddIsArray_ArrNotAvailable
+    Dim a,d,e
+    d = Array(1,2)
+    e = Array(1,2)
+    cf_pushMulti a, d
+    
+    assertAllElements e, a
+End Sub
+Sub Test_cf_pushMulti_AddIsNotArray_ArrAvailable
+    Dim a,d,e
+    Redim a(0)
+    d = "a"
+    e = Array(Empty,"a")
+    cf_pushMulti a, d
+    
+    assertAllElements e, a
+End Sub
+Sub Test_cf_pushMulti_AddIsNotArray_ArrNotAvailable
+    Dim a,d,e
+    d = "a"
+    e = Array("a")
+    cf_pushMulti a, d
+    
+    assertAllElements e, a
 End Sub
 
 '###################################################################################################
@@ -180,6 +219,113 @@ Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err_FinaryErr
     AssertEqual 13, Err.Number
     AssertEqual "å^Ç™àÍívÇµÇ‹ÇπÇÒÅB", Err.Description
     AssertEqual Empty, oRet
+End Sub
+
+'###################################################################################################
+'cf_isSame()
+Sub Test_cf_isSame_OvsO_Same
+    Dim a,da,db,e
+    Set da = new_Dic()
+    Set db = da
+    e = True
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_OvsO_NotSame
+    Dim a,da,db,e
+    Set da = new_Dic()
+    Set db = new_Dic()
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_OvsV_NotSame
+    Dim a,da,db,e
+    Set da = new_Dic()
+    db = "a"
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsO_NotSame
+    Dim a,da,db,e
+    da = 5
+    Set db = new_Dic()
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsV_and_SvsS_Same
+    Dim a,da,db,e
+    da = "a"
+    db = "a"
+    e = True
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsV_and_SvsS_NotSame
+    Dim a,da,db,e
+    da = "a"
+    db = "A"
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsV_and_NvsN_Same
+    Dim a,da,db,e
+    da = 9
+    db = 9
+    e = True
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsV_and_NvsN_NotSame
+    Dim a,da,db,e
+    da = 8
+    db = 9
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsV_and_SvsN_NotSame
+    Dim a,da,db,e
+    da = "9"
+    db = 9
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isSame_VvsV_and_NvsS_NotSame
+    Dim a,da,db,e
+    da = 500
+    db = "abc"
+    e = False
+    a = cf_isSame(da,db)
+
+    AssertEqual e,a
+End Sub
+
+'###################################################################################################
+'common
+Sub assertAllElements(e,a)
+    AssertEqualWithMessage Ubound(e), Ubound(a), "Ubound"
+    Dim i
+    For i=0 To Ubound(e)
+        If IsObject(e(i)) Then
+            AssertSameWithMessage e(i), a(i), "Element Object"
+        Else
+            AssertEqualWithMessage e(i), a(i), "Element Variable"
+        End If
+    Next
 End Sub
 
 ' Local Variables:

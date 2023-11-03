@@ -37,12 +37,15 @@ Sub sub_import( _
     End With
 End Sub
 'import
-Call sub_import("clsCmArray.vbs")
-Call sub_import("clsCmBufferedWriter.vbs")
-Call sub_import("clsCmCalendar.vbs")
-Call sub_import("clsCmBroker.vbs")
-Call sub_import("clsCompareExcel.vbs")
-Call sub_import("libCom.vbs")
+sub_import "clsCmArray.vbs"
+sub_import "clsCmBroker.vbs"
+sub_import "clsCmBufferedReader.vbs"
+sub_import "clsCmBufferedWriter.vbs"
+sub_import "clsCmCalendar.vbs"
+sub_import "clsCmCharacterType.vbs"
+sub_import "clsCmCssGenerator.vbs"
+sub_import "clsCmHtmlGenerator.vbs"
+sub_import "libCom.vbs"
 
 'メイン関数実行
 Call Main()
@@ -149,8 +152,7 @@ Private Sub sub_GnrtPwGetParameters( _
         If oArg.Item("Named").Exists(oKey) Then lSum = lSum + oSetting.Item(oKey)
     Next
     lType = lSum
-    If lType = 0 And new_Arr().hasElement(vAdd)<>True Then lType = 15
-'    If lType = 0 And func_CM_ArrayIsAvailable(vAdd)<>True Then lType = 15
+    If lType = 0 And IsEmpty(vAdd) Then lType = 15
     
     Dim oParam : Set oParam = new_DicWith(Array("Length", lLength, "Type", lType, "Additional", vAdd))
     
@@ -186,7 +188,10 @@ Private Sub sub_GnrtPwGenerate( _
         cf_bind lType, .Item("Type")
         cf_bind vAdd, .Item("Additional")
     End With
-    Dim sPw : sPw = func_CM_UtilGenerateRandomString(lLength, lType, vAdd)
+    Dim vCharList : vCharList = new_Char().getCharList(lType)
+    vCharList = Filter(vCharList, " ", False, vbBinaryCompare)
+    If Not IsEmpty(vAdd) Then cf_pushMulti vCharList, vAdd
+    Dim sPw : sPw = func_CM_UtilGenerateRandomString(vCharList, lLength)
     
     '★ログ出力
     sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw)

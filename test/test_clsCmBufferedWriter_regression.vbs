@@ -1,11 +1,13 @@
 ' clsCmBufferedWriter.vbs: test.
 ' @import ../lib/clsCmArray.vbs
+' @import ../lib/clsCmBroker.vbs
 ' @import ../lib/clsCmBufferedReader.vbs
 ' @import ../lib/clsCmBufferedWriter.vbs
 ' @import ../lib/clsCmCalendar.vbs
-' @import ../lib/clsCmBroker.vbs
+' @import ../lib/clsCmCharacterType.vbs
+' @import ../lib/clsCmCssGenerator.vbs
+' @import ../lib/clsCmHtmlGenerator.vbs
 ' @import ../lib/clsCompareExcel.vbs
-' @import ../lib/clsFsBase.vbs
 ' @import ../lib/libCom.vbs
 
 Option Explicit

@@ -82,17 +82,53 @@ Private Sub cf_push( _
     byRef avArr _ 
     , byRef aoEle _ 
     )
-    If new_Arr().hasElement(avArr) Then
-'    If func_CM_ArrayIsAvailable(avArr) Then
-        Redim Preserve avArr(Ubound(avArr)+1)
-    Else
-        Redim avArr(0)
-    End If
+    On Error Resume Next
+    Redim Preserve avArr(Ubound(avArr)+1)
+    If Err.Number<>0 Then Redim avArr(0)
+    On Error Goto 0
     cf_bind avArr(Ubound(avArr)), aoEle
+End Sub
 
-'    cf_tryCatch Getref("func_CM_ArrayAddElement"), avArr, Getref("func_CM_ArrayInitialize"), Empty
-'    cf_bind avArr(Ubound(avArr)), aoEle
-
+'***************************************************************************************************
+'Function/Sub Name           : cf_pushMulti()
+'Overview                    : 配列に要素を追加する
+'Detailed Description        : 工事中
+'Argument
+'     avArr                  : 配列
+'     avAdd                  : 追加する配列
+'Return Value
+'     配列の次元数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub cf_pushMulti( _
+    byRef avArr _ 
+    , byRef avAdd _ 
+    )
+    On Error Resume Next
+    Dim lUbAdd : lUbAdd = Ubound(avAdd)
+    If Err.Number=0 Then
+    '追加する配列（avAdd）が要素を持つ場合
+        Dim lUb : lUb = Ubound(avArr)
+        If Err.Number=0 Then 
+        '配列（avArr）が要素を持つ場合
+            Redim Preserve avArr(lUb+lUbAdd+1)
+            Dim lIdx
+            For lIdx=0 To lUbAdd
+                cf_bind avArr(lUb+1+lIdx), avAdd(lIdx)
+            Next
+        Else
+        '配列（avArr）が要素を持たない場合
+            avArr = avAdd
+        End If
+    Else
+    '追加する配列（avAdd）が要素を持たない場合
+        cf_push avArr, avAdd
+    End If
+    On Error Goto 0
 End Sub
 
 '***************************************************************************************************
@@ -144,6 +180,38 @@ Private Function cf_tryCatch( _
     Set cf_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
     Set oRet = Nothing
     Set oErr = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isSame()
+'Overview                    : 同一か判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoA                    : 比較対象
+'     aoB                    : 比較対象
+'Return Value
+'     結果 True:同一 / False:同一でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isSame( _
+    byRef aoA _
+    , byRef aoB _
+    )
+    Dim boFlg : boFlg = False
+    If IsObject(aoA) And IsObject(aoB) Then
+        If aoA Is aoB Then boFlg = True
+    ElseIf Not IsObject(aoA) And Not IsObject(aoB) Then
+        If VarType(aoA) = vbString And VarType(aoB) = vbString Then
+            If Strcomp(aoA, aoB, vbBinaryCompare)=0 Then boFlg = True
+        Else
+            If aoA = aoB Then boFlg = True
+        End If
+    End If
+    cf_isSame = boFlg
 End Function
 
 
@@ -525,7 +593,11 @@ Private Function new_Func( _
     sSoruceCode = Replace(sSoruceCode, "'", """")
     
     '関数名（仮名）を作る
-    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
+    Dim vCharList : vCharList = new_Char().getCharList(5)
+    cf_push vCharList, "_"
+    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(vCharList, 10)
+'    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 0, vCharList)
+'    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
     
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
@@ -1848,68 +1920,6 @@ Private Function func_CM_ArrayGetDimensionNumber( _
    func_CM_ArrayGetDimensionNumber = lNum - 1
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ArrayAddElement()
-'Overview                    : 配列の要素を追加する
-'Detailed Description        : 工事中
-'Argument
-'     avArr                  : 配列
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ArrayAddElement( _
-    byRef avArr _
-    )
-    Redim Preserve avArr(Ubound(avArr)+1)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ArrayInitialize()
-'Overview                    : 配列を初期化する
-'Detailed Description        : 工事中
-'Argument
-'     avArr                  : 配列
-'     avErr                  : エラー情報
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ArrayInitialize( _
-    byRef avArr _
-    , byRef avErr _
-    )
-    Redim avArr(0)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ArrayUbound()
-'Overview                    : 配列のインデックスの最大数を返す
-'Detailed Description        : 工事中
-'Argument
-'     avArr                  : 配列
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ArrayUbound( _
-    byRef avArr _
-    )
-    func_CM_ArrayUbound = Ubound(avArr)
-End Function
-
 '###################################################################################################
 'チェック系
 '###################################################################################################
@@ -2768,122 +2778,28 @@ End Function
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilGenerateRandomString()
 'Overview                    : ランダムな文字列を生成する
-'Detailed Description        : 指定した長さ、文字の種類でランダムな文字列を生成する
+'Detailed Description        : 指定した文字（配列）、指定した回数でランダムな文字列を生成する
 'Argument
-'     alLength               : 文字の長さ
-'     alType                 : 文字の種類（複数指定する場合は以下の和を設定する）
-'                                    1:半角英字大文字
-'                                    2:半角英字小文字
-'                                    4:半角数字
-'                                    8:半角記号
-'                                   16:半角カタカナ
-'                                   32:半角カタカナ記号
-'                                   64:全角英字大文字
-'                                  128:全角英字小文字
-'                                  256:全角数字
-'                                  512:全角記号
-'                                 1024:全角ひらがな
-'                                 2048:全角カタカナ
-'                                 4096:全角ギリシャ、キリル文字の大文字
-'                                 8192:全角ギリシャ、キリル文字の小文字
-'                                16384:全角線枠
-'                                32768:全角漢字 第1水準(16区～47区)
-'                                65536:全角漢字 第2水準(48区～84区)
-'     avAdditional           : 配列で指定する文字種、前述の文字の種類と重複する場合は追加しない
-'                              指定がない場合はNothingなど配列以外を指定する
+'     avStrings              : 文字の配列
+'     alTimes                : 回数
 'Return Value
 '     生成した文字列
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/09/24         Y.Fujii                  First edition
+'2023/11/03         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_CM_UtilGenerateRandomString( _
-    byVal alLength _
-    , byVal alType _
-    , byRef avAdditional _
+    byRef avStrings _
+    , byVal alTimes _
     )
-    
-    '文字の種類（alType）で指定した文字のリストを作成する
-    Dim vSettings : vSettings = Array( _
-          Array( Array("A", "Z") ) _
-          , Array( Array("a", "z") ) _
-          , Array( Array("0", "9") ) _
-          , Array( Array("!", "/"), Array(":", "@"), Array("[", "`"), Array("{", "~") ) _
-          , Array( Array("ｦ", "ｯ"), Array("ｱ", "ﾟ") ) _
-          , Array( Array("｡", "･"), Array("ｰ", "ｰ") ) _
-          , Array( Array("Ａ", "Ｚ") ) _
-          , Array( Array("ａ", "ｚ") ) _
-          , Array( Array("０", "９") ) _
-          , Array( Array("、", "〓"), Array("∈", "∩"), Array("∧", "∃"), Array("∠", "∬"), Array("Å", "¶"), Array("◯", "◯") ) _
-          , Array( Array("ぁ", "ん") ) _
-          , Array( Array("ァ", "ヶ") ) _
-          , Array( Array("Α", "Ω"), Array("А", "Я") ) _
-          , Array( Array("α", "ω"), Array("а", "я") ) _
-          , Array( Array("─", "╂") ) _
-          , Array( Array("亜", "腕") ) _
-          , Array( Array("弌", "滌"), Array("漾", "熙") ) _
-          )
-    
-    Dim lType : lType = alType
-    Dim lPowerOf2 : lPowerOf2 = 16          '2^16 = 65536 <= alTypeの最大値
-    Dim oChars : Set oChars = new_Dic()
-    Dim lQuotient,lDivide, vSetting, vItem, bCode
-'    Dim lQuotient,lDivide, vSetting, vItem, bCode, sCodeHex
-    Do Until lPowerOf2<0
-        lDivide = 2^lPowerOf2
-        lQuotient = lType \ lDivide
-        lType = lType Mod lDivide
-        
-        If lQuotient>0 Then
-            vSetting = vSettings(lPowerOf2)
-            For Each vItem In vSetting
-                For bCode = Asc(vItem(0)) To Asc(vItem(1))
-                    oChars.Add bCode, Chr(bCode)
-'                    sCodeHex = Right(Hex(bCode),2)
-'                    If bCode>0 Or (sCodeHex<>"7F" And ("3F"<sCodeHex And sCodeHex<"FD")) Then
-'                        oChars.Add bCode, Chr(bCode)
-'                    End If
-                Next
-            Next
-        End If
-        
-        lPowerOf2 = lPowerOf2 - 1
-    Loop
-    
-    'sjis使用範囲外のコードを除外する
-    Dim sCodeHex
-    For Each bCode In oChars.Keys()
-        If bCode<0 Then
-            sCodeHex = Right(Hex(bCode),2)
-            If sCodeHex="7F" Or sCodeHex<="3F" Or "FD"<=sCodeHex Then
-                oChars.Remove bCode
-            End If
-        End If
-    Next
-    
-    '配列で指定する文字種（avAdditional）を追加する
-    If Not IsObject(avAdditional) Then
-        If IsArray(avAdditional) And (Not IsEmpty(avAdditional)) Then
-            Dim sChar
-            For Each sChar In avAdditional
-                If Not oChars.Exists(Asc(sChar)) Then
-                    oChars.Add Asc(sChar), sChar
-                End If
-            Next
-        End If
-    End If
-
-    '上述で作成した文字のリストを使ってランダムな文字列を生成する
     Dim lPos, sRet
     sRet = ""
-    For lPos = 1 To alLength
-        sRet = sRet & oChars.Items()( math_rand(0, oChars.Count - 1, 0) )
+    For lPos = 1 To alTimes
+        sRet = sRet & avStrings( math_rand(0, Ubound(avStrings), 0) )
     Next
     func_CM_UtilGenerateRandomString = sRet
-    
-    Set oChars = Nothing
 End Function
 
 '***************************************************************************************************
@@ -3066,38 +2982,6 @@ End Function
 Private Function func_CM_UtilGetComputerName( _
     )
     func_CM_UtilGetComputerName = CreateObject("WScript.Network").ComputerName
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilIsSame()
-'Overview                    : 同一か判定する
-'Detailed Description        : 工事中
-'Argument
-'     aoA                    : 比較対象
-'     aoB                    : 比較対象
-'Return Value
-'     結果 True:同一 / False:同一でない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilIsSame( _
-    byRef aoA _
-    , byRef aoB _
-    )
-    Dim boFlg : boFlg = False
-    If IsObject(aoA) And IsObject(aoB) Then
-        If aoA Is aoB Then boFlg = True
-    ElseIf Not IsObject(aoA) And Not IsObject(aoB) Then
-        If VarType(aoA) = vbString And VarType(aoB) = vbString Then
-            If Strcomp(aoA, aoB, vbBinaryCompare)=0 Then boFlg = True
-        Else
-            If aoA = aoB Then boFlg = True
-        End If
-    End If
-    func_CM_UtilIsSame = boFlg
 End Function
 
 '***************************************************************************************************

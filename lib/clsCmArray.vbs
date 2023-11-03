@@ -288,7 +288,7 @@ Class clsCmArray
     'Detailed Description        : func_CmArrayHasElement()に委譲する
     '                              初期状態の配列はFalseを返す
     'Argument
-    '     acArr                  : 配列
+    '     avArr                  : 配列
     'Return Value
     '     結果 True:要素を含む / False:要素を含まない
     '---------------------------------------------------------------------------------------------------
@@ -298,9 +298,9 @@ Class clsCmArray
     '2023/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Function hasElement( _
-        byRef acArr _
+        byRef avArr _
         )
-        hasElement = func_CmArrayHasElement(acArr)
+        hasElement = func_CmArrayHasElement(avArr)
     End Function
 
     '***************************************************************************************************
@@ -873,7 +873,7 @@ Class clsCmArray
     'Overview                    : 配列が要素を含むか検査する
     'Detailed Description        : 初期状態の配列はFalseを返す
     'Argument
-    '     acArr                  : 配列
+    '     avArr                  : 配列
     'Return Value
     '     結果 True:要素を含む / False:要素を含まない
     '---------------------------------------------------------------------------------------------------
@@ -883,18 +883,15 @@ Class clsCmArray
     '2023/10/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function func_CmArrayHasElement( _
-        byRef acArr _
+        byRef avArr _
         )
         func_CmArrayHasElement = False
-        If IsArray(acArr) Then
+        If IsArray(avArr) Then
             On Error Resume Next
-            Ubound(acArr)
+            Ubound(avArr)
             If Err.Number=0 Then func_CmArrayHasElement = True
             On Error Goto 0
         End If
-
-'        func_CmArrayHasElement = False
-'        If IsArray(avArray) Then func_CmArrayHasElement = cf_tryCatch(Getref("func_CM_ArrayUbound"), avArray, Empty, Empty).Item("Result")
     End Function
 
     '***************************************************************************************************
@@ -940,7 +937,7 @@ Class clsCmArray
             If aboOrder Then lStep=1 Else lStep=-1
 
             For lIdx=lStart To lEnd Step lStep
-                If func_CM_UtilIsSame(avTarget, vArr(lIdx)) Then
+                If cf_isSame(avTarget, vArr(lIdx)) Then
                     func_CmArrayIndexOf = lIdx
                     Exit For
                 End If

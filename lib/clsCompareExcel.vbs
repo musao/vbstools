@@ -592,7 +592,7 @@ Class clsCompareExcel
                     Set oRet = cf_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB, Empty, Empty)
                 End If
                 If oRet.Item("Result") Then
-                    If func_CM_UtilIsSame(sTextA, oRet.Item("Return")) Then
+                    If cf_isSame(sTextA, oRet.Item("Return")) Then
                     'オートシェイプの名前とテキストが一致する（差異がない）場合は灰色にする
                         sub_CmpExcelSetAutoshapeColor oAutoshapeA
                     End If
