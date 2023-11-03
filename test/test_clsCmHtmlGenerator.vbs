@@ -98,6 +98,17 @@ Sub Test_clsCmHtmlGenerator_element
     a = ao.element
     AssertEqualWithMessage e, a, "1-3"
 End Sub
+Sub Test_clsCmHtmlGenerator_element_Err
+    Dim ao,d
+    Set ao = new clsCmHtmlGenerator
+
+    On Error Resume Next
+    d = "Ｈｏｇｅ"
+    ao.element = d
+
+    AssertEqual 1032, Err.Number
+    AssertEqual "要素（element）には半角英字以外の文字を指定できません。", Err.Description
+End Sub
 
 '###################################################################################################
 'clsCmHtmlGenerator.generate()

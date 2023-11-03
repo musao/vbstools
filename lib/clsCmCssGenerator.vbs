@@ -1,6 +1,6 @@
 '***************************************************************************************************
 'FILENAME                    : clsCmCssGenerator.vbs
-'Overview                    : CSSを生成する
+'Overview                    : CSS生成クラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
 'Histroy
@@ -83,7 +83,11 @@ Class clsCmCssGenerator
     Public Property Let selector( _
         byVal asSelector _
         )
-        PoTagInfo.Item("selector") = asSelector
+        If new_Re("^[!-~][ -~]*$", "i").Test(asSelector) Then
+            PoTagInfo.Item("selector") = asSelector
+        Else
+            Err.Raise 1032, "clsCmCssGenerator.vbs:clsCmCssGenerator+selector()", "セレクタには半角以外の文字を指定できません。"
+        End If
     End Property
     
     '***************************************************************************************************

@@ -1,6 +1,6 @@
 '***************************************************************************************************
 'FILENAME                    : clsCmHtmlGenerator.vbs
-'Overview                    : HTMLを生成する
+'Overview                    : HTML生成クラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
 'Histroy
@@ -101,7 +101,11 @@ Class clsCmHtmlGenerator
     Public Property Let element( _
         byVal asElement _
         )
-        PoTagInfo.Item("element") = asElement
+        If new_Re("^\w+$", "i").Test(asElement) Then
+            PoTagInfo.Item("element") = asElement
+        Else
+            Err.Raise 1032, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator+element()", "要素（element）には半角英字以外の文字を指定できません。"
+        End If
     End Property
     
     '***************************************************************************************************

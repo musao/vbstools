@@ -539,6 +539,52 @@ Private Function new_ArrSplit( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_HtmlOf()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : HTML生成クラスのインスタンスを返す
+'Argument
+'     asElement              : 要素
+'Return Value
+'     HTML生成クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_HtmlOf( _
+    byVal asElement _
+    )
+    Dim oHtml : Set oHtml = New clsCmHtmlGenerator
+    oHtml.element = asElement
+    Set new_HtmlOf = oHtml
+    Set oHtml = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_CssOf()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : CSS生成クラスのインスタンスを返す
+'Argument
+'     asSelector             : セレクタ
+'Return Value
+'     CSS生成クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_CssOf( _
+    byVal asSelector _
+    )
+    Dim oCss : Set oCss = New clsCmCssGenerator
+    oCss.selector = asSelector
+    Set new_CssOf = oCss
+    Set oCss = Nothing
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_Char()
 'Overview                    : インスタンス生成関数
 'Detailed Description        : 文字種類管理クラスのインスタンスを返す
