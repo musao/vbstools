@@ -80,6 +80,14 @@ Sub Test_cf_pushMulti_AddIsArray_ArrNotAvailable
     
     assertAllElements e, a
 End Sub
+Sub Test_cf_pushMulti_AddIsZeroArray
+    Dim a,d(),e
+    Redim a(0)
+    e = Array(Empty)
+    cf_pushMulti a, d
+    
+    assertAllElements e, a
+End Sub
 Sub Test_cf_pushMulti_AddIsNotArray_ArrAvailable
     Dim a,d,e
     Redim a(0)

@@ -231,6 +231,39 @@ Sub Test_func_MathRound_d9
     Next
 End Sub
 
+'###################################################################################################
+'math_log2()
+Sub Test_math_log2
+    dim d,i,al,e,a
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"antilogarithm",1024 ,"expected",10 )) _
+            , new_DicWith(Array(  "No",2 ,"antilogarithm",0.125 ,"expected",-3 )) _
+            )
+    For Each i In d
+        al = i.Item("antilogarithm")
+        e = i.Item("expected")
+        a = math_log2(al)
+        AssertEqualWithMessage Cstr(e), Cstr(a), "No = "&i.Item("No")&", antilogarithm = "&al
+    Next
+End Sub
+
+'###################################################################################################
+'func_MathLog()
+Sub Test_func_MathLog
+    dim d,i,b,al,e,a
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"base",2 ,"antilogarithm",4 ,"expected",2 )) _
+            , new_DicWith(Array(  "No",2 ,"base",10 ,"antilogarithm",0.01 ,"expected",-2 )) _
+            )
+    For Each i In d
+        b = i.Item("base")
+        al = i.Item("antilogarithm")
+        e = i.Item("expected")
+        a = func_MathLog(b,al)
+        AssertEqualWithMessage Cstr(e), Cstr(a), "No = "&i.Item("No")& ", base = "&b&", antilogarithm = "&al
+    Next
+End Sub
+
 ' Local Variables:
 ' mode: Visual-Basic
 ' indent-tabs-mode: nil

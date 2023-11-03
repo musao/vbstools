@@ -124,8 +124,8 @@ Private Sub cf_pushMulti( _
         '配列（avArr）が要素を持たない場合
             avArr = avAdd
         End If
-    Else
-    '追加する配列（avAdd）が要素を持たない場合
+    Elseif Not IsArray(avAdd) Then
+    '追加する配列（avAdd）が要素を持たず配列でない場合
         cf_push avArr, avAdd
     End If
     On Error Goto 0
@@ -593,11 +593,11 @@ Private Function new_Func( _
     sSoruceCode = Replace(sSoruceCode, "'", """")
     
     '関数名（仮名）を作る
-    Dim vCharList : vCharList = new_Char().getCharList(5)
+    With new_Char()
+        Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
+    End With
     cf_push vCharList, "_"
     Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(vCharList, 10)
-'    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 0, vCharList)
-'    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(10, 5, Array("_"))
     
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
@@ -903,6 +903,26 @@ Private Function math_rand( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : math_log2()
+'Overview                    : 2が底の対数
+'Detailed Description        : 工事中
+'Argument
+'     adbAntilogarithm       : 真数
+'Return Value
+'     冪指数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_log2( _
+    byVal adbAntilogarithm _
+    )
+    math_log2 = func_MathLog(2, adbAntilogarithm)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_MathRound()
 'Overview                    : 数値を丸める
 'Detailed Description        : 符号を無視して絶対値を丸める
@@ -948,6 +968,28 @@ Private Function func_MathRound( _
     Else
         func_MathRound = Cdbl( Cstr( Int(dbTemp) * 10^(-1*alPlace) ) )
     End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_MathLog()
+'Overview                    : 引数を底とする対数
+'Detailed Description        : 工事中
+'Argument
+'     adbBase                : 底
+'     adbAntilogarithm       : 真数
+'Return Value
+'     冪指数
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_MathLog( _
+    byVal adbBase _
+    , byVal adbAntilogarithm _
+    )
+    func_MathLog = log(adbAntilogarithm)/log(adbBase)
 End Function
 
 

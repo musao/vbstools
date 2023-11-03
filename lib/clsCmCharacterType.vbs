@@ -74,6 +74,120 @@ Class clsCmCharacterType
     End Sub
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get type*()
+    'Overview                    : 文字の種類の値を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     文字の種類の値
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/11/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get typeHalfWidthAlphabetUppercase()
+        typeHalfWidthAlphabetUppercase = 2^0
+    End Property
+    Public Property Get typeHalfWidthAlphabetLowercase()
+        typeHalfWidthAlphabetLowercase = 2^1
+    End Property
+    Public Property Get typeHalfWidthNumbers()
+        typeHalfWidthNumbers = 2^2
+    End Property
+    Public Property Get typeHalfWidthSymbol()
+        typeHalfWidthSymbol = 2^3
+    End Property
+    Public Property Get typeHalfWidthKatakana()
+        typeHalfWidthKatakana = 2^4
+    End Property
+    Public Property Get typeHalfWidthKatakanaSymbol()
+        typeHalfWidthKatakanaSymbol = 2^5
+    End Property
+    Public Property Get typeFullWidthAlphabeticUppercase()
+        typeFullWidthAlphabeticUppercase = 2^6
+    End Property
+    Public Property Get typeFullWidthAlphabeticLowercase()
+        typeFullWidthAlphabeticLowercase = 2^7
+    End Property
+    Public Property Get typeFullWidthNumbers()
+        typeFullWidthNumbers = 2^8
+    End Property
+    Public Property Get typeFullWidthSymbol()
+        typeFullWidthSymbol = 2^9
+    End Property
+    Public Property Get typeFullWidthHiragana()
+        typeFullWidthHiragana = 2^10
+    End Property
+    Public Property Get typeFullWidthKatakana()
+        typeFullWidthKatakana = 2^11
+    End Property
+    Public Property Get typeFullWidthGreekCyrillicUppercase()
+        typeFullWidthGreekCyrillicUppercase = 2^12
+    End Property
+    Public Property Get typeFullWidthGreekCyrillicLowercase()
+        typeFullWidthGreekCyrillicLowercase = 2^13
+    End Property
+    Public Property Get typeFullWidthLineFrame()
+        typeFullWidthLineFrame = 2^14
+    End Property
+    Public Property Get typeFullWidthKanjiLevel1()
+        typeFullWidthKanjiLevel1 = 2^15
+    End Property
+    Public Property Get typeFullWidthKanjiLevel2()
+        typeFullWidthKanjiLevel2 = 2^16
+    End Property
+    '全て
+    Public Property Get typeAll()
+        Dim i,lStt,lEnd,lRet : lRet = 0
+        lStt = 0
+        lEnd = Cl_MAX_POWER_OF_2
+        For i=lStt To lEnd
+            lRet = lRet + 2^i
+        Next
+        typeAll = lRet
+    End Property
+    '半角のグループ
+    Public Property Get typeHalfWidthAlphanumeric()
+        Dim i,lStt,lEnd,lRet : lRet = 0
+        lStt = math_log2(typeHalfWidthAlphabetUppercase)
+        lEnd = math_log2(typeHalfWidthNumbers)
+        For i=lStt To lEnd
+            lRet = lRet + 2^i
+        Next
+        typeHalfWidthAlphanumeric = lRet
+    End Property
+    Public Property Get typeHalfWidthAlphanumericSymbols()
+        Dim i,lStt,lEnd,lRet : lRet = 0
+        lStt = math_log2(typeHalfWidthAlphabetUppercase)
+        lEnd = math_log2(typeHalfWidthSymbol)
+        For i=lStt To lEnd
+            lRet = lRet + 2^i
+        Next
+        typeHalfWidthAlphanumericSymbols = lRet
+    End Property
+    Public Property Get typeHalfWidthAll()
+        Dim i,lStt,lEnd,lRet : lRet = 0
+        lStt = math_log2(typeHalfWidthAlphabetUppercase)
+        lEnd = math_log2(typeHalfWidthKatakanaSymbol)
+        For i=lStt To lEnd
+            lRet = lRet + 2^i
+        Next
+        typeHalfWidthAll = lRet
+    End Property
+    '全角のグループ
+    Public Property Get typeFullWidthAll()
+        Dim i,lStt,lEnd,lRet : lRet = 0
+        lStt = math_log2(typeFullWidthAlphabeticUppercase)
+        lEnd = math_log2(typeFullWidthKanjiLevel2)
+        For i=lStt To lEnd
+            lRet = lRet + 2^i
+        Next
+        typeFullWidthAll = lRet
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : whatType()
     'Overview                    : 文字の種類を返す
     'Detailed Description        : 工事中
@@ -145,7 +259,7 @@ Class clsCmCharacterType
         )
         Dim lType : lType = alType
         Dim lPowerOf2 : lPowerOf2 = Cl_MAX_POWER_OF_2
-        Dim vRet : Set vRet = new_Arr()
+        Dim vRet
         Dim lQuotient,lDivide
         Do Until lPowerOf2<0
             lDivide = 2^lPowerOf2
@@ -155,11 +269,11 @@ Class clsCmCharacterType
                 If Not PoType2Chars.Exists(lDivide) Then
                     sub_CmCharTypeCreateDefinitionsByCharacterType lPowerOf2
                 End If
-                vRet.pushMulti PoType2Chars.Item(lDivide)
+                cf_pushMulti vRet, PoType2Chars.Item(lDivide)
             End If
             lPowerOf2 = lPowerOf2 - 1
         Loop
-        getCharList = vRet.items()
+        getCharList = vRet
     End Function
     
 

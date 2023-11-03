@@ -21,6 +21,130 @@ Sub Test_clsCmCharacterType
 End Sub
 
 '###################################################################################################
+'clsCmCharacterType.type*()
+Sub Test_clsCmCharacterType_type_
+    Dim ao,a,e
+    Set ao = new clsCmCharacterType
+
+    e = 2^0
+    a = ao.typeHalfWidthAlphabetUppercase
+    AssertEqualWithMessage e, a, "typeHalfWidthAlphabetUppercase"
+
+    e = e*2
+    a = ao.typeHalfWidthAlphabetLowercase
+    AssertEqualWithMessage e, a, "typeHalfWidthAlphabetLowercase"
+
+    e = e*2
+    a = ao.typeHalfWidthNumbers
+    AssertEqualWithMessage e, a, "typeHalfWidthNumbers"
+
+    e = e*2
+    a = ao.typeHalfWidthSymbol
+    AssertEqualWithMessage e, a, "typeHalfWidthSymbol"
+
+    e = e*2
+    a = ao.typeHalfWidthKatakana
+    AssertEqualWithMessage e, a, "typeHalfWidthKatakana"
+
+    e = e*2
+    a = ao.typeHalfWidthKatakanaSymbol
+    AssertEqualWithMessage e, a, "typeHalfWidthKatakanaSymbol"
+
+    e = e*2
+    a = ao.typeFullWidthAlphabeticUppercase
+    AssertEqualWithMessage e, a, "typeFullWidthAlphabeticUppercase"
+
+    e = e*2
+    a = ao.typeFullWidthAlphabeticLowercase
+    AssertEqualWithMessage e, a, "typeFullWidthAlphabeticLowercase"
+
+    e = e*2
+    a = ao.typeFullWidthNumbers
+    AssertEqualWithMessage e, a, "typeFullWidthNumbers"
+
+    e = e*2
+    a = ao.typeFullWidthSymbol
+    AssertEqualWithMessage e, a, "typeFullWidthSymbol"
+
+    e = e*2
+    a = ao.typeFullWidthHiragana
+    AssertEqualWithMessage e, a, "typeFullWidthHiragana"
+
+    e = e*2
+    a = ao.typeFullWidthKatakana
+    AssertEqualWithMessage e, a, "typeFullWidthKatakana"
+
+    e = e*2
+    a = ao.typeFullWidthGreekCyrillicUppercase
+    AssertEqualWithMessage e, a, "typeFullWidthGreekCyrillicUppercase"
+
+    e = e*2
+    a = ao.typeFullWidthGreekCyrillicLowercase
+    AssertEqualWithMessage e, a, "typeFullWidthGreekCyrillicLowercase"
+
+    e = e*2
+    a = ao.typeFullWidthLineFrame
+    AssertEqualWithMessage e, a, "typeFullWidthLineFrame"
+
+    e = e*2
+    a = ao.typeFullWidthKanjiLevel1
+    AssertEqualWithMessage e, a, "typeFullWidthKanjiLevel1"
+
+    e = e*2
+    a = ao.typeFullWidthKanjiLevel2
+    AssertEqualWithMessage e, a, "typeFullWidthKanjiLevel2"
+End Sub
+Sub Test_clsCmCharacterType_typeSum_
+    Dim ao,a,e,i,stt,ed
+    Set ao = new clsCmCharacterType
+
+    stt = math_log2(ao.typeHalfWidthAlphabetUppercase)
+    ed = math_log2(ao.typeFullWidthKanjiLevel2)
+    e = 0
+    For i=stt To ed
+        e = e + 2^i
+    Next
+    a = ao.typeAll
+    AssertEqualWithMessage e, a, "typeAll"
+
+    stt = math_log2(ao.typeHalfWidthAlphabetUppercase)
+    ed = math_log2(ao.typeHalfWidthNumbers)
+    e = 0
+    For i=stt To ed
+        e = e + 2^i
+    Next
+    a = ao.typeHalfWidthAlphanumeric
+    AssertEqualWithMessage e, a, "typeHalfWidthAlphanumeric"
+
+    stt = math_log2(ao.typeHalfWidthAlphabetUppercase)
+    ed = math_log2(ao.typeHalfWidthSymbol)
+    e = 0
+    For i=stt To ed
+        e = e + 2^i
+    Next
+    a = ao.typeHalfWidthAlphanumericSymbols
+    AssertEqualWithMessage e, a, "typeHalfWidthAlphanumericSymbols"
+
+    stt = math_log2(ao.typeHalfWidthAlphabetUppercase)
+    ed = math_log2(ao.typeHalfWidthKatakanaSymbol)
+    e = 0
+    For i=stt To ed
+        e = e + 2^i
+    Next
+    a = ao.typeHalfWidthAll
+    AssertEqualWithMessage e, a, "typeHalfWidthAll"
+
+    stt = math_log2(ao.typeFullWidthAlphabeticUppercase)
+    ed = math_log2(ao.typeFullWidthKanjiLevel2)
+    e = 0
+    For i=stt To ed
+        e = e + 2^i
+    Next
+    a = ao.typeFullWidthAll
+    AssertEqualWithMessage e, a, "typeFullWidthAll"
+End Sub
+
+'###################################################################################################
 'clsCmCharacterType.whatType()
 Sub Test_clsCmCharacterType_whatType
     Dim ao,a,d,dc,e,i
