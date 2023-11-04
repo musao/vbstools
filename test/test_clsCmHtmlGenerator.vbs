@@ -107,7 +107,7 @@ Sub Test_clsCmHtmlGenerator_element_Err
     ao.element = d
 
     AssertEqual 1032, Err.Number
-    AssertEqual "要素（element）には半角英字以外の文字を指定できません。", Err.Description
+    AssertEqual "要素（element）には半角以外の文字を指定できません。", Err.Description
 End Sub
 
 '###################################################################################################
@@ -187,6 +187,33 @@ Sub Test_clsCmHtmlGenerator_generate_Err
 
     AssertEqualWithMessage 17, Err.Number, "Err.Number"
     AssertEqualWithMessage "要素がないHTMLタグは生成できません。", Err.Description, "Err.Description"
+End Sub
+
+'###################################################################################################
+'clsCmHtmlGenerator.generate()Encoding
+Sub Test_clsCmHtmlGenerator_generate_Encoding
+    Dim ao,a,d,dc,e,i
+    
+    d = Array( _
+        new_DicWith(Array(  "No",1 ,"Cont","'fuga"   ,"Expected","&#39;fuga")) _
+        , new_DicWith(Array("No",2 ,"Cont","fu""ga"   ,"Expected","fu&quot;ga")) _
+        , new_DicWith(Array("No",3 ,"Cont","fuga&"   ,"Expected","fuga&amp;")) _
+        , new_DicWith(Array("No",4 ,"Cont","<fuga"   ,"Expected","&lt;fuga")) _
+        , new_DicWith(Array("No",5 ,"Cont","fuga>"   ,"Expected","fuga&gt;")) _
+        , new_DicWith(Array("No",6 ,"Cont","<'fu""ga&>"   ,"Expected","&lt;&#39;fu&quot;ga&amp;&gt;")) _
+        )
+    
+    For Each i In d
+        dc = i.Item("Cont")
+        e = "<hoge>"&i.Item("Expected")&"</hoge>"
+
+        Set ao = new clsCmHtmlGenerator
+        ao.element = "hoge"
+        ao.addContent dc
+        a = ao.generate
+
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&", Cont="&dc
+    Next
 End Sub
 
 ' Local Variables:

@@ -101,10 +101,10 @@ Class clsCmHtmlGenerator
     Public Property Let element( _
         byVal asElement _
         )
-        If new_Re("^\w+$", "i").Test(asElement) Then
+        If new_Re("^[!-~][ -~]*$", "i").Test(asElement) Then
             PoTagInfo.Item("element") = asElement
         Else
-            Err.Raise 1032, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator+element()", "要素（element）には半角英字以外の文字を指定できません。"
+            Err.Raise 1032, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator+element()", "要素（element）には半角以外の文字を指定できません。"
         End If
     End Property
     
@@ -306,10 +306,42 @@ Class clsCmHtmlGenerator
         On Error Resume Next
         sRet = aoCont.generate()
         If Err.Number<>0 Then
-            sRet = aoCont
+            sRet = func_CmHtmlGenHtmlEncoding(aoCont)
         End If
         On Error GoTo 0
         func_CmHtmlGenEditContent = sRet
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmHtmlGenHtmlEncoding()
+    'Overview                    : HTMLエンコードする
+    'Detailed Description        : 工事中
+    'Argument
+    '     asTarget               : HTMLエンコードする文字列
+    'Return Value
+    '     エンコードした文字列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/11/04         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmHtmlGenHtmlEncoding( _
+        byRef asTarget _
+        )
+        Dim vSettings : vSettings = Array( _
+            Array("&", "&amp;") _
+            , Array("'", "&#39;") _
+            , Array("""", "&quot;") _
+            , Array("<", "&lt;") _
+            , Array(">", "&gt;") _
+            )
+        Dim sTarget : sTarget = asTarget
+        Dim i
+        For Each i In vSettings
+            sTarget = Replace(sTarget, i(0), i(1))
+        Next
+        func_CmHtmlGenHtmlEncoding = sTarget
     End Function
 
 End Class

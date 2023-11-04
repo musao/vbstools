@@ -289,7 +289,7 @@ Sub Test_new_HtmlOf_Err
     Dim a : Set a = new_HtmlOf("Ｈｏｇｅ")
     
     AssertEqual 1032, Err.Number
-    AssertEqual "要素（element）には半角英字以外の文字を指定できません。", Err.Description
+    AssertEqual "要素（element）には半角以外の文字を指定できません。", Err.Description
     AssertEqual Empty, a
 End Sub
 
