@@ -643,7 +643,7 @@ Private Function new_Func( _
         Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
     End With
     cf_push vCharList, "_"
-    Dim sFuncName : sFuncName = "anonymous_" & func_CM_UtilGenerateRandomString(vCharList, 10)
+    Dim sFuncName : sFuncName = "anonymous_" & util_randStr(vCharList, 10)
     
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
@@ -1038,6 +1038,54 @@ Private Function func_MathLog( _
     func_MathLog = log(adbAntilogarithm)/log(adbBase)
 End Function
 
+'###################################################################################################
+'ユーティリティ系の関数
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : util_randStr()
+'Overview                    : ランダムな文字列を生成する
+'Detailed Description        : 指定した文字（配列）、指定した回数でランダムな文字列を生成する
+'Argument
+'     avStrings              : 文字の配列
+'     alTimes                : 回数
+'Return Value
+'     生成した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_randStr( _
+    byRef avStrings _
+    , byVal alTimes _
+    )
+    Dim lPos, sRet
+    sRet = ""
+    For lPos = 1 To alTimes
+        sRet = sRet & avStrings( math_rand(0, Ubound(avStrings), 0) )
+    Next
+    util_randStr = sRet
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '###################################################################################################
 'エクセル系
@@ -1147,7 +1195,7 @@ End Function
 Private Function func_CM_FsDeleteFile( _
     byVal asPath _
     ) 
-    If Not func_CM_FsFileExists(asPath) Then func_CM_FsDeleteFile = False
+    If Not new_Fso().FileExists(asPath) Then func_CM_FsDeleteFile = False
     func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(new_Fso(), asPath), Empty, Empty).Item("Result")
     
 '    On Error Resume Next
@@ -1176,7 +1224,7 @@ End Function
 Private Function func_CM_FsDeleteFolder( _
     byVal asPath _
     ) 
-    If Not func_CM_FsFolderExists(asPath) Then func_CM_FsDeleteFolder = False
+    If Not new_Fso().FolderExists(asPath) Then func_CM_FsDeleteFolder = False
     On Error Resume Next
     new_Fso().DeleteFolder(asPath)
     func_CM_FsDeleteFolder = True
@@ -1204,8 +1252,8 @@ Private Function func_CM_FsDeleteFsObject( _
     byVal asPath _
     )
     func_CM_FsDeleteFsObject = False
-    If func_CM_FsFileExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFile(asPath)
-    If func_CM_FsFolderExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFolder(asPath)
+    If new_Fso().FileExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFile(asPath)
+    If new_Fso().FolderExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFolder(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1227,7 +1275,7 @@ Private Function func_CM_FsCopyFile( _
     byVal asPathFrom _
     , byVal asPathTo _
     ) 
-    If Not func_CM_FsFileExists(asPathFrom) Then func_CM_FsCopyFile = False
+    If Not new_Fso().FileExists(asPathFrom) Then func_CM_FsCopyFile = False
     On Error Resume Next
     Call new_Fso().CopyFile(asPathFrom, asPathTo)
     func_CM_FsCopyFile = True
@@ -1256,7 +1304,7 @@ Private Function func_CM_FsCopyFolder( _
     byVal asPathFrom _
     , byVal asPathTo _
     ) 
-    If Not func_CM_FsFolderExists(asPathFrom) Then func_CM_FsCopyFolder = False
+    If Not new_Fso().FolderExists(asPathFrom) Then func_CM_FsCopyFolder = False
     On Error Resume Next
     Call new_Fso().CopyFolder(asPathFrom, asPathTo)
     func_CM_FsCopyFolder = True
@@ -1286,8 +1334,8 @@ Private Function func_CM_FsCopyFsObject( _
     , byVal asPathTo _
     )
     func_CM_FsCopyFsObject = False
-    If func_CM_FsFileExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFile(asPathFrom, asPathTo)
-    If func_CM_FsFolderExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFolder(asPathFrom, asPathTo)
+    If new_Fso().FileExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFile(asPathFrom, asPathTo)
+    If new_Fso().FolderExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFolder(asPathFrom, asPathTo)
 End Function
 
 '***************************************************************************************************
@@ -1309,7 +1357,7 @@ Private Function func_CM_FsMoveFile( _
     byVal asPathFrom _
     , byVal asPathTo _
     ) 
-    If Not func_CM_FsFileExists(asPathFrom) Then func_CM_FsMoveFile = False
+    If Not new_Fso().FileExists(asPathFrom) Then func_CM_FsMoveFile = False
     On Error Resume Next
     Call new_Fso().MoveFile(asPathFrom, asPathTo)
     func_CM_FsMoveFile = True
@@ -1338,7 +1386,7 @@ Private Function func_CM_FsMoveFolder( _
     byVal asPathFrom _
     , byVal asPathTo _
     ) 
-    If Not func_CM_FsFolderExists(asPathFrom) Then func_CM_FsMoveFolder = False
+    If Not new_Fso().FolderExists(asPathFrom) Then func_CM_FsMoveFolder = False
     On Error Resume Next
     Call new_Fso().MoveFolder(asPathFrom, asPathTo)
     func_CM_FsMoveFolder = True
@@ -1368,8 +1416,8 @@ Private Function func_CM_FsMoveFsObject( _
     , byVal asPathTo _
     )
     func_CM_FsMoveFsObject = False
-    If func_CM_FsFileExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFile(asPathFrom, asPathTo)
-    If func_CM_FsFolderExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFolder(asPathFrom, asPathTo)
+    If new_Fso().FileExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFile(asPathFrom, asPathTo)
+    If new_Fso().FolderExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFolder(asPathFrom, asPathTo)
 End Function
 
 '***************************************************************************************************
@@ -1454,45 +1502,45 @@ Private Function func_CM_FsBuildPath( _
     func_CM_FsBuildPath = new_Fso().BuildPath(asFolderPath, asItemName)
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsFileExists()
-'Overview                    : ファイルの存在確認
-'Detailed Description        : FileSystemObjectのFileExists()と同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     結果 True:存在する / False:存在しない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsFileExists( _
-    byVal asPath _
-    ) 
-    func_CM_FsFileExists = new_Fso().FileExists(asPath)
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_FsFileExists()
+''Overview                    : ファイルの存在確認
+''Detailed Description        : FileSystemObjectのFileExists()と同等
+''Argument
+''     asPath                 : パス
+''Return Value
+''     結果 True:存在する / False:存在しない
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/09/27         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_FsFileExists( _
+'    byVal asPath _
+'    ) 
+'    func_CM_FsFileExists = new_Fso().FileExists(asPath)
+'End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsFolderExists()
-'Overview                    : フォルダの存在確認
-'Detailed Description        : FileSystemObjectのFolderExists()と同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     結果 True:存在する / False:存在しない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/16         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsFolderExists( _
-    byVal asPath _
-    ) 
-    func_CM_FsFolderExists = new_Fso().FolderExists(asPath)
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_FsFolderExists()
+''Overview                    : フォルダの存在確認
+''Detailed Description        : FileSystemObjectのFolderExists()と同等
+''Argument
+''     asPath                 : パス
+''Return Value
+''     結果 True:存在する / False:存在しない
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/10/16         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_FsFolderExists( _
+'    byVal asPath _
+'    ) 
+'    func_CM_FsFolderExists = new_Fso().FolderExists(asPath)
+'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetFile()
@@ -1552,8 +1600,8 @@ Private Function func_CM_FsGetFsObject( _
     byVal asPath _
     )
     Set func_CM_FsGetFsObject = Nothing
-    If func_CM_FsFileExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFile(asPath)
-    If func_CM_FsFolderExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFolder(asPath)
+    If new_Fso().FileExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFile(asPath)
+    If new_Fso().FolderExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFolder(asPath)
 End Function
 
 '***************************************************************************************************
@@ -1614,7 +1662,7 @@ Private Function func_CM_FsGetFsObjects( _
     byVal asPath _
     )
     Set func_CM_FsGetFsObjects = Nothing
-    If Not func_CM_FsFolderExists(asPath) Then Exit Function
+    If Not new_Fso().FolderExists(asPath) Then Exit Function
     Dim oTemp : Set oTemp = new_Dic()
     With oTemp
         .Add "Filse", func_CM_FsGetFiles(asPath)
@@ -1729,7 +1777,7 @@ Private Function func_CM_FsGetFilePathWithCreateParentFolder( _
     byVal asParentFolderPath _
     , byVal asFileName _
     )
-    If Not(func_CM_FsFolderExists(asParentFolderPath)) Then func_CM_FsCreateFolder(asParentFolderPath)
+    If Not(new_Fso().FolderExists(asParentFolderPath)) Then func_CM_FsCreateFolder(asParentFolderPath)
     func_CM_FsGetFilePathWithCreateParentFolder = func_CM_FsBuildPath(asParentFolderPath, asFileName)
 End Function
 
@@ -2070,25 +2118,25 @@ End Function
 'その他
 '###################################################################################################
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_GetObjectByNameFromCollection()
-'Overview                    : コレクションから指定したnameのメンバーを取得する
-'Detailed Description        : エラー処理は行わない
-'Argument
-'     aoArr                  : 0番目　コレクション、1番目　name
-'Return Value
-'     該当するメンバー
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_GetObjectByNameFromCollection( _
-    byRef aoArr _
-    )
-    cf_bind func_CM_GetObjectByNameFromCollection, aoArr(0).Item(aoArr(1))
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_GetObjectByNameFromCollection()
+''Overview                    : コレクションから指定したnameのメンバーを取得する
+''Detailed Description        : エラー処理は行わない
+''Argument
+''     aoArr                  : 0番目　コレクション、1番目　name
+''Return Value
+''     該当するメンバー
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/09/27         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_GetObjectByNameFromCollection( _
+'    byRef aoArr _
+'    )
+'    cf_bind func_CM_GetObjectByNameFromCollection, aoArr(0).Item(aoArr(1))
+'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : sub_CM_Swap()
@@ -2864,33 +2912,6 @@ Private Function func_CM_UtilSortDefaultFunc( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilGenerateRandomString()
-'Overview                    : ランダムな文字列を生成する
-'Detailed Description        : 指定した文字（配列）、指定した回数でランダムな文字列を生成する
-'Argument
-'     avStrings              : 文字の配列
-'     alTimes                : 回数
-'Return Value
-'     生成した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilGenerateRandomString( _
-    byRef avStrings _
-    , byVal alTimes _
-    )
-    Dim lPos, sRet
-    sRet = ""
-    For lPos = 1 To alTimes
-        sRet = sRet & avStrings( math_rand(0, Ubound(avStrings), 0) )
-    Next
-    func_CM_UtilGenerateRandomString = sRet
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : sub_CM_UtilLogger()
 'Overview                    : ログ出力する
 'Detailed Description        : 引数の情報にタイムスタンプを付加してファイル出力する
@@ -3136,6 +3157,6 @@ End Function
 Private Function func_CM_UtilJoin( _
     byRef avArr _
     , byVal asDel _
-)
+    )
     func_CM_UtilJoin = Join(avArr, asDel)
 End Function

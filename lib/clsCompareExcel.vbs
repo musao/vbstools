@@ -68,7 +68,7 @@ Class clsCompareExcel
     Public Property Let pathFrom( _
         byVal asPath _
         )
-        If func_CM_FsFileExists(asPath) Then PsPathFrom = asPath Else PsPathFrom = ""
+        If new_Fso().FileExists(asPath) Then PsPathFrom = asPath Else PsPathFrom = ""
     End Property
     
     '***************************************************************************************************
@@ -106,7 +106,7 @@ Class clsCompareExcel
     Public Property Let pathTo( _
         byVal asPath _
         )
-        If func_CM_FsFileExists(asPath) Then PsPathTo = asPath Else PsPathTo = ""
+        If new_Fso().FileExists(asPath) Then PsPathTo = asPath Else PsPathTo = ""
     End Property
     
     '***************************************************************************************************
@@ -583,7 +583,7 @@ Class clsCompareExcel
         'オートシェイプの比較
         Dim oAutoshapeA, oAutoshapeB, oRet, sTextA
         For Each oAutoshapeA In aoWorkbookForResults.Worksheets(asSheetNameA).Shapes
-            Set oRet = cf_tryCatch(Getref("func_CM_GetObjectByNameFromCollection"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
+            Set oRet = cf_tryCatch(new_Func("(a)=>a(0).Item(a(1))"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
             If oRet.Item("Result") Then
                 Set oAutoshapeB = oRet.Item("Return")
                 Set oRet = cf_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA, Empty, Empty)

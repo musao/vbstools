@@ -108,8 +108,8 @@ Private Sub sub_BackupFilesGetParameters( _
     For Each sParam In WScript.Arguments
         'ファイルが存在する場合1、フォルダが存在する場合2
         lFileFolderKbn = 0
-        If func_CM_FsFileExists(sParam) Then lFileFolderKbn = 1
-        If func_CM_FsFolderExists(sParam) Then lFileFolderKbn = 2
+        If new_Fso().FileExists(sParam) Then lFileFolderKbn = 1
+        If new_Fso().FolderExists(sParam) Then lFileFolderKbn = 2
         
         If lFileFolderKbn Then
         'ファイルまたはフォルダが存在する場合パラメータを取得
@@ -364,7 +364,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
     Dim sTemp : Dim lKey
     For Each lKey In oFolders.Keys
         sTemp = func_CM_FsBuildPath(sParentFolderPath, oFolders.Item(lKey))
-        If func_CM_FsFolderExists(sTemp) Then
+        If new_Fso().FolderExists(sTemp) Then
             sTargetFolder = sTemp
             Exit For
         End If

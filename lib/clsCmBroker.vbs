@@ -1,7 +1,7 @@
 '***************************************************************************************************
 'FILENAME                    : clsCmBroker.vbs
-'Overview                    : 出版-購読型モデル（Publish/subscribe）のブローカー
-'Detailed Description        : 工事中
+'Overview                    : ブローカークラス
+'Detailed Description        : 出版-購読型モデル（Publish/subscribe）のブローカーの役割をする
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes

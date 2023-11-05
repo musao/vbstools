@@ -67,7 +67,7 @@ Wscript.Quit
 Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath(), 8, True, -2)
-    '出版-購読型（Publish/subscribe）インスタンスの設定
+    'ブローカークラスのインスタンスの設定
     Set PoBroker = new_Broker()
     PoBroker.subscribe "log", GetRef("sub_CmpExcelLogger")
     'パラメータ格納用汎用オブジェクト宣言

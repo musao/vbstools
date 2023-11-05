@@ -306,27 +306,28 @@ Class clsCmHtmlGenerator
         On Error Resume Next
         sRet = aoCont.generate()
         If Err.Number<>0 Then
-            sRet = func_CmHtmlGenHtmlEncoding(aoCont)
+            sRet = func_CmHtmlGenHtmlEntityReference(aoCont)
         End If
         On Error GoTo 0
         func_CmHtmlGenEditContent = sRet
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlGenHtmlEncoding()
-    'Overview                    : HTMLエンコードする
-    'Detailed Description        : 工事中
+    'Function/Sub Name           : func_CmHtmlGenHtmlEntityReference()
+    'Overview                    : HTMLの特殊文字を実体参照（entity reference）処理する
+    'Detailed Description        : HTMLとして特殊な意味を持つ文字（特殊文字またはメタ文字）を意味を持たない
+    '                              別の文字列に置換する
     'Argument
-    '     asTarget               : HTMLエンコードする文字列
+    '     asTarget               : 実体参照処理する文字列
     'Return Value
-    '     エンコードした文字列
+    '     実体参照処理した文字列
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlGenHtmlEncoding( _
+    Private Function func_CmHtmlGenHtmlEntityReference( _
         byRef asTarget _
         )
         Dim vSettings : vSettings = Array( _
@@ -341,7 +342,7 @@ Class clsCmHtmlGenerator
         For Each i In vSettings
             sTarget = Replace(sTarget, i(0), i(1))
         Next
-        func_CmHtmlGenHtmlEncoding = sTarget
+        func_CmHtmlGenHtmlEntityReference = sTarget
     End Function
 
 End Class

@@ -190,8 +190,8 @@ Sub Test_clsCmHtmlGenerator_generate_Err
 End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.generate()Encoding
-Sub Test_clsCmHtmlGenerator_generate_Encoding
+'clsCmHtmlGenerator.generate()EntityReference
+Sub Test_clsCmHtmlGenerator_generate_EntityReference
     Dim ao,a,d,dc,e,i
     
     d = Array( _

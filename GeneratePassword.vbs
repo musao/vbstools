@@ -70,7 +70,7 @@ Wscript.Quit
 Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
-    '出版-購読型（Publish/subscribe）インスタンスの設定
+    'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
     oBroker.subscribe "log", GetRef("sub_GnrtPwLogger")
     'パラメータ格納用オブジェクト宣言
@@ -191,7 +191,7 @@ Private Sub sub_GnrtPwGenerate( _
     Dim vCharList : vCharList = new_Char().getCharList(lType)
     vCharList = Filter(vCharList, " ", False, vbBinaryCompare)
     If Not IsEmpty(vAdd) Then cf_pushMulti vCharList, vAdd
-    Dim sPw : sPw = func_CM_UtilGenerateRandomString(vCharList, lLength)
+    Dim sPw : sPw = util_randStr(vCharList, lLength)
     
     '★ログ出力
     sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw)
