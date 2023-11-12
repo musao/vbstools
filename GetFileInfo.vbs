@@ -73,7 +73,7 @@ Sub Main()
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
     sub_CM_ExcuteSub "sub_GetFileInfoGetParameters", oParams, oBroker
     
-    '引数のファイルパスをクリップボードに出力する
+    'ファイル情報の取得
     sub_CM_ExcuteSub "sub_GetFileInfoProc", oParams, oBroker
     
     'ログ出力をクローズ
@@ -111,8 +111,18 @@ Private Sub sub_GetFileInfoGetParameters( _
     sub_GetFileInfoLogger Array(9, "sub_GetFileInfoGetParameters", func_CM_ToStringArguments())
     
     'パラメータ格納用オブジェクトに設定
-    cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,vbNullString)
+    Dim oParam, oRet, oItem
+    Set oParam = new_Arr()
+    For Each oItem In oArg.Item("Unnamed").Items()
+        Set oRet = cf_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
+        If Not oRet.Item("Result") Then Set oRet = cf_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
+        If oRet.Item("Result") Then oParam.push oRet.Item("Return")
+    Next
+    cf_bindAt aoParams, "Param", oParam
     
+    Set oItem = Nothing
+    Set oRet = Nothing
+    Set oParam = Nothing
     Set oArg = Nothing
 End Sub
 
@@ -135,18 +145,58 @@ Private Sub sub_GetFileInfoProc( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
-    Dim oParam : Set oParam = aoParams.Item("Param")
-    
-    '一時ファイルに連結した引数を出力
-    Dim sTempFilePaths : sTempFilePaths = func_CM_FsGetTempFilePath() 
-    sub_CM_FsWriteFile sTempFilePaths, oParam.join(vbNewLine)
-    CreateObject("Wscript.Shell").Run "cmd /c clip <""" & sTempFilePaths & """", 0, True
-    
-    '一時ファイルを削除
-    func_CM_FsDeleteFile sTempFilePaths
-    
+    Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
+
+    'ファイル情報を取得
+    Dim oList : Set oList = new_Arr()
+    Do While oParam.length>0
+        oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
+    Loop
+
+    '重複を排除してpath順にソートする
+    cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.Path>n.Path"))
+
+    Set oList = Nothing
     Set oParam = Nothing
 End Sub
+
+'***************************************************************************************************
+'Processing Order            : 2-1
+'Function/Sub Name           : func_GetFileInfoProcGetFilesRecursion()
+'Overview                    : フォルダ配下の全ファイルを取得する
+'Detailed Description        : 工事中
+'Argument
+'     aoItem                 : ファイル/フォルダオブジェクト
+'Return Value
+'     ファイルオブジェクトの配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_GetFileInfoProcGetFilesRecursion( _
+    byRef aoItem _
+    )
+    If cf_isSame(TypeName(aoItem), "Folder") Then
+    'フォルダの場合
+        Dim oEle, vRet
+        'ファイルの取得
+        For Each oEle In aoItem.Files
+            cf_push vRet, oEle
+        Next
+        'フォルダの取得
+        For Each oEle In aoItem.SubFolders
+            cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursion(oEle)
+        Next
+        func_GetFileInfoProcGetFilesRecursion = vRet
+    Else
+    'ファイルの場合
+        func_GetFileInfoProcGetFilesRecursion = Array(aoItem)
+    End If
+
+End Function
+
 
 '***************************************************************************************************
 'Processing Order            : -

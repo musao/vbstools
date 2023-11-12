@@ -26,14 +26,10 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
-
-dim s : s = "C:\Users\89585\Documents\dev\vbs\otameshi.vbs"
-dim t : t = "C:\Users\89585\Documents\dev\vbs\"
-
-call msgbox(func_CM_FsIsSame(s,t))                                     'false
-call msgbox(func_CM_FsIsSame(s,func_CM_StrConvOnlyAlphabet(s, 2)))     'true
-call msgbox(func_CM_FsIsSame(func_CM_StrConvOnlyAlphabet(t, 1),t))     'true
-call msgbox(func_CM_FsIsSame("",t))                                    'false
+inputbox "","",TypeName(new_FileOf(WScript.ScriptFullName))
+inputbox "","",VarType(new_FileOf(WScript.ScriptFullName))
+inputbox "","",TypeName(new_FolderOf(new_Fso().GetParentFolderName(WScript.ScriptFullName)))
+inputbox "","",VarType(new_FolderOf(new_Fso().GetParentFolderName(WScript.ScriptFullName)))
 
 wscript.quit
 

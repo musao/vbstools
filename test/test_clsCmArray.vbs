@@ -861,7 +861,29 @@ Sub Test_clsCmArray_splice_Empty
     
 End Sub
 
-
+'###################################################################################################
+'clsCmArray.uniq()
+Sub Test_clsCmArray_uniq_ari
+    Dim e,d,a
+    d = Array(1,2,3,2,3)
+    e = Array(1,2,3)
+    Set a = new_ArrWith(d).uniq()
+    assertAllElements e, a
+End Sub
+Sub Test_clsCmArray_uniq_nasi
+    Dim e,d,a
+    d = Array(1,2,3)
+    e = Array(1,2,3)
+    Set a = new_ArrWith(d).uniq()
+    assertAllElements e, a
+End Sub
+Sub Test_clsCmArray_uniq_Empty
+    Dim e,d,a
+    d = Array()
+    e = Array()
+    Set a = new_ArrWith(d).uniq()
+    assertAllElements e, a
+End Sub
 
 
 

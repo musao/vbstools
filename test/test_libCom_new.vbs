@@ -62,6 +62,66 @@ Sub Test_new_Fso
 End Sub
 
 '###################################################################################################
+'new_FileOf()
+Sub Test_new_FileOf
+    Dim p,e,a
+    p = WScript.ScriptFullName
+    Set e = CreateObject("Scripting.FileSystemObject").GetFile(p)
+    Set a = new_FileOf(p)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_FileOf_Err
+    On Error Resume Next
+    Dim a : Set a = new_FileOf(vbNullString)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
+'new_FolderOf()
+Sub Test_new_FolderOf
+    Dim p,e,a
+    p = new_Fso().GetParentFolderName(WScript.ScriptFullName)
+    Set e = CreateObject("Scripting.FileSystemObject").GetFolder(p)
+    Set a = new_FolderOf(p)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_FolderOf_Err
+    On Error Resume Next
+    Dim a : Set a = new_FolderOf(vbNullString)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
+'new_DriveOf()
+Sub Test_new_DriveOf
+    Dim d,e,a
+    d = "c"
+    Set e = CreateObject("Scripting.FileSystemObject").GetDrive(d)
+    Set a = new_DriveOf(d)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_DriveOf_Err
+    On Error Resume Next
+    Dim a : Set a = new_DriveOf(vbNullString)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
 'new_Re()
 Sub Test_new_Re_Normal
     Dim e : Set e = New RegExp

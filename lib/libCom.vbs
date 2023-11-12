@@ -109,20 +109,22 @@ Private Sub cf_pushMulti( _
     , byRef avAdd _ 
     )
     On Error Resume Next
-    Dim lUbAdd : lUbAdd = Ubound(avAdd)
+    Dim lUbAdd,lIdx : lUbAdd = Ubound(avAdd)
     If Err.Number=0 Then
     '追加する配列（avAdd）が要素を持つ場合
         Dim lUb : lUb = Ubound(avArr)
         If Err.Number=0 Then 
         '配列（avArr）が要素を持つ場合
             Redim Preserve avArr(lUb+lUbAdd+1)
-            Dim lIdx
             For lIdx=0 To lUbAdd
                 cf_bind avArr(lUb+1+lIdx), avAdd(lIdx)
             Next
         Else
         '配列（avArr）が要素を持たない場合
-            avArr = avAdd
+            Redim avArr(Ubound(avAdd))
+            For lIdx=0 To Ubound(avArr)
+                cf_bind avArr(lIdx), avAdd(lIdx)
+            Next
         End If
     Elseif Not IsArray(avAdd) Then
     '追加する配列（avAdd）が要素を持たず配列でない場合
@@ -159,7 +161,11 @@ Private Function cf_tryCatch( _
     
     'tryブロックの処理
     On Error Resume Next
-    cf_bind oRet, aoTry(aoArgs)
+    If IsEmpty(aoArgs) Then
+        cf_bind oRet, aoTry()
+    Else
+        cf_bind oRet, aoTry(aoArgs)
+    End If
     If Err.Number<>0 Then
         boFlg = False
         Set oErr = func_CM_UtilStoringErr()
@@ -168,12 +174,16 @@ Private Function cf_tryCatch( _
 
     'catchブロックの処理
     If Not boFlg And func_CM_UtilIsAvailableObject(aoCatch) Then
-        cf_bind oRet, aoCatch(aoArgs, oErr)
+        If IsEmpty(aoArgs) Then
+            cf_bind oRet, aoCatch()
+        Else
+            cf_bind oRet, aoCatch(aoArgs)
+        End If
     End If
     
     'finaryブロックの処理
     If func_CM_UtilIsAvailableObject(aoFinary) Then
-        cf_bind oRet, aoFinary(aoArgs, oRet, oErr)
+        cf_bind oRet, aoFinary(oRet)
     End If
     
     '結果を返却
@@ -292,6 +302,66 @@ End Function
 Private Function new_Fso( _
     )
     Set new_Fso = CreateObject("Scripting.FileSystemObject")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_FileOf()
+'Overview                    : Fileオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : パス
+'Return Value
+'     生成したFileオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/11         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_FileOf( _
+    byVal asPath _
+    )
+    Set new_FileOf = new_Fso().GetFile(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_FolderOf()
+'Overview                    : Folderオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : パス
+'Return Value
+'     生成したFolderオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/11         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_FolderOf( _
+    byVal asPath _
+    )
+    Set new_FolderOf = new_Fso().GetFolder(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_DriveOf()
+'Overview                    : Driveオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asDriveName            : ドライブ名
+'Return Value
+'     生成したDriveオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/11         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_DriveOf( _
+    byVal asDriveName _
+    )
+    Set new_DriveOf = new_Fso().GetDrive(asDriveName)
 End Function
 
 '***************************************************************************************************

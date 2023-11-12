@@ -636,6 +636,25 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
+    'Function/Sub Name           : uniq()
+    'Overview                    : 配列の重複を排除する
+    'Detailed Description        : func_CmArrayUniq()に委譲する
+    'Argument
+    '     なし
+    'Return Value
+    '     処理後の自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/11/12         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function uniq( _
+        )
+        Set uniq = func_CmArrayUniq()
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : unshift()
     'Overview                    : 配列の先頭に要素を1つ追加する
     'Detailed Description        : func_CmArrayUnshiftMulti()に委譲する
@@ -1279,6 +1298,41 @@ Class clsCmArray
         Else
             Set func_CmArraySplice = new_Arr()
         End If
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArrayUniq()
+    'Overview                    : 配列の先頭に要素を複数追加する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     処理後の自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/11/12         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArrayUniq( _
+        )
+        '重複を排除
+        Dim oEle, oDic : Set oDic = new_Dic()
+        For Each oEle In PoArr.Items()
+            If Not oDic.Exists(oEle) Then oDic.Add oEle, Empty
+        Next
+        '新しい配列を作成
+        Dim oArr : Set oArr = new_Dic()
+        For Each oEle In oDic.Keys()
+            cf_bindAt oArr, oArr.Count, oEle
+        Next
+        Set PoArr = oArr
+        '自身のインスタンスを返す
+        Set func_CmArrayUniq = Me
+
+        Set oEle = Nothing
+        Set oDic = Nothing
+        Set oArr = Nothing
     End Function
 
     '***************************************************************************************************
