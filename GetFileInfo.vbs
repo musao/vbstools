@@ -76,6 +76,10 @@ Sub Main()
     'ファイル情報の取得
     sub_CM_ExcuteSub "sub_GetFileInfoProc", oParams, oBroker
     
+    '結果出力
+    sub_GetFileInfoReport oParams
+'    sub_CM_ExcuteSub "sub_GetFileInfoReport", oParams, oBroker
+    
     'ログ出力をクローズ
     PoWriter.close()
     
@@ -110,7 +114,7 @@ Private Sub sub_GetFileInfoGetParameters( _
     '★ログ出力
     sub_GetFileInfoLogger Array(9, "sub_GetFileInfoGetParameters", func_CM_ToStringArguments())
     
-    'パラメータ格納用オブジェクトに設定
+    '実在するパスだけパラメータ格納用オブジェクトに設定
     Dim oParam, oRet, oItem
     Set oParam = new_Arr()
     For Each oItem In oArg.Item("Unnamed").Items()
@@ -129,7 +133,7 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 2
 'Function/Sub Name           : sub_GetFileInfoProc()
-'Overview                    : 引数のファイルパスをクリップボードに出力する
+'Overview                    : ファイル情報の取得
 'Detailed Description        : 工事中
 'Argument
 '     aoParams               : パラメータ格納用オブジェクト
@@ -147,7 +151,7 @@ Private Sub sub_GetFileInfoProc( _
     'パラメータ格納用汎用オブジェクト
     Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
 
-    'ファイル情報を取得
+    'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
         oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
@@ -163,7 +167,7 @@ End Sub
 '***************************************************************************************************
 'Processing Order            : 2-1
 'Function/Sub Name           : func_GetFileInfoProcGetFilesRecursion()
-'Overview                    : フォルダ配下の全ファイルを取得する
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する
 'Detailed Description        : 工事中
 'Argument
 '     aoItem                 : ファイル/フォルダオブジェクト
@@ -197,6 +201,156 @@ Private Function func_GetFileInfoProcGetFilesRecursion( _
 
 End Function
 
+'***************************************************************************************************
+'Processing Order            : 3
+'Function/Sub Name           : sub_GetFileInfoReport()
+'Overview                    : 結果出力
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用オブジェクト
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_GetFileInfoReport( _
+    byRef aoParams _
+    )
+
+    'レポートの作成
+    Dim oHtml : Set oHtml = new_HtmlOf("html")
+    oHtml.addContent func_GetFileInfoReportHtmlHead(aoParams)
+    oHtml.addContent func_GetFileInfoReportHtmlBody(aoParams)
+
+    'ファイル出力
+    Dim sPath
+    sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
+    sub_CM_FsWriteFile sPath, oHtml.generate
+
+    Set oHtml = Nothing
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : 3-1
+'Function/Sub Name           : func_GetFileInfoReportHtmlHead()
+'Overview                    : 結果HTMLのheadタグ内の編集
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用オブジェクト
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_GetFileInfoReportHtmlHead( _
+    byRef aoParams _
+    )
+    'パラメータ格納用汎用オブジェクト
+    Dim oList : Set oList = aoParams.Item("List").slice(0,vbNullString)
+    
+    Dim oStyle : Set oStyle = new_HtmlOf("style").addAttribute("type", "text/css").addAttribute("media", "all")
+    With oStyle
+        .addContent new_CssOf(".table_wrap").addProperty("overflow", "auto").addProperty("height", "300px")
+        .addContent new_CssOf("table.table01").addProperty("width", "1000px").addProperty("min-width", "635px").addProperty("margin", "10px 0").addProperty("font-size", "1.4rem").addProperty("border-spacing", "0px").addProperty("border-collapse", "separate")
+        .addContent new_CssOf("table.table01 th").addProperty("background-color", "#6b6b6b").addProperty("color", "#fff").addProperty("padding", "10px").addProperty("border-bottom", "1px solid #E0E1E3").addProperty("border-right", "1px solid #E0E1E3").addProperty("position", "sticky").addProperty("top", "0").addProperty("left", "0").addProperty("z-index", "1")
+        .addContent new_CssOf("table.table01 thead table th").addProperty("border-top", "1px solid #E0E1E3")
+        .addContent new_CssOf("table.table01 thead tr:first-of-type th:first-of-type").addProperty("z-index", "2")
+        .addContent new_CssOf("table.table01 tbody td").addProperty("padding", "10px").addProperty("font-weight", "normal").addProperty("border-bottom", "1px solid #E0E1E3").addProperty("border-right", "1px solid #E0E1E3")
+    End With
+
+    Dim oHead : Set oHead = new_HtmlOf("head")
+    oHead.addContent oStyle
+
+    Set func_GetFileInfoReportHtmlHead = oHead
+    Set oStyle = Nothing
+    Set oHead = Nothing
+End Function
+
+'***************************************************************************************************
+'Processing Order            : 3-2
+'Function/Sub Name           : func_GetFileInfoReportHtmlBody()
+'Overview                    : 結果HTMLのbodyタグ内の編集
+'Detailed Description        : 工事中
+'Argument
+'     aoParams               : パラメータ格納用オブジェクト
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_GetFileInfoReportHtmlBody( _
+    byRef aoParams _
+    )
+    'パラメータ格納用汎用オブジェクト
+    Dim oList : Set oList = aoParams.Item("List").slice(0,vbNullString)
+    
+    'theader
+    Dim oTr : Set oTr = new_HtmlOf("tr")
+    oTr.addContent new_HtmlOf("th").addContent("Seq")
+    oTr.addContent new_HtmlOf("th").addContent("Attributes")
+    oTr.addContent new_HtmlOf("th").addContent("DateCreated")
+    oTr.addContent new_HtmlOf("th").addContent("DateLastAccessed")
+    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
+    oTr.addContent new_HtmlOf("th").addContent("Drive")
+    oTr.addContent new_HtmlOf("th").addContent("Name")
+    oTr.addContent new_HtmlOf("th").addContent("ParentFolder")
+    oTr.addContent new_HtmlOf("th").addContent("Path")
+    oTr.addContent new_HtmlOf("th").addContent("ShortName")
+    oTr.addContent new_HtmlOf("th").addContent("ShortPath")
+    oTr.addContent new_HtmlOf("th").addContent("Size")
+    oTr.addContent new_HtmlOf("th").addContent("Type")
+    Dim oThead : Set oThead = new_HtmlOf("thead")
+    oThead.addContent oTr
+
+    'tbody
+    Dim oTbody : Set oTbody = new_HtmlOf("tbody")
+    Dim lSeq : lSeq=1
+    Do While oList.length>0
+        Set oTr = new_HtmlOf("tr")
+        With oList.shift
+            oTr.addContent new_HtmlOf("th").addContent(lSeq)
+            oTr.addContent new_HtmlOf("td").addContent(.Attributes)
+            oTr.addContent new_HtmlOf("td").addContent(.DateCreated)
+            oTr.addContent new_HtmlOf("td").addContent(.DateLastAccessed)
+            oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
+            oTr.addContent new_HtmlOf("td").addContent(.Drive)
+            oTr.addContent new_HtmlOf("td").addContent(.Name)
+            oTr.addContent new_HtmlOf("td").addContent(.ParentFolder)
+            oTr.addContent new_HtmlOf("td").addContent(.Path)
+            oTr.addContent new_HtmlOf("td").addContent(.ShortName)
+            oTr.addContent new_HtmlOf("td").addContent(.ShortPath)
+            oTr.addContent new_HtmlOf("td").addContent(.Size)
+            oTr.addContent new_HtmlOf("td").addContent(.Type)
+        End With
+        oTbody.addContent oTr
+        lSeq = lSeq+1
+    Loop
+    Dim oTable : Set oTable = new_HtmlOf("table").addAttribute("class", "table01")
+    oTable.addContent oThead
+    oTable.addContent oTbody
+
+    Dim oDiv : Set oDiv = new_HtmlOf("div").addAttribute("class", "table_wrap")
+    oDiv.addContent oTable
+
+    Dim oBody : Set oBody = new_HtmlOf("body")
+    oBody.addContent oDiv
+
+    Set func_GetFileInfoReportHtmlBody = oBody
+    Set oTr = Nothing
+    Set oThead = Nothing
+    Set oTbody = Nothing
+    Set oTable = Nothing
+    Set oBody = Nothing
+End Function
 
 '***************************************************************************************************
 'Processing Order            : -

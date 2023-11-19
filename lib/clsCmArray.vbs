@@ -452,6 +452,7 @@ Class clsCmArray
     'Detailed Description        : func_CmArrayReduce()に委譲する
     'Argument
     '     aoFunc                 : 関数
+    '     avInitial              : 初期値
     'Return Value
     '     引数の関数で算出した結果
     '---------------------------------------------------------------------------------------------------
@@ -462,8 +463,9 @@ Class clsCmArray
     '***************************************************************************************************
     Public Function reduce( _
         byRef aoFunc _
+        , byRef avInitial _
         )
-        cf_bind reduce, func_CmArrayReduce(aoFunc, True)
+        cf_bind reduce, func_CmArrayReduce(aoFunc, avInitial, True)
     End Function
 
     '***************************************************************************************************
@@ -472,6 +474,7 @@ Class clsCmArray
     'Detailed Description        : func_CmArrayReduce()に委譲する
     'Argument
     '     aoFunc                 : 関数
+    '     avInitial              : 初期値
     'Return Value
     '     引数の関数で算出した結果
     '---------------------------------------------------------------------------------------------------
@@ -482,8 +485,9 @@ Class clsCmArray
     '***************************************************************************************************
     Public Function reduceRight( _
         byRef aoFunc _
+        , byRef avInitial _
         )
-        cf_bind reduceRight, func_CmArrayReduce(aoFunc, False)
+        cf_bind reduceRight, func_CmArrayReduce(aoFunc, avInitial, False)
     End Function
 
     '***************************************************************************************************
@@ -1069,6 +1073,7 @@ Class clsCmArray
     '                                array         :配列
     'Argument
     '     aoFunc                 : 関数
+    '     avInitial              : 初期値
     '     aboOrder               : True：正順（順番どおり） / False：逆順
     'Return Value
     '     引数の関数で算出した結果
@@ -1080,6 +1085,7 @@ Class clsCmArray
     '***************************************************************************************************
     Private Function func_CmArrayReduce( _
         byRef aoFunc _
+        , byRef avInitial _
         , byVal aboOrder _
         )
         Dim lIdx, vArr, lUb, oRet
@@ -1090,7 +1096,7 @@ Class clsCmArray
             vArr = func_CmArrayConvArray(aboOrder)
             lUb = Ubound(vArr)
             
-            cf_bind oRet, vArr(0)
+            If IsEmpty(avInitial) Then cf_bind oRet, vArr(0) Else cf_bind oRet, avInitial
             For lIdx=1 To lUb
                 cf_bind oRet, aoFunc(oRet, vArr(lIdx), lIdx, vArr)
             Next

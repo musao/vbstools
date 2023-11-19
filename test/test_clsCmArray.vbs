@@ -432,21 +432,41 @@ End Sub
 
 '###################################################################################################
 'clsCmArray.reduce()
-Sub Test_clsCmArray_reduce
+Sub Test_clsCmArray_reduce_InitEmpty
     Dim e : e = 24
     Dim d : d = Array(1,2,3,4)
     Dim a1 : Set a1 = new_ArrWith(d)
-    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"))
+    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), Empty)
     
     AssertEqual e, a2
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduce_Len1
+Sub Test_clsCmArray_reduce_InitNoEmpty
+    Dim e : e = 120
+    Dim d : d = Array(1,2,3,4)
+    Dim a1 : Set a1 = new_ArrWith(d)
+    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), 5)
+    
+    AssertEqual e, a2
+    
+    assertAllElements d, a1
+End Sub
+Sub Test_clsCmArray_reduce_InitEmpty_Len1
     Dim e : e = 1
     Dim d : d = Array(1)
     Dim a1 : Set a1 = new_ArrWith(d)
-    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"))
+    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), Empty)
+    
+    AssertEqual e, a2
+    
+    assertAllElements d, a1
+End Sub
+Sub Test_clsCmArray_reduce_InitNoEmpty_Len1
+    Dim e : e = 10
+    Dim d : d = Array(1)
+    Dim a1 : Set a1 = new_ArrWith(d)
+    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), 10)
     
     AssertEqual e, a2
     
@@ -455,7 +475,7 @@ End Sub
 Sub Test_clsCmArray_reduce_Err
     On Error Resume Next
     Dim a1 : Set a1 = new_Arr()
-    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"))
+    Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), Empty)
     
     AssertEqual 9, Err.Number
     AssertEqual "配列の初期値がありません。", Err.Description
@@ -465,21 +485,41 @@ End Sub
 
 '###################################################################################################
 'clsCmArray.reduceRight()
-Sub Test_clsCmArray_reduceRight
+Sub Test_clsCmArray_reduceRight_InitEmpty
     Dim e : e = 3
     Dim d : d = Array(2,10,60)
     Dim a1 : Set a1 = new_ArrWith(d)
-    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p/c"))
+    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p/c"), Empty)
     
     AssertEqual e, a2
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduceRight_Len1
+Sub Test_clsCmArray_reduceRight_InitNoEmpty
+    Dim e : e = 5
+    Dim d : d = Array(2,10,60)
+    Dim a1 : Set a1 = new_ArrWith(d)
+    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p/c"), 100)
+    
+    AssertEqual e, a2
+    
+    assertAllElements d, a1
+End Sub
+Sub Test_clsCmArray_reduceRight_InitEmpty_Len1
     Dim e : e = 2
     Dim d : d = Array(2)
     Dim a1 : Set a1 = new_ArrWith(d)
-    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p/c"))
+    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p/c"), Empty)
+    
+    AssertEqual e, a2
+    
+    assertAllElements d, a1
+End Sub
+Sub Test_clsCmArray_reduceRight_InitNoEmpty_Len1
+    Dim e : e = 1
+    Dim d : d = Array(2)
+    Dim a1 : Set a1 = new_ArrWith(d)
+    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p/c"), 1)
     
     AssertEqual e, a2
     
@@ -488,7 +528,7 @@ End Sub
 Sub Test_clsCmArray_reduceRight_Err
     On Error Resume Next
     Dim a1 : Set a1 = new_Arr()
-    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p*c"))
+    Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p*c"), Empty)
     
     AssertEqual 9, Err.Number
     AssertEqual "配列の初期値がありません。", Err.Description

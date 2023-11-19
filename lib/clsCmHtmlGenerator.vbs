@@ -133,14 +133,14 @@ Class clsCmHtmlGenerator
     'Argument
     '     avCont                 : 追加する内容
     'Return Value
-    '     なし
+    '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/23         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub addContent( _
+    Public Function addContent( _
         byRef avCont _
         )
         If IsEmpty(PoTagInfo.Item("content")) Then
@@ -148,8 +148,10 @@ Class clsCmHtmlGenerator
         Else
             PoTagInfo.Item("content").push avCont
         End If
+
+        Set addContent = Me
         Set oNewAttr = Nothing
-    End Sub
+    End Function
         
     '***************************************************************************************************
     'Function/Sub Name           : addAttribute()
@@ -159,14 +161,14 @@ Class clsCmHtmlGenerator
     '     asKey                  : 追加する属性のキー
     '     asValue                : 追加する属性の値
     'Return Value
-    '     なし
+    '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/23         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub addAttribute( _
+    Public Function addAttribute( _
         byVal asKey _
         , byVal asValue _
         )
@@ -176,8 +178,10 @@ Class clsCmHtmlGenerator
         Else
             PoTagInfo.Item("attribute").push oNewAttr
         End If
+
+        Set addAttribute = Me
         Set oNewAttr = Nothing
-    End Sub
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : generate()
@@ -222,9 +226,9 @@ Class clsCmHtmlGenerator
             Exit Function
         End If
 
-        Dim sRet : sRet = "<" & PoTagInfo.Item("element")
+        '開始タグの編集
+        Dim sStt : sStt =  "<" & PoTagInfo.Item("element")
         Dim vNewArr, vArr
-
         '属性（attribute）の編集
         If Not IsEmpty(PoTagInfo.Item("attribute")) Then
         'attributeが空でない場合
@@ -233,30 +237,44 @@ Class clsCmHtmlGenerator
             Do While vArr.length>0
                 vNewArr.push func_CmHtmlGenEditAttribute(vArr.shift)
             Loop
-            sRet = sRet & " " & vNewArr.join(" ")
+            sStt = sStt & " " & vNewArr.join(" ")
+        End If
+        If Not IsEmpty(PoTagInfo.Item("content")) Then
+        'contentが空でない場合
+            sStt = sStt & ">"
+        Else
+        'contentが空の場合
+            sStt = sStt & " />"
         End If
         
         '内容（content）の編集
+        Dim sCont : sCont = ""
         If Not IsEmpty(PoTagInfo.Item("content")) Then
         'contentが空でない場合
-            sRet = sRet & ">"
             Set vNewArr = new_Arr()
             Set vArr = PoTagInfo.Item("content").slice(0,vbNullString)
             Do While vArr.length>0
                 vNewArr.push func_CmHtmlGenEditContent(vArr.shift)
             Loop
-            sRet = sRet & vNewArr.join("")
-            sRet = sRet & "</" & PoTagInfo.Item("element") & ">"
-        Else
-        'contentが空の場合
-            sRet = sRet & " />"
+            Dim oTmp : Set oTmp = new_ArrSplit(vNewArr.join(vbNewLine), vbNewLine)
+            sCont = oTmp.reduce(new_Func("(p,c,i,a)=>p&vbNewLine&'  '&c"), "  "&oTmp(0))
+        End If
+
+        '終了タグの編集
+        Dim sEnd : sEnd =  ""
+        If Not IsEmpty(PoTagInfo.Item("content")) Then
+        'contentが空でない場合
+            sEnd =  "</" & PoTagInfo.Item("element") & ">"
         End If
 
         '生成したHTMLを返却
+        sRet = sStt
+        If Not IsEmpty(PoTagInfo.Item("content")) Then sRet = sRet & vbNewLine & sCont & vbNewLine & sEnd
         func_CmHtmlGenGenerate = sRet
 
         Set vNewArr = Nothing
         Set vArr = Nothing
+        Set oTmp = Nothing
     End Function
 
     '***************************************************************************************************

@@ -146,7 +146,10 @@ Sub Test_clsCmHtmlGenerator_generate_ElementAndContent
     de = "hoge" : ao.element = de
 
     dc1 = "fuga"
-    e = "<hoge>fuga</hoge>"
+    e = _
+        "<hoge>" & vbNewLine _
+        & "  fuga" & vbNewLine _
+        & "</hoge>"
     ao.addContent dc1
     a = ao.generate
     AssertEqualWithMessage e, a, "1"
@@ -154,7 +157,13 @@ Sub Test_clsCmHtmlGenerator_generate_ElementAndContent
     Set dc2 = new clsCmHtmlGenerator
     dc2.element = "foo"
     dc2.addContent "bar"
-    e = "<hoge>fuga<foo>bar</foo></hoge>"
+    e = _
+        "<hoge>" & vbNewLine _
+        & "  fuga" & vbNewLine _
+        & "  <foo>" & vbNewLine _
+        & "    bar" & vbNewLine _
+        & "  </foo>" & vbNewLine _
+        & "</hoge>"
     ao.addContent dc2
     a = ao.generate
     AssertEqualWithMessage e, a, "2"
@@ -174,7 +183,13 @@ Sub Test_clsCmHtmlGenerator_generate_All
     ao.addContent "wao1"
     ao.addContent dx
 
-    e = "<hoge foo1="&Chr(34)&"bar1"&Chr(34)&" woo1>wao1<fuga2 foo2="&Chr(34)&"bar2"&Chr(34)&" woo2>wao2</fuga2></hoge>"
+    e = _ 
+        "<hoge foo1="&Chr(34)&"bar1"&Chr(34)&" woo1>" & vbNewLine _
+        & "  wao1" & vbNewLine _
+        & "  <fuga2 foo2="&Chr(34)&"bar2"&Chr(34)&" woo2>" & vbNewLine _
+        & "    wao2" & vbNewLine _
+        & "  </fuga2>" & vbNewLine _
+        & "</hoge>"
     a = ao.generate
     AssertEqualWithMessage e, a, "1"
 End Sub
@@ -205,7 +220,10 @@ Sub Test_clsCmHtmlGenerator_generate_EntityReference
     
     For Each i In d
         dc = i.Item("Cont")
-        e = "<hoge>"&i.Item("Expected")&"</hoge>"
+        e = _
+            "<hoge>" & vbNewLine _
+            & "  " & i.Item("Expected") & vbNewLine _
+            & "</hoge>"
 
         Set ao = new clsCmHtmlGenerator
         ao.element = "hoge"

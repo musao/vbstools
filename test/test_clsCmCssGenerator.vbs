@@ -102,13 +102,20 @@ Sub Test_clsCmCssGenerator_generate_All
     de = "hoge" : ao.selector = de
 
     dak1 = "foo" : dav1 = "bar"
-    e = "hoge {" & vbNewLine & "foo : bar ;" & "}"
+    e = _
+        "hoge {" & vbNewLine _
+        & "  foo : bar ;" & vbNewLine _
+        & "}"
     ao.addProperty dak1,dav1
     a = ao.generate
     AssertEqualWithMessage e, a, "1"
     
     dak2 = "woo" : dav2 = "woo"
-    e = "hoge {" & vbNewLine & "foo : bar ;" & vbNewLine & "woo : woo ;" & "}"
+    e = _
+        "hoge {" & vbNewLine _
+        & "  foo : bar ;" & vbNewLine _
+        & "  woo : woo ;" & vbNewLine _
+        & "}"
     ao.addProperty dak2,dav2
     a = ao.generate
     AssertEqualWithMessage e, a, "2"

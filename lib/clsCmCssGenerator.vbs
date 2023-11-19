@@ -116,14 +116,14 @@ Class clsCmCssGenerator
     '     asKey                  : 追加するプロパティのキー
     '     asValue                : 追加するプロパティの値
     'Return Value
-    '     なし
+    '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/25         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Sub addProperty( _
+    Public Function addProperty( _
         byVal asKey _
         , byVal asValue _
         )
@@ -133,8 +133,9 @@ Class clsCmCssGenerator
         Else
             PoTagInfo.Item("property").push oNewAttr
         End If
+        Set addProperty = Me
         Set oNewAttr = Nothing
-    End Sub
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : generate()
@@ -188,9 +189,9 @@ Class clsCmCssGenerator
             Set vNewArr = new_Arr()
             Set vArr = PoTagInfo.Item("property").slice(0,vbNullString)
             Do While vArr.length>0
-                vNewArr.push func_CmCssGenEditProperty(vArr.shift)
+                vNewArr.push "  " & func_CmCssGenEditProperty(vArr.shift)
             Loop
-            sRet = sRet & vNewArr.join(vbNewLine)
+            sRet = sRet & vNewArr.join(vbNewLine) & vbNewLine
         End If
         
         sRet = sRet & "}"
