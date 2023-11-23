@@ -77,8 +77,8 @@ Sub Main()
     sub_CM_ExcuteSub "sub_GetFileInfoProc", oParams, oBroker
     
     '結果出力
-    sub_GetFileInfoReport oParams
-'    sub_CM_ExcuteSub "sub_GetFileInfoReport", oParams, oBroker
+'    sub_GetFileInfoReport oParams
+    sub_CM_ExcuteSub "sub_GetFileInfoReport", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -158,7 +158,7 @@ Private Sub sub_GetFileInfoProc( _
     Loop
 
     '重複を排除してpath順にソートする
-    cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.Path>n.Path"))
+    cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.ParentFolder&c.Path>n.ParentFolder&n.Path"))
 
     Set oList = Nothing
     Set oParam = Nothing
@@ -254,14 +254,46 @@ Private Function func_GetFileInfoReportHtmlHead( _
     'パラメータ格納用汎用オブジェクト
     Dim oList : Set oList = aoParams.Item("List").slice(0,vbNullString)
     
-    Dim oStyle : Set oStyle = new_HtmlOf("style").addAttribute("type", "text/css").addAttribute("media", "all")
+    Dim oStyle : Set oStyle = _
+        new_HtmlOf("style") _
+            .addAttribute("type", "text/css") _
+            .addAttribute("media", "all")
+    
     With oStyle
-        .addContent new_CssOf(".table_wrap").addProperty("overflow", "auto").addProperty("height", "300px")
-        .addContent new_CssOf("table.table01").addProperty("width", "1000px").addProperty("min-width", "635px").addProperty("margin", "10px 0").addProperty("font-size", "1.4rem").addProperty("border-spacing", "0px").addProperty("border-collapse", "separate")
-        .addContent new_CssOf("table.table01 th").addProperty("background-color", "#6b6b6b").addProperty("color", "#fff").addProperty("padding", "10px").addProperty("border-bottom", "1px solid #E0E1E3").addProperty("border-right", "1px solid #E0E1E3").addProperty("position", "sticky").addProperty("top", "0").addProperty("left", "0").addProperty("z-index", "1")
-        .addContent new_CssOf("table.table01 thead table th").addProperty("border-top", "1px solid #E0E1E3")
-        .addContent new_CssOf("table.table01 thead tr:first-of-type th:first-of-type").addProperty("z-index", "2")
-        .addContent new_CssOf("table.table01 tbody td").addProperty("padding", "10px").addProperty("font-weight", "normal").addProperty("border-bottom", "1px solid #E0E1E3").addProperty("border-right", "1px solid #E0E1E3")
+        .addContent new_CssOf(".table_wrap") _
+            .addProperty("overflow", "auto") _
+            .addProperty("height", "100%")
+        
+        .addContent new_CssOf("table.table01") _
+            .addProperty("width", "1000px") _
+            .addProperty("min-width", "635px") _
+            .addProperty("margin", "10px 0") _
+            .addProperty("font-size", "1.4rem") _
+            .addProperty("border-spacing", "0px") _
+            .addProperty("border-collapse", "separate")
+        
+        .addContent new_CssOf("table.table01 th") _
+            .addProperty("background-color", "#6b6b6b") _
+            .addProperty("color", "#fff") _
+            .addProperty("padding", "10px") _
+            .addProperty("border-bottom", "1px solid #E0E1E3") _
+            .addProperty("border-right", "1px solid #E0E1E3") _
+            .addProperty("position", "sticky") _
+            .addProperty("top", "0") _
+            .addProperty("left", "0") _
+            .addProperty("z-index", "1")
+        
+        .addContent new_CssOf("table.table01 thead table th") _
+            .addProperty("border-top", "1px solid #E0E1E3")
+        
+        .addContent new_CssOf("table.table01 thead tr:first-of-type th:first-of-type") _
+            .addProperty("z-index", "2")
+        
+        .addContent new_CssOf("table.table01 tbody td") _
+            .addProperty("padding", "10px") _
+            .addProperty("font-weight", "normal") _
+            .addProperty("border-bottom", "1px solid #E0E1E3") _
+            .addProperty("border-right", "1px solid #E0E1E3")
     End With
 
     Dim oHead : Set oHead = new_HtmlOf("head")
@@ -293,7 +325,7 @@ Private Function func_GetFileInfoReportHtmlBody( _
     'パラメータ格納用汎用オブジェクト
     Dim oList : Set oList = aoParams.Item("List").slice(0,vbNullString)
     
-    'theader
+    'thead
     Dim oTr : Set oTr = new_HtmlOf("tr")
     oTr.addContent new_HtmlOf("th").addContent("Seq")
     oTr.addContent new_HtmlOf("th").addContent("Attributes")

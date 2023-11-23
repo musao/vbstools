@@ -257,7 +257,7 @@ Class clsCmHtmlGenerator
                 vNewArr.push func_CmHtmlGenEditContent(vArr.shift)
             Loop
             Dim oTmp : Set oTmp = new_ArrSplit(vNewArr.join(vbNewLine), vbNewLine)
-            sCont = oTmp.reduce(new_Func("(p,c,i,a)=>p&vbNewLine&'  '&c"), "  "&oTmp(0))
+            sCont = oTmp.map(new_Func("(e,i,a)=>'  '&e")).join(vbNewLine)
         End If
 
         '終了タグの編集

@@ -26,10 +26,22 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
-inputbox "","",TypeName(new_FileOf(WScript.ScriptFullName))
-inputbox "","",VarType(new_FileOf(WScript.ScriptFullName))
-inputbox "","",TypeName(new_FolderOf(new_Fso().GetParentFolderName(WScript.ScriptFullName)))
-inputbox "","",VarType(new_FolderOf(new_Fso().GetParentFolderName(WScript.ScriptFullName)))
+
+Dim stPath : stPath = ""C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip""
+Dim oFolder : Set oFolder = CreateObject("Shell.Application").Namespace(stPath)
+inputbox "","",func_CM_ToString(func_GetFile(oFolder))
+
+Private Function func_GetFile(aoFolder)
+    Dim oFile,vArr
+    For Each oFile In aoFolder.Items
+        If oFile.IsFolder Then 'フォルダであれば再帰処理
+            cf_pushMulti vArr, func_GetFile(oFile.GetFolder)
+        Else
+            cf_push vArr, oFile.ModifyDate
+        End If
+    Next
+    cf_bind func_GetFile, vArr
+End Function
 
 wscript.quit
 

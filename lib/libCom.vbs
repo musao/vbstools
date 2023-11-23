@@ -3000,9 +3000,11 @@ Private Sub sub_CM_UtilLogger( _
     byRef avParams _
     , byRef aoWriter _
     )
-    Dim sIp : sIp = ""
     Dim oIps : Set oIps = new_ArrWith(func_CM_UtilGetIpaddress())
-    If oIps.length>0 Then sIp = oIps.reduce(new_Func("(p,c,i,a)=>p&','&c.Item('Ip').Item('V4')"), oIps(0).Item("Ip").Item("V4"))
+    Dim sIp : sIp = oIps.shift().Item("Ip").Item("V4")
+    Do While oIps.length>0
+        sIp = sIp & "," & oIps.shift().Item("Ip").Item("V4")
+    Loop
     
     Dim oCont
     Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
