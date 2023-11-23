@@ -74,6 +74,7 @@ Sub Main()
     sub_CM_ExcuteSub "sub_GetFileInfoGetParameters", oParams, oBroker
     
     'ファイル情報の取得
+'    sub_GetFileInfoProc oParams
     sub_CM_ExcuteSub "sub_GetFileInfoProc", oParams, oBroker
     
     '結果出力
@@ -152,11 +153,11 @@ Private Sub sub_GetFileInfoProc( _
     Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
 
     'ファイルオブジェクトのリストを取得
-    Dim oList : Set oList = new_Arr()
+    Dim oList, vRet : Set oList = new_Arr()
     Do While oParam.length>0
-        oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
+        vRet = func_GetFileInfoProcGetFilesRecursion(oParam.pop)
+        If Not IsEmpty(vRet) Then oList.pushMulti vRet
     Loop
-
     '重複を排除してpath順にソートする
     cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.ParentFolder&c.Path>n.ParentFolder&n.Path"))
 
@@ -184,14 +185,15 @@ Private Function func_GetFileInfoProcGetFilesRecursion( _
     )
     If cf_isSame(TypeName(aoItem), "Folder") Then
     'フォルダの場合
-        Dim oEle, vRet
+        Dim oEle, vRet, vTmp
         'ファイルの取得
         For Each oEle In aoItem.Files
             cf_push vRet, oEle
         Next
         'フォルダの取得
         For Each oEle In aoItem.SubFolders
-            cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursion(oEle)
+            vTmp = func_GetFileInfoProcGetFilesRecursion(oEle)
+            If Not IsEmpty(vTmp) Then cf_pushMulti vRet, vTmp
         Next
         func_GetFileInfoProcGetFilesRecursion = vRet
     Else
@@ -221,16 +223,16 @@ Private Sub sub_GetFileInfoReport( _
     )
 
     'レポートの作成
-    Dim oHtml : Set oHtml = new_HtmlOf("html")
-    oHtml.addContent func_GetFileInfoReportHtmlHead(aoParams)
-    oHtml.addContent func_GetFileInfoReportHtmlBody(aoParams)
+    With new_HtmlOf("html")
+        .addContent func_GetFileInfoReportHtmlHead(aoParams)
+        .addContent func_GetFileInfoReportHtmlBody(aoParams)
+    
+        'ファイル出力
+        Dim sPath
+        sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
+        sub_CM_FsWriteFile sPath, .generate
 
-    'ファイル出力
-    Dim sPath
-    sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
-    sub_CM_FsWriteFile sPath, oHtml.generate
-
-    Set oHtml = Nothing
+    End With
 End Sub
 
 '***************************************************************************************************
@@ -328,16 +330,9 @@ Private Function func_GetFileInfoReportHtmlBody( _
     'thead
     Dim oTr : Set oTr = new_HtmlOf("tr")
     oTr.addContent new_HtmlOf("th").addContent("Seq")
-    oTr.addContent new_HtmlOf("th").addContent("Attributes")
-    oTr.addContent new_HtmlOf("th").addContent("DateCreated")
-    oTr.addContent new_HtmlOf("th").addContent("DateLastAccessed")
     oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
-    oTr.addContent new_HtmlOf("th").addContent("Drive")
     oTr.addContent new_HtmlOf("th").addContent("Name")
-    oTr.addContent new_HtmlOf("th").addContent("ParentFolder")
     oTr.addContent new_HtmlOf("th").addContent("Path")
-    oTr.addContent new_HtmlOf("th").addContent("ShortName")
-    oTr.addContent new_HtmlOf("th").addContent("ShortPath")
     oTr.addContent new_HtmlOf("th").addContent("Size")
     oTr.addContent new_HtmlOf("th").addContent("Type")
     Dim oThead : Set oThead = new_HtmlOf("thead")
@@ -350,16 +345,9 @@ Private Function func_GetFileInfoReportHtmlBody( _
         Set oTr = new_HtmlOf("tr")
         With oList.shift
             oTr.addContent new_HtmlOf("th").addContent(lSeq)
-            oTr.addContent new_HtmlOf("td").addContent(.Attributes)
-            oTr.addContent new_HtmlOf("td").addContent(.DateCreated)
-            oTr.addContent new_HtmlOf("td").addContent(.DateLastAccessed)
             oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
-            oTr.addContent new_HtmlOf("td").addContent(.Drive)
             oTr.addContent new_HtmlOf("td").addContent(.Name)
-            oTr.addContent new_HtmlOf("td").addContent(.ParentFolder)
             oTr.addContent new_HtmlOf("td").addContent(.Path)
-            oTr.addContent new_HtmlOf("td").addContent(.ShortName)
-            oTr.addContent new_HtmlOf("td").addContent(.ShortPath)
             oTr.addContent new_HtmlOf("td").addContent(.Size)
             oTr.addContent new_HtmlOf("td").addContent(.Type)
         End With

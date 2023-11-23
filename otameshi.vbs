@@ -27,17 +27,50 @@ Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
 
-Dim stPath : stPath = ""C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip""
+'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f1"
+Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip"
 Dim oFolder : Set oFolder = CreateObject("Shell.Application").Namespace(stPath)
 inputbox "","",func_CM_ToString(func_GetFile(oFolder))
 
 Private Function func_GetFile(aoFolder)
+on error resume next
     Dim oFile,vArr
     For Each oFile In aoFolder.Items
         If oFile.IsFolder Then 'フォルダであれば再帰処理
             cf_pushMulti vArr, func_GetFile(oFile.GetFolder)
         Else
-            cf_push vArr, oFile.ModifyDate
+            cf_push vArr, Array( _
+                new_FileOf(oFile.Path).Attributes _
+                , new_FileOf(oFile.Path).DateCreated _
+                , new_FileOf(oFile.Path).DateLastAccessed _
+                , new_FileOf(oFile.Path).DateLastModified _
+                , new_FileOf(oFile.Path).Drive _
+                , new_FileOf(oFile.Path).Name _
+                , new_FileOf(oFile.Path).ParentFolder _
+                , new_FileOf(oFile.Path).Path _
+                , new_FileOf(oFile.Path).ShortName _
+                , new_FileOf(oFile.Path).ShortPath _
+                , new_FileOf(oFile.Path).Size _
+                , new_FileOf(oFile.Path).Type _
+                )
+'                aoFolder.GetDetailsOf(oFile, 0) _
+'                , aoFolder.GetDetailsOf(oFile, 1) _
+'                , aoFolder.GetDetailsOf(oFile, 2) _
+'                , aoFolder.GetDetailsOf(oFile, 3) _
+'                , aoFolder.GetDetailsOf(oFile, 4) _
+'                , oFile.IsBrowsable _
+'                , oFile.IsFileSystem _
+'                , oFile.IsFolder _
+'                , oFile.IsLink _
+'                , oFile.ModifyDate _
+'                , oFile.Name _
+'                , oFile.Parent _
+'                , oFile.Path _
+'                , oFile.Size _
+'                , oFile.Type _
+
+'            cf_push vArr, aoFolder.GetDetailsOf(oFile, 4)
+'            cf_push vArr, oFile.ModifyDate
         End If
     Next
     cf_bind func_GetFile, vArr
