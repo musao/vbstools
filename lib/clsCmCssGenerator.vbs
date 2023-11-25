@@ -63,7 +63,7 @@ Class clsCmCssGenerator
     '2023/10/25         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get property()
-        property = PoTagInfo.Item("property").Items()
+        property = PoTagInfo.Item("property")
     End Property
     
     '***************************************************************************************************
@@ -128,11 +128,10 @@ Class clsCmCssGenerator
         , byVal asValue _
         )
         Dim oNewAttr : Set oNewAttr = new_DicWith(Array("key", asKey, "value", asValue))
-        If IsEmpty(PoTagInfo.Item("property")) Then
-            Set PoTagInfo.Item("property") = new_ArrWith(oNewAttr)
-        Else
-            PoTagInfo.Item("property").push oNewAttr
-        End If
+        Dim vArr : cf_bind vArr, PoTagInfo.Item("property")
+        cf_push vArr, oNewAttr
+        cf_bindAt PoTagInfo, "property", vArr
+
         Set addProperty = Me
         Set oNewAttr = Nothing
     End Function
@@ -183,24 +182,19 @@ Class clsCmCssGenerator
         Dim sRet : sRet = PoTagInfo.Item("selector") & " {" & vbNewLine
 
         'プロパティ（property）の編集
-        Dim vNewArr, vArr
+        Dim vArr, vEle
         If Not IsEmpty(PoTagInfo.Item("property")) Then
         'propertyが空でない場合
-            Set vNewArr = new_Arr()
-            Set vArr = PoTagInfo.Item("property").slice(0,vbNullString)
-            Do While vArr.length>0
-                vNewArr.push "  " & func_CmCssGenEditProperty(vArr.shift)
-            Loop
-            sRet = sRet & vNewArr.join(vbNewLine) & vbNewLine
+            For Each vEle In PoTagInfo.Item("property")
+                cf_push vArr, "  " & func_CmCssGenEditProperty(vEle)
+            Next
+            sRet = sRet & Join(vArr, vbNewLine) & vbNewLine
         End If
         
         sRet = sRet & "}"
 
         '生成したCSSを返却
         func_CmCssGenGenerate = sRet
-
-        Set vNewArr = Nothing
-        Set vArr = Nothing
     End Function
 
     '***************************************************************************************************

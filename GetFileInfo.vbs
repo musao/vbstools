@@ -74,11 +74,9 @@ Sub Main()
     sub_CM_ExcuteSub "sub_GetFileInfoGetParameters", oParams, oBroker
     
     'ファイル情報の取得
-'    sub_GetFileInfoProc oParams
     sub_CM_ExcuteSub "sub_GetFileInfoProc", oParams, oBroker
     
     '結果出力
-'    sub_GetFileInfoReport oParams
     sub_CM_ExcuteSub "sub_GetFileInfoReport", oParams, oBroker
     
     'ログ出力をクローズ
@@ -121,7 +119,12 @@ Private Sub sub_GetFileInfoGetParameters( _
     For Each oItem In oArg.Item("Unnamed").Items()
         Set oRet = cf_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
         If Not oRet.Item("Result") Then Set oRet = cf_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
-        If oRet.Item("Result") Then oParam.push oRet.Item("Return")
+        If oRet.Item("Result") Then
+            oParam.push oRet.Item("Return")
+        Else
+            '★ログ出力
+            sub_GetFileInfoLogger Array(3, "sub_GetFileInfoGetParameters", oItem & "is an invalid argument.")
+        End If
     Next
     cf_bindAt aoParams, "Param", oParam
     
@@ -152,12 +155,16 @@ Private Sub sub_GetFileInfoProc( _
     'パラメータ格納用汎用オブジェクト
     Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
 
+    '★ログ出力
+    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before getting list of files.")
     'ファイルオブジェクトのリストを取得
-    Dim oList, vRet : Set oList = new_Arr()
+    Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-        vRet = func_GetFileInfoProcGetFilesRecursion(oParam.pop)
-        If Not IsEmpty(vRet) Then oList.pushMulti vRet
+        oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
     Loop
+
+    '★ログ出力
+    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before sorting.")
     '重複を排除してpath順にソートする
     cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.ParentFolder&c.Path>n.ParentFolder&n.Path"))
 
@@ -185,15 +192,14 @@ Private Function func_GetFileInfoProcGetFilesRecursion( _
     )
     If cf_isSame(TypeName(aoItem), "Folder") Then
     'フォルダの場合
-        Dim oEle, vRet, vTmp
+        Dim oEle, vRet()
         'ファイルの取得
         For Each oEle In aoItem.Files
             cf_push vRet, oEle
         Next
         'フォルダの取得
         For Each oEle In aoItem.SubFolders
-            vTmp = func_GetFileInfoProcGetFilesRecursion(oEle)
-            If Not IsEmpty(vTmp) Then cf_pushMulti vRet, vTmp
+            cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursion(oEle)
         Next
         func_GetFileInfoProcGetFilesRecursion = vRet
     Else
@@ -227,6 +233,8 @@ Private Sub sub_GetFileInfoReport( _
         .addContent func_GetFileInfoReportHtmlHead(aoParams)
         .addContent func_GetFileInfoReportHtmlBody(aoParams)
     
+        '★ログ出力
+        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before file output.")
         'ファイル出力
         Dim sPath
         sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")

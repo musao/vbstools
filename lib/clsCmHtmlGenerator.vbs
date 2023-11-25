@@ -63,7 +63,7 @@ Class clsCmHtmlGenerator
     '2023/10/23         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get attribute()
-        attribute = PoTagInfo.Item("attribute").Items()
+        attribute = PoTagInfo.Item("attribute")
     End Property
     
     '***************************************************************************************************
@@ -81,7 +81,7 @@ Class clsCmHtmlGenerator
     '2023/10/23         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get content()
-        content = PoTagInfo.Item("content").Items()
+        content = PoTagInfo.Item("content")
     End Property
     
     '***************************************************************************************************
@@ -143,14 +143,11 @@ Class clsCmHtmlGenerator
     Public Function addContent( _
         byRef avCont _
         )
-        If IsEmpty(PoTagInfo.Item("content")) Then
-            Set PoTagInfo.Item("content") = new_ArrWith(avCont)
-        Else
-            PoTagInfo.Item("content").push avCont
-        End If
+        Dim vArr : cf_bind vArr, PoTagInfo.Item("content")
+        cf_push vArr, avCont
+        cf_bindAt PoTagInfo, "content", vArr
 
         Set addContent = Me
-        Set oNewAttr = Nothing
     End Function
         
     '***************************************************************************************************
@@ -173,11 +170,9 @@ Class clsCmHtmlGenerator
         , byVal asValue _
         )
         Dim oNewAttr : Set oNewAttr = new_DicWith(Array("key", asKey, "value", asValue))
-        If IsEmpty(PoTagInfo.Item("attribute")) Then
-            Set PoTagInfo.Item("attribute") = new_ArrWith(oNewAttr)
-        Else
-            PoTagInfo.Item("attribute").push oNewAttr
-        End If
+        Dim vArr : cf_bind vArr, PoTagInfo.Item("attribute")
+        cf_push vArr, oNewAttr
+        cf_bindAt PoTagInfo, "attribute", vArr
 
         Set addAttribute = Me
         Set oNewAttr = Nothing
@@ -228,16 +223,14 @@ Class clsCmHtmlGenerator
 
         '開始タグの編集
         Dim sStt : sStt =  "<" & PoTagInfo.Item("element")
-        Dim vNewArr, vArr
+        Dim vArr, vEle
         '属性（attribute）の編集
         If Not IsEmpty(PoTagInfo.Item("attribute")) Then
         'attributeが空でない場合
-            Set vNewArr = new_Arr()
-            Set vArr = PoTagInfo.Item("attribute").slice(0,vbNullString)
-            Do While vArr.length>0
-                vNewArr.push func_CmHtmlGenEditAttribute(vArr.shift)
-            Loop
-            sStt = sStt & " " & vNewArr.join(" ")
+            For Each vEle In PoTagInfo.Item("attribute")
+                cf_push vArr, func_CmHtmlGenEditAttribute(vEle)
+            Next
+            sStt = sStt & " " & Join(vArr, " ")
         End If
         If Not IsEmpty(PoTagInfo.Item("content")) Then
         'contentが空でない場合
@@ -251,13 +244,11 @@ Class clsCmHtmlGenerator
         Dim sCont : sCont = ""
         If Not IsEmpty(PoTagInfo.Item("content")) Then
         'contentが空でない場合
-            Set vNewArr = new_Arr()
-            Set vArr = PoTagInfo.Item("content").slice(0,vbNullString)
-            Do While vArr.length>0
-                vNewArr.push func_CmHtmlGenEditContent(vArr.shift)
-            Loop
-            Dim oTmp : Set oTmp = new_ArrSplit(vNewArr.join(vbNewLine), vbNewLine)
-            sCont = oTmp.map(new_Func("(e,i,a)=>'  '&e")).join(vbNewLine)
+            vArr = Array()
+            For Each vEle In PoTagInfo.Item("content")
+                cf_push vArr, func_CmHtmlGenEditContent(vEle)
+            Next
+            sCont = Join(vArr, vbNewLine)
         End If
 
         '終了タグの編集
@@ -272,9 +263,6 @@ Class clsCmHtmlGenerator
         If Not IsEmpty(PoTagInfo.Item("content")) Then sRet = sRet & vbNewLine & sCont & vbNewLine & sEnd
         func_CmHtmlGenGenerate = sRet
 
-        Set vNewArr = Nothing
-        Set vArr = Nothing
-        Set oTmp = Nothing
     End Function
 
     '***************************************************************************************************
@@ -327,7 +315,7 @@ Class clsCmHtmlGenerator
             sRet = func_CmHtmlGenHtmlEntityReference(aoCont)
         End If
         On Error GoTo 0
-        func_CmHtmlGenEditContent = sRet
+        func_CmHtmlGenEditContent = new_Re("^([^\n])", "igm").Replace(sRet,"  $1")
     End Function
 
     '***************************************************************************************************

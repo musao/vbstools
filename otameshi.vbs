@@ -27,6 +27,28 @@ Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
 
+dim hoge : Set hoge = new_DicWith(Array("fuga"))
+dim foo
+cf_push hoge.Item("fuga"), "aaa"
+inputbox "","",func_CM_ToString(hoge)
+cf_push foo, "aaa"
+inputbox "","",func_CM_ToString(foo)
+cf_bindAt hoge, "fuga", foo
+inputbox "","",func_CM_ToString(hoge)
+
+wscript.quit
+
+
+dim sp:sp="C:\Users\89585\Documents\dev\vbs\data\test.txt"
+With CreateObject("Scripting.FileSystemObject")
+    Dim sParentDir:sParentDir = .BuildPath(.GetParentFolderName(WScript.ScriptFullName), "data")
+    Dim sText:sText=.OpenTextfile(.BuildPath(sParentDir,"test.txt")).ReadAll
+End With
+sub_CM_FsWriteFile sp&"_", new_Re("^([^\n])", "igm").Replace(sText,"  $1")
+
+wscript.quit
+
+
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f1"
 Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip"
 Dim oFolder : Set oFolder = CreateObject("Shell.Application").Namespace(stPath)
