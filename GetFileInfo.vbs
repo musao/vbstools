@@ -161,12 +161,14 @@ Private Sub sub_GetFileInfoProc( _
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
         oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
+'        oList.pushMulti func_GetFileInfoProcGetFilesRecursionByShell(oParam.pop().Path)
     Loop
 
     '★ログ出力
     sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before sorting.")
     '重複を排除してpath順にソートする
     cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.ParentFolder&c.Path>n.ParentFolder&n.Path"))
+'    cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.Parent.Self.Path&c.Path>n.Parent.Self.Path&n.Path"))
 
     Set oList = Nothing
     Set oParam = Nothing
@@ -210,6 +212,51 @@ Private Function func_GetFileInfoProcGetFilesRecursion( _
 End Function
 
 '***************************************************************************************************
+'Processing Order            : 2-1a
+'Function/Sub Name           : func_GetFileInfoProcGetFilesRecursionByShell()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイル/フォルダのパス
+'Return Value
+'     FolderItemオブジェクトの配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_GetFileInfoProcGetFilesRecursionByShell( _
+    byVal asPath _
+    )
+    Dim oItem,oFile
+    If new_Fso().FolderExists(asPath) Then
+    'フォルダの場合
+        Dim oFolder : Set oFolder = new_ShellApp().Namespace(asPath)
+        Dim vRet()
+        For Each oItem In oFolder.Items
+        'フォルダ内全てのアイテムについて
+            If oItem.IsFolder Then
+            'フォルダの場合
+                cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursionByShell(oItem.Path)
+            Else
+            'ファイルの場合
+                cf_push vRet, oItem
+            End If
+        Next
+        func_GetFileInfoProcGetFilesRecursionByShell = vRet
+    Else
+    'ファイルの場合
+        Set oFile = new_FileOf(asPath)
+        Set oItem = new_ShellApp().Namespace(CStr(oFile.ParentFolder)).Items().Item(oFile.Name)
+        func_GetFileInfoProcGetFilesRecursionByShell = Array(oItem)
+    End If
+
+    Set oItem = Nothing
+    Set oFile = Nothing
+End Function
+
+'***************************************************************************************************
 'Processing Order            : 3
 'Function/Sub Name           : sub_GetFileInfoReport()
 'Overview                    : 結果出力
@@ -234,13 +281,18 @@ Private Sub sub_GetFileInfoReport( _
         .addContent func_GetFileInfoReportHtmlBody(aoParams)
     
         '★ログ出力
-        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before file output.")
-        'ファイル出力
+        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before file output.")
+        'レポートをファイルに出力
         Dim sPath
         sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
         sub_CM_FsWriteFile sPath, .generate
-
     End With
+
+    '★ログ出力
+    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before open file.")
+    'レポートを開く
+    CreateObject("WScript.Shell").Run sPath, 1
+    
 End Sub
 
 '***************************************************************************************************
@@ -338,7 +390,7 @@ Private Function func_GetFileInfoReportHtmlBody( _
     'thead
     Dim oTr : Set oTr = new_HtmlOf("tr")
     oTr.addContent new_HtmlOf("th").addContent("Seq")
-    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
+'    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
     oTr.addContent new_HtmlOf("th").addContent("Name")
     oTr.addContent new_HtmlOf("th").addContent("Path")
     oTr.addContent new_HtmlOf("th").addContent("Size")
@@ -353,7 +405,7 @@ Private Function func_GetFileInfoReportHtmlBody( _
         Set oTr = new_HtmlOf("tr")
         With oList.shift
             oTr.addContent new_HtmlOf("th").addContent(lSeq)
-            oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
+'            oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
             oTr.addContent new_HtmlOf("td").addContent(.Name)
             oTr.addContent new_HtmlOf("td").addContent(.Path)
             oTr.addContent new_HtmlOf("td").addContent(.Size)

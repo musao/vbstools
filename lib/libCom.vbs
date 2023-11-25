@@ -305,6 +305,25 @@ Private Function new_Fso( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_ShellApp()
+'Overview                    : Shell.Applicationオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したShell.Applicationオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ShellApp( _
+    )
+    Set new_ShellApp = CreateObject("Shell.Application")
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_FileOf()
 'Overview                    : Fileオブジェクト生成関数
 'Detailed Description        : 工事中

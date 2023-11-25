@@ -27,32 +27,45 @@ Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
 
-dim hoge : Set hoge = new_DicWith(Array("fuga"))
-dim foo
-cf_push hoge.Item("fuga"), "aaa"
-inputbox "","",func_CM_ToString(hoge)
-cf_push foo, "aaa"
-inputbox "","",func_CM_ToString(foo)
-cf_bindAt hoge, "fuga", foo
-inputbox "","",func_CM_ToString(hoge)
-
-wscript.quit
-
-
-dim sp:sp="C:\Users\89585\Documents\dev\vbs\data\test.txt"
-With CreateObject("Scripting.FileSystemObject")
-    Dim sParentDir:sParentDir = .BuildPath(.GetParentFolderName(WScript.ScriptFullName), "data")
-    Dim sText:sText=.OpenTextfile(.BuildPath(sParentDir,"test.txt")).ReadAll
-End With
-sub_CM_FsWriteFile sp&"_", new_Re("^([^\n])", "igm").Replace(sText,"  $1")
-
-wscript.quit
-
 
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f1"
-Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip"
-Dim oFolder : Set oFolder = CreateObject("Shell.Application").Namespace(stPath)
-inputbox "","",func_CM_ToString(func_GetFile(oFolder))
+Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip"
+'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip"
+'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2\jis_ins.vbs"
+'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2"
+DIm ret : ret = func_GetFileInfoProcGetFilesRecursionByShell(stPath)
+inputbox "","",func_CM_ToString(new_ArrWith(ret).map(new_Func("(e,i,a)=>e.Parent.Self.Path")))
+
+
+Private Function func_GetFileInfoProcGetFilesRecursionByShell( _
+    byVal asPath _
+    )
+    Dim oItem,oFile
+    If new_Fso().FolderExists(asPath) Then
+    'フォルダの場合
+        Dim oFolder : Set oFolder = CreateObject("Shell.Application").Namespace(asPath)
+        Dim vRet()
+        For Each oItem In oFolder.Items
+        'フォルダ内全てのアイテムについて
+            If oItem.IsFolder Then
+            'フォルダの場合
+                cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursionByShell(oItem.Path)
+            Else
+            'ファイルの場合
+                cf_push vRet, oItem
+            End If
+        Next
+        func_GetFileInfoProcGetFilesRecursionByShell = vRet
+    Else
+    'ファイルの場合
+        Set oFile = new_FileOf(asPath)
+        Set oItem = CreateObject("Shell.Application").Namespace(CStr(oFile.ParentFolder)).Items().Item(oFile.Name)
+        func_GetFileInfoProcGetFilesRecursionByShell = Array(oItem)
+    End If
+
+    Set oItem = Nothing
+End Function
+
 
 Private Function func_GetFile(aoFolder)
 on error resume next

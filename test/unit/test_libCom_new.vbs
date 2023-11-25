@@ -62,6 +62,16 @@ Sub Test_new_Fso
 End Sub
 
 '###################################################################################################
+'new_ShellApp()
+Sub Test_new_ShellApp
+    Dim e : Set e = CreateObject("Shell.Application")
+    Dim a : Set a = new_ShellApp()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
 'new_FileOf()
 Sub Test_new_FileOf
     Dim p,e,a
