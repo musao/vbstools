@@ -305,22 +305,29 @@ Private Function new_Fso( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_ShellApp()
-'Overview                    : Shell.Applicationオブジェクト生成関数
-'Detailed Description        : 工事中
+'Function/Sub Name           : new_Ts()
+'Overview                    : TextStreamオブジェクト生成関数
+'Detailed Description        : FileSystemObjectのOpenTextFile()と同等
 'Argument
-'     なし
+'     asPath                 : パス
+'     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
+'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
+'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
 'Return Value
-'     生成したShell.Applicationオブジェクトのインスタンス
+'     生成したTextStreamオブジェクトのインスタンス
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/11/25         Y.Fujii                  First edition
+'2023/01/09         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_ShellApp( _
+Private Function new_Ts( _
+    byVal asPath _
+    , byVal alIomode _
+    , byVal aboCreate _
+    , byVal alFileFormat _
     )
-    Set new_ShellApp = CreateObject("Shell.Application")
+    Set new_Ts = new_Fso().OpenTextFile(asPath, alIomode, aboCreate, alFileFormat)
 End Function
 
 '***************************************************************************************************
@@ -335,7 +342,7 @@ End Function
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/11/11         Y.Fujii                  First edition
+'2022/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function new_FileOf( _
     byVal asPath _
@@ -355,7 +362,7 @@ End Function
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/11/11         Y.Fujii                  First edition
+'2022/10/23         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function new_FolderOf( _
     byVal asPath _
@@ -381,6 +388,45 @@ Private Function new_DriveOf( _
     byVal asDriveName _
     )
     Set new_DriveOf = new_Fso().GetDrive(asDriveName)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_AdptFile()
+'Overview                    : Fileオブジェクトのアダプター生成関数
+'Detailed Description        : 工事中
+'Argument
+'     aoFile                 : ファイルのオブジェクト
+'Return Value
+'     生成したFileオブジェクトのアダプターのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_AdptFile( _
+    byRef aoFile _
+    )
+    Set new_AdptFile = (New clsAdptFile).setFileObject(aoFile)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ShellApp()
+'Overview                    : Shell.Applicationオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したShell.Applicationオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ShellApp( _
+    )
+    Set new_ShellApp = CreateObject("Shell.Application")
 End Function
 
 '***************************************************************************************************
@@ -456,7 +502,7 @@ End Function
 Private Function new_ReaderFrom( _
     byVal asPath _
     )
-    Set new_ReaderFrom = (New clsCmBufferedReader).setTextStream(func_CM_FsOpenTextFile(asPath, 1, False, -2))
+    Set new_ReaderFrom = (New clsCmBufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
 End Function
 
 '***************************************************************************************************
@@ -502,7 +548,7 @@ Private Function new_WriterTo( _
     , byVal aboCreate _
     , byVal alFileFormat _
     )
-    Set new_WriterTo = (New clsCmBufferedWriter).setTextStream(func_CM_FsOpenTextFile(asPath, alIomode, aboCreate, alFileFormat))
+    Set new_WriterTo = (New clsCmBufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
 End Function
 
 '***************************************************************************************************
@@ -1591,108 +1637,6 @@ Private Function func_CM_FsBuildPath( _
     func_CM_FsBuildPath = new_Fso().BuildPath(asFolderPath, asItemName)
 End Function
 
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_FsFileExists()
-''Overview                    : ファイルの存在確認
-''Detailed Description        : FileSystemObjectのFileExists()と同等
-''Argument
-''     asPath                 : パス
-''Return Value
-''     結果 True:存在する / False:存在しない
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2022/09/27         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_FsFileExists( _
-'    byVal asPath _
-'    ) 
-'    func_CM_FsFileExists = new_Fso().FileExists(asPath)
-'End Function
-
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_FsFolderExists()
-''Overview                    : フォルダの存在確認
-''Detailed Description        : FileSystemObjectのFolderExists()と同等
-''Argument
-''     asPath                 : パス
-''Return Value
-''     結果 True:存在する / False:存在しない
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2022/10/16         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_FsFolderExists( _
-'    byVal asPath _
-'    ) 
-'    func_CM_FsFolderExists = new_Fso().FolderExists(asPath)
-'End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFile()
-'Overview                    : ファイルオブジェクトの取得
-'Detailed Description        : FileSystemObjectのGetFile()と同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     Fileオブジェクト
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFile( _
-    byVal asPath _
-    ) 
-    Set func_CM_FsGetFile = new_Fso().GetFile(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFolder()
-'Overview                    : フォルダオブジェクトの取得
-'Detailed Description        : FileSystemObjectのGetFolder()と同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     Folderオブジェクト
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/23         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFolder( _
-    byVal asPath _
-    ) 
-    Set func_CM_FsGetFolder = new_Fso().GetFolder(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFsObject()
-'Overview                    : ファイルかフォルダオブジェクトの取得
-'Detailed Description        : func_CM_FsGetFile()とfunc_CM_FsGetFolder()に委譲
-'Argument
-'     asPath                 : パス
-'Return Value
-'     File/Folderオブジェクト
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFsObject( _
-    byVal asPath _
-    )
-    Set func_CM_FsGetFsObject = Nothing
-    If new_Fso().FileExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFile(asPath)
-    If new_Fso().FolderExists(asPath) Then Set func_CM_FsGetFsObject = func_CM_FsGetFolder(asPath)
-End Function
-
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetFiles()
 'Overview                    : 指定したフォルダ以下のFilesコレクションを取得する
@@ -1891,38 +1835,6 @@ Private Function func_CM_FsCreateFolder( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_FsOpenTextFile()
-'Overview                    : ファイルを開きTextStreamオブジェクトを返す
-'Detailed Description        : FileSystemObjectのOpenTextFile()と同等
-'Argument
-'     asPath                 : パス
-'     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
-'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
-'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
-'Return Value
-'     TextStreamオブジェクト
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/01/09         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsOpenTextFile( _
-    byVal asPath _
-    , byVal alIomode _
-    , byVal aboCreate _
-    , byVal alFileFormat _
-    )
-    'ファイルを開く
-    Set func_CM_FsOpenTextFile = new_Fso().OpenTextFile( _
-                                                              asPath _
-                                                              , alIomode _
-                                                              , aboCreate _
-                                                              , alFileFormat _
-                                                              )
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : sub_CM_FsWriteFile()
 'Overview                    : ファイル出力する
 'Detailed Description        : エラーは無視する
@@ -1944,7 +1856,7 @@ Private Sub sub_CM_FsWriteFile( _
     )
     On Error Resume Next
     'ファイルを開く（存在しない場合は作成する）
-    With func_CM_FsOpenTextFile(asPath, 2, True, -2)
+    With new_Ts(asPath, 2, True, -2)
         Call .WriteLine(asCont)
         Call .Close
     End With

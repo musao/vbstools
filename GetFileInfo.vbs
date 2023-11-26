@@ -31,6 +31,7 @@ Sub sub_import( _
     End With
 End Sub
 'import
+sub_import "clsAdptFile.vbs"
 sub_import "clsCmArray.vbs"
 sub_import "clsCmBroker.vbs"
 sub_import "clsCmBufferedReader.vbs"
@@ -64,6 +65,7 @@ Wscript.Quit
 Sub Main()
     'ログ出力の設定
     Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
+    PoWriter.writeBufferSize=100000
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
     oBroker.subscribe "log", GetRef("sub_GetFileInfoLogger")
@@ -160,15 +162,14 @@ Private Sub sub_GetFileInfoProc( _
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-        oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
-'        oList.pushMulti func_GetFileInfoProcGetFilesRecursionByShell(oParam.pop().Path)
+'        oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
+        oList.pushMulti func_GetFileInfoProcGetFilesRecursionByShell(oParam.pop().Path)
     Loop
 
     '★ログ出力
     sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before sorting.")
     '重複を排除してpath順にソートする
     cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.ParentFolder&c.Path>n.ParentFolder&n.Path"))
-'    cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.Parent.Self.Path&c.Path>n.Parent.Self.Path&n.Path"))
 
     Set oList = Nothing
     Set oParam = Nothing
@@ -182,7 +183,7 @@ End Sub
 'Argument
 '     aoItem                 : ファイル/フォルダオブジェクト
 'Return Value
-'     ファイルオブジェクトの配列
+'     Fileオブジェクト相当（アダプターでラップしたオブジェクト）の配列
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -197,7 +198,7 @@ Private Function func_GetFileInfoProcGetFilesRecursion( _
         Dim oEle, vRet()
         'ファイルの取得
         For Each oEle In aoItem.Files
-            cf_push vRet, oEle
+            cf_push vRet, new_AdptFile(oEle)
         Next
         'フォルダの取得
         For Each oEle In aoItem.SubFolders
@@ -206,7 +207,7 @@ Private Function func_GetFileInfoProcGetFilesRecursion( _
         func_GetFileInfoProcGetFilesRecursion = vRet
     Else
     'ファイルの場合
-        func_GetFileInfoProcGetFilesRecursion = Array(aoItem)
+        func_GetFileInfoProcGetFilesRecursion = Array(new_AdptFile(aoItem))
     End If
 
 End Function
@@ -219,7 +220,7 @@ End Function
 'Argument
 '     asPath                 : ファイル/フォルダのパス
 'Return Value
-'     FolderItemオブジェクトの配列
+'     Fileオブジェクト相当（FolderItem2オブジェクトをアダプターでラップしたオブジェクト）の配列
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -241,15 +242,14 @@ Private Function func_GetFileInfoProcGetFilesRecursionByShell( _
                 cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursionByShell(oItem.Path)
             Else
             'ファイルの場合
-                cf_push vRet, oItem
+                cf_push vRet, new_AdptFile(oItem)
             End If
         Next
         func_GetFileInfoProcGetFilesRecursionByShell = vRet
     Else
     'ファイルの場合
-        Set oFile = new_FileOf(asPath)
-        Set oItem = new_ShellApp().Namespace(CStr(oFile.ParentFolder)).Items().Item(oFile.Name)
-        func_GetFileInfoProcGetFilesRecursionByShell = Array(oItem)
+        Set oItem = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
+        func_GetFileInfoProcGetFilesRecursionByShell = Array(new_AdptFile(oItem))
     End If
 
     Set oItem = Nothing
@@ -274,6 +274,13 @@ End Function
 Private Sub sub_GetFileInfoReport( _
     byRef aoParams _
     )
+    If aoParams.Item("List").length=0 Then
+    'パラメータ格納用汎用オブジェクトが空の場合
+        '★ログ出力
+        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "There was no files.")
+        '何もせず処理を抜ける
+        Exit Sub
+    End If
 
     'レポートの作成
     With new_HtmlOf("html")
@@ -281,7 +288,7 @@ Private Sub sub_GetFileInfoReport( _
         .addContent func_GetFileInfoReportHtmlBody(aoParams)
     
         '★ログ出力
-        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before file output.")
+        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before reportfile output.")
         'レポートをファイルに出力
         Dim sPath
         sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
@@ -289,7 +296,7 @@ Private Sub sub_GetFileInfoReport( _
     End With
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before open file.")
+    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before open reportfile.")
     'レポートを開く
     CreateObject("WScript.Shell").Run sPath, 1
     
@@ -390,9 +397,10 @@ Private Function func_GetFileInfoReportHtmlBody( _
     'thead
     Dim oTr : Set oTr = new_HtmlOf("tr")
     oTr.addContent new_HtmlOf("th").addContent("Seq")
-'    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
+    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
     oTr.addContent new_HtmlOf("th").addContent("Name")
     oTr.addContent new_HtmlOf("th").addContent("Path")
+    oTr.addContent new_HtmlOf("th").addContent("ParentFolder")
     oTr.addContent new_HtmlOf("th").addContent("Size")
     oTr.addContent new_HtmlOf("th").addContent("Type")
     Dim oThead : Set oThead = new_HtmlOf("thead")
@@ -405,11 +413,12 @@ Private Function func_GetFileInfoReportHtmlBody( _
         Set oTr = new_HtmlOf("tr")
         With oList.shift
             oTr.addContent new_HtmlOf("th").addContent(lSeq)
-'            oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
+            oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
             oTr.addContent new_HtmlOf("td").addContent(.Name)
             oTr.addContent new_HtmlOf("td").addContent(.Path)
+            oTr.addContent new_HtmlOf("td").addContent(.ParentFolder)
             oTr.addContent new_HtmlOf("td").addContent(.Size)
-            oTr.addContent new_HtmlOf("td").addContent(.Type)
+            oTr.addContent new_HtmlOf("td").addContent(.FileType)
         End With
         oTbody.addContent oTr
         lSeq = lSeq+1

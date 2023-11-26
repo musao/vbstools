@@ -27,6 +27,20 @@ Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
 
+'dim aaa:Set aaa=CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2").Items().Item("jis_ins.vbs")
+dim aaa:Set aaa=CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip").Items().Item("VbsBasicLibCommonTest.vbs")
+
+inputbox "","","Vartype(aaa) = " & Vartype(aaa) & ", Typename(aaa) = " & Typename(aaa)  'Vartype(aaa) = 8, Typename(aaa) = FolderItem2
+                                                                                        'Vartype(aaa) = 8, Typename(aaa) = FolderItem2
+
+Set aaa=new_FileOf("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2\jis_ins.vbs")
+
+inputbox "","","Vartype(aaa) = " & Vartype(aaa) & ", Typename(aaa) = " & Typename(aaa)  'Vartype(aaa) = 8, Typename(aaa) = File
+
+
+wscript.quit
+
+
 
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f1"
 Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip"
@@ -607,7 +621,7 @@ wscript.quit
 Dim sPatha
 sPatha = func_CM_FsGetPrivateLogFilePath()
 Dim bw
-Set bw = new_Writer(func_CM_FsOpenTextFile(sPatha, 8, True, -2))
+Set bw = new_Writer(new_Ts(sPatha, 8, True, -2))
 
 With bw
     .WriteBufferSize = 2

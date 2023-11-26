@@ -21,7 +21,7 @@ Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 Sub SetUp()
     PsPathTempFolder = func_CM_FsBuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedWriter")
     PsPathForAppending = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
-    With func_CM_FsOpenTextFile(PsPathForAppending, ForWriting, True, -2)
+    With new_Ts(PsPathForAppending, ForWriting, True, -2)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
         .Close
     End With
@@ -102,7 +102,7 @@ Sub writer_testCommon(f,p)
                 Set eo = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
             Else
                 pt = PsPathForAppending
-                With func_CM_FsOpenTextFile(pt, ForWriting, True, -2)
+                With new_Ts(pt, ForWriting, True, -2)
                     .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
                     .Close
                 End With

@@ -62,13 +62,21 @@ Sub Test_new_Fso
 End Sub
 
 '###################################################################################################
-'new_ShellApp()
-Sub Test_new_ShellApp
-    Dim e : Set e = CreateObject("Shell.Application")
-    Dim a : Set a = new_ShellApp()
+'new_Ts()
+Sub Test_new_Ts
+    Dim e : Set e = CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName, 1, False, -2)
+    Dim a : Set a = new_Ts(WScript.ScriptFullName, 1, False, -2)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_WriterTo_Err
+    On Error Resume Next
+    Dim a : Set a = new_Ts(vbNullString, 8, False, -2)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
 End Sub
 
 '###################################################################################################
@@ -129,6 +137,16 @@ Sub Test_new_DriveOf_Err
     AssertEqual 5, Err.Number
     AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
     AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
+'new_ShellApp()
+Sub Test_new_ShellApp
+    Dim e : Set e = CreateObject("Shell.Application")
+    Dim a : Set a = new_ShellApp()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
 End Sub
 
 '###################################################################################################

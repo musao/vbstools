@@ -207,7 +207,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     Dim oParam : Set oParam = aoParams.Item("Param")
     
     'ファイルの最終更新日昇順に並べ替える
-    oParam.sortUsing new_Func("(c,n)=>new_CalAt(func_CM_FsGetFile(c).DateLastModified).compareTo(new_CalAt(func_CM_FsGetFile(n).DateLastModified))>0")
+    oParam.sortUsing new_Func("(c,n)=>new_CalAt(new_FileOf(c).DateLastModified).compareTo(new_CalAt(new_FileOf(n).DateLastModified))>0")
     '★ログ出力
     sub_CmpExcelLogger Array(3, "sub_CmpExcelCompareFiles", "aoParams sorted.")
     sub_CmpExcelLogger Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & func_CM_ToString(aoParams))

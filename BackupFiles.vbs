@@ -282,7 +282,7 @@ Private Sub sub_BackupFileProcForOneFile( _
         Dim boDoBackup : boDoBackup = False
         If Not(.Item("Exists")) Then
             boDoBackup = True
-        ElseIf .Item("DateLastModified") <> (func_CM_FsGetFile(asPath)).DateLastModified Then
+        ElseIf .Item("DateLastModified") <> (new_FileOf(asPath)).DateLastModified Then
             boDoBackup = True
         End If
         
@@ -416,7 +416,7 @@ Private Sub sub_BackupFileFindPreviousFile( _
     Dim boExistsTargetFile : boExistsTargetFile = False
     If (Len(sTargetPath)>0) Then boExistsTargetFile = True
     Dim oTargetFile : Set oTargetFile = Nothing
-    If (Len(sTargetPath)>0) Then Set oTargetFile = func_CM_FsGetFile(sTargetPath)
+    If (Len(sTargetPath)>0) Then Set oTargetFile = new_FileOf(sTargetPath)
     
     'パラメータ格納用汎用ハッシュマップに格納する
     Dim oTempHistory : Set oTempHistory = new_Dic()
