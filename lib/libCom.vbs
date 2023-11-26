@@ -1204,6 +1204,89 @@ Private Function util_randStr( _
     util_randStr = sRet
 End Function
 
+'###################################################################################################
+'ファイル操作系
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_getAllFiles()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイル/フォルダのパス
+'Return Value
+'     Fileオブジェクト相当（アダプターでラップしたオブジェクト）の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_getAllFiles( _
+    byVal asPath _
+    )
+    If new_Fso().FolderExists(asPath) Then
+    'フォルダの場合
+        Dim oFolder : Set oFolder = new_FolderOf(asPath)
+        Dim oEle, vRet()
+        'ファイルの取得
+        For Each oEle In oFolder.Files
+            cf_push vRet, new_AdptFile(oEle)
+        Next
+        'フォルダの取得
+        For Each oEle In oFolder.SubFolders
+            cf_pushMulti vRet, fs_getAllFiles(oEle)
+        Next
+        fs_getAllFiles = vRet
+    Else
+    'ファイルの場合
+        fs_getAllFiles = Array(new_AdptFile(new_FileOf(asPath)))
+    End If
+
+    Set oFolder = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_getAllFilesByShell()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイル/フォルダのパス
+'Return Value
+'     Fileオブジェクト相当（FolderItem2オブジェクトをアダプターでラップしたオブジェクト）の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_getAllFilesByShell( _
+    byVal asPath _
+    )
+    Dim oItem
+    If new_Fso().FolderExists(asPath) Then
+    'フォルダの場合
+        Dim oFolder : Set oFolder = new_ShellApp().Namespace(asPath)
+        Dim vRet()
+        For Each oItem In oFolder.Items
+        'フォルダ内全てのアイテムについて
+            If oItem.IsFolder Then
+            'フォルダの場合
+                cf_pushMulti vRet, fs_getAllFilesByShell(oItem.Path)
+            Else
+            'ファイルの場合
+                cf_push vRet, new_AdptFile(oItem)
+            End If
+        Next
+        fs_getAllFilesByShell = vRet
+    Else
+    'ファイルの場合
+        Set oItem = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
+        fs_getAllFilesByShell = Array(new_AdptFile(oItem))
+    End If
+
+    Set oItem = Nothing
+End Function
 
 
 

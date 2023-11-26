@@ -162,8 +162,8 @@ Private Sub sub_GetFileInfoProc( _
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-'        oList.pushMulti func_GetFileInfoProcGetFilesRecursion(oParam.pop)
-        oList.pushMulti func_GetFileInfoProcGetFilesRecursionByShell(oParam.pop().Path)
+'        oList.pushMulti fs_getAllFiles(oParam.pop().Path)
+        oList.pushMulti fs_getAllFilesByShell(oParam.pop().Path)
     Loop
 
     '★ログ出力
@@ -174,87 +174,6 @@ Private Sub sub_GetFileInfoProc( _
     Set oList = Nothing
     Set oParam = Nothing
 End Sub
-
-'***************************************************************************************************
-'Processing Order            : 2-1
-'Function/Sub Name           : func_GetFileInfoProcGetFilesRecursion()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する
-'Detailed Description        : 工事中
-'Argument
-'     aoItem                 : ファイル/フォルダオブジェクト
-'Return Value
-'     Fileオブジェクト相当（アダプターでラップしたオブジェクト）の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_GetFileInfoProcGetFilesRecursion( _
-    byRef aoItem _
-    )
-    If cf_isSame(TypeName(aoItem), "Folder") Then
-    'フォルダの場合
-        Dim oEle, vRet()
-        'ファイルの取得
-        For Each oEle In aoItem.Files
-            cf_push vRet, new_AdptFile(oEle)
-        Next
-        'フォルダの取得
-        For Each oEle In aoItem.SubFolders
-            cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursion(oEle)
-        Next
-        func_GetFileInfoProcGetFilesRecursion = vRet
-    Else
-    'ファイルの場合
-        func_GetFileInfoProcGetFilesRecursion = Array(new_AdptFile(aoItem))
-    End If
-
-End Function
-
-'***************************************************************************************************
-'Processing Order            : 2-1a
-'Function/Sub Name           : func_GetFileInfoProcGetFilesRecursionByShell()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する
-'Detailed Description        : 工事中
-'Argument
-'     asPath                 : ファイル/フォルダのパス
-'Return Value
-'     Fileオブジェクト相当（FolderItem2オブジェクトをアダプターでラップしたオブジェクト）の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/25         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_GetFileInfoProcGetFilesRecursionByShell( _
-    byVal asPath _
-    )
-    Dim oItem,oFile
-    If new_Fso().FolderExists(asPath) Then
-    'フォルダの場合
-        Dim oFolder : Set oFolder = new_ShellApp().Namespace(asPath)
-        Dim vRet()
-        For Each oItem In oFolder.Items
-        'フォルダ内全てのアイテムについて
-            If oItem.IsFolder Then
-            'フォルダの場合
-                cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursionByShell(oItem.Path)
-            Else
-            'ファイルの場合
-                cf_push vRet, new_AdptFile(oItem)
-            End If
-        Next
-        func_GetFileInfoProcGetFilesRecursionByShell = vRet
-    Else
-    'ファイルの場合
-        Set oItem = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
-        func_GetFileInfoProcGetFilesRecursionByShell = Array(new_AdptFile(oItem))
-    End If
-
-    Set oItem = Nothing
-    Set oFile = Nothing
-End Function
 
 '***************************************************************************************************
 'Processing Order            : 3
