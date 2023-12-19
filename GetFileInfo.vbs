@@ -64,7 +64,7 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
+    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -1)
     PoWriter.writeBufferSize=100000
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
@@ -162,8 +162,7 @@ Private Sub sub_GetFileInfoProc( _
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-'        oList.pushMulti fs_getAllFiles(oParam.pop().Path)
-        oList.pushMulti fs_getAllFilesByShell(oParam.pop().Path)
+        oList.pushMulti fs_getAllFiles(oParam.pop().Path)
     Loop
 
     '★ログ出力
@@ -211,13 +210,13 @@ Private Sub sub_GetFileInfoReport( _
         'レポートをファイルに出力
         Dim sPath
         sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
-        sub_CM_FsWriteFile sPath, .generate
+        fs_writeFile sPath, .generate
     End With
 
     '★ログ出力
     sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before open reportfile.")
     'レポートを開く
-    CreateObject("WScript.Shell").Run sPath, 1
+    new_Shell().Run sPath, 1
     
 End Sub
 
@@ -281,7 +280,8 @@ Private Function func_GetFileInfoReportHtmlHead( _
             .addProperty("padding", "10px") _
             .addProperty("font-weight", "normal") _
             .addProperty("border-bottom", "1px solid #E0E1E3") _
-            .addProperty("border-right", "1px solid #E0E1E3")
+            .addProperty("border-right", "1px solid #E0E1E3") _
+            .addProperty("white-space", "nowrap")
     End With
 
     Dim oHead : Set oHead = new_HtmlOf("head")

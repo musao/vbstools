@@ -65,11 +65,7 @@ Class clsAdptFile
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get DateLastModified()
-        If func_AdptFileIsFile Then
-            DateLastModified = PoFile.ModifyDate
-        Else
-            DateLastModified = PoFile.DateLastModified
-        End If
+        DateLastModified = PoFile.ModifyDate
     End Property
     
     '***************************************************************************************************
@@ -105,11 +101,7 @@ Class clsAdptFile
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get ParentFolder()
-        If func_AdptFileIsFile Then
-            ParentFolder = PoFile.Parent.Self.Path
-        Else
-            ParentFolder = PoFile.ParentFolder
-        End If
+        ParentFolder = PoFile.Parent.Self.Path
     End Property
     
     '***************************************************************************************************
@@ -171,7 +163,7 @@ Class clsAdptFile
     'Overview                    : ファイルのオブジェクトを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     aoFile                 : ファイルのオブジェクト
+    '     aoFile                 : FolderItem2オブジェクト
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
@@ -183,35 +175,39 @@ Class clsAdptFile
     Public Function setFileObject( _
         byRef aoFile _
         )
-        If Not func_CM_UtilIsAvailableObject(aoFile) Then
+        If Not cf_isSame(PsTypeName, Typename(aoFile)) Then
             Err.Raise 438, "clsAdptFile.vbs:clsAdptFile+setFileObject()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
             Exit Function
         End If
-
+        
         Set PoFile = aoFile
         Set setFileObject = Me
     End Function
     
-
-
-    
     '***************************************************************************************************
-    'Function/Sub Name           : setFileObject()
-    'Overview                    : ファイルのオブジェクトか否か判定する
+    'Function/Sub Name           : setFilePath()
+    'Overview                    : ファイルのパスからオブジェクトを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     asPath                 : ファイルのパス
     'Return Value
-    '     結果 True:ファイルのオブジェクト / False:ファイルのオブジェクトでない
+    '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/11/26         Y.Fujii                  First edition
+    '2023/12/19         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_AdptFileIsFile( _
-    )
-        If cf_isSame(PsTypeName, Typename(PoFile)) Then func_AdptFileIsFile=True Else func_AdptFileIsFile=False
+    Public Function setFilePath( _
+        byVal asPath _
+        )
+        If Not new_Fso().FileExists(asPath) Then
+            Err.Raise 76, "clsAdptFile.vbs:clsAdptFile+setFilePath()", "パスが見つかりません。"
+            Exit Function
+        End If
+        
+        Set PoFile = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
+        Set setFilePath = Me
     End Function
 
 End Class

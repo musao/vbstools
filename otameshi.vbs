@@ -18,6 +18,7 @@ Sub sub_import( _
     End With
 End Sub
 'import
+Call sub_import("clsAdptFile.vbs")
 Call sub_import("clsCmArray.vbs")
 Call sub_import("clsCmBufferedWriter.vbs")
 Call sub_import("clsCmCalendar.vbs")
@@ -27,23 +28,102 @@ Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
 
-'dim aaa:Set aaa=CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2").Items().Item("jis_ins.vbs")
-dim aaa:Set aaa=CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip").Items().Item("VbsBasicLibCommonTest.vbs")
+Const pathpath = "C:\Users\89585\Documents\dev\vbs\otameshi.vbs"
 
-inputbox "","","Vartype(aaa) = " & Vartype(aaa) & ", Typename(aaa) = " & Typename(aaa)  'Vartype(aaa) = 8, Typename(aaa) = FolderItem2
-                                                                                        'Vartype(aaa) = 8, Typename(aaa) = FolderItem2
+'msgbox new_Fso().GetParentFolderName(pathpath) & vbnewline & new_Re("^.*\\", "gi").Execute(pathpath)(0)
+'msgbox new_Fso().GetFileName(pathpath) & vbnewline & new_Re("[^\\]+$", "gi").Execute(pathpath)(0)
 
-Set aaa=new_FileOf("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2\jis_ins.vbs")
+dim i,j,nowstt
+Set nowstt = new_Now()
+dim rree : set rree = new_Re("^.*\\", "gi")
+'dim rree : set rree = new_Re("[^\\]+$", "gi")
+for i=1 to 1000
+    j = rree.Execute(pathpath)(0)
+next
+dim ss1
+ss1 = new_Now().differenceFrom(nowstt)
 
-inputbox "","","Vartype(aaa) = " & Vartype(aaa) & ", Typename(aaa) = " & Typename(aaa)  'Vartype(aaa) = 8, Typename(aaa) = File
+Set nowstt = new_Now()
+for i=1 to 1000
+'    j = new_Fso().GetFileName(pathpath)
+    j = new_Fso().GetParentFolderName(pathpath)
+next
+dim ss2
+ss2 = new_Now().differenceFrom(nowstt)
+
+msgbox ss1 & vbnewline & ss2
+
+wscript.quit
 
 
+'***************************************************************************************************
+'Function/Sub Name           : fs_getAllFilesByDir()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイル/フォルダのパス
+'Return Value
+'     Fileオブジェクト相当（FolderItem2オブジェクトをアダプターでラップしたオブジェクト）の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_getAllFilesByDirEx( _
+    byVal asPath _
+    )
+    Dim sTmpPath : sTmpPath = func_CM_FsGetTempFilePath()
+    new_Shell().run "cmd /U /C dir /S /B /A-D " & Chr(34) & asPath & Chr(34) & " > " & Chr(34) & sTmpPath & Chr(34), 0, True
+    Dim sLists
+    With CreateObject("ADODB.Stream")
+        .Charset = "Unicode"
+        .Open
+        .LoadFromFile sTmpPath
+        Do Until .EOS
+            cf_push sLists, .ReadText(-2)
+        Loop
+        .Close
+    End With
+    fs_deleteFile sTmpPath
+
+    Dim vRet(), sList
+    For Each sList In sLists
+        If Len(Trim(sList))>0 Then
+            cf_push vRet, new_AdptFile(new_ShellApp().Namespace(new_Fso().GetParentFolderName(sList)).Items().Item(new_Fso().GetFileName(sList)))
+        End If
+    Next
+    fs_getAllFilesByDirEx = vRet
+End Function
+Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test"
+
+dim aa: set aa = new_Now()
+Dim ret1: ret1 = fs_getAllFilesByDir(stPath)
+dim rap1: rap1 = new_Now().differenceFrom(aa)
+set aa = new_Now()
+Dim ret2: ret2 = fs_getAllFilesByDirEx(stPath)
+dim rap2: rap2 = new_Now().differenceFrom(aa)
+
+dim fg
+If ubound(ret1)=ubound(ret2) Then
+    dim bb
+    fg=true
+    For bb=0 To ubound(ret1)
+        if Not cf_isSame(ret1(bb),ret2(bb)) then fg=false
+    Next
+else
+    fg=false
+End If
+inputbox "","",ret1
+inputbox "","",ret2
+inputbox "","",fg
+inputbox "","",rap1-rap2
 wscript.quit
 
 
 
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f1"
-Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip"
+'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip"
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip"
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2\jis_ins.vbs"
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2"

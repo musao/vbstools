@@ -140,6 +140,16 @@ Sub Test_new_DriveOf_Err
 End Sub
 
 '###################################################################################################
+'new_Shell()
+Sub Test_new_Shell
+    Dim e : Set e = CreateObject("Wscript.Shell")
+    Dim a : Set a = new_Shell()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
 'new_ShellApp()
 Sub Test_new_ShellApp
     Dim e : Set e = CreateObject("Shell.Application")

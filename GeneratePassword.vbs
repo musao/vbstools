@@ -69,7 +69,7 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -2)
+    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
     oBroker.subscribe "log", GetRef("sub_GnrtPwLogger")
@@ -207,11 +207,11 @@ Private Sub sub_GnrtPwGenerate( _
     Dim sPath : sPath = func_CM_FsGetTempFilePath()
     Do Until Inputbox(sMsg, sTitle, sPw)=False
         '一時ファイルに生成したパスワードを出力
-        sub_CM_FsWriteFile sPath, sPw
+        fs_writeFile sPath, sPw
         'クリップボードに一時ファイルの内容を出力
-        CreateObject("Wscript.Shell").Run "cmd /c clip <""" & sPath & """", 0, True
+        new_Shell().Run "cmd /c clip <""" & sPath & """", 0, True
         '一時ファイルを削除
-        func_CM_FsDeleteFile sPath
+        fs_deleteFile sPath
         '★ログ出力
         sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "Copied to clipboard.")
     Loop

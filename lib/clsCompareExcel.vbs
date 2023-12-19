@@ -383,7 +383,7 @@ Class clsCompareExcel
         
         If Len(sTempPath) Then
         'マクロありの場合に別名で保存したファイルがあったら削除する
-            Call func_CM_FsDeleteFile(sTempPath)
+            fs_deleteFile sTempPath
             '★ログ出力
             Call sub_CmpExcelPublish("log", 3, sMyName, "Delete file saved with a different name.")
         End If

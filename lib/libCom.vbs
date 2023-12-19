@@ -411,6 +411,45 @@ Private Function new_AdptFile( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_AdptFileOf()
+'Overview                    : Fileオブジェクトのアダプター生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイルのパス
+'Return Value
+'     生成したFileオブジェクトのアダプターのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_AdptFileOf( _
+    byVal asPath _
+    )
+    Set new_AdptFileOf = (New clsAdptFile).setFilePath(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Shell()
+'Overview                    : Wscript.Shellオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したWscript.Shellオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Shell( _
+    )
+    Set new_Shell = CreateObject("Wscript.Shell")
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_ShellApp()
 'Overview                    : Shell.Applicationオブジェクト生成関数
 'Detailed Description        : 工事中
@@ -1209,13 +1248,89 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
+'Function/Sub Name           : fs_writeFile()
+'Overview                    : Unicode形式でファイル出力する
+'Detailed Description        : func_FsWriteFile()に委譲し以下の設定で出力する
+'                               出力モード            ：既存のファイルを新しいデータで置き換える
+'                               ファイルが存在しない場合：新しいファイルを作成する
+'                               ファイルの形式         ：Unicode形式
+'Argument
+'     asPath                 : 出力先のフルパス
+'     asCont                 : 出力する内容
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_writeFile( _
+    byVal asPath _
+    , byVal asCont _
+    )
+    fs_writeFile = func_FsWriteFile(asPath, 2, True, -1, asCont)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_readFile()
+'Overview                    : Unicode形式のファイルを読んで中身を取得する
+'Detailed Description        : func_FsReadFile()に委譲し以下の設定で読込む
+'                               ファイルの形式         ：Unicode形式
+'Argument
+'     asPath                 : 入力先のフルパス
+'Return Value
+'     ファイルの内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_readFile( _
+    byVal asPath _
+    )
+    fs_readFile = func_FsReadFile(asPath, -1)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_deleteFile()
+'Overview                    : ファイルを削除する
+'Detailed Description        : FileSystemObjectのDeleteFile()と同等
+'Argument
+'     asPath                 : 削除するファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_deleteFile( _
+    byVal asPath _
+    ) 
+    If Not new_Fso().FileExists(asPath) Then
+    '削除対象が存在しない場合は失敗
+        fs_deleteFile = False
+        Exit function
+    End If
+
+    fs_deleteFile = True
+    On Error Resume Next
+    new_Fso().DeleteFile(asPath)
+    If Err.Number Then fs_deleteFile = False
+    On Error Goto 0
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fs_getAllFiles()
 'Overview                    : フォルダ配下のファイルオブジェクトを取得する
 'Detailed Description        : 工事中
 'Argument
 '     asPath                 : ファイル/フォルダのパス
 'Return Value
-'     Fileオブジェクト相当（アダプターでラップしたオブジェクト）の配列
+'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -1225,42 +1340,64 @@ End Function
 Private Function fs_getAllFiles( _
     byVal asPath _
     )
+    fs_getAllFiles = func_FsGetAllFilesByFso(asPath)
+'    fs_getAllFiles = func_FsGetAllFilesByShell(asPath)
+'    fs_getAllFiles = func_FsGetAllFilesByDir(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FsGetAllFilesByFso()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する（FSO版）
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイル/フォルダのパス
+'Return Value
+'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FsGetAllFilesByFso( _
+    byVal asPath _
+    )
     If new_Fso().FolderExists(asPath) Then
     'フォルダの場合
         Dim oFolder : Set oFolder = new_FolderOf(asPath)
         Dim oEle, vRet()
         'ファイルの取得
         For Each oEle In oFolder.Files
-            cf_push vRet, new_AdptFile(oEle)
+            cf_push vRet, new_AdptFileOf(oEle.Path)
         Next
         'フォルダの取得
         For Each oEle In oFolder.SubFolders
-            cf_pushMulti vRet, fs_getAllFiles(oEle)
+            cf_pushMulti vRet, func_FsGetAllFilesByFso(oEle)
         Next
-        fs_getAllFiles = vRet
+        func_FsGetAllFilesByFso = vRet
     Else
     'ファイルの場合
-        fs_getAllFiles = Array(new_AdptFile(new_FileOf(asPath)))
+        func_FsGetAllFilesByFso = Array(new_AdptFileOf(asPath))
     End If
 
     Set oFolder = Nothing
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : fs_getAllFilesByShell()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する
-'Detailed Description        : 工事中
+'Function/Sub Name           : func_FsGetAllFilesByShell()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する（ShellApp版）
+'Detailed Description        : zipファイル内のファイルリストを取得できる
 'Argument
 '     asPath                 : ファイル/フォルダのパス
 'Return Value
-'     Fileオブジェクト相当（FolderItem2オブジェクトをアダプターでラップしたオブジェクト）の配列
+'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/25         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function fs_getAllFilesByShell( _
+Private Function func_FsGetAllFilesByShell( _
     byVal asPath _
     )
     Dim oItem
@@ -1272,20 +1409,119 @@ Private Function fs_getAllFilesByShell( _
         'フォルダ内全てのアイテムについて
             If oItem.IsFolder Then
             'フォルダの場合
-                cf_pushMulti vRet, fs_getAllFilesByShell(oItem.Path)
+                cf_pushMulti vRet, func_FsGetAllFilesByShell(oItem.Path)
             Else
             'ファイルの場合
                 cf_push vRet, new_AdptFile(oItem)
             End If
         Next
-        fs_getAllFilesByShell = vRet
+        func_FsGetAllFilesByShell = vRet
     Else
     'ファイルの場合
-        Set oItem = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
-        fs_getAllFilesByShell = Array(new_AdptFile(oItem))
+        func_FsGetAllFilesByShell = Array(new_AdptFileOf(asPath))
     End If
 
     Set oItem = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FsGetAllFilesByDir()
+'Overview                    : フォルダ配下のファイルオブジェクトを取得する（Dir版）
+'Detailed Description        : ネットワークフォルダだと早いらしい
+'Argument
+'     asPath                 : ファイル/フォルダのパス
+'Return Value
+'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FsGetAllFilesByDir( _
+    byVal asPath _
+    )
+    Dim sDir : sDir = "dir /S /B /A-D " & Chr(34) & asPath & Chr(34)
+    Dim sLists
+    Dim sTmpPath : sTmpPath = func_CM_FsGetTempFilePath()
+    new_Shell().run "cmd /U /C " & sDir & " > " & Chr(34) & sTmpPath & Chr(34), 0, True
+    sLists = fs_readFile(sTmpPath)
+    fs_deleteFile sTmpPath
+    
+    Dim vRet(), sList
+    For Each sList In Split(sLists, vbNewLine)
+        If Len(Trim(sList))>0 Then
+            cf_push vRet, new_AdptFileOf(sList)
+        End If
+    Next
+    func_FsGetAllFilesByDir = vRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FsWriteFile()
+'Overview                    : ファイルに出力する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 出力先のフルパス
+'     alMode                 : 出力モード
+'                               2：既存のファイルを新しいデータで置き換える / 8：ファイルの最後に書き込み）
+'     aboCreate              : ファイルが存在しない場合に新しいファイルを作成できるかどうかを示す
+'                               True：新しいファイルを作成する / False：作成しない
+'     alFormat               : ファイルの形式
+'                               -2：システムの既定 / -1：Unicode / 0：Ascii
+'     asCont                 : 出力する内容
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FsWriteFile( _
+    byVal asPath _
+    , byVal alMode _
+    , byVal aboCreate _
+    , byVal alFormat _
+    , byVal asCont _
+    )
+    func_FsWriteFile = True
+    On Error Resume Next
+    With new_Ts(asPath, alMode, aboCreate, alFormat)
+        .Write asCont
+        .Close
+    End With
+    If Err.Number Then func_FsWriteFile = False
+    On Error Goto 0
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FsReadFile()
+'Overview                    : ファイルを読んで中身を取得する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 入力先のフルパス
+'     alFormat               : ファイルの形式
+'                               -2：システムの既定 / -1：Unicode / 0：Ascii
+'Return Value
+'     ファイルの内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FsReadFile( _
+    byVal asPath _
+    , byVal alFormat _
+    )
+    func_FsReadFile = Empty
+    On Error Resume Next
+    With new_Ts(asPath, 1, False, alFormat)
+        func_FsReadFile = .ReadAll
+        .Close
+    End With
+    On Error Goto 0
 End Function
 
 
@@ -1396,34 +1632,34 @@ End Function
 'ファイル操作系
 '###################################################################################################
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsDeleteFile()
-'Overview                    : ファイルを削除する
-'Detailed Description        : FileSystemObjectのDeleteFile()と同等
-'Argument
-'     asPath                 : 削除するファイルのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsDeleteFile( _
-    byVal asPath _
-    ) 
-    If Not new_Fso().FileExists(asPath) Then func_CM_FsDeleteFile = False
-    func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(new_Fso(), asPath), Empty, Empty).Item("Result")
-    
-'    On Error Resume Next
-'    new_Fso().DeleteFile(asPath)
-'    func_CM_FsDeleteFile = True
-'    If Err.Number Then
-'        Err.Clear
-'        func_CM_FsDeleteFile = False
-'    End If
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_FsDeleteFile()
+''Overview                    : ファイルを削除する
+''Detailed Description        : FileSystemObjectのDeleteFile()と同等
+''Argument
+''     asPath                 : 削除するファイルのフルパス
+''Return Value
+''     結果 True:成功 / False:失敗
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2022/09/27         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_FsDeleteFile( _
+'    byVal asPath _
+'    ) 
+'    If Not new_Fso().FileExists(asPath) Then func_CM_FsDeleteFile = False
+'    func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(new_Fso(), asPath), Empty, Empty).Item("Result")
+'    
+''    On Error Resume Next
+''    new_Fso().DeleteFile(asPath)
+''    func_CM_FsDeleteFile = True
+''    If Err.Number Then
+''        Err.Clear
+''        func_CM_FsDeleteFile = False
+''    End If
+'End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsDeleteFolder()
@@ -1455,7 +1691,7 @@ End Function
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsDeleteFsObject()
 'Overview                    : ファイルかフォルダを削除する
-'Detailed Description        : func_CM_FsDeleteFile()とfunc_CM_FsDeleteFolder()に委譲
+'Detailed Description        : fs_deleteFile()とfunc_CM_FsDeleteFolder()に委譲
 'Argument
 '     asPath                 : パス
 'Return Value
@@ -1470,7 +1706,7 @@ Private Function func_CM_FsDeleteFsObject( _
     byVal asPath _
     )
     func_CM_FsDeleteFsObject = False
-    If new_Fso().FileExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFile(asPath)
+    If new_Fso().FileExists(asPath) Then func_CM_FsDeleteFsObject = fs_deleteFile(asPath)
     If new_Fso().FolderExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFolder(asPath)
 End Function
 
@@ -1916,37 +2152,6 @@ Private Function func_CM_FsCreateFolder( _
     )
     func_CM_FsCreateFolder = new_Fso().CreateFolder(asPath)
 End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : sub_CM_FsWriteFile()
-'Overview                    : ファイル出力する
-'Detailed Description        : エラーは無視する
-'Argument
-'     asPath                 : 出力先のフルパス
-'     asCont                 : 出力する内容
-'     なし
-'Return Value
-'     作成したフォルダのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/16         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_FsWriteFile( _
-    byVal asPath _
-    , byVal asCont _
-    )
-    On Error Resume Next
-    'ファイルを開く（存在しない場合は作成する）
-    With new_Ts(asPath, 2, True, -2)
-        Call .WriteLine(asCont)
-        Call .Close
-    End With
-    If Err.Number Then
-        Err.Clear
-    End If
-End Sub
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsIsSame()
