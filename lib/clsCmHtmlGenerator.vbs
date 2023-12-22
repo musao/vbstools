@@ -101,11 +101,12 @@ Class clsCmHtmlGenerator
     Public Property Let element( _
         byVal asElement _
         )
-        If new_Re("^[!-~][ -~]*$", "i").Test(asElement) Then
-            PoTagInfo.Item("element") = asElement
-        Else
-            Err.Raise 1032, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator+element()", "要素（element）には半角以外の文字を指定できません。"
-        End If
+        PoTagInfo.Item("element") = asElement
+'        If new_Re("^[!-~][ -~]*$", "i").Test(asElement) Then
+'            PoTagInfo.Item("element") = asElement
+'        Else
+'            Err.Raise 1032, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator+element()", "要素（element）には半角以外の文字を指定できません。"
+'        End If
     End Property
     
     '***************************************************************************************************
@@ -248,7 +249,7 @@ Class clsCmHtmlGenerator
             For Each vEle In PoTagInfo.Item("content")
                 cf_push vArr, func_CmHtmlGenEditContent(vEle)
             Next
-            sCont = Join(vArr, vbNewLine)
+            sCont = new_Re("^([^\n])", "igm").Replace(Join(vArr, vbNewLine),"  $1")
         End If
 
         '終了タグの編集
@@ -315,7 +316,7 @@ Class clsCmHtmlGenerator
             sRet = func_CmHtmlGenHtmlEntityReference(aoCont)
         End If
         On Error GoTo 0
-        func_CmHtmlGenEditContent = new_Re("^([^\n])", "igm").Replace(sRet,"  $1")
+        func_CmHtmlGenEditContent = sRet
     End Function
 
     '***************************************************************************************************

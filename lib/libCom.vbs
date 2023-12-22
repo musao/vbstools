@@ -1235,10 +1235,10 @@ Private Function util_randStr( _
     byRef avStrings _
     , byVal alTimes _
     )
-    Dim lPos, sRet
-    sRet = ""
+    Dim lPos, sRet, lUb
+    sRet = "" : lUb = Ubound(avStrings)
     For lPos = 1 To alTimes
-        sRet = sRet & avStrings( math_rand(0, Ubound(avStrings), 0) )
+        sRet = sRet & avStrings( math_rand(0, lUb, 0) )
     Next
     util_randStr = sRet
 End Function
@@ -1348,7 +1348,7 @@ End Function
 '***************************************************************************************************
 'Function/Sub Name           : func_FsGetAllFilesByFso()
 'Overview                    : フォルダ配下のファイルオブジェクトを取得する（FSO版）
-'Detailed Description        : 工事中
+'Detailed Description        : zipファイル内の検索はfunc_FsGetAllFilesByShell()に委譲する
 'Argument
 '     asPath                 : ファイル/フォルダのパス
 'Return Value
@@ -1368,7 +1368,13 @@ Private Function func_FsGetAllFilesByFso( _
         Dim oEle, vRet()
         'ファイルの取得
         For Each oEle In oFolder.Files
-            cf_push vRet, new_AdptFileOf(oEle.Path)
+            If StrComp(new_Fso().GetExtensionName(oEle.Path), "zip", vbTextCompar)=0 Then
+            'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
+                cf_pushMulti vRet, func_FsGetAllFilesByShell(oEle.Path)
+            Else
+            'zipファイル以外の場合、ファイル情報を取得する
+                cf_push vRet, new_AdptFileOf(oEle.Path)
+            End If
         Next
         'フォルダの取得
         For Each oEle In oFolder.SubFolders
@@ -1400,11 +1406,16 @@ End Function
 Private Function func_FsGetAllFilesByShell( _
     byVal asPath _
     )
-    Dim oItem
-    If new_Fso().FolderExists(asPath) Then
-    'フォルダの場合
+    '処理タイプ判定
+    Dim boFlg : boFlg = True 'AsFolder
+    If new_Fso().FileExists(asPath) Then
+        If StrComp(new_Fso().GetExtensionName(asPath), "zip", vbTextCompar)<>0 Then boFlg=False 'AsFile
+    End If
+    
+    If boFlg Then
+    'フォルダかzipファイルの場合
         Dim oFolder : Set oFolder = new_ShellApp().Namespace(asPath)
-        Dim vRet()
+        Dim oItem, vRet()
         For Each oItem In oFolder.Items
         'フォルダ内全てのアイテムについて
             If oItem.IsFolder Then
@@ -1416,18 +1427,17 @@ Private Function func_FsGetAllFilesByShell( _
             End If
         Next
         func_FsGetAllFilesByShell = vRet
+        Set oItem = Nothing
     Else
-    'ファイルの場合
+    '上記以外の場合
         func_FsGetAllFilesByShell = Array(new_AdptFileOf(asPath))
     End If
-
-    Set oItem = Nothing
 End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_FsGetAllFilesByDir()
 'Overview                    : フォルダ配下のファイルオブジェクトを取得する（Dir版）
-'Detailed Description        : ネットワークフォルダだと早いらしい
+'Detailed Description        : zipファイル内の検索はfunc_FsGetAllFilesByShell()に委譲する
 'Argument
 '     asPath                 : ファイル/フォルダのパス
 'Return Value
@@ -1451,7 +1461,13 @@ Private Function func_FsGetAllFilesByDir( _
     Dim vRet(), sList
     For Each sList In Split(sLists, vbNewLine)
         If Len(Trim(sList))>0 Then
-            cf_push vRet, new_AdptFileOf(sList)
+            If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompar)=0 Then
+            'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
+                cf_pushMulti vRet, func_FsGetAllFilesByShell(sList)
+            Else
+            'zipファイル以外の場合、ファイル情報を取得する
+                cf_push vRet, new_AdptFileOf(sList)
+            End If
         End If
     Next
     func_FsGetAllFilesByDir = vRet
@@ -3186,7 +3202,7 @@ End Sub
 '     aoCurrentValue         : 配列の要素
 '     aoNextValue            : 次の配列の要素
 'Return Value
-'     ソート後の配列
+'     要素の比較結果
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes

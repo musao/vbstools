@@ -561,30 +561,30 @@ Sub Test_clsCmArray_shift_unshift_unshiftMulti
     Set a = new clsCmArray
     
     e = Array("hoge", 2, "参", Nothing)
-    AssertEqual 1, a.unshift(e(3))
-    AssertEqual 2, a.unshift(e(2))
-    AssertEqual 3, a.unshift(e(1))
-    AssertEqual 4, a.unshift(e(0))
+    AssertEqualWithMessage 1, a.unshift(e(3)), "1-1"
+    AssertEqualWithMessage 2, a.unshift(e(2)), "1-2"
+    AssertEqualWithMessage 3, a.unshift(e(1)), "1-3"
+    AssertEqualWithMessage 4, a.unshift(e(0)), "1-4"
     
     assertAllElements e, a
     
-    AssertEqual e(0), a.shift
-    AssertEqual e(1), a.shift
+    AssertEqualWithMessage e(0), a.shift, "2-1"
+    AssertEqualWithMessage e(1), a.shift, "2-2"
     
-    AssertEqual 2, a.length
-    AssertEqual e(2), a(0)
-    AssertSame e(3), a(1)
+    AssertEqualWithMessage 2, a.length, "3-1"
+    AssertEqualWithMessage e(2), a(0), "3-2"
+    AssertSameWithMessage e(3), a(1), "3-3"
     
-    AssertEqual 4, a.unshiftMulti(Array(Empty, "四"))
+    AssertEqualWithMessage 4, a.unshiftMulti(Array(Empty, "四")), "4-1"
     
     e = Array(Empty, "四", "参", Nothing)
     assertAllElements e, a
     
-    AssertEqual e(0), a.shift
-    AssertEqual e(1), a.shift
-    AssertEqual e(2), a.shift
-    AssertSame e(3), a.shift
-    AssertEqual 0, a.length
+    AssertEqualWithMessage e(0), a.shift, "5-1"
+    AssertEqualWithMessage e(1), a.shift, "5-2"
+    AssertEqualWithMessage e(2), a.shift, "5-3"
+    AssertSameWithMessage e(3), a.shift, "5-4"
+    AssertEqualWithMessage 0, a.length, "5-5"
 End Sub
 
 '###################################################################################################

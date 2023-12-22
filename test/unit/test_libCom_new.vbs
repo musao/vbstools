@@ -382,14 +382,14 @@ Sub Test_new_HtmlOf
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-Sub Test_new_HtmlOf_Err
-    On Error Resume Next
-    Dim a : Set a = new_HtmlOf("Ｈｏｇｅ")
-    
-    AssertEqual 1032, Err.Number
-    AssertEqual "要素（element）には半角以外の文字を指定できません。", Err.Description
-    AssertEqual Empty, a
-End Sub
+'Sub Test_new_HtmlOf_Err
+'    On Error Resume Next
+'    Dim a : Set a = new_HtmlOf("Ｈｏｇｅ")
+'    
+'    AssertEqual 1032, Err.Number
+'    AssertEqual "要素（element）には半角以外の文字を指定できません。", Err.Description
+'    AssertEqual Empty, a
+'End Sub
 
 '###################################################################################################
 'new_CssOf()
@@ -400,14 +400,14 @@ Sub Test_new_CssOf
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-Sub Test_new_CssOf_Err
-    On Error Resume Next
-    Dim a : Set a = new_CssOf("．Ｈｏｇｅ")
-    
-    AssertEqual 1032, Err.Number
-    AssertEqual "セレクタには半角以外の文字を指定できません。", Err.Description
-    AssertEqual Empty, a
-End Sub
+'Sub Test_new_CssOf_Err
+'    On Error Resume Next
+'    Dim a : Set a = new_CssOf("．Ｈｏｇｅ")
+'    
+'    AssertEqual 1032, Err.Number
+'    AssertEqual "セレクタには半角以外の文字を指定できません。", Err.Description
+'    AssertEqual Empty, a
+'End Sub
 
 '###################################################################################################
 'new_Char()

@@ -168,7 +168,7 @@ Private Sub sub_GetFileInfoProc( _
     '★ログ出力
     sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before sorting.")
     '重複を排除してpath順にソートする
-    cf_bindAt aoParams, "List", oList.uniq().sortUsing(new_Func("(c,n)=>c.ParentFolder&c.Path>n.ParentFolder&n.Path"))
+    cf_bindAt aoParams, "List", oList.uniq().sortUsing(getref("func_GetFileInfoSort"))
 
     Set oList = Nothing
     Set oParam = Nothing
@@ -238,8 +238,6 @@ End Sub
 Private Function func_GetFileInfoReportHtmlHead( _
     byRef aoParams _
     )
-    'パラメータ格納用汎用オブジェクト
-    Dim oList : Set oList = aoParams.Item("List").slice(0,vbNullString)
     
     Dim oStyle : Set oStyle = _
         new_HtmlOf("style") _
@@ -337,7 +335,7 @@ Private Function func_GetFileInfoReportHtmlBody( _
             oTr.addContent new_HtmlOf("td").addContent(.Path)
             oTr.addContent new_HtmlOf("td").addContent(.ParentFolder)
             oTr.addContent new_HtmlOf("td").addContent(.Size)
-            oTr.addContent new_HtmlOf("td").addContent(.FileType)
+            oTr.addContent new_HtmlOf("td").addContent(.Type)
         End With
         oTbody.addContent oTr
         lSeq = lSeq+1
@@ -358,6 +356,7 @@ Private Function func_GetFileInfoReportHtmlBody( _
     Set oTbody = Nothing
     Set oTable = Nothing
     Set oBody = Nothing
+    Set oList = Nothing
 End Function
 
 '***************************************************************************************************
@@ -380,3 +379,25 @@ Private Sub sub_GetFileInfoLogger( _
     )
     sub_CM_UtilLogger avParams, PoWriter
 End Sub
+'***************************************************************************************************
+'Processing Order            : -
+'Function/Sub Name           : func_GetFileInfoSort()
+'Overview                    : 要素の比較結果を返す
+'Detailed Description        : ファイル情報リストのソートで使用する
+'Argument
+'     aoCurrentValue         : 配列の要素
+'     aoNextValue            : 次の配列の要素
+'Return Value
+'     ソート後の配列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_GetFileInfoSort( _
+    byRef aoCurrentValue _
+    , byRef aoNextValue _
+    )
+    func_GetFileInfoSort = aoCurrentValue.ParentFolder&aoCurrentValue.Path > aoNextValue.ParentFolder&aoNextValue.Path
+End Function

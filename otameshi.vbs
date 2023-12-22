@@ -28,25 +28,45 @@ Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
 
-Const pathpath = "C:\Users\89585\Documents\dev\vbs\otameshi.vbs"
+dim arrx
+arrx = array(1,2,3,4)
+inputbox "","",func_CM_ToString(arrx)
 
-'msgbox new_Fso().GetParentFolderName(pathpath) & vbnewline & new_Re("^.*\\", "gi").Execute(pathpath)(0)
-'msgbox new_Fso().GetFileName(pathpath) & vbnewline & new_Re("[^\\]+$", "gi").Execute(pathpath)(0)
+dim newarr
+newarr = array("a","b,","c","d")
+inputbox "","",func_CM_ToString(newarr)
 
-dim i,j,nowstt
-Set nowstt = new_Now()
-dim rree : set rree = new_Re("^.*\\", "gi")
-'dim rree : set rree = new_Re("[^\\]+$", "gi")
+arrx = newarr
+inputbox "","",func_CM_ToString(arrx)
+
+cf_bind arrx(1), "xyz"
+inputbox "","",func_CM_ToString(arrx)
+inputbox "","",func_CM_ToString(newarr)
+
+wscript.quit
+
+
+
+Dim tgt
+tgt = "Aa 1$:_zZ9%Aa 1$"
+'tgt = "Aa 1$:_zZ9%Aa 1$:_zZ9%Aa 1$:_zZ9%Aa 1$:_zZ9%"
+Dim nowstt : Set nowstt = new_Now()
+Dim i
 for i=1 to 1000
-    j = rree.Execute(pathpath)(0)
+    new_Re("^[!-~][ -~]*$", "i").Test(tgt)
 next
 dim ss1
 ss1 = new_Now().differenceFrom(nowstt)
 
 Set nowstt = new_Now()
-for i=1 to 1000
-'    j = new_Fso().GetFileName(pathpath)
-    j = new_Fso().GetParentFolderName(pathpath)
+Dim j,xx
+for i=1 To 1000
+    j=1
+    set xx = new_Char()
+    do while j<=len(tgt)
+        math_log2(xx.whatType(mid(tgt,j,1)))
+        j=j+1
+    loop
 next
 dim ss2
 ss2 = new_Now().differenceFrom(nowstt)

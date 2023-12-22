@@ -71,17 +71,17 @@ Sub Test_clsCmCssGenerator_selector
     a = ao.selector
     AssertEqualWithMessage e, a, "1-3"
 End Sub
-Sub Test_clsCmCssGenerator_selector_Err
-    Dim ao,a,d
-    Set ao = new clsCmCssGenerator
-
-    On Error Resume Next
-    d = "Ｈｏｇｅ"
-    ao.selector = d
-
-    AssertEqual 1032, Err.Number
-    AssertEqual "セレクタには半角以外の文字を指定できません。", Err.Description
-End Sub
+'Sub Test_clsCmCssGenerator_selector_Err
+'    Dim ao,a,d
+'    Set ao = new clsCmCssGenerator
+'
+'    On Error Resume Next
+'    d = "Ｈｏｇｅ"
+'    ao.selector = d
+'
+'    AssertEqual 1032, Err.Number
+'    AssertEqual "セレクタには半角以外の文字を指定できません。", Err.Description
+'End Sub
 
 '###################################################################################################
 'clsCmCssGenerator.generate()
