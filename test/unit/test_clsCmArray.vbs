@@ -276,26 +276,26 @@ Sub Test_clsCmArray_hasElement_Ok
     Set a = new_Arr()
     
     Dim d1(0)
-    AssertEqual True, a.hasElement(d1)
+    AssertEqualWithMessage True, a.hasElement(d1), "1"
     
     Dim d2(1)
-    AssertEqual True, a.hasElement(d2)
+    AssertEqualWithMessage True, a.hasElement(d2), "2"
     
     Dim d3
     d3 = Array(1)
-    AssertEqual True, a.hasElement(d3)
+    AssertEqualWithMessage True, a.hasElement(d3), "3"
     
     d3 = Array(1,2)
-    AssertEqual True, a.hasElement(d3)
+    AssertEqualWithMessage True, a.hasElement(d3), "4"
     
     Redim d4(1)
-    AssertEqual True, a.hasElement(d4)
+    AssertEqualWithMessage True, a.hasElement(d4), "5"
     
     Redim Preserve d4(2)
-    AssertEqual True, a.hasElement(d4)
+    AssertEqualWithMessage True, a.hasElement(d4), "6"
     
     Redim d4(0)
-    AssertEqual True, a.hasElement(d4)
+    AssertEqualWithMessage True, a.hasElement(d4), "7"
 End Sub
 Sub Test_clsCmArray_hasElement_Ng_Variable
     Dim a
@@ -303,26 +303,29 @@ Sub Test_clsCmArray_hasElement_Ng_Variable
     
     Dim d
     d = Empty
-    AssertEqual False, a.hasElement(d)
+    AssertEqualWithMessage False, a.hasElement(d), "1"
     
     d = vbNullString
-    AssertEqual False, a.hasElement(d)
+    AssertEqualWithMessage False, a.hasElement(d), "2"
     
     Set d = Nothing
-    AssertEqual False, a.hasElement(d)
+    AssertEqualWithMessage False, a.hasElement(d), "3"
     
     d = "abc"
-    AssertEqual False, a.hasElement(d)
+    AssertEqualWithMessage False, a.hasElement(d), "4"
     
     d = 123
-    AssertEqual False, a.hasElement(d)
+    AssertEqualWithMessage False, a.hasElement(d), "5"
 End Sub
 Sub Test_clsCmArray_hasElement_Ng_Array
     Dim a
     Set a = new_Arr()
     
     Dim d()
-    AssertEqual False, a.hasElement(d)
+    AssertEqualWithMessage False, a.hasElement(d), "1"
+    
+    Dim d2: d2 = Array()
+    AssertEqualWithMessage False, a.hasElement(d2), "2"
 End Sub
 
 '###################################################################################################
@@ -899,6 +902,16 @@ Sub Test_clsCmArray_splice_Empty
     assertAllElements e, a
     AssertEqual 0, a1.length
     
+End Sub
+
+'###################################################################################################
+'clsCmArray.toString()
+Sub Test_clsCmArray_toString
+    Dim e,d,a
+    d = Array(1,2,3)
+    e = "<clsCmArray>[<Integer>1,<Integer>2,<Integer>3]"
+    a = new_ArrWith(d).toString
+    AssertEqual e, a
 End Sub
 
 '###################################################################################################

@@ -630,6 +630,34 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
+    'Function/Sub Name           : toString()
+    'Overview                    : 配列の内容を文字列で表示する
+    'Detailed Description        : cf_toString()準拠
+    'Argument
+    '     なし
+    'Return Value
+    '     文字列に変換した配列の内容
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/12/24         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function toString( _
+        )
+        If func_CmArrayLength()>0 Then
+            Dim vRet, oEle
+            For Each oEle In PvArr
+                cf_push vRet, cf_toString(oEle)
+            Next
+            toString = "<" & TypeName(Me) & ">[" & func_CM_UtilJoin(vRet, ",") & "]"
+            Set oEle = Nothing
+        Else
+            toString = "<" & TypeName(Me) & ">[]"
+        End If
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : uniq()
     'Overview                    : 配列の重複を排除する
     'Detailed Description        : func_CmArrayUniq()に委譲する
@@ -901,8 +929,8 @@ Class clsCmArray
         func_CmArrayHasElement = False
         If IsArray(avArr) Then
             On Error Resume Next
-            Ubound(avArr)
-            If Err.Number=0 Then func_CmArrayHasElement = True
+            Dim lUb : lUb = Ubound(avArr)
+            If Err.Number=0 And lUb>=0 Then func_CmArrayHasElement = True
             On Error Goto 0
         End If
     End Function

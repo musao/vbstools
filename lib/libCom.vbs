@@ -71,7 +71,7 @@ End Sub
 '     avArr                  : 配列
 '     aoEle                  : 追加する要素
 'Return Value
-'     配列の次元数
+'     なし
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -91,13 +91,13 @@ End Sub
 
 '***************************************************************************************************
 'Function/Sub Name           : cf_pushMulti()
-'Overview                    : 配列に要素を追加する
+'Overview                    : 配列に複数の要素を追加する
 'Detailed Description        : 工事中
 'Argument
 '     avArr                  : 配列
-'     avAdd                  : 追加する配列
+'     avAdd                  : 追加する要素の配列
 'Return Value
-'     配列の次元数
+'     なし
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
@@ -224,6 +224,155 @@ Private Function cf_isSame( _
     cf_isSame = boFlg
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : cf_toString()
+'Overview                    : 引数の内容を文字列で表示する
+'Detailed Description        : func_CfToString()に委譲する
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_toString( _
+    byRef avTgt _
+    )
+    cf_toString = func_CfToString(avTgt)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToString()
+'Overview                    : 引数の内容を文字列で表示する
+'Detailed Description        : 表示型式は以下のとおり
+'                               配列、Dictionaryは要素ごとに内容を表示する、入れ子は再帰表示する
+'                               　配列：[<Long>0,<String>"a",<Empty>,[value1,...],{key1=>value1,...},...]
+'                               　Dictionary：{key1=>value1,key2=>[a_value1,...],key3=>{d_key1=>d_value1,...}...}
+'                               上記以外 <VarType>Value形式 ※Valueはない場合あり
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToString( _
+    byRef avTgt _
+    )
+    If IsArray(avTgt) Then
+        func_CfToString = func_CfToStringArray(avTgt)
+        Exit Function
+    End If
+    If IsObject(avTgt) Then
+        func_CfToString = func_CfToStringObject(avTgt)
+        Exit Function
+    End If
+    Dim sRet : sRet = "<" & TypeName(avTgt) & ">" 
+    If cf_isSame(TypeName(avTgt),"String") Then
+        sRet = sRet & Chr(34) & Replace(avTgt,Chr(34),Chr(34)&Chr(34)) & Chr(34)
+    ElseIf Not (IsEmpty(avTgt) Or IsNull(avTgt)) Then
+        sRet = sRet & CStr(avTgt)
+    End If
+    func_CfToString = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToStringArray()
+'Overview                    : 配列の内容を文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToStringArray( _
+    byRef avTgt _
+    )
+    If new_Arr().hasElement(avTgt) Then
+        Dim vRet, oEle
+        For Each oEle In avTgt
+            cf_push vRet, func_CfToString(oEle)
+        Next
+        func_CfToStringArray = "<Array>[" & Join(vRet, ",") & "]"
+        Set oEle = Nothing
+    Else
+        func_CfToStringArray = "<Array>[]"
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToStringObject()
+'Overview                    : オブジェクトの内容を文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToStringObject( _
+    byRef avTgt _
+    )
+    If cf_isSame(TypeName(avTgt),"Dictionary") Then
+        func_CfToStringObject = func_CfToStringObjectDictionary(avTgt)
+        Exit Function
+    End If
+
+    On Error Resume Next
+    func_CfToStringObject = avTgt.toString()
+    If Err.Number=0 Then Exit Function
+    On Error Goto 0
+
+    If cf_isSame(VarType(avTgt), 8) Then
+        func_CfToStringObject = "<" & TypeName(avTgt) & ">" & avTgt
+        Exit Function
+    End If
+    func_CfToStringObject = "<" & TypeName(avTgt) & ">"
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToStringObjectDictionary()
+'Overview                    : ディクショナリの内容を文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToStringObjectDictionary( _
+    byRef avTgt _
+    )
+    If avTgt.Count>0 Then
+        Dim vRet, oEle
+        For Each oEle In avTgt.Keys
+            cf_push vRet, func_CfToString(oEle) & "=>" & func_CfToString(avTgt.Item(oEle))
+        Next
+        func_CfToStringObjectDictionary = "<Dictionary>{" & Join(vRet, ",") & "}"
+        Set oEle = Nothing
+    Else
+        func_CfToStringObjectDictionary = "<Dictionary>{}"
+    End If
+End Function
 
 '###################################################################################################
 'インスタンス生成関数
@@ -2828,7 +2977,7 @@ Private Sub sub_CM_ExcuteSub( _
     '出版（Publish） 開始
     If Not aoBroker Is Nothing Then
         aoBroker.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
-        aoBroker.Publish Cs_TOPIC, Array(9 ,asSubName ,func_CM_ToString(aoArgument))
+        aoBroker.Publish Cs_TOPIC, Array(9 ,asSubName ,cf_toString(aoArgument))
     End If
     
     '関数の実行
@@ -2844,12 +2993,12 @@ Private Sub sub_CM_ExcuteSub( _
     If Not aoBroker Is Nothing Then
         If oRet.Item("Result")=False Then
         'エラー
-            aoBroker.Publish Cs_TOPIC, Array(1, asSubName, func_CM_ToString(oRet.Item("Err")))
+            aoBroker.Publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.Item("Err")))
         Else
         '正常
             aoBroker.Publish Cs_TOPIC, Array(5, asSubName, "End")
         End If
-        aoBroker.Publish Cs_TOPIC, Array(9, asSubName, func_CM_ToString(aoArgument))
+        aoBroker.Publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArgument))
     End If
     
     Set oRet = Nothing

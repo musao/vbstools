@@ -184,7 +184,7 @@ Class clsCompareExcel
         Dim sMyName : sMyName = "+compare"
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
-        Call sub_CmpExcelPublish("log", 9, sMyName, "PsPathFrom = " & func_CM_ToString(PsPathFrom) & ", PsPathTo = " & func_CM_ToString(PsPathTo))
+        Call sub_CmpExcelPublish("log", 9, sMyName, "PsPathFrom = " & cf_toString(PsPathFrom) & ", PsPathTo = " & cf_toString(PsPathTo))
         
         compare = False
         
@@ -246,7 +246,7 @@ Class clsCompareExcel
         Dim sMyName : sMyName = "-sub_CmpExcelCopyAllSheetsToWorkbookForResults"
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
-        Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
+        Call sub_CmpExcelPublish("log", 9, sMyName, cf_toString(aoParams))
         
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : Call cf_bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
@@ -259,7 +259,7 @@ Class clsCompareExcel
         
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "Source file copy completed.")
-        Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
+        Call sub_CmpExcelPublish("log", 9, sMyName, cf_toString(aoParams))
         
         '比較先ファイルのコピー
         sPath = PsPathTo : sFromToString = "To"
@@ -268,7 +268,7 @@ Class clsCompareExcel
         
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "End")
-        Call sub_CmpExcelPublish("log", 9, sMyName, func_CM_ToString(aoParams))
+        Call sub_CmpExcelPublish("log", 9, sMyName, cf_toString(aoParams))
         
         Set oWorkbookForResults = Nothing
     End Sub
@@ -304,13 +304,13 @@ Class clsCompareExcel
         
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
-        Call sub_CmpExcelPublish("log", 9, sMyName, "aoWorkbookForResults = " & func_CM_ToString(aoWorkbookForResults) & ", asPath = " & func_CM_ToString(asPath)& ", asFromToString = " & func_CM_ToString(asFromToString))
+        Call sub_CmpExcelPublish("log", 9, sMyName, "aoWorkbookForResults = " & cf_toString(aoWorkbookForResults) & ", asPath = " & cf_toString(asPath)& ", asFromToString = " & cf_toString(asFromToString))
 
         '比較対象ファイルを開く
         Dim oExcel : Set oExcel = aoWorkbookForResults.Parent
         Dim oWorkBook : Set oWorkBook = func_CM_ExcelOpenFile(oExcel, asPath)
         '★ログ出力
-        Call sub_CmpExcelPublish("log", 3, sMyName, "Opened Excel file, file path is " & func_CM_ToString(asPath) )
+        Call sub_CmpExcelPublish("log", 3, sMyName, "Opened Excel file, file path is " & cf_toString(asPath) )
         
         Dim sTempPath : sTempPath = ""
         If oWorkBook.HasVBProject Then
@@ -338,7 +338,7 @@ Class clsCompareExcel
                 If oWorksheet.Visible=True Then
                 '全ての見えるシートを比較結果用ワークブックにコピーする
                     '★ログ出力
-                    Call sub_CmpExcelPublish("log", 3, sMyName, "Start processing sheet " & func_CM_ToString(oWorksheet.Name) & "." )
+                    Call sub_CmpExcelPublish("log", 3, sMyName, "Start processing sheet " & cf_toString(oWorksheet.Name) & "." )
                     
                     'シート保護の解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to unprotect a sheet.")
@@ -352,7 +352,7 @@ Class clsCompareExcel
                     sNewSheetName = func_CmpExcelMakeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
                     oWorkSheetRenameInfo.Push new_DicWith( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
                     '★ログ出力
-                    Call sub_CmpExcelPublish("log", 9, sMyName, "oWorkSheetRenameInfo = " & func_CM_ToString(oWorkSheetRenameInfo) )
+                    Call sub_CmpExcelPublish("log", 9, sMyName, "oWorkSheetRenameInfo = " & cf_toString(oWorkSheetRenameInfo) )
                     
                     'シート名変更＆タブの色を変更
                     oWorksheet.Name = sNewSheetName
@@ -410,7 +410,7 @@ Class clsCompareExcel
         Set func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = oWorkSheetRenameInfo
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "End")
-        Call sub_CmpExcelPublish("log", 9, sMyName, "func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = " & func_CM_ToString(oWorkSheetRenameInfo))
+        Call sub_CmpExcelPublish("log", 9, sMyName, "func_CmpExcelCopyAllSheetsToWorkbookForResultsDetail = " & cf_toString(oWorkSheetRenameInfo))
         
         'オブジェクトを開放
         Set oStringToColumn = Nothing
@@ -465,7 +465,7 @@ Class clsCompareExcel
         Dim sMyName : sMyName = "-sub_CmpExcelCompare"
         '★ログ出力
         Call sub_CmpExcelPublish("log", 5, sMyName, "Start")
-        Call sub_CmpExcelPublish("log", 9, sMyName, "aoParams = " & func_CM_ToString(aoParams))
+        Call sub_CmpExcelPublish("log", 9, sMyName, "aoParams = " & cf_toString(aoParams))
         
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : Call cf_bind(oWorkbookForResults, aoParams.Item("WorkbookForResults"))
@@ -660,7 +660,7 @@ Class clsCompareExcel
         )
         If aoRet.Item("Result") Then Exit Sub
         sub_CmpExcelPublish "log", 3, asYourName, "It couldn't."
-        sub_CmpExcelPublish "log", 9, asYourName, "<Err> " & func_CM_ToString(aoRet.Item("Err"))
+        sub_CmpExcelPublish "log", 9, asYourName, "<Err> " & cf_toString(aoRet.Item("Err"))
     End Sub
 
     '***************************************************************************************************

@@ -210,7 +210,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     oParam.sortUsing new_Func("(c,n)=>new_CalAt(new_FileOf(c).DateLastModified).compareTo(new_CalAt(new_FileOf(n).DateLastModified))>0")
     'ÅöÉçÉOèoóÕ
     sub_CmpExcelLogger Array(3, "sub_CmpExcelCompareFiles", "aoParams sorted.")
-    sub_CmpExcelLogger Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & func_CM_ToString(aoParams))
+    sub_CmpExcelLogger Array(9, "sub_CmpExcelCompareFiles", "aoParams is " & cf_toString(aoParams))
     
     'î‰är
     With New clsCompareExcel

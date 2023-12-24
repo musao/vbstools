@@ -349,6 +349,151 @@ Sub Test_cf_isSame_VvsV_and_NvsS_NotSame
 End Sub
 
 '###################################################################################################
+'cf_toString()
+Sub Test_cf_toString_Empty
+    Dim a,d,e
+    d = Empty
+    e = "<Empty>"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Null
+    Dim a,d,e
+    d = Null
+    e = "<Null>"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Integer
+    Dim a,d,e
+    d = CInt(100)
+    e = "<Integer>100"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Long
+    Dim a,d,e
+    d = CLng(99999999)
+    e = "<Long>99999999"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Single
+    Dim a,d,e
+    d = CSng(1.23)
+    e = "<Single>1.23"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Double
+    Dim a,d,e
+    d = CDbl(1.23)
+    e = "<Double>1.23"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Currency
+    Dim a,d,e
+    d = CCur(100.1)
+    e = "<Currency>100.1"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Date
+    Dim a,d,e
+    d = #2023-01-24 18:12:04#
+    e = "<Date>2023/01/24 18:12:04"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_String
+    Dim a,d,e
+    d = "foo"
+    e = "<String>" & Chr(34) & d & Chr(34)
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_String_vbNullString
+    Dim a,d,e
+    d = vbNullString
+    e = "<String>" & Chr(34)&Chr(34)
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_String_ContainsDoubleQuotes
+    Dim a,d,e
+    d = "foo" & Chr(34) & "bar"
+    e = "<String>" & Chr(34) & Replace(d,Chr(34),Chr(34)&Chr(34)) & Chr(34)
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Object_Dictionary
+    Dim a,d,e
+    Set d = new_DicWith(Array("foo","apple","bar",5))
+    e = "<Dictionary>{<String>" & Chr(34) & "foo" & Chr(34) & "=><String>" & Chr(34) & "apple" & Chr(34) & ",<String>" & Chr(34) & "bar" & Chr(34) & "=><Integer>5}"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Object_Dictionary_Empty
+    Dim a,d,e
+    Set d = new_Dic()
+    e = "<Dictionary>{}"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Object_Nothing
+    Dim a,d,e
+    Set d = Nothing
+    e = "<Nothing>"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Object_Other_ShellApp
+    Dim a,d,e
+    Set d = new_ShellApp()
+    e = "<IShellDispatch6>"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Object_Other_UserDef
+    Dim a,d,e
+    Set d = new_Char()
+    e = "<clsCmCharacterType>"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Boolean
+    Dim a,d,e
+    d = True
+    e = "<Boolean>True"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Byte
+    Dim a,d,e
+    d = CByte(1)
+    e = "<Byte>1"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Array
+    Dim a,d,e
+    d = Array(1,"a",Array("ŽQ",4),new_DicWith(Array("‡X",6,7,"‚W")))
+    e = "<Array>[<Integer>1,<String>" & Chr(34) & "a" & Chr(34) & ",<Array>[<String>" & Chr(34) & "ŽQ" & Chr(34) & ",<Integer>4],<Dictionary>{<String>" & Chr(34) & "‡X" & Chr(34) & "=><Integer>6,<Integer>7=><String>" & Chr(34) & "‚W" & Chr(34) & "}]"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Array_Empty
+    Dim a,d,e
+    d = Array()
+    e = "<Array>[]"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+
+
+
+'###################################################################################################
 'common
 Sub assertAllElements(e,a)
     AssertEqualWithMessage Ubound(e), Ubound(a), "Ubound"
