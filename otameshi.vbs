@@ -27,6 +27,32 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
+
+inputbox "","",cf_toString(WScript.Arguments)
+wscript.quit
+
+
+
+Dim WMI : Set WMI = CreateObject("WbemScripting.SWbemLocator")
+Dim oService : Set oService = WMI.ConnectServer
+Dim oFiles : Set oFiles = oService.ExecQuery("Select * from CIM_DataFile where Drive = 'C:' and Path = '\\Users\89585\\Documents\\dev\\vbs\\' and FileName = 'BackupFiles' and Extension = 'vbs'")
+'Dim oFiles : Set oFiles = oService.ExecQuery("Select * from CIM_DataFile where Drive = 'C:' and Name = 'C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip\VbsBasicLibCommonTest.vbs'")
+
+Dim oFile
+For Each oFile In oFiles
+    inputbox "","","Name：" & oFile.Name
+    inputbox "","","FileSize：" & oFile.FileSize
+'    inputbox "","","プリンタ名前：" & oClass.Caption
+'    Debug.Print "ドライバー名：" & oClass.DriverName
+'    Debug.Print "プリンタのポート：" & oClass.PortName
+'    Debug.Print "デフォルトプリンタ：" & oClass.Default
+'    Debug.Print ""
+Next
+
+msgbox"ok"
+wscript.quit
+
+
 dim sdg : Set sdg=new_ArrWith(Array(1,2,3))
 
 inputbox "","",sdg.toString()

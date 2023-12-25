@@ -108,7 +108,7 @@ Private Sub sub_GetPathsGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    sub_GetPathsLogger Array(9, "sub_GetPathsGetParameters", func_CM_ToStringArguments())
+    sub_GetPathsLogger Array(9, "sub_GetPathsGetParameters", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,vbNullString)

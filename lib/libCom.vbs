@@ -362,16 +362,206 @@ End Function
 Private Function func_CfToStringObjectDictionary( _
     byRef avTgt _
     )
+    Const Cs_SPKEY = "__Special__"
+    Dim sLabel : sLabel="Dictionary"
     If avTgt.Count>0 Then
+        If avTgt.Exists(Cs_SPKEY) Then sLabel=avTgt.Item(Cs_SPKEY)
         Dim vRet, oEle
         For Each oEle In avTgt.Keys
-            cf_push vRet, func_CfToString(oEle) & "=>" & func_CfToString(avTgt.Item(oEle))
+            If Not cf_isSame(oEle,Cs_SPKEY) Then
+                cf_push vRet, func_CfToString(oEle) & "=>" & func_CfToString(avTgt.Item(oEle))
+            End If
         Next
-        func_CfToStringObjectDictionary = "<Dictionary>{" & Join(vRet, ",") & "}"
+        func_CfToStringObjectDictionary = "<" & sLabel & ">{" & Join(vRet, ",") & "}"
         Set oEle = Nothing
     Else
-        func_CfToStringObjectDictionary = "<Dictionary>{}"
+        func_CfToStringObjectDictionary = "<" & sLabel & ">{}"
     End If
+End Function
+
+
+'###################################################################################################
+'フレームワーク系の関数
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_ExcuteSub()
+'Overview                    : 関数を実行する
+'Detailed Description        : 工事中
+'Argument
+'     asSubName              : 実行する関数名
+'     aoArgument             : 実行する関数に渡す引数
+'     aoBroker               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_ExcuteSub( _
+    byVal asSubName _
+    , byRef aoArgument _
+    , byRef aoBroker _
+    )
+    Const Cs_TOPIC = "log"
+    
+    '出版（Publish） 開始
+    If Not aoBroker Is Nothing Then
+        aoBroker.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
+        aoBroker.Publish Cs_TOPIC, Array(9 ,asSubName ,cf_toString(aoArgument))
+    End If
+    
+    '関数の実行
+    Dim oFunc, oRet
+    Set oFunc = GetRef(asSubName)
+    If aoArgument Is Nothing Then
+        Set oRet = cf_tryCatch( new_Func("function(a){a()}"), oFunc, Empty, Empty )
+    Else
+        Set oRet = cf_tryCatch( oFunc, aoArgument, Empty, Empty )
+    End If
+    
+    '出版（Publish） 終了
+    If Not aoBroker Is Nothing Then
+        If oRet.Item("Result")=False Then
+        'エラー
+            aoBroker.Publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.Item("Err")))
+        Else
+        '正常
+            aoBroker.Publish Cs_TOPIC, Array(5, asSubName, "End")
+        End If
+        aoBroker.Publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArgument))
+    End If
+    
+    Set oRet = Nothing
+    Set oFunc = Nothing
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CM_UtilLogger()
+'Overview                    : ログ出力する
+'Detailed Description        : 引数の情報にタイムスタンプを付加してファイル出力する
+'Argument
+'     avParams               : 配列型のパラメータリスト
+'     aoWriter               : ファイル出力バッファリング処理クラスのインスタンス
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CM_UtilLogger( _
+    byRef avParams _
+    , byRef aoWriter _
+    )
+    Dim oIps : Set oIps = new_ArrWith(func_CM_UtilGetIpaddress())
+    Dim sIp : sIp = oIps.shift().Item("Ip").Item("V4")
+    Do While oIps.length>0
+        sIp = sIp & "," & oIps.shift().Item("Ip").Item("V4")
+    Loop
+    
+    Dim oCont
+    Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
+    
+    With aoWriter
+        .Write(oCont.Concat(avParams).join(vbTab))
+        .newLine()
+    End With
+
+    Set oIps = Nothing
+    Set oCont = Nothing
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilStoringErr()
+'Overview                    : Errオブジェクトの内容をオブジェクトに変換する
+'Detailed Description        : 変換したオブジェクトの構成
+'                              Key             Value                     例
+'                              --------------  ------------------------  ---------------------------
+'                              "Number"        Err.Numberの内容          11
+'                              "Description"   Err.Descriptionのの内容   0 で除算しました。
+'                              "Source"        Err.Sourceの内容          Microsoft VBScript 実行時エラー
+'Argument
+'     なし
+'Return Value
+'     変換したオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/01         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilStoringErr( _
+    )
+    Dim oRet : Set oRet = new_Dic()
+    '特殊キーを追加
+    oRet.Add "__Special__", "Err"
+
+    oRet.Add "Number", Err.Number
+    oRet.Add "Description", Err.Description
+    oRet.Add "Source", Err.Source
+    Set func_CM_UtilStoringErr = oRet
+    Set oRet = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CM_UtilStoringArguments()
+'Overview                    : Argumentsオブジェクトの内容をオブジェクトに変換する
+'Detailed Description        : 変換したオブジェクトの構成
+'                              例は引数が a /X /Hoge:Fuga, b の場合
+'                              Key         Value                                        例
+'                              ----------  -------------------------------------------  -------------
+'                              "All"       WScript.Arguments以下のItemの内容            a /X /Hoge:Fuga, b
+'                              "Named"     WScript.Arguments.Named以下のItemの内容      X: Hoge:Fuga
+'                              "Unnamed"   WScript.Arguments.Unnamed以下のItemの内容    a b
+'Argument
+'     なし
+'Return Value
+'     変換したオブジェクト
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CM_UtilStoringArguments( _
+    )
+    Dim oRet : Set oRet = new_Dic()
+    Dim oTemp, oEle, oKey
+    
+    '特殊キーを追加
+    oRet.Add "__Special__", "Arguments"
+    
+    'All
+    Set oTemp = new_Arr()
+    For Each oEle In WScript.Arguments
+        oTemp.Push oEle
+    Next
+    oRet.Add "All", oTemp
+    
+    'Named
+    Set oTemp = new_Dic()
+    For Each oKey In WScript.Arguments.Named
+        oTemp.Add oKey, WScript.Arguments.Named.Item(oKey)
+    Next
+    oRet.Add "Named", oTemp
+    
+    'Unnamed
+    Set oTemp = new_Arr()
+    For Each oEle In WScript.Arguments.Unnamed
+        oTemp.Push oEle
+    Next
+    oRet.Add "Unnamed", oTemp
+    
+    Set func_CM_UtilStoringArguments = oRet
+    
+    Set oKey = Nothing
+    Set oEle = Nothing
+    Set oTemp = Nothing
+    Set oRet = Nothing
 End Function
 
 '###################################################################################################
@@ -1517,7 +1707,7 @@ Private Function func_FsGetAllFilesByFso( _
         Dim oEle, vRet()
         'ファイルの取得
         For Each oEle In oFolder.Files
-            If StrComp(new_Fso().GetExtensionName(oEle.Path), "zip", vbTextCompar)=0 Then
+            If StrComp(new_Fso().GetExtensionName(oEle.Path), "zip", vbTextCompare)=0 Then
             'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
                 cf_pushMulti vRet, func_FsGetAllFilesByShell(oEle.Path)
             Else
@@ -1558,7 +1748,7 @@ Private Function func_FsGetAllFilesByShell( _
     '処理タイプ判定
     Dim boFlg : boFlg = True 'AsFolder
     If new_Fso().FileExists(asPath) Then
-        If StrComp(new_Fso().GetExtensionName(asPath), "zip", vbTextCompar)<>0 Then boFlg=False 'AsFile
+        If StrComp(new_Fso().GetExtensionName(asPath), "zip", vbTextCompare)<>0 Then boFlg=False 'AsFile
     End If
     
     If boFlg Then
@@ -1610,7 +1800,7 @@ Private Function func_FsGetAllFilesByDir( _
     Dim vRet(), sList
     For Each sList In Split(sLists, vbNewLine)
         If Len(Trim(sList))>0 Then
-            If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompar)=0 Then
+            If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompare)=0 Then
             'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
                 cf_pushMulti vRet, func_FsGetAllFilesByShell(sList)
             Else
@@ -2710,300 +2900,248 @@ Private Function func_CM_FormatDecimalNumber( _
                                                           )
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToString()
-'Overview                    : 引数の数値・文字列やオブジェクトの中身を可読な表示に変換する
-'Detailed Description        : 配列やディクショナリのようなオブジェクトだったら中身を表示し、
-'                              そうでない場合はVarTypeでオブジェクトのクラスを表示する
-'Argument
-'     avTarget               : 対象
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToString( _
-    byRef avTarget _
-    )
-    Dim oEscapingDoubleQuote, sRet
-    Set oEscapingDoubleQuote = new_Re("""", "g")
-    sRet = ""
-    
-    Err.Clear
-    On Error Resume Next
-    
-    If VarType(avTarget) = vbString Then
-        sRet = """" & oEscapingDoubleQuote.Replace(avTarget, """""") & """"
-    ElseIf IsArray(avTarget) Then
-        sRet = func_CM_ToStringArray(avTarget)
-    ElseIf IsObject(avTarget) Then
-        sRet = func_CM_ToStringObject(avTarget)
-    ElseIf IsEmpty(avTarget) Then
-        sRet = "<empty>"
-    ElseIf IsNull(avTarget) Then
-        sRet = "<null>"
-    Else
-        sRet = func_CM_ToStringOther(avTarget)
-    End If
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = func_CM_ToStringUnknown(avTarget)
-    End If
-    
-    func_CM_ToString = sRet
-    
-    Set oEscapingDoubleQuote = Nothing
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToString()
+''Overview                    : 引数の数値・文字列やオブジェクトの中身を可読な表示に変換する
+''Detailed Description        : 配列やディクショナリのようなオブジェクトだったら中身を表示し、
+''                              そうでない場合はVarTypeでオブジェクトのクラスを表示する
+''Argument
+''     avTarget               : 対象
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToString( _
+'    byRef avTarget _
+'    )
+'    Dim oEscapingDoubleQuote, sRet
+'    Set oEscapingDoubleQuote = new_Re("""", "g")
+'    sRet = ""
+'    
+'    Err.Clear
+'    On Error Resume Next
+'    
+'    If VarType(avTarget) = vbString Then
+'        sRet = """" & oEscapingDoubleQuote.Replace(avTarget, """""") & """"
+'    ElseIf IsArray(avTarget) Then
+'        sRet = func_CM_ToStringArray(avTarget)
+'    ElseIf IsObject(avTarget) Then
+'        sRet = func_CM_ToStringObject(avTarget)
+'    ElseIf IsEmpty(avTarget) Then
+'        sRet = "<empty>"
+'    ElseIf IsNull(avTarget) Then
+'        sRet = "<null>"
+'    Else
+'        sRet = func_CM_ToStringOther(avTarget)
+'    End If
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = func_CM_ToStringUnknown(avTarget)
+'    End If
+'    
+'    func_CM_ToString = sRet
+'    
+'    Set oEscapingDoubleQuote = Nothing
+'End Function
+'
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringArray()
+''Overview                    : 配列の中身を可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     avTarget               : 対象
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringArray( _
+'    byRef avTarget _
+'    )
+'    Dim oTemp(), vItem
+'    
+'    For Each vItem In avTarget
+'        Call cf_push(oTemp, func_CM_ToString(vItem))
+'    Next
+'    func_CM_ToStringArray = "[" & Join(oTemp, ",") & "]"
+'End Function
+'
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringDictionary()
+''Overview                    : ディクショナリの中身を可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     avTarget               : 対象
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringDictionary( _
+'    byRef avTarget _
+'    )
+'    Dim oTemp(), vKey
+'    
+'    For Each vKey In avTarget.Keys
+'        Call cf_push(oTemp, func_CM_ToString(vKey) & "=>" & func_CM_ToString(avTarget.Item(vKey)))
+'    Next
+'    func_CM_ToStringDictionary = "{" & Join(oTemp, ",") & "}"
+'End Function
+'
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringObject()
+''Overview                    : オブジェクトの中身を可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     avTarget               : 対象
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringObject( _
+'    byRef avTarget _
+'    )
+'    Dim sRet
+'    
+'    Err.Clear
+'    On Error Resume Next
+'    
+'    sRet = func_CM_ToStringDictionary(avTarget)
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = func_CM_ToStringArray(avTarget)
+'    End If
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = func_CM_ToStringArray(avTarget.Items)
+'    End If
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = "<" & TypeName(avTarget) & ">"
+'    End If
+'    
+'    func_CM_ToStringObject = sRet
+'End Function
+'
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringOther()
+''Overview                    : その他オブジェクトの中身を可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     avTarget               : 対象
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringOther( _
+'    byRef avTarget _
+'    )
+'    Dim sRet
+'    
+'    Err.Clear
+'    On Error Resume Next
+'    
+'    sRet = CStr(avTarget)
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = func_CM_ToStringArray(avTarget)
+'    End If
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = func_CM_ToStringDictionary(avTarget)
+'    End If
+'    
+'    If Err.Number <> 0 Then
+'        Err.Clear
+'        sRet = func_CM_ToStringUnknown(avTarget)
+'    End If
+'    
+'    func_CM_ToStringOther = sRet
+'End Function
+'
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringUnknown()
+''Overview                    : 引数の型が不明な場合に可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     avTarget               : 対象
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/03         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringUnknown( _
+'    byRef avTarget _
+'    )
+'    func_CM_ToStringUnknown = "<unknown:" & VarType(avTarget) & " " & TypeName(avTarget) & ">"
+'End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringArray()
-'Overview                    : 配列の中身を可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     avTarget               : 対象
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringArray( _
-    byRef avTarget _
-    )
-    Dim oTemp(), vItem
-    
-    For Each vItem In avTarget
-        Call cf_push(oTemp, func_CM_ToString(vItem))
-    Next
-    func_CM_ToStringArray = "[" & Join(oTemp, ",") & "]"
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringErr()
+''Overview                    : Errオブジェクトの内容を可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     なし
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/25         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringErr( _
+'    )
+'    func_CM_ToStringErr = cf_toString(func_CM_UtilStoringErr())
+''    func_CM_ToStringErr = "<Err> " & func_CM_ToString(func_CM_UtilStoringErr())
+'End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringDictionary()
-'Overview                    : ディクショナリの中身を可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     avTarget               : 対象
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringDictionary( _
-    byRef avTarget _
-    )
-    Dim oTemp(), vKey
-    
-    For Each vKey In avTarget.Keys
-        Call cf_push(oTemp, func_CM_ToString(vKey) & "=>" & func_CM_ToString(avTarget.Item(vKey)))
-    Next
-    func_CM_ToStringDictionary = "{" & Join(oTemp, ",") & "}"
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringObject()
-'Overview                    : オブジェクトの中身を可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     avTarget               : 対象
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringObject( _
-    byRef avTarget _
-    )
-    Dim sRet
-    
-    Err.Clear
-    On Error Resume Next
-    
-    sRet = func_CM_ToStringDictionary(avTarget)
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = func_CM_ToStringArray(avTarget)
-    End If
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = func_CM_ToStringArray(avTarget.Items)
-    End If
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = "<" & TypeName(avTarget) & ">"
-    End If
-    
-    func_CM_ToStringObject = sRet
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringOther()
-'Overview                    : その他オブジェクトの中身を可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     avTarget               : 対象
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringOther( _
-    byRef avTarget _
-    )
-    Dim sRet
-    
-    Err.Clear
-    On Error Resume Next
-    
-    sRet = CStr(avTarget)
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = func_CM_ToStringArray(avTarget)
-    End If
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = func_CM_ToStringDictionary(avTarget)
-    End If
-    
-    If Err.Number <> 0 Then
-        Err.Clear
-        sRet = func_CM_ToStringUnknown(avTarget)
-    End If
-    
-    func_CM_ToStringOther = sRet
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringUnknown()
-'Overview                    : 引数の型が不明な場合に可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     avTarget               : 対象
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringUnknown( _
-    byRef avTarget _
-    )
-    func_CM_ToStringUnknown = "<unknown:" & VarType(avTarget) & " " & TypeName(avTarget) & ">"
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringErr()
-'Overview                    : Errオブジェクトの内容を可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/25         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringErr( _
-    )
-    func_CM_ToStringErr = "<Err> " & func_CM_ToString(func_CM_UtilStoringErr())
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ToStringArguments()
-'Overview                    : Argumentsオブジェクトの内容を可読な表示に変換する
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     変換した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ToStringArguments( _
-    )
-    func_CM_ToStringArguments = "<Arguments> " & func_CM_ToString(func_CM_UtilStoringArguments())
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : sub_CM_ExcuteSub()
-'Overview                    : 関数を実行する
-'Detailed Description        : 工事中
-'Argument
-'     asSubName              : 実行する関数名
-'     aoArgument             : 実行する関数に渡す引数
-'     aoBroker               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_ExcuteSub( _
-    byVal asSubName _
-    , byRef aoArgument _
-    , byRef aoBroker _
-    )
-    Const Cs_TOPIC = "log"
-    
-    '出版（Publish） 開始
-    If Not aoBroker Is Nothing Then
-        aoBroker.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
-        aoBroker.Publish Cs_TOPIC, Array(9 ,asSubName ,cf_toString(aoArgument))
-    End If
-    
-    '関数の実行
-    Dim oFunc, oRet
-    Set oFunc = GetRef(asSubName)
-    If aoArgument Is Nothing Then
-        Set oRet = cf_tryCatch( new_Func("function(a){a()}"), oFunc, Empty, Empty )
-    Else
-        Set oRet = cf_tryCatch( oFunc, aoArgument, Empty, Empty )
-    End If
-    
-    '出版（Publish） 終了
-    If Not aoBroker Is Nothing Then
-        If oRet.Item("Result")=False Then
-        'エラー
-            aoBroker.Publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.Item("Err")))
-        Else
-        '正常
-            aoBroker.Publish Cs_TOPIC, Array(5, asSubName, "End")
-        End If
-        aoBroker.Publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArgument))
-    End If
-    
-    Set oRet = Nothing
-    Set oFunc = Nothing
-End Sub
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ToStringArguments()
+''Overview                    : Argumentsオブジェクトの内容を可読な表示に変換する
+''Detailed Description        : 工事中
+''Argument
+''     なし
+''Return Value
+''     変換した文字列
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/09/26         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ToStringArguments( _
+'    )
+'    func_CM_ToStringArguments = cf_toString(func_CM_UtilStoringArguments())
+''    func_CM_ToStringArguments = "<Arguments> " & func_CM_ToString(func_CM_UtilStoringArguments())
+'End Function
 
 '###################################################################################################
 'ユーティリティ系
@@ -3364,127 +3502,6 @@ Private Function func_CM_UtilSortDefaultFunc( _
     )
     func_CM_UtilSortDefaultFunc = aoCurrentValue>aoNextValue
 End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : sub_CM_UtilLogger()
-'Overview                    : ログ出力する
-'Detailed Description        : 引数の情報にタイムスタンプを付加してファイル出力する
-'Argument
-'     avParams               : 配列型のパラメータリスト
-'     aoWriter               : ファイル出力バッファリング処理クラスのインスタンス
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_UtilLogger( _
-    byRef avParams _
-    , byRef aoWriter _
-    )
-    Dim oIps : Set oIps = new_ArrWith(func_CM_UtilGetIpaddress())
-    Dim sIp : sIp = oIps.shift().Item("Ip").Item("V4")
-    Do While oIps.length>0
-        sIp = sIp & "," & oIps.shift().Item("Ip").Item("V4")
-    Loop
-    
-    Dim oCont
-    Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
-    
-    With aoWriter
-        .Write(oCont.Concat(avParams).join(vbTab))
-        .newLine()
-    End With
-
-    Set oIps = Nothing
-    Set oCont = Nothing
-End Sub
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilStoringErr()
-'Overview                    : Errオブジェクトの内容をオブジェクトに変換する
-'Detailed Description        : 変換したオブジェクトの構成
-'                              Key             Value                     例
-'                              --------------  ------------------------  ---------------------------
-'                              "Number"        Err.Numberの内容          11
-'                              "Description"   Err.Descriptionのの内容   0 で除算しました。
-'                              "Source"        Err.Sourceの内容          Microsoft VBScript 実行時エラー
-'Argument
-'     なし
-'Return Value
-'     変換したオブジェクト
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/01         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilStoringErr( _
-    )
-    Dim oRet : Set oRet = new_Dic()
-    oRet.Add "Number", Err.Number
-    oRet.Add "Description", Err.Description
-    oRet.Add "Source", Err.Source
-    Set func_CM_UtilStoringErr = oRet
-    Set oRet = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilStoringArguments()
-'Overview                    : Argumentsオブジェクトの内容をオブジェクトに変換する
-'Detailed Description        : 変換したオブジェクトの構成
-'                              例は引数が a /X /Hoge:Fuga, b の場合
-'                              Key         Value                                        例
-'                              ----------  -------------------------------------------  -------------
-'                              "All"       WScript.Arguments以下のItemの内容            a /X /Hoge:Fuga, b
-'                              "Named"     WScript.Arguments.Named以下のItemの内容      X: Hoge:Fuga
-'                              "Unnamed"   WScript.Arguments.Unnamed以下のItemの内容    a b
-'Argument
-'     なし
-'Return Value
-'     変換したオブジェクト
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilStoringArguments( _
-    )
-    Dim oRet : Set oRet = new_Dic()
-    Dim oTemp, oEle, oKey
-    
-    'All
-    Set oTemp = new_Arr()
-    For Each oEle In WScript.Arguments
-        oTemp.Push oEle
-    Next
-    oRet.Add "All", oTemp
-    
-    'Named
-    Set oTemp = new_Dic()
-    For Each oKey In WScript.Arguments.Named
-        oTemp.Add oKey, WScript.Arguments.Named.Item(oKey)
-    Next
-    oRet.Add "Named", oTemp
-    
-    'Unnamed
-    Set oTemp = new_Arr()
-    For Each oEle In WScript.Arguments.Unnamed
-        oTemp.Push oEle
-    Next
-    oRet.Add "Unnamed", oTemp
-    
-    Set func_CM_UtilStoringArguments = oRet
-    
-    Set oKey = Nothing
-    Set oEle = Nothing
-    Set oTemp = Nothing
-    Set oRet = Nothing
-End Function
-
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilGetIpaddress()
 'Overview                    : 自身のIPアドレスを取得する

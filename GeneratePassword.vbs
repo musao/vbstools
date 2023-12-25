@@ -126,7 +126,7 @@ Private Sub sub_GnrtPwGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    sub_GnrtPwLogger Array(9, "sub_GnrtPwGetParameters", func_CM_ToStringArguments())
+    sub_GnrtPwLogger Array(9, "sub_GnrtPwGetParameters", cf_toString(oArg))
     
     '引数の内容を解析
     

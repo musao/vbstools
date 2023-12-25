@@ -113,7 +113,7 @@ Private Sub sub_GetFileInfoGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = func_CM_UtilStoringArguments()
     '★ログ出力
-    sub_GetFileInfoLogger Array(9, "sub_GetFileInfoGetParameters", func_CM_ToStringArguments())
+    sub_GetFileInfoLogger Array(9, "sub_GetFileInfoGetParameters", cf_toString(oArg))
     
     '実在するパスだけパラメータ格納用オブジェクトに設定
     Dim oParam, oRet, oItem
