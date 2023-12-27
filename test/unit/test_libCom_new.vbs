@@ -150,6 +150,16 @@ Sub Test_new_Shell
 End Sub
 
 '###################################################################################################
+'new_Network()
+Sub Test_new_Network
+    Dim e : Set e = CreateObject("WScript.Network")
+    Dim a : Set a = new_Network()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
 'new_ShellApp()
 Sub Test_new_ShellApp
     Dim e : Set e = CreateObject("Shell.Application")

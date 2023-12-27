@@ -513,7 +513,7 @@ Private Sub fw_logger( _
     Next
 
     With aoWriter
-        .Write(new_ArrWith(Array(new_Now(), Join(vIps,","), func_CM_UtilGetComputerName())).Concat(avParams).join(vbTab))
+        .Write(new_ArrWith(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
         .newLine()
     End With
 
@@ -575,37 +575,36 @@ End Function
 Private Function fw_storeArguments( _
     )
     Dim oRet : Set oRet = new_Dic()
-    Dim oTemp, oEle, oKey
-    
     '特殊キーを追加
     oRet.Add "__Special__", "Arguments"
     
+    Dim vArr, oDic, oEle, oKey
     'All
-    Set oTemp = new_Arr()
+    vArr = Array()
     For Each oEle In WScript.Arguments
-        oTemp.Push oEle
+        cf_push vArr, oEle
     Next
-    oRet.Add "All", oTemp
+    oRet.Add "All", vArr
     
     'Named
-    Set oTemp = new_Dic()
+    Set oDic = new_Dic()
     For Each oKey In WScript.Arguments.Named
-        oTemp.Add oKey, WScript.Arguments.Named.Item(oKey)
+        oDic.Add oKey, WScript.Arguments.Named.Item(oKey)
     Next
-    oRet.Add "Named", oTemp
+    oRet.Add "Named", oDic
     
     'Unnamed
-    Set oTemp = new_Arr()
+    vArr = Array()
     For Each oEle In WScript.Arguments.Unnamed
-        oTemp.Push oEle
+        cf_push vArr, oEle
     Next
-    oRet.Add "Unnamed", oTemp
+    oRet.Add "Unnamed", vArr
     
     Set fw_storeArguments = oRet
     
     Set oKey = Nothing
     Set oEle = Nothing
-    Set oTemp = Nothing
+    Set oDic = Nothing
     Set oRet = Nothing
 End Function
 
@@ -831,6 +830,25 @@ End Function
 Private Function new_Shell( _
     )
     Set new_Shell = CreateObject("Wscript.Shell")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Network()
+'Overview                    : WScript.Networkオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したWScript.Networkオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Network( _
+    )
+    Set new_Network = CreateObject("WScript.Network")
 End Function
 
 '***************************************************************************************************
@@ -3301,7 +3319,6 @@ Private Function func_CM_UtilGetIpaddress( _
     Dim sMyComp, oAdapter, oAddress, oRet, oIpv4, oIpv6
     
     sMyComp = "."
-    Set oRet = new_Arr()
     For Each oAdapter in GetObject("winmgmts:\\"&sMyComp&"\root\cimv2").ExecQuery("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
          For Each oAddress in oAdapter.IPAddress
              If new_ArrSplit(oAddress, ".").length=4 Then
@@ -3312,32 +3329,12 @@ Private Function func_CM_UtilGetIpaddress( _
                  cf_bind oIpv6, oAddress
              End If
          Next
-         oRet.push new_DicWith(Array("Caption", oAdapter.Caption, "Ip", new_DicWith(Array("V4", oIpv4, "V6", oIpv6))))
+         cf_push oRet, new_DicWith(Array("Caption", oAdapter.Caption, "Ip", new_DicWith(Array("V4", oIpv4, "V6", oIpv6))))
     Next
-    func_CM_UtilGetIpaddress = oRet.items
+    func_CM_UtilGetIpaddress = oRet
     
     Set oAddress = Nothing
     Set oAdapter = Nothing
-    Set oRet = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilGetComputerName()
-'Overview                    : 自身のコンピュータ名を取得する
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     自身のコンピュータ名
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/10         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilGetComputerName( _
-    )
-    func_CM_UtilGetComputerName = CreateObject("WScript.Network").ComputerName
 End Function
 
 '***************************************************************************************************

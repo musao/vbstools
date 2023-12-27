@@ -122,7 +122,7 @@ Private Sub sub_CmpExcelGetParameters( _
     sub_CmpExcelLogger Array(9, "sub_CmpExcelGetParameters", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
-    cf_bindAt aoParams, "Param", oArg.Item("Unnamed").slice(0,2)
+    cf_bindAt aoParams, "Param", new_ArrWith(oArg.Item("Unnamed")).slice(0,2)
     
     Set oArg = Nothing
 End Sub

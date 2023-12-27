@@ -118,7 +118,7 @@ Private Sub sub_GetFileInfoGetParameters( _
     '実在するパスだけパラメータ格納用オブジェクトに設定
     Dim oParam, oRet, oItem
     Set oParam = new_Arr()
-    For Each oItem In oArg.Item("Unnamed").Items()
+    For Each oItem In oArg.Item("Unnamed")
         Set oRet = cf_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
         If Not oRet.Item("Result") Then Set oRet = cf_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
         If oRet.Item("Result") Then
