@@ -631,12 +631,12 @@ Class clsCmArray
 
     '***************************************************************************************************
     'Function/Sub Name           : toString()
-    'Overview                    : 配列の内容を文字列で表示する
+    'Overview                    : オブジェクトの内容を文字列で表示する
     'Detailed Description        : cf_toString()準拠
     'Argument
     '     なし
     'Return Value
-    '     文字列に変換した配列の内容
+    '     文字列に変換したオブジェクトの内容
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -1302,7 +1302,7 @@ Class clsCmArray
 
     '***************************************************************************************************
     'Function/Sub Name           : func_CmArrayUniq()
-    'Overview                    : 配列の先頭に要素を複数追加する
+    'Overview                    : 配列の重複を排除する
     'Detailed Description        : 工事中
     'Argument
     '     なし

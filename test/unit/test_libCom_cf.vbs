@@ -349,6 +349,96 @@ Sub Test_cf_isSame_VvsV_and_NvsS_NotSame
 End Sub
 
 '###################################################################################################
+'cf_isValid()
+Sub Test_cf_isValid_Object_Valid
+    Dim a,d,e
+    Set d = new_Dic()
+    e = True
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Object_InValid
+    Dim a,d,e
+    Set d = Nothing
+    e = False
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Array_Valid
+    Dim a,d,e
+    d = Array(1,"2")
+    e = True
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Array_InValid_1
+    Dim a,d,e
+    d = Array()
+    e = False
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Array_InValid_2
+    Dim a,e
+    Dim d()
+    e = False
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Variable_Valid
+    Dim a,d,e
+    d = "a"
+    e = True
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Variable_InValid_Empty
+    Dim a,d,e
+    d = Empty
+    e = False
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Variable_InValid_Null
+    Dim a,d,e
+    d = Null
+    e = False
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isValid_Variable_InValid_NullString
+    Dim a,d,e
+    d = vbNullString
+    e = False
+    a = cf_isValid(d)
+    AssertEqual e,a
+End Sub
+
+'###################################################################################################
+'cf_isAvailableObject()
+Sub Test_cf_isAvailableObject
+    Dim a,d,e
+    Set d = new_Dic()
+    e = True
+    a = cf_isAvailableObject(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isAvailableObject_Nothing
+    Dim a,d,e
+    Set d = Nothing
+    e = False
+    a = cf_isAvailableObject(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_isAvailableObject_Variable
+    Dim a,d,e
+    d = Empty
+    e = False
+    a = cf_isAvailableObject(d)
+    AssertEqual e,a
+End Sub
+
+'###################################################################################################
 'cf_toString()
 Sub Test_cf_toString_Empty
     Dim a,d,e
@@ -459,6 +549,13 @@ Sub Test_cf_toString_Object_Other_UserDef
     Dim a,d,e
     Set d = new_Char()
     e = "<clsCmCharacterType>"
+    a = cf_toString(d)
+    AssertEqual e,a
+End Sub
+Sub Test_cf_toString_Object_Other_UserDef_Special
+    Dim a,d,e
+    Set d = new_DicWith(Array("__Special__", "Test", "Key", "Value"))
+    e = "<Test>{<String>" & Chr(34) & "Key" & Chr(34) & "=><String>" & Chr(34) & "Value" & Chr(34) & "}"
     a = cf_toString(d)
     AssertEqual e,a
 End Sub

@@ -69,7 +69,7 @@ End Sub
 'Detailed Description        : 工事中
 'Argument
 '     avArr                  : 配列
-'     aoEle                  : 追加する要素
+'     avEle                  : 追加する要素
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -80,13 +80,13 @@ End Sub
 '***************************************************************************************************
 Private Sub cf_push( _
     byRef avArr _ 
-    , byRef aoEle _ 
+    , byRef avEle _ 
     )
     On Error Resume Next
     Redim Preserve avArr(Ubound(avArr)+1)
     If Err.Number<>0 Then Redim avArr(0)
     On Error Goto 0
-    cf_bind avArr(Ubound(avArr)), aoEle
+    cf_bind avArr(Ubound(avArr)), avEle
 End Sub
 
 '***************************************************************************************************
@@ -161,19 +161,19 @@ Private Function cf_tryCatch( _
     
     'tryブロックの処理
     On Error Resume Next
-    If IsEmpty(aoArgs) Then
-        cf_bind oRet, aoTry()
-    Else
+    If cf_isValid(aoArgs) Then
         cf_bind oRet, aoTry(aoArgs)
+    Else
+        cf_bind oRet, aoTry()
     End If
     If Err.Number<>0 Then
         boFlg = False
-        Set oErr = func_CM_UtilStoringErr()
+        Set oErr = fw_storeErr()
     End If
     On Error GoTo 0
 
     'catchブロックの処理
-    If Not boFlg And func_CM_UtilIsAvailableObject(aoCatch) Then
+    If Not boFlg And cf_isAvailableObject(aoCatch) Then
         If IsEmpty(aoArgs) Then
             cf_bind oRet, aoCatch()
         Else
@@ -182,7 +182,7 @@ Private Function cf_tryCatch( _
     End If
     
     'finaryブロックの処理
-    If func_CM_UtilIsAvailableObject(aoFinary) Then
+    If cf_isAvailableObject(aoFinary) Then
         cf_bind oRet, aoFinary(oRet)
     End If
     
@@ -222,6 +222,65 @@ Private Function cf_isSame( _
         End If
     End If
     cf_isSame = boFlg
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isValid()
+'Overview                    : 有効な値（初期値でない）か判定する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 判定対象
+'Return Value
+'     結果 True:有効な値がある / False:有効な値がない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isValid( _
+    byRef avTgt _
+    )
+    Dim boFlg : boFlg = True
+    If IsObject(avTgt) Then
+    'オブジェクトの場合
+        If avTgt Is Nothing Then boFlg = False
+    ElseIf IsArray(avTgt) Then
+    '配列の場合
+        boFlg = new_Arr().hasElement(avTgt)
+    Else
+    '上記以外の場合
+        If IsEmpty(avTgt) Or IsNull(avTgt) Then
+            boFlg = False
+        ElseIf cf_isSame(avTgt, vbNullString) Then
+            boFlg = False
+        End If
+    End If
+    cf_isValid = boFlg
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isAvailableObject()
+'Overview                    : オブジェクトが利用可能か判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoObj                  : オブジェクト
+'Return Value
+'     結果 True:利用可能 / False:利用不可
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isAvailableObject( _
+    byRef aoObj _
+    )
+    Dim boFlg : boFlg = False
+    If IsObject(aoObj) Then
+        If Not aoObj Is Nothing Then boFlg = True
+    End If
+    cf_isAvailableObject = boFlg
 End Function
 
 '***************************************************************************************************
@@ -338,7 +397,7 @@ Private Function func_CfToStringObject( _
     If Err.Number=0 Then Exit Function
     On Error Goto 0
 
-    If cf_isSame(VarType(avTgt), 8) Then
+    If cf_isSame(VarType(avTgt), vbString) Then
         func_CfToStringObject = "<" & TypeName(avTgt) & ">" & avTgt
         Exit Function
     End If
@@ -385,13 +444,13 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_ExcuteSub()
+'Function/Sub Name           : fw_excuteSub()
 'Overview                    : 関数を実行する
-'Detailed Description        : 工事中
+'Detailed Description        : ブローカーの指定があれば実行前後に出版（Publish）処理を行う
 'Argument
 '     asSubName              : 実行する関数名
-'     aoArgument             : 実行する関数に渡す引数
-'     aoBroker               : 出版-購読型（Publish/subscribe）クラスのオブジェクト
+'     aoArg                  : 実行する関数に渡す引数
+'     aoBroker               : ブローカークラスのオブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -400,46 +459,37 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CM_ExcuteSub( _
+Private Sub fw_excuteSub( _
     byVal asSubName _
-    , byRef aoArgument _
+    , byRef aoArg _
     , byRef aoBroker _
     )
     Const Cs_TOPIC = "log"
     
-    '出版（Publish） 開始
-    If Not aoBroker Is Nothing Then
-        aoBroker.Publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
-        aoBroker.Publish Cs_TOPIC, Array(9 ,asSubName ,cf_toString(aoArgument))
+    '実行前の出版（Publish） 処理
+    If cf_isAvailableObject(aoBroker) Then
+        aoBroker.publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
+        aoBroker.publish Cs_TOPIC, Array(9 ,asSubName ,cf_toString(aoArg))
     End If
     
     '関数の実行
-    Dim oFunc, oRet
-    Set oFunc = GetRef(asSubName)
-    If aoArgument Is Nothing Then
-        Set oRet = cf_tryCatch( new_Func("function(a){a()}"), oFunc, Empty, Empty )
-    Else
-        Set oRet = cf_tryCatch( oFunc, aoArgument, Empty, Empty )
-    End If
+    Dim oRet : Set oRet = cf_tryCatch(GetRef(asSubName), aoArg, Empty, Empty)
     
-    '出版（Publish） 終了
-    If Not aoBroker Is Nothing Then
+    '実行後の出版（Publish） 処理
+    If cf_isAvailableObject(aoBroker) Then
         If oRet.Item("Result")=False Then
         'エラー
-            aoBroker.Publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.Item("Err")))
-        Else
-        '正常
-            aoBroker.Publish Cs_TOPIC, Array(5, asSubName, "End")
+            aoBroker.publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.Item("Err")))
         End If
-        aoBroker.Publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArgument))
+        aoBroker.publish Cs_TOPIC, Array(5, asSubName, "End")
+        aoBroker.publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArg))
     End If
     
     Set oRet = Nothing
-    Set oFunc = Nothing
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_UtilLogger()
+'Function/Sub Name           : fw_logger()
 'Overview                    : ログ出力する
 'Detailed Description        : 引数の情報にタイムスタンプを付加してファイル出力する
 'Argument
@@ -453,30 +503,25 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CM_UtilLogger( _
+Private Sub fw_logger( _
     byRef avParams _
     , byRef aoWriter _
     )
-    Dim oIps : Set oIps = new_ArrWith(func_CM_UtilGetIpaddress())
-    Dim sIp : sIp = oIps.shift().Item("Ip").Item("V4")
-    Do While oIps.length>0
-        sIp = sIp & "," & oIps.shift().Item("Ip").Item("V4")
-    Loop
-    
-    Dim oCont
-    Set oCont = new_ArrWith(Array(new_Now(), sIp, func_CM_UtilGetComputerName()))
-    
+    Dim vIps, oEle
+    For Each oEle In func_CM_UtilGetIpaddress()
+        cf_push vIps, oEle.Item("Ip").Item("V4")
+    Next
+
     With aoWriter
-        .Write(oCont.Concat(avParams).join(vbTab))
+        .Write(new_ArrWith(Array(new_Now(), Join(vIps,","), func_CM_UtilGetComputerName())).Concat(avParams).join(vbTab))
         .newLine()
     End With
 
-    Set oIps = Nothing
-    Set oCont = Nothing
+    Set oEle = Nothing
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilStoringErr()
+'Function/Sub Name           : fw_storeErr()
 'Overview                    : Errオブジェクトの内容をオブジェクトに変換する
 'Detailed Description        : 変換したオブジェクトの構成
 '                              Key             Value                     例
@@ -494,7 +539,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/10/01         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_CM_UtilStoringErr( _
+Private Function fw_storeErr( _
     )
     Dim oRet : Set oRet = new_Dic()
     '特殊キーを追加
@@ -503,12 +548,12 @@ Private Function func_CM_UtilStoringErr( _
     oRet.Add "Number", Err.Number
     oRet.Add "Description", Err.Description
     oRet.Add "Source", Err.Source
-    Set func_CM_UtilStoringErr = oRet
+    Set fw_storeErr = oRet
     Set oRet = Nothing
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilStoringArguments()
+'Function/Sub Name           : fw_storeArguments()
 'Overview                    : Argumentsオブジェクトの内容をオブジェクトに変換する
 'Detailed Description        : 変換したオブジェクトの構成
 '                              例は引数が a /X /Hoge:Fuga, b の場合
@@ -527,7 +572,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_CM_UtilStoringArguments( _
+Private Function fw_storeArguments( _
     )
     Dim oRet : Set oRet = new_Dic()
     Dim oTemp, oEle, oKey
@@ -556,7 +601,7 @@ Private Function func_CM_UtilStoringArguments( _
     Next
     oRet.Add "Unnamed", oTemp
     
-    Set func_CM_UtilStoringArguments = oRet
+    Set fw_storeArguments = oRet
     
     Set oKey = Nothing
     Set oEle = Nothing
@@ -3296,30 +3341,6 @@ Private Function func_CM_UtilGetComputerName( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilIsAvailableObject()
-'Overview                    : オブジェクトが利用可能か判定する
-'Detailed Description        : 工事中
-'Argument
-'     aoObj                  : オブジェクト
-'Return Value
-'     結果 True:利用可能 / False:利用不可
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilIsAvailableObject( _
-    byRef aoObj _
-    )
-    Dim boFlg : boFlg = False
-    If IsObject(aoObj) Then
-        If Not aoObj Is Nothing Then boFlg = True
-    End If
-    func_CM_UtilIsAvailableObject = boFlg
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilIsTextStream()
 'Overview                    : オブジェクトがTextStreamか判定する
 'Detailed Description        : 工事中
@@ -3337,7 +3358,7 @@ Private Function func_CM_UtilIsTextStream( _
     byRef aoObj _
     )
     Dim boFlg : boFlg = False
-    If Vartype(aoObj)=9 And Strcomp(Typename(aoObj),"TextStream",vbBinaryCompare)=0 Then boFlg = True
+    If cf_isSame(Vartype(aoObj),vbObject) And cf_isSame(Typename(aoObj),"TextStream") Then boFlg = True
     func_CM_UtilIsTextStream = boFlg
 End Function
 

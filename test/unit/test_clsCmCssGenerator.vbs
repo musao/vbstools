@@ -131,6 +131,20 @@ Sub Test_clsCmCssGenerator_generate_Err
     AssertEqualWithMessage "セレクタがないCSSは生成できません。", Err.Description, "Err.Description"
 End Sub
 
+'###################################################################################################
+'clsCmCssGenerator.toString()
+Sub Test_clsCmCssGenerator_toString
+    Dim ao,a,d,e
+    Set ao = new clsCmCssGenerator
+    
+    d = "hoge"
+    ao.selector = d
+    e = ao.generate()
+    a = ao.toString()
+
+    AssertEqualWithMessage e, a, "1"
+End Sub
+
 ' Local Variables:
 ' mode: Visual-Basic
 ' indent-tabs-mode: nil

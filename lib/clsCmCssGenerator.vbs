@@ -156,6 +156,25 @@ Class clsCmCssGenerator
         generate = func_CmCssGenGenerate()
     End Function
 
+    '***************************************************************************************************
+    'Function/Sub Name           : toString()
+    'Overview                    : オブジェクトの内容を文字列で表示する
+    'Detailed Description        : cf_toString()準拠
+    'Argument
+    '     なし
+    'Return Value
+    '     文字列に変換したオブジェクトの内容
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/12/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function toString( _
+        )
+        toString = func_CmCssGenGenerate()
+    End Function
+
 
 
 

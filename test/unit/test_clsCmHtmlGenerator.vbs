@@ -234,6 +234,20 @@ Sub Test_clsCmHtmlGenerator_generate_EntityReference
     Next
 End Sub
 
+'###################################################################################################
+'clsCmHtmlGenerator.toString()
+Sub Test_clsCmHtmlGenerator_toString
+    Dim ao,a,d,e
+    Set ao = new clsCmHtmlGenerator
+    
+    d = "hoge"
+    ao.element = d 
+    e = ao.generate()
+    a = ao.toString()
+
+    AssertEqualWithMessage e, a, "1"
+End Sub
+
 ' Local Variables:
 ' mode: Visual-Basic
 ' indent-tabs-mode: nil

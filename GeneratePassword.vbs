@@ -77,10 +77,10 @@ Sub Main()
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    sub_CM_ExcuteSub "sub_GnrtPwGetParameters", oParams, oBroker
+    fw_excuteSub "sub_GnrtPwGetParameters", oParams, oBroker
     
     'パスワードを生成する
-    sub_CM_ExcuteSub "sub_GnrtPwGenerate", oParams, oBroker
+    fw_excuteSub "sub_GnrtPwGenerate", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -124,7 +124,7 @@ Private Sub sub_GnrtPwGetParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
-    Dim oArg : Set oArg = func_CM_UtilStoringArguments()
+    Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
     sub_GnrtPwLogger Array(9, "sub_GnrtPwGetParameters", cf_toString(oArg))
     
@@ -223,7 +223,7 @@ End Sub
 'Processing Order            : -
 'Function/Sub Name           : sub_GnrtPwLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : sub_CM_UtilLogger()に委譲する
+'Detailed Description        : fw_logger()に委譲する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 'Return Value
@@ -237,5 +237,5 @@ End Sub
 Private Sub sub_GnrtPwLogger( _
     byRef avParams _
     )
-    sub_CM_UtilLogger avParams, PoWriter
+    fw_logger avParams, PoWriter
 End Sub

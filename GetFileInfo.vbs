@@ -73,13 +73,13 @@ Sub Main()
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    sub_CM_ExcuteSub "sub_GetFileInfoGetParameters", oParams, oBroker
+    fw_excuteSub "sub_GetFileInfoGetParameters", oParams, oBroker
     
     'ファイル情報の取得
-    sub_CM_ExcuteSub "sub_GetFileInfoProc", oParams, oBroker
+    fw_excuteSub "sub_GetFileInfoProc", oParams, oBroker
     
     '結果出力
-    sub_CM_ExcuteSub "sub_GetFileInfoReport", oParams, oBroker
+    fw_excuteSub "sub_GetFileInfoReport", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -111,7 +111,7 @@ Private Sub sub_GetFileInfoGetParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
-    Dim oArg : Set oArg = func_CM_UtilStoringArguments()
+    Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
     sub_GetFileInfoLogger Array(9, "sub_GetFileInfoGetParameters", cf_toString(oArg))
     
@@ -363,7 +363,7 @@ End Function
 'Processing Order            : -
 'Function/Sub Name           : sub_GetFileInfoLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : sub_CM_UtilLogger()に委譲する
+'Detailed Description        : fw_logger()に委譲する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 'Return Value
@@ -377,7 +377,7 @@ End Function
 Private Sub sub_GetFileInfoLogger( _
     byRef avParams _
     )
-    sub_CM_UtilLogger avParams, PoWriter
+    fw_logger avParams, PoWriter
 End Sub
 '***************************************************************************************************
 'Processing Order            : -

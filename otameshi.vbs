@@ -27,6 +27,10 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
+inputbox "","","'" & vbNullString & "'"
+
+wscript.quit
+
 
 inputbox "","",cf_toString(WScript.Arguments)
 wscript.quit
@@ -55,7 +59,7 @@ wscript.quit
 
 dim sdg : Set sdg=new_ArrWith(Array(1,2,3))
 
-inputbox "","",sdg.toString()
+inputbox "","",vbNullString
 
 wscript.quit
 

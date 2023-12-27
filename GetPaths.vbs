@@ -71,10 +71,10 @@ Sub Main()
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    sub_CM_ExcuteSub "sub_GetPathsGetParameters", oParams, oBroker
+    fw_excuteSub "sub_GetPathsGetParameters", oParams, oBroker
     
     '引数のファイルパスをクリップボードに出力する
-    sub_CM_ExcuteSub "sub_GetPathsProc", oParams, oBroker
+    fw_excuteSub "sub_GetPathsProc", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -106,7 +106,7 @@ Private Sub sub_GetPathsGetParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
-    Dim oArg : Set oArg = func_CM_UtilStoringArguments()
+    Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
     sub_GetPathsLogger Array(9, "sub_GetPathsGetParameters", cf_toString(oArg))
     
@@ -152,7 +152,7 @@ End Sub
 'Processing Order            : -
 'Function/Sub Name           : sub_GetPathsLogger()
 'Overview                    : ログ出力する
-'Detailed Description        : sub_CM_UtilLogger()に委譲する
+'Detailed Description        : fw_logger()に委譲する
 'Argument
 '     avParams               : 配列型のパラメータリスト
 'Return Value
@@ -166,5 +166,5 @@ End Sub
 Private Sub sub_GetPathsLogger( _
     byRef avParams _
     )
-    sub_CM_UtilLogger avParams, PoWriter
+    fw_logger avParams, PoWriter
 End Sub
