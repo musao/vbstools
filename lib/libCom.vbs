@@ -508,7 +508,7 @@ Private Sub fw_logger( _
     , byRef aoWriter _
     )
     Dim vIps, oEle
-    For Each oEle In func_CM_UtilGetIpaddress()
+    For Each oEle In util_getIpAddress()
         cf_push vIps, oEle.Item("Ip").Item("V4")
     Next
 
@@ -1643,6 +1643,53 @@ Private Function util_randStr( _
         sRet = sRet & avStrings( math_rand(0, lUb, 0) )
     Next
     util_randStr = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : util_getIpAddress()
+'Overview                    : 自身のIPアドレスを取得する
+'Detailed Description        : IPアドレスを格納したオブジェクトを返す
+'Argument
+'     なし
+'Return Value
+'     IPアドレスを格納したオブジェクトの配列
+'                              内容は以下のとおり
+'                               Key             Value                   例
+'                               --------------  ----------------------  ----------------------------
+'                               "Caption"       Adapter名               -
+'                               "Ip"            以下オブジェクト        -
+'                              
+'                              IP Addressを格納したオブジェクト
+'                               Key             Value                   例
+'                               --------------  ----------------------  ----------------------------
+'                               "V4"            IP Address(v4)          192.168.11.52
+'                               "V6"            IP Address(v6)          fe80::ba87:1e93:59ab:28f7%18
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/10         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_getIpAddress( _
+    )
+    Dim sMyComp, oAdapter, oAddress, oRet, oIpv4, oIpv6
+    
+    For Each oAdapter in CreateObject("WbemScripting.SWbemLocator").ConnectServer().ExecQuery("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
+         For Each oAddress in oAdapter.IPAddress
+             If new_ArrSplit(oAddress, ".").length=4 Then
+             'IPv4
+                 cf_bind oIpv4, oAddress
+             Else
+             'IPv6
+                 cf_bind oIpv6, oAddress
+             End If
+         Next
+         cf_push oRet, new_DicWith(Array("Caption", oAdapter.Caption, "Ip", new_DicWith(Array("V4", oIpv4, "V6", oIpv6))))
+    Next
+    util_getIpAddress = oRet
+    
+    Set oAddress = Nothing
+    Set oAdapter = Nothing
 End Function
 
 '###################################################################################################
@@ -2831,11 +2878,11 @@ Private Sub sub_CM_Swap( _
     byRef avA _
     , byRef avB _
     )
-    Dim oTemp
-    Call cf_bind(oTemp, avA)
-    Call cf_bind(avA, avB)
-    Call cf_bind(avB, oTemp)
-    Set oTemp = Nothing
+    Dim oTmp
+    cf_bind oTmp, avA
+    cf_bind avA, avB
+    cf_bind avB, oTmp
+    Set oTmp = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -3288,53 +3335,6 @@ Private Function func_CM_UtilSortDefaultFunc( _
     , byRef aoNextValue _
     )
     func_CM_UtilSortDefaultFunc = aoCurrentValue>aoNextValue
-End Function
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilGetIpaddress()
-'Overview                    : 自身のIPアドレスを取得する
-'Detailed Description        : IPアドレスを格納したオブジェクトを返す
-'Argument
-'     なし
-'Return Value
-'     IPアドレスを格納したオブジェクトの配列
-'                              内容は以下のとおり
-'                               Key             Value                   例
-'                               --------------  ----------------------  ----------------------------
-'                               "Caption"       Adapter名               -
-'                               "Ip"            以下オブジェクト        -
-'                              
-'                              IP Addressを格納したオブジェクト
-'                               Key             Value                   例
-'                               --------------  ----------------------  ----------------------------
-'                               "V4"            IP Address(v4)          192.168.11.52
-'                               "V6"            IP Address(v6)          fe80::ba87:1e93:59ab:28f7%18
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/10         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilGetIpaddress( _
-    )
-    Dim sMyComp, oAdapter, oAddress, oRet, oIpv4, oIpv6
-    
-    sMyComp = "."
-    For Each oAdapter in GetObject("winmgmts:\\"&sMyComp&"\root\cimv2").ExecQuery("Select * From Win32_NetworkAdapterConfiguration Where IPEnabled = True")
-         For Each oAddress in oAdapter.IPAddress
-             If new_ArrSplit(oAddress, ".").length=4 Then
-             'IPv4
-                 cf_bind oIpv4, oAddress
-             Else
-             'IPv6
-                 cf_bind oIpv6, oAddress
-             End If
-         Next
-         cf_push oRet, new_DicWith(Array("Caption", oAdapter.Caption, "Ip", new_DicWith(Array("V4", oIpv4, "V6", oIpv6))))
-    Next
-    func_CM_UtilGetIpaddress = oRet
-    
-    Set oAddress = Nothing
-    Set oAdapter = Nothing
 End Function
 
 '***************************************************************************************************

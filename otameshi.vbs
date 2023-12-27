@@ -321,12 +321,12 @@ wscript.quit
 'inputbox "", "", "Vartype(a) = " & vartype(a) & vbnewline & "typename(a) = " & typename(a) & vbnewline & "ubound(a) = " & Ubound(a) & vbnewline & "isarray(a) = " & isarray(a) & vbnewline & "isempty(a) = " & isempty(a) & vbnewline & "isobject(a) = " & isobject(a)
 ''Vartype(a) = 8204 typename(a) = Variant() ubound(a) = 2 isarray(a) = True isempty(a) = False isobject(a) = False
 
-''Test func_CM_UtilGetIpaddress
-'inputbox "", "", cf_toString(func_CM_UtilGetIpaddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
-'dim s : Set s = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress())
+''Test util_getIpAddress
+'inputbox "", "", cf_toString(util_getIpAddress())                   '{"[00000016] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"172.23.0.1","v6"=>"fe80::b763:3fce:cdd9:c0d3"},"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
+'dim s : Set s = new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(util_getIpAddress())
 'inputbox "", "", cf_toString(s)                                            '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
 '                                                                                '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
-'inputbox "", "", cf_toString( new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(func_CM_UtilGetIpaddress()).Items()(0) )
+'inputbox "", "", cf_toString( new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(util_getIpAddress()).Items()(0) )
 
 ''Test cf_tryCatch()
 'Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
