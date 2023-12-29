@@ -207,7 +207,7 @@ Private Sub sub_GnrtPwGenerate( _
     Dim sPath : sPath = func_CM_FsGetTempFilePath()
     Do Until Inputbox(sMsg, sTitle, sPw)=False
         '一時ファイルに生成したパスワードを出力
-        fs_writeFile sPath, sPw
+        fs_writeFileDefault sPath, sPw
         'クリップボードに一時ファイルの内容を出力
         new_Shell().Run "cmd /c clip <""" & sPath & """", 0, True
         '一時ファイルを削除

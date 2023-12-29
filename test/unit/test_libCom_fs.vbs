@@ -116,6 +116,28 @@ Sub Test_fs_writeFile_Err
 End Sub
 
 '###################################################################################################
+'fs_writeFileDefault()
+Sub Test_fs_writeFileDefault
+    Dim path,ec,ea,d,a,cont
+    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+
+    d = "abc" & vbNewLine & "‚ ‚¢‚¤" & vbNewLine & "123"
+    ec = d : ea = True
+    a = fs_writeFileDefault(path, d)
+    With CreateObject("ADODB.Stream")
+        .Charset = "shift-jis"
+        .Open
+        .LoadFromFile path
+        cont = .ReadText
+        .Close
+    End With
+
+    AssertEqualWithMessage ea, a, "ret"
+    AssertEqualWithMessage ec, cont, "cont"
+End Sub
+
+'###################################################################################################
 'fs_readFile()
 Sub Test_fs_readFile
     Dim path,e,d,a

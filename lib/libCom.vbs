@@ -134,6 +134,32 @@ Private Sub cf_pushMulti( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_swap()
+'Overview                    : 変数の値を入れ替える
+'Detailed Description        : 移送処理はcf_bind()を使用する
+'Argument
+'     avA                    : 値を入れ替える変数
+'     avB                    : 値を入れ替える変数
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/21         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub cf_swap( _
+    byRef avA _
+    , byRef avB _
+    )
+    Dim oTmp
+    cf_bind oTmp, avA
+    cf_bind avA, avB
+    cf_bind avB, oTmp
+    Set oTmp = Nothing
+End Sub
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_tryCatch()
 'Overview                    : 処理の実行とエラー発生時の処理実行
 'Detailed Description        : 他の言語のtry-chatch文に準拠
@@ -513,8 +539,7 @@ Private Sub fw_logger( _
     Next
 
     With aoWriter
-        .Write(new_ArrWith(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
-        .newLine()
+        .WriteLine(new_ArrWith(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
     End With
 
     Set oEle = Nothing
@@ -1722,6 +1747,31 @@ Private Function fs_writeFile( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : fs_writeFileDefault()
+'Overview                    : システムの既定の形式でファイル出力する
+'Detailed Description        : func_FsWriteFile()に委譲し以下の設定で出力する
+'                               出力モード            ：既存のファイルを新しいデータで置き換える
+'                               ファイルが存在しない場合：新しいファイルを作成する
+'                               ファイルの形式         ：システムの既定
+'Argument
+'     asPath                 : 出力先のフルパス
+'     asCont                 : 出力する内容
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_writeFileDefault( _
+    byVal asPath _
+    , byVal asCont _
+    )
+    fs_writeFileDefault = func_FsWriteFile(asPath, 2, True, -2, asCont)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fs_readFile()
 'Overview                    : Unicode形式のファイルを読んで中身を取得する
 'Detailed Description        : func_FsReadFile()に委譲し以下の設定で読込む
@@ -2860,32 +2910,6 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
-'Function/Sub Name           : sub_CM_Swap()
-'Overview                    : 変数の値を入れ替える
-'Detailed Description        : 移送処理はcf_bind()を使用する
-'Argument
-'     avA                    : 値を入れ替える変数
-'     avB                    : 値を入れ替える変数
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/21         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_Swap( _
-    byRef avA _
-    , byRef avB _
-    )
-    Dim oTmp
-    cf_bind oTmp, avA
-    cf_bind avA, avB
-    cf_bind avB, oTmp
-    Set oTmp = Nothing
-End Sub
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_FillInTheCharacters()
 'Overview                    : 文字を埋める
 'Detailed Description        : 対象文字の不足桁を指定したアライメントで指定した文字の1文字目で埋める
@@ -3010,7 +3034,6 @@ Private Function func_CM_UtilSortBubble( _
     )
     func_CM_UtilSortBubble = avArr
     If Not new_Arr().hasElement(avArr) Then Exit Function
-'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     Dim lEnd, lPos
@@ -3019,7 +3042,7 @@ Private Function func_CM_UtilSortBubble( _
         For lPos=0 To lEnd-1
             If aoFunc(avArr(lPos), avArr(lPos+1))=aboFlg Then
             'lPos番目の要素と(lPos+1)番目の要素を入れ替える
-                Call sub_CM_Swap(avArr(lPos), avArr(lPos+1))
+                cf_swap avArr(lPos), avArr(lPos+1)
             End If
         Next
         lEnd = lEnd-1
@@ -3056,7 +3079,6 @@ Private Function func_CM_UtilSortQuick( _
     )
     func_CM_UtilSortQuick = avArr
     If Not new_Arr().hasElement(avArr) Then Exit Function
-'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     '0番目の要素をピボットに決める
@@ -3066,9 +3088,9 @@ Private Function func_CM_UtilSortQuick( _
     Dim lPos, vRight, vLeft
     For lPos=1 To Ubound(avArr)
         If aoFunc(avArr(lPos), oPivot)=aboFlg Then
-            Call cf_push(vRight, avArr(lPos))
+            cf_push vRight, avArr(lPos)
         Else
-            Call cf_push(vLeft, avArr(lPos))
+            cf_push vLeft, avArr(lPos)
         End If
     Next
     
@@ -3077,11 +3099,10 @@ Private Function func_CM_UtilSortQuick( _
     vRight = func_CM_UtilSortQuick(vRight, aoFunc, aboFlg)
     
     'Leftにピボット＋Rightを結合する
-    Call cf_push(vLeft, oPivot)
+    cf_push vLeft, oPivot
     If new_Arr().hasElement(vRight) Then
-'    If func_CM_ArrayIsAvailable(vRight) Then
         For lPos=0 To Ubound(vRight)
-            Call cf_push(vLeft, vRight(lPos))
+            cf_push vLeft, vRight(lPos)
         Next
     End If
     
@@ -3116,20 +3137,18 @@ Private Function func_CM_UtilSortMerge( _
     )
     func_CM_UtilSortMerge = avArr
     If Not new_Arr().hasElement(avArr) Then Exit Function
-'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     '2つの配列に分解する
     Dim lLength, lMedian
     lLength = Ubound(avArr) - Lbound(avArr) + 1
     lMedian = math_roundUp(lLength/2, 0)
-'    lMedian = math_roundUp(lLength/2, 1)
     Dim lPos, vFirst, vSecond
     For lPos=Lbound(avArr) To lMedian-1
-        Call cf_push(vFirst, avArr(lPos))
+        cf_push vFirst, avArr(lPos)
     Next
     For lPos=lMedian To Ubound(avArr)
-        Call cf_push(vSecond, avArr(lPos))
+        cf_push vSecond, avArr(lPos)
     Next
     
     '再帰処理で配列の要素が1つになるまで分解する
@@ -3177,7 +3196,7 @@ Private Function func_CM_UtilSortMergeMerge( _
     Dim vRet
     Do While lPosF<=lEndF And lPosS<=lEndS
         If aoFunc(avFirst(lPosF), avSecond(lPosS))=aboFlg Then
-            Call cf_push(vRet, avSecond(lPosS))
+            cf_push vRet, avSecond(lPosS)
             lPosS = lPosS + 1
         Else
             Call cf_push(vRet, avFirst(lPosF))
@@ -3189,12 +3208,12 @@ Private Function func_CM_UtilSortMergeMerge( _
     Dim lPos
     If lPosF<=lEndF Then
         For lPos=lPosF To lEndF
-            Call cf_push(vRet, avFirst(lPos))
+            cf_push vRet, avFirst(lPos)
         Next
     End If
     If lPosS<=lEndS Then
         For lPos=lPosS To lEndS
-            Call cf_push(vRet, avSecond(lPos))
+            cf_push vRet, avSecond(lPos)
         Next
     End If
     
@@ -3229,7 +3248,6 @@ Private Function func_CM_UtilSortHeap( _
     )
     func_CM_UtilSortHeap = avArr
     If Not new_Arr().hasElement(avArr) Then Exit Function
-'    If Not func_CM_ArrayIsAvailable(avArr) Then Exit Function
     If Ubound(avArr)=0 Then Exit Function
     
     'ヒープの作成
@@ -3238,16 +3256,16 @@ Private Function func_CM_UtilSortHeap( _
     lSize = lUb - lLb + 1
     '子を持つ最下部のノードから上位に向けて順番にノード単位の処理を行う
     For lParent=lSize\2-1 To lLb Step -1
-        Call sub_CM_UtilSortHeapPerNodeProc(avArr, lSize, lParent, aoFunc, aboFlg)
+        sub_CM_UtilSortHeapPerNodeProc avArr, lSize, lParent, aoFunc, aboFlg
     Next
     
     'ヒープの先頭（最大/最小値）を順番に取り出す
     Do While lSize>0
         'ヒープの先頭と末尾を入れ替える
-        Call sub_CM_Swap(avArr(lLb), avArr(lSize-1))
+        cf_swap avArr(lLb), avArr(lSize-1)
         'ヒープサイズを１つ減らして再作成
         lSize = lSize - 1
-        Call sub_CM_UtilSortHeapPerNodeProc(avArr, lSize, 0, aoFunc, aboFlg)
+        sub_CM_UtilSortHeapPerNodeProc avArr, lSize, 0, aoFunc, aboFlg
     Loop
     
     'ソート済の配列を返す
@@ -3308,9 +3326,9 @@ Private Sub sub_CM_UtilSortHeapPerNodeProc( _
     
     If lToSwap<>alParent Then
         '親と子の要素を入れ替える
-        Call sub_CM_Swap(avArr(alParent), avArr(lToSwap))
+        cf_swap avArr(alParent), avArr(lToSwap)
         '入れ替えた子の要素以下のノードを再処理する
-        Call sub_CM_UtilSortHeapPerNodeProc(avArr, alSize, lToSwap, aoFunc, aboFlg)
+        sub_CM_UtilSortHeapPerNodeProc avArr, alSize, lToSwap, aoFunc, aboFlg
     End If
     
 End Sub

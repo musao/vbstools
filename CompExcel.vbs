@@ -167,10 +167,12 @@ Private Sub sub_CmpExcelDispInputFiles( _
             sPath = .GetOpenFilename( , , Cs_TITLE_EXCEL, , False)
             If sPath = False Then
             'ファイル選択キャンセルの場合は当スクリプトを終了する
+                .Quit
+
                 '★ログ出力
                 sub_CmpExcelLogger Array(3, "sub_CmpExcelDispInputFiles", "Dialog input canceled.")
-                
                 PoWriter.close
+                
                 Set oParam = Nothing
                 Wscript.Quit
             End If
