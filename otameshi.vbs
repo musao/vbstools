@@ -27,6 +27,15 @@ Call sub_import("clsCompareExcel.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
+
+dim ada
+'ada = eval("new_Fso().FileExists(WScript.ScriptFullName)")
+ada = eval("new_Fso().DeleteFile(""C:\Users\89585\Documents\dev\vbs\bin\test_libCom_fs.vbs\231230_174651.203125.txt"")")
+inputbox "","",cf_toString(ada)
+
+wscript.quit
+
+
 inputbox "","","'" & vbNullString & "'"
 
 wscript.quit
@@ -172,7 +181,7 @@ wscript.quit
 Private Function fs_getAllFilesByDirEx( _
     byVal asPath _
     )
-    Dim sTmpPath : sTmpPath = func_CM_FsGetTempFilePath()
+    Dim sTmpPath : sTmpPath = fw_getTempPath()
     new_Shell().run "cmd /U /C dir /S /B /A-D " & Chr(34) & asPath & Chr(34) & " > " & Chr(34) & sTmpPath & Chr(34), 0, True
     Dim sLists
     With CreateObject("ADODB.Stream")
@@ -798,7 +807,7 @@ wscript.quit
 
 
 Dim sPatha
-sPatha = func_CM_FsGetPrivateLogFilePath()
+sPatha = fw_getLogPath()
 Dim bw
 Set bw = new_Writer(new_Ts(sPatha, 8, True, -2))
 
@@ -1022,7 +1031,7 @@ sPath(3) = "C:\Users\89585\Documents\dev\vbs\lib.abc"
 'Dim lCnt
 For lCnt=1 To Ubound(sPath)
     Call Msgbox(sPath(lCnt))
-    Call Msgbox("Basename : " & func_CM_FsGetGetBaseName(sPath(lCnt)) &", Extension : " & func_CM_FsGetGetExtensionName(sPath(lCnt)))
+    Call Msgbox("Basename : " & func_CM_FsGetGetBaseName(sPath(lCnt)) &", Extension : " & new_Fso().GetExtensionName(sPath(lCnt)))
 Next
 wscript.quit
 

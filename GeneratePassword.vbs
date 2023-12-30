@@ -69,7 +69,7 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -1)
+    Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
     oBroker.subscribe "log", GetRef("sub_GnrtPwLogger")
@@ -204,7 +204,7 @@ Private Sub sub_GnrtPwGenerate( _
     '★ログ出力
     sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "Display Inputbox.")
     '一時ファイルのパスを作成
-    Dim sPath : sPath = func_CM_FsGetTempFilePath()
+    Dim sPath : sPath = fw_getTempPath()
     Do Until Inputbox(sMsg, sTitle, sPw)=False
         '一時ファイルに生成したパスワードを出力
         fs_writeFileDefault sPath, sPw

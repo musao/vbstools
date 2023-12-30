@@ -210,14 +210,13 @@ Sub Test_fw_storeArguments
     dim k,v
     k = "__Special__" : v = "Arguments"
     AssertEqualWithMessage v, a.Item(k), k
-'    k = "All"
-'    AssertEqualWithMessage MY_NAME, a.Item(k)(0), k
+    k = "All"
+    AssertEqualWithMessage 0, Ubound(a.Item(k)), k
 '    k = "Named"
 '    AssertEqualWithMessage 0, a.Item(k).Count, k
 '    k = "Unnamed"
-'    AssertEqualWithMessage MY_NAME, a.Item(k)(0), k
+'    AssertEqualWithMessage 0, Ubound(a.Item(k)), k
 End Sub
-
 
 '###################################################################################################
 'common

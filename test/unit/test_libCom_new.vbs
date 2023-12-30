@@ -504,37 +504,37 @@ Sub Test_new_Func_Arrow_nLine_nReturn
 End Sub
 
 '###################################################################################################
-'func_FuncAnalyze()
-Sub Test_func_FuncAnalyze_1Line
+'func_NewAnalyze()
+Sub Test_func_NewAnalyze_1Line
     Dim code : code = "abc"
     Dim ev : ev = Array("abc")
-    Dim a : a = func_FuncAnalyze(code)
+    Dim a : a = func_NewAnalyze(code)
     
     AssertEqual Ubound(ev), Ubound(a)
     AssertEqual ev(0), a(0)
 End Sub
-Sub Test_func_FuncAnalyze_1Line_UnderLine
+Sub Test_func_NewAnalyze_1Line_UnderLine
     Dim code : code = " a_b c_d_ "
     Dim ev : ev = Array("a_b c_d_")
-    Dim a : a = func_FuncAnalyze(code)
+    Dim a : a = func_NewAnalyze(code)
     
     AssertEqual Ubound(ev), Ubound(a)
     AssertEqual ev(0), a(0)
 End Sub
-Sub Test_func_FuncAnalyze_nLine
+Sub Test_func_NewAnalyze_nLine
     Dim code : code = "a b:c_: d"
     Dim ev : ev = Array("a b","c_","d")
-    Dim a : a = func_FuncAnalyze(code)
+    Dim a : a = func_NewAnalyze(code)
     
     AssertEqual Ubound(ev), Ubound(a)
     AssertEqual ev(0), a(0)
     AssertEqual ev(1), a(1)
     AssertEqual ev(2), a(2)
 End Sub
-Sub Test_func_FuncAnalyze_nLine_UnderLine
+Sub Test_func_NewAnalyze_nLine_UnderLine
     Dim code : code = "a: b _:c d: e "
     Dim ev : ev = Array("a","b c d", "e")
-    Dim a : a = func_FuncAnalyze(code)
+    Dim a : a = func_NewAnalyze(code)
     
     AssertEqual Ubound(ev), Ubound(a)
     AssertEqual ev(0), a(0)
@@ -543,94 +543,94 @@ Sub Test_func_FuncAnalyze_nLine_UnderLine
 End Sub
 
 '###################################################################################################
-'func_FuncRewriteReturnPhrase()
-Sub Test_func_FuncRewriteReturnPhrase_Normal_1Line_0Return
+'func_NewRewriteReturnPhrase()
+Sub Test_func_NewRewriteReturnPhrase_Normal_1Line_0Return
     Dim fn : fn = "fn_normal"
     Dim flg : flg = False
     Dim code : code = Array("abc")
     Dim e : e = "abc"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Normal_1Line_1Return
+Sub Test_func_NewRewriteReturnPhrase_Normal_1Line_1Return
     Dim fn : fn = "fn_normal"
     Dim flg : flg = False
     Dim code : code = Array("ab return c")
     Dim e : e = "ab  cf_bind fn_normal, (c)"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Normal_nLine_0Return
+Sub Test_func_NewRewriteReturnPhrase_Normal_nLine_0Return
     Dim fn : fn = "fn_normal"
     Dim flg : flg = False
     Dim code : code = Array("a bC", "dEf", "Gh i")
     Dim e : e = "a bC:dEf:Gh i"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Normal_nLine_1Return
+Sub Test_func_NewRewriteReturnPhrase_Normal_nLine_1Return
     Dim fn : fn = "fn_normal"
     Dim flg : flg = False
     Dim code : code = Array("aB c", "D ef", "g return h I")
     Dim e : e = "aB c:D ef:g  cf_bind fn_normal, (h I)"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Normal_nLine_nReturn
+Sub Test_func_NewRewriteReturnPhrase_Normal_nLine_nReturn
     Dim fn : fn = "fn_normal"
     Dim flg : flg = False
     Dim code : code = Array("Abc", "d return eF", "return g H i")
     Dim e : e = "Abc:d  cf_bind fn_normal, (eF): cf_bind fn_normal, (g H i)"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Arrow_1Line_0Return
+Sub Test_func_NewRewriteReturnPhrase_Arrow_1Line_0Return
     Dim fn : fn = "fn_arrow"
     Dim flg : flg = True
     Dim code : code = Array("abc")
     Dim e : e = "cf_bind fn_arrow, (abc)"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Arrow_1Line_1Return
+Sub Test_func_NewRewriteReturnPhrase_Arrow_1Line_1Return
     Dim fn : fn = "fn_arrow"
     Dim flg : flg = True
     Dim code : code = Array("a B return c")
     Dim e : e = "a B  cf_bind fn_arrow, (c)"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Arrow_nLine_0Return
+Sub Test_func_NewRewriteReturnPhrase_Arrow_nLine_0Return
     Dim fn : fn = "fn_arrow"
     Dim flg : flg = True
     Dim code : code = Array("a b  c", "DEF", "G h  I")
     Dim e : e = "a b  c:DEF:G h  I"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Arrow_nLine_1Return
+Sub Test_func_NewRewriteReturnPhrase_Arrow_nLine_1Return
     Dim fn : fn = "fn_arrow"
     Dim flg : flg = True
     Dim code : code = Array("return a Bc", "De f", "g  h I")
     Dim e : e = " cf_bind fn_arrow, (a Bc):De f:g  h I"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub
-Sub Test_func_FuncRewriteReturnPhrase_Arrow_nLine_nReturn
+Sub Test_func_NewRewriteReturnPhrase_Arrow_nLine_nReturn
     Dim fn : fn = "fn_arrow"
     Dim flg : flg = True
     Dim code : code = Array("AB return c", "D return e f", "G   HI")
     Dim e : e = "AB  cf_bind fn_arrow, (c):D  cf_bind fn_arrow, (e f):G   HI"
-    Dim a : a = func_FuncRewriteReturnPhrase(fn, flg, code)
+    Dim a : a = func_NewRewriteReturnPhrase(fn, flg, code)
     
     AssertEqual e, a
 End Sub

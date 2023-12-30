@@ -315,7 +315,7 @@ Class clsCompareExcel
         Dim sTempPath : sTempPath = ""
         If oWorkBook.HasVBProject Then
         'マクロありの場合は別名で保存した上で再度開く
-            sTempPath = func_CM_FsGetTempFilePath()
+            sTempPath = fw_getTempPath()
             Call sub_CM_ExcelSaveAs(oWorkBook, sTempPath, vbNullString)
             Set oWorkBook = func_CM_ExcelOpenFile( oExcel, sTempPath)
             '★ログ出力

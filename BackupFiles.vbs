@@ -302,12 +302,12 @@ Private Sub sub_BackupFileProcForOneFile( _
         Dim sNewFileName
         sNewFileName = func_CM_FsGetGetBaseName(asPath) & "_"& Right(sNewDate,6)
         If (Len(sNewSeq)>0) Then sNewFileName = sNewFileName & "_" & sNewSeq
-        sNewFileName = sNewFileName & "." & func_CM_FsGetGetExtensionName(asPath)
+        sNewFileName = sNewFileName & "." & new_Fso().GetExtensionName(asPath)
         
     End With
     
     'コピー実施
-    Dim sNewFilePath : sNewFilePath = func_CM_FsBuildPath(aoParams.Item(asPath).Item("OutputFolderPath"), sNewFileName)
+    Dim sNewFilePath : sNewFilePath = new_Fso().BuildPath(aoParams.Item(asPath).Item("OutputFolderPath"), sNewFileName)
     Call func_CM_FsCopyFile(asPath, sNewFilePath)
     
 End Sub
@@ -363,20 +363,20 @@ Private Sub sub_BackupFileFindPreviousFile( _
     Dim sTargetFolder : sTargetFolder = ""
     Dim sTemp : Dim lKey
     For Each lKey In oFolders.Keys
-        sTemp = func_CM_FsBuildPath(sParentFolderPath, oFolders.Item(lKey))
+        sTemp = new_Fso().BuildPath(sParentFolderPath, oFolders.Item(lKey))
         If new_Fso().FolderExists(sTemp) Then
             sTargetFolder = sTemp
             Exit For
         End If
     Next
     If (Len(sTargetFolder)=0) Then
-        sTargetFolder = func_CM_FsBuildPath(sParentFolderPath, oFolders.Item(1))
-        Call func_CM_FsCreateFolder(sTargetFolder)
+        sTargetFolder = new_Fso().BuildPath(sParentFolderPath, oFolders.Item(1))
+        fs_createFolder sTargetFolder
     End If
     
     'バックアップ対象ファイルのファイル名と拡張子からバックアップ履歴ファイル抽出用の正規表現を作成
     Dim sBasename : sBasename = func_CM_FsGetGetBaseName(asPath)
-    Dim sExtensionName : sExtensionName = func_CM_FsGetGetExtensionName(asPath)
+    Dim sExtensionName : sExtensionName = new_Fso().GetExtensionName(asPath)
     Dim sPattern
     sPattern = sBasename & "_" & "(20)?(\d{2}[01]\d[0123]\d)" & "((_)(\d+))?"
     If (Len(sExtensionName)) Then sPattern = sPattern & "." & sExtensionName

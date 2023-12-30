@@ -64,7 +64,7 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -1)
+    Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     PoWriter.writeBufferSize=100000
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
@@ -209,7 +209,7 @@ Private Sub sub_GetFileInfoReport( _
         sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before reportfile output.")
         'レポートをファイルに出力
         Dim sPath
-        sPath = func_CM_FsGetPrivateFilePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
+        sPath = fw_getPrivatePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
         fs_writeFile sPath, .generate
     End With
 

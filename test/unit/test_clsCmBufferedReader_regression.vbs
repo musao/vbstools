@@ -19,20 +19,21 @@ Dim PsPathTempFolder,PsPathData1,PsPathData2
 '###################################################################################################
 'SetUp()/TearDown()
 Sub SetUp()
-    PsPathTempFolder = func_CM_FsBuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedReader_regression")
-    PsPathData1 = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedReader_regression")
+    If Not(new_Fso().FolderExists(PsPathTempFolder)) Then fs_createFolder(PsPathTempFolder)
+    PsPathData1 = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With new_Ts(PsPathData1, ForWriting, True, -2)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCrLf & vbCr & "abcde" & vbLf & vbLf & "12" & vbCr & "345")
         .Close
     End With
-    PsPathData2 = func_CM_FsGetFilePathWithCreateParentFolder(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathData2 = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With new_Ts(PsPathData2, ForWriting, True, -2)
         .Write("‚©‚«‚­‚¯‚±" & vbCr)
         .Close
     End With
 End Sub
 Sub TearDown()
-    func_CM_FsDeleteFolder PsPathTempFolder
+    fs_deleteFolder PsPathTempFolder
 End Sub
 
 

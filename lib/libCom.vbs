@@ -64,6 +64,97 @@ Private Sub cf_bindAt( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_isAvailableObject()
+'Overview                    : オブジェクトが利用可能か判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoObj                  : オブジェクト
+'Return Value
+'     結果 True:利用可能 / False:利用不可
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isAvailableObject( _
+    byRef aoObj _
+    )
+    Dim boFlg : boFlg = False
+    If IsObject(aoObj) Then
+        If Not aoObj Is Nothing Then boFlg = True
+    End If
+    cf_isAvailableObject = boFlg
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isSame()
+'Overview                    : 同一か判定する
+'Detailed Description        : 工事中
+'Argument
+'     aoA                    : 比較対象
+'     aoB                    : 比較対象
+'Return Value
+'     結果 True:同一 / False:同一でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/15         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isSame( _
+    byRef aoA _
+    , byRef aoB _
+    )
+    Dim boFlg : boFlg = False
+    If IsObject(aoA) And IsObject(aoB) Then
+        If aoA Is aoB Then boFlg = True
+    ElseIf Not IsObject(aoA) And Not IsObject(aoB) Then
+        If VarType(aoA) = vbString And VarType(aoB) = vbString Then
+            If Strcomp(aoA, aoB, vbBinaryCompare)=0 Then boFlg = True
+        Else
+            If aoA = aoB Then boFlg = True
+        End If
+    End If
+    cf_isSame = boFlg
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isValid()
+'Overview                    : 有効な値（初期値でない）か判定する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 判定対象
+'Return Value
+'     結果 True:有効な値がある / False:有効な値がない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isValid( _
+    byRef avTgt _
+    )
+    Dim boFlg : boFlg = True
+    If IsObject(avTgt) Then
+    'オブジェクトの場合
+        If avTgt Is Nothing Then boFlg = False
+    ElseIf IsArray(avTgt) Then
+    '配列の場合
+        boFlg = new_Arr().hasElement(avTgt)
+    Else
+    '上記以外の場合
+        If IsEmpty(avTgt) Or IsNull(avTgt) Then
+            boFlg = False
+        ElseIf cf_isSame(avTgt, vbNullString) Then
+            boFlg = False
+        End If
+    End If
+    cf_isValid = boFlg
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_push()
 'Overview                    : 配列に要素を追加する
 'Detailed Description        : 工事中
@@ -160,6 +251,26 @@ Private Sub cf_swap( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_toString()
+'Overview                    : 引数の内容を文字列で表示する
+'Detailed Description        : func_CfToString()に委譲する
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_toString( _
+    byRef avTgt _
+    )
+    cf_toString = func_CfToString(avTgt)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_tryCatch()
 'Overview                    : 処理の実行とエラー発生時の処理実行
 'Detailed Description        : 他の言語のtry-chatch文に準拠
@@ -216,117 +327,6 @@ Private Function cf_tryCatch( _
     Set cf_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
     Set oRet = Nothing
     Set oErr = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : cf_isSame()
-'Overview                    : 同一か判定する
-'Detailed Description        : 工事中
-'Argument
-'     aoA                    : 比較対象
-'     aoB                    : 比較対象
-'Return Value
-'     結果 True:同一 / False:同一でない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function cf_isSame( _
-    byRef aoA _
-    , byRef aoB _
-    )
-    Dim boFlg : boFlg = False
-    If IsObject(aoA) And IsObject(aoB) Then
-        If aoA Is aoB Then boFlg = True
-    ElseIf Not IsObject(aoA) And Not IsObject(aoB) Then
-        If VarType(aoA) = vbString And VarType(aoB) = vbString Then
-            If Strcomp(aoA, aoB, vbBinaryCompare)=0 Then boFlg = True
-        Else
-            If aoA = aoB Then boFlg = True
-        End If
-    End If
-    cf_isSame = boFlg
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : cf_isValid()
-'Overview                    : 有効な値（初期値でない）か判定する
-'Detailed Description        : 工事中
-'Argument
-'     avTgt                  : 判定対象
-'Return Value
-'     結果 True:有効な値がある / False:有効な値がない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/12/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function cf_isValid( _
-    byRef avTgt _
-    )
-    Dim boFlg : boFlg = True
-    If IsObject(avTgt) Then
-    'オブジェクトの場合
-        If avTgt Is Nothing Then boFlg = False
-    ElseIf IsArray(avTgt) Then
-    '配列の場合
-        boFlg = new_Arr().hasElement(avTgt)
-    Else
-    '上記以外の場合
-        If IsEmpty(avTgt) Or IsNull(avTgt) Then
-            boFlg = False
-        ElseIf cf_isSame(avTgt, vbNullString) Then
-            boFlg = False
-        End If
-    End If
-    cf_isValid = boFlg
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : cf_isAvailableObject()
-'Overview                    : オブジェクトが利用可能か判定する
-'Detailed Description        : 工事中
-'Argument
-'     aoObj                  : オブジェクト
-'Return Value
-'     結果 True:利用可能 / False:利用不可
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function cf_isAvailableObject( _
-    byRef aoObj _
-    )
-    Dim boFlg : boFlg = False
-    If IsObject(aoObj) Then
-        If Not aoObj Is Nothing Then boFlg = True
-    End If
-    cf_isAvailableObject = boFlg
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : cf_toString()
-'Overview                    : 引数の内容を文字列で表示する
-'Detailed Description        : func_CfToString()に委譲する
-'Argument
-'     avTgt                  : 対象
-'Return Value
-'     文字列に変換した引数の内容
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/12/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function cf_toString( _
-    byRef avTgt _
-    )
-    cf_toString = func_CfToString(avTgt)
 End Function
 
 '***************************************************************************************************
@@ -463,7 +463,6 @@ Private Function func_CfToStringObjectDictionary( _
         func_CfToStringObjectDictionary = "<" & sLabel & ">{}"
     End If
 End Function
-
 
 '###################################################################################################
 'フレームワーク系の関数
@@ -631,6 +630,83 @@ Private Function fw_storeArguments( _
     Set oEle = Nothing
     Set oDic = Nothing
     Set oRet = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_getPrivatePath()
+'Overview                    : 実行中のスクリプトがあるフォルダ以下のフルパスを返す
+'Detailed Description        : 親フォルダ名の指定があればそのフォルダ以下のパスを返す
+'                              親フォルダ名の指定がない場合は実行中のスクリプトがあるフォルダ直下のパスを返す
+'Argument
+'     asParentFolderName     : 親フォルダ名
+'     asFileName             : ファイル名
+'Return Value
+'     フルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getPrivatePath( _
+    byVal asParentFolderName _
+    , byVal asFileName _
+    )
+    '実行中のスクリプトがあるフォルダのパスを取得
+    Dim sParentFolderPath : sParentFolderPath = new_Fso().GetParentFolderName(WScript.ScriptFullName)
+    
+    'ファイルの上位ディレクトリを決める
+    If Len(asParentFolderName)>0 Then
+    '引数で指定したディレクトリ名がある場合
+        sParentFolderPath = new_Fso().BuildPath(sParentFolderPath ,asParentFolderName)
+    End If
+
+    '上位ディレクトリが存在しない場合は作成する
+    fs_createFolder(sParentFolderPath)
+    
+    'パスを返す
+    fw_getPrivatePath = new_Fso().BuildPath(sParentFolderPath, asFileName)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_getTempPath()
+'Overview                    : 一時ファイルのパスを返す
+'Detailed Description        : 実行中のスクリプトがあるフォルダのtmpフォルダ以下に作成する
+'                              fw_getPrivatePath()に委譲する
+'Argument
+'     なし
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getTempPath( _
+    )
+    fw_getTempPath = fw_getPrivatePath("tmp", new_Fso().GetTempName())
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_getLogPath()
+'Overview                    : 実行中のスクリプトのログファイルパスを返す
+'Detailed Description        : 実行中のスクリプトがあるフォルダのlogフォルダ以下に
+'                              スクリプトファイル名＋".log"形式のファイル名で作成する
+'                              fw_getPrivatePath()に委譲する
+'Argument
+'     なし
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getLogPath( _
+    )
+    fw_getLogPath = fw_getPrivatePath("log", new_Fso().GetBaseName(WScript.ScriptName) & ".log" )
 End Function
 
 '###################################################################################################
@@ -1255,10 +1331,10 @@ Private Function new_Func( _
         sProcStr = oRegExp.Replace(sSoruceCode, "$2")
         
         'return句があれば関数名で書き換える
-        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, False, func_FuncAnalyze(sProcStr) )
+        sProcStr = func_NewRewriteReturnPhrase(sFuncName, False, func_NewAnalyze(sProcStr) )
         
         '関数の生成
-        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
+        Set new_Func = func_NewGenerate(sFuncName, sArgStr, sProcStr)
         Set oRegExp = Nothing
         Exit Function
     End If
@@ -1277,16 +1353,16 @@ Private Function new_Func( _
         sProcStr = new_Re(sPattern, "igm").Replace(sProcStr, "$1")
         
         'return句があれば関数名で書き換える
-        sProcStr = func_FuncRewriteReturnPhrase(sFuncName, True, func_FuncAnalyze(sProcStr) )
+        sProcStr = func_NewRewriteReturnPhrase(sFuncName, True, func_NewAnalyze(sProcStr) )
         
         '関数の生成
-        Set new_Func = func_FuncGenerate(sFuncName, sArgStr, sProcStr)
+        Set new_Func = func_NewGenerate(sFuncName, sArgStr, sProcStr)
     End If
     Set oRegExp = Nothing
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_FuncAnalyze()
+'Function/Sub Name           : func_NewAnalyze()
 'Overview                    : ソースコードを解釈する
 'Detailed Description        : new_Func()から使用する
 '                              _（アンダーライン）は行を結合する
@@ -1300,7 +1376,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/10/12         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_FuncAnalyze( _
+Private Function func_NewAnalyze( _
     byVal asCode _
     )
     Dim sRow, sPtn, oCode, sTemp
@@ -1319,12 +1395,12 @@ Private Function func_FuncAnalyze( _
         End If
     Next
     
-    func_FuncAnalyze = oCode.Items()
+    func_NewAnalyze = oCode.Items()
     Set oCode = Nothing
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_FuncRewriteReturnPhrase()
+'Function/Sub Name           : func_NewRewriteReturnPhrase()
 'Overview                    : return句を書き換える
 'Detailed Description        : new_Func()から使用する
 '                              Arrow関数で1行の場合はその行全体をreturnする
@@ -1340,7 +1416,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_FuncRewriteReturnPhrase( _
+Private Function func_NewRewriteReturnPhrase( _
     byVal asFuncName _
     , byVal aboArrowFlg _
     , byRef avCode _
@@ -1352,10 +1428,10 @@ Private Function func_FuncRewriteReturnPhrase( _
         Dim sCode : sCode = avCode(0)
         If new_Re(sPtnRet, "ig").Test(sCode) Then
         'return句がある場合
-            func_FuncRewriteReturnPhrase = new_Re(sPtnRet, "ig").Replace(sCode, "$1 cf_bind " & asFuncName & ", ($2)")
+            func_NewRewriteReturnPhrase = new_Re(sPtnRet, "ig").Replace(sCode, "$1 cf_bind " & asFuncName & ", ($2)")
         Else
         'return句がない場合
-            func_FuncRewriteReturnPhrase = "cf_bind " & asFuncName & ", (" & sCode & ")"
+            func_NewRewriteReturnPhrase = "cf_bind " & asFuncName & ", (" & sCode & ")"
         End If
         Exit Function
     End If
@@ -1368,12 +1444,12 @@ Private Function func_FuncRewriteReturnPhrase( _
         End If
     Next
     
-    func_FuncRewriteReturnPhrase = Join(avCode, ":")
+    func_NewRewriteReturnPhrase = Join(avCode, ":")
     
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_FuncGenerate()
+'Function/Sub Name           : func_NewGenerate()
 'Overview                    : 引数の情報で関数のインスタンスを生成する
 'Detailed Description        : new_Func()から使用する
 'Argument
@@ -1388,7 +1464,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_FuncGenerate( _
+Private Function func_NewGenerate( _
     byVal asFuncName _
     , byVal asArgStr _
     , byVal asProcStr _
@@ -1403,7 +1479,7 @@ Private Function func_FuncGenerate( _
 'inputbox "","",sCode
     '関数の生成
     ExecuteGlobal sCode
-    Set func_FuncGenerate = Getref(asFuncName)
+    Set func_NewGenerate = Getref(asFuncName)
 End Function
 
 '###################################################################################################
@@ -1796,6 +1872,7 @@ End Function
 'Function/Sub Name           : fs_deleteFile()
 'Overview                    : ファイルを削除する
 'Detailed Description        : FileSystemObjectのDeleteFile()と同等
+'                              func_FsGeneralExecutor()に委譲する
 'Argument
 '     asPath                 : 削除するファイルのフルパス
 'Return Value
@@ -1808,18 +1885,71 @@ End Function
 '***************************************************************************************************
 Private Function fs_deleteFile( _
     byVal asPath _
-    ) 
-    If Not new_Fso().FileExists(asPath) Then
-    '削除対象が存在しない場合は失敗
-        fs_deleteFile = False
-        Exit function
-    End If
+    )
+    fs_deleteFile = func_FsGeneralExecutor(False, False, asPath, "DeleteFile")
+'    fs_deleteFile = False
+'    If Not new_Fso().FileExists(asPath) Then Exit function
+'
+'    On Error Resume Next
+'    new_Fso().DeleteFile asPath
+'    If Err.Number=0 Then fs_deleteFile = True
+'    On Error Goto 0
+End Function
 
-    fs_deleteFile = True
-    On Error Resume Next
-    new_Fso().DeleteFile(asPath)
-    If Err.Number Then fs_deleteFile = False
-    On Error Goto 0
+'***************************************************************************************************
+'Function/Sub Name           : fs_deleteFolder()
+'Overview                    : フォルダを削除する
+'Detailed Description        : FileSystemObjectのDeleteFolder()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asPath                 : 削除するフォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_deleteFolder( _
+    byVal asPath _
+    )
+    fs_deleteFolder = func_FsGeneralExecutor(True, False, asPath, "DeleteFolder")
+'    fs_deleteFolder = False
+'    If Not new_Fso().FolderExists(asPath) Then Exit function
+'
+'    On Error Resume Next
+'    new_Fso().DeleteFolder asPath
+'    If Err.Number=0 Then fs_deleteFolder = True
+'    On Error Goto 0
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_createFolder()
+'Overview                    : フォルダを作成する
+'Detailed Description        : FileSystemObjectのCreateFolder()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asPath                 : パス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/30         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_createFolder( _
+    byVal asPath _
+    )
+    fs_createFolder = func_FsGeneralExecutor(True, True, asPath, "CreateFolder")
+'    fs_createFolder = False
+'    If new_Fso().FolderExists(asPath) Then Exit function
+'
+'    On Error Resume Next
+'    new_Fso().CreateFolder asPath
+'    If Err.Number=0 Then fs_createFolder = True
+'    On Error Goto 0
 End Function
 
 '***************************************************************************************************
@@ -1952,7 +2082,7 @@ Private Function func_FsGetAllFilesByDir( _
     )
     Dim sDir : sDir = "dir /S /B /A-D " & Chr(34) & asPath & Chr(34)
     Dim sLists
-    Dim sTmpPath : sTmpPath = func_CM_FsGetTempFilePath()
+    Dim sTmpPath : sTmpPath = fw_getTempPath()
     new_Shell().run "cmd /U /C " & sDir & " > " & Chr(34) & sTmpPath & Chr(34), 0, True
     sLists = fs_readFile(sTmpPath)
     fs_deleteFile sTmpPath
@@ -1970,6 +2100,71 @@ Private Function func_FsGetAllFilesByDir( _
         End If
     Next
     func_FsGetAllFilesByDir = vRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FsGeneralExecutor()
+'Overview                    : Fsoコマンド汎用実行関数
+'Detailed Description        : 工事中
+'Argument
+'     aboIsFolder            : True:フォルダ有無の判定 / False:ファイル有無の判定
+'     aboFlg                 : 判定に使用するフラグ
+'     asPath                 : パス
+'     asCmd                  : 実行コマンド
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/30         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FsGeneralExecutor( _
+    byVal asIsFolder _
+    , byVal aboFlg _
+    , byVal asPath _
+    , byVal asCmd _
+    )
+    func_FsGeneralExecutor=False
+    If asIsFolder Then
+        If new_Fso().FolderExists(asPath)=aboFlg Then Exit Function
+    Else
+        If new_Fso().FileExists(asPath)=aboFlg Then Exit Function
+    End If
+
+    On Error Resume Next
+    Eval("new_Fso()." & asCmd & "(" & Chr(34) & asPath & Chr(34) & ")")
+    If Err.Number=0 Then func_FsGeneralExecutor=True
+    On Error Goto 0
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_FsReadFile()
+'Overview                    : ファイルを読んで中身を取得する
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 入力先のフルパス
+'     alFormat               : ファイルの形式
+'                               -2：システムの既定 / -1：Unicode / 0：Ascii
+'Return Value
+'     ファイルの内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_FsReadFile( _
+    byVal asPath _
+    , byVal alFormat _
+    )
+    func_FsReadFile = Empty
+    On Error Resume Next
+    With new_Ts(asPath, 1, False, alFormat)
+        func_FsReadFile = .ReadAll
+        .Close
+    End With
+    On Error Goto 0
 End Function
 
 '***************************************************************************************************
@@ -2007,35 +2202,6 @@ Private Function func_FsWriteFile( _
         .Close
     End With
     If Err.Number Then func_FsWriteFile = False
-    On Error Goto 0
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_FsReadFile()
-'Overview                    : ファイルを読んで中身を取得する
-'Detailed Description        : 工事中
-'Argument
-'     asPath                 : 入力先のフルパス
-'     alFormat               : ファイルの形式
-'                               -2：システムの既定 / -1：Unicode / 0：Ascii
-'Return Value
-'     ファイルの内容
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/12/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_FsReadFile( _
-    byVal asPath _
-    , byVal alFormat _
-    )
-    func_FsReadFile = Empty
-    On Error Resume Next
-    With new_Ts(asPath, 1, False, alFormat)
-        func_FsReadFile = .ReadAll
-        .Close
-    End With
     On Error Goto 0
 End Function
 
@@ -2134,84 +2300,6 @@ End Function
 'ファイル操作系
 '###################################################################################################
 
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_FsDeleteFile()
-''Overview                    : ファイルを削除する
-''Detailed Description        : FileSystemObjectのDeleteFile()と同等
-''Argument
-''     asPath                 : 削除するファイルのフルパス
-''Return Value
-''     結果 True:成功 / False:失敗
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2022/09/27         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_FsDeleteFile( _
-'    byVal asPath _
-'    ) 
-'    If Not new_Fso().FileExists(asPath) Then func_CM_FsDeleteFile = False
-'    func_CM_FsDeleteFile = cf_tryCatch(new_Func("a=>a(0).DeleteFile(a(1))"), Array(new_Fso(), asPath), Empty, Empty).Item("Result")
-'    
-''    On Error Resume Next
-''    new_Fso().DeleteFile(asPath)
-''    func_CM_FsDeleteFile = True
-''    If Err.Number Then
-''        Err.Clear
-''        func_CM_FsDeleteFile = False
-''    End If
-'End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsDeleteFolder()
-'Overview                    : フォルダを削除する
-'Detailed Description        : FileSystemObjectのDeleteFolder()と同等
-'Argument
-'     asPath                 : 削除するフォルダのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsDeleteFolder( _
-    byVal asPath _
-    ) 
-    If Not new_Fso().FolderExists(asPath) Then func_CM_FsDeleteFolder = False
-    On Error Resume Next
-    new_Fso().DeleteFolder(asPath)
-    func_CM_FsDeleteFolder = True
-    If Err.Number Then
-        Err.Clear
-        func_CM_FsDeleteFolder = False
-    End If
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsDeleteFsObject()
-'Overview                    : ファイルかフォルダを削除する
-'Detailed Description        : fs_deleteFile()とfunc_CM_FsDeleteFolder()に委譲
-'Argument
-'     asPath                 : パス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsDeleteFsObject( _
-    byVal asPath _
-    )
-    func_CM_FsDeleteFsObject = False
-    If new_Fso().FileExists(asPath) Then func_CM_FsDeleteFsObject = fs_deleteFile(asPath)
-    If new_Fso().FolderExists(asPath) Then func_CM_FsDeleteFsObject = func_CM_FsDeleteFolder(asPath)
-End Function
-
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsCopyFile ()
 'Overview                    : ファイルをコピーする
@@ -2268,30 +2356,6 @@ Private Function func_CM_FsCopyFolder( _
         Err.Clear
         func_CM_FsCopyFolder = False
     End If
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsCopyFsObject()
-'Overview                    : ファイルかフォルダをコピーする
-'Detailed Description        : func_CM_FsCopyFile()とfunc_CM_FsCopyFolder()に委譲
-'Argument
-'     asPathFrom             : コピー元ファイル/フォルダのフルパス
-'     asPathTo               : コピー先のフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsCopyFsObject( _
-    byVal asPathFrom _
-    , byVal asPathTo _
-    )
-    func_CM_FsCopyFsObject = False
-    If new_Fso().FileExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFile(asPathFrom, asPathTo)
-    If new_Fso().FolderExists(asPathFrom) Then func_CM_FsCopyFsObject = func_CM_FsCopyFolder(asPathFrom, asPathTo)
 End Function
 
 '***************************************************************************************************
@@ -2353,112 +2417,6 @@ Private Function func_CM_FsMoveFolder( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_FsMoveFsObject()
-'Overview                    : ファイルかフォルダを移動する
-'Detailed Description        : func_CM_FsMoveFile()とfunc_CM_FsMoveFolder()に委譲
-'Argument
-'     asPathFrom             : 移動元ファイル/フォルダのフルパス
-'     asPathTo               : 移動先のフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsMoveFsObject( _
-    byVal asPathFrom _
-    , byVal asPathTo _
-    )
-    func_CM_FsMoveFsObject = False
-    If new_Fso().FileExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFile(asPathFrom, asPathTo)
-    If new_Fso().FolderExists(asPathFrom) Then func_CM_FsMoveFsObject = func_CM_FsMoveFolder(asPathFrom, asPathTo)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetParentFolderPath()
-'Overview                    : 親フォルダパスの取得
-'Detailed Description        : FileSystemObjectのGetParentFolderName()と同等
-'Argument
-'     asPath                 : ファイルのパス
-'Return Value
-'     親フォルダパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetParentFolderPath( _
-    byVal asPath _
-    ) 
-    func_CM_FsGetParentFolderPath = new_Fso().GetParentFolderName(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetGetBaseName()
-'Overview                    : ファイル名（拡張子を除く）の取得
-'Detailed Description        : FileSystemObjectのGetBaseName()と同等
-'Argument
-'     asPath                 : ファイルのパス
-'Return Value
-'     ファイル名（拡張子を除く）
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/23         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetGetBaseName( _
-    byVal asPath _
-    ) 
-    func_CM_FsGetGetBaseName = new_Fso().GetBaseName(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetGetExtensionName()
-'Overview                    : ファイルの拡張子の取得
-'Detailed Description        : FileSystemObjectのGetExtensionName()と同等
-'Argument
-'     asPath                 : ファイルのパス
-'Return Value
-'     ファイルの拡張子
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/23         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetGetExtensionName( _
-    byVal asPath _
-    ) 
-    func_CM_FsGetGetExtensionName = new_Fso().GetExtensionName(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsBuildPath()
-'Overview                    : ファイルパスの連結
-'Detailed Description        : FileSystemObjectのBuildPath()と同等
-'Argument
-'     asFolderPath           : パス
-'     asItemName             : asFolderPathに連結するフォルダ名またはファイル名
-'Return Value
-'     連結したファイルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsBuildPath( _
-    byVal asFolderPath _
-    , byVal asItemName _
-    ) 
-    func_CM_FsBuildPath = new_Fso().BuildPath(asFolderPath, asItemName)
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetFiles()
 'Overview                    : 指定したフォルダ以下のFilesコレクションを取得する
 'Detailed Description        : FileSystemObjectのFolderオブジェクトのFilesコレクションと同等
@@ -2496,163 +2454,6 @@ Private Function func_CM_FsGetFolders( _
     byVal asPath _
     ) 
     Set func_CM_FsGetFolders = new_Fso().GetFolder(asPath).SubFolders
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFsObjects()
-'Overview                    : 指定したフォルダ以下のFilesコレクションとFoldersコレクションを取得する
-'Detailed Description        : func_CM_FsGetFiles()とfunc_CM_FsGetFolders()に委譲
-'Argument
-'     asPath                 : パス
-'Return Value
-'     FilesコレクションとFoldersコレクション
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFsObjects( _
-    byVal asPath _
-    )
-    Set func_CM_FsGetFsObjects = Nothing
-    If Not new_Fso().FolderExists(asPath) Then Exit Function
-    Dim oTemp : Set oTemp = new_Dic()
-    With oTemp
-        .Add "Filse", func_CM_FsGetFiles(asPath)
-        .Add "Folders", func_CM_FsGetFolders(asPath)
-    End With
-    Set func_CM_FsGetFsObjects = oTemp
-    Set oTemp = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetTempFileName()
-'Overview                    : ランダムに生成された一時ファイルまたはフォルダーの名前の取得
-'Detailed Description        : FileSystemObjectのGetTempName()と同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     一時ファイルまたはフォルダーの名前
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetTempFileName()
-    func_CM_FsGetTempFileName = new_Fso().GetTempName()
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetPrivateFilePath()
-'Overview                    : 実行中のスクリプトがあるフォルダからのパスを返す
-'Detailed Description        : 上位フォルダが存在しない場合は作成する
-'Argument
-'     asParentFolderName     : 親フォルダ名
-'     asFileName             : ファイル名
-'Return Value
-'     ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetPrivateFilePath( _
-    byVal asParentFolderName _
-    , byVal asFileName _
-    )
-    Dim sParentFolderPath : sParentFolderPath = func_CM_FsGetParentFolderPath(WScript.ScriptFullName)
-    If Len(asParentFolderName)>0 Then
-    '引数で指定したディレクトリ名がある場合
-        sParentFolderPath = func_CM_FsBuildPath(sParentFolderPath ,asParentFolderName)
-    End If
-    func_CM_FsGetPrivateFilePath = func_CM_FsGetFilePathWithCreateParentFolder(sParentFolderPath, asFileName)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetTempFilePath()
-'Overview                    : 一時ファイルのパスを返す
-'Detailed Description        : 実行中のスクリプトがあるフォルダのtmpフォルダ以下に作成する
-'                              上位フォルダが存在しない場合は作成する
-'Argument
-'     なし
-'Return Value
-'     ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetTempFilePath( _
-    )
-    func_CM_FsGetTempFilePath = func_CM_FsGetPrivateFilePath("tmp", func_CM_FsGetTempFileName())
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetPrivateLogFilePath()
-'Overview                    : 実行中のスクリプトのログファイルパスを返す
-'Detailed Description        : 実行中のスクリプトがあるフォルダのlogフォルダ以下に
-'                              スクリプトファイル名＋".log"形式のファイル名で作成する
-'                              上位フォルダが存在しない場合は作成する
-'Argument
-'     なし
-'Return Value
-'     ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetPrivateLogFilePath( _
-    )
-    func_CM_FsGetPrivateLogFilePath = func_CM_FsGetPrivateFilePath("log", func_CM_FsGetGetBaseName(WScript.ScriptName) & ".log" )
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFilePathWithCreateParentFolder()
-'Overview                    : ファイルのパスを取得
-'Detailed Description        : 上位フォルダが存在しない場合は作成する
-'Argument
-'     asParentFolderPath     : 親フォルダのパス
-'     asFileName             : ファイル名
-'Return Value
-'     ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFilePathWithCreateParentFolder( _
-    byVal asParentFolderPath _
-    , byVal asFileName _
-    )
-    If Not(new_Fso().FolderExists(asParentFolderPath)) Then func_CM_FsCreateFolder(asParentFolderPath)
-    func_CM_FsGetFilePathWithCreateParentFolder = func_CM_FsBuildPath(asParentFolderPath, asFileName)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsCreateFolder()
-'Overview                    : フォルダを作成する
-'Detailed Description        : FileSystemObjectのCreateFolder()と同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     作成したフォルダのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsCreateFolder( _
-    byVal asPath _
-    )
-    func_CM_FsCreateFolder = new_Fso().CreateFolder(asPath)
 End Function
 
 '***************************************************************************************************

@@ -63,7 +63,7 @@ Wscript.Quit
 '***************************************************************************************************
 Sub Main()
     'ログ出力の設定
-    Set PoWriter = new_WriterTo(func_CM_FsGetPrivateLogFilePath, 8, True, -1)
+    Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
     oBroker.subscribe "log", GetRef("sub_GetPathsLogger")
@@ -138,7 +138,7 @@ Private Sub sub_GetPathsProc( _
     Dim oParam : Set oParam = aoParams.Item("Param")
     
     '一時ファイルに連結した引数を出力
-    Dim sTempFilePaths : sTempFilePaths = func_CM_FsGetTempFilePath() 
+    Dim sTempFilePaths : sTempFilePaths = fw_getTempPath() 
     fs_writeFileDefault sTempFilePaths, oParam.join(vbNewLine)
     new_Shell().Run "cmd /c clip <""" & sTempFilePaths & """", 0, True
     
