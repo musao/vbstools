@@ -308,7 +308,7 @@ Private Sub sub_BackupFileProcForOneFile( _
     
     'ÉRÉsÅ[é¿é{
     Dim sNewFilePath : sNewFilePath = new_Fso().BuildPath(aoParams.Item(asPath).Item("OutputFolderPath"), sNewFileName)
-    Call func_CM_FsCopyFile(asPath, sNewFilePath)
+    Call fs_copyFile(asPath, sNewFilePath)
     
 End Sub
 

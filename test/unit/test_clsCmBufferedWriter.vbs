@@ -20,7 +20,8 @@ Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 'SetUp()/TearDown()
 Sub SetUp()
     PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedWriter")
-    If Not(new_Fso().FolderExists(PsPathTempFolder)) Then fs_createFolder(PsPathTempFolder)
+    If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
+'    fs_createFolder PsPathTempFolder
     PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With new_Ts(PsPathForAppending, ForWriting, True, -2)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
@@ -29,7 +30,8 @@ Sub SetUp()
     PsPathForWriting = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
 End Sub
 Sub TearDown()
-    fs_deleteFolder PsPathTempFolder
+    new_Fso().DeleteFolder PsPathTempFolder
+'    fs_deleteFolder PsPathTempFolder
 End Sub
 
 

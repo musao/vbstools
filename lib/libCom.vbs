@@ -1798,6 +1798,214 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
+'Function/Sub Name           : fs_copyFile()
+'Overview                    : ファイルをコピーする
+'Detailed Description        : FileSystemObjectのCopyFile()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asFrom                 : コピー元ファイルのフルパス
+'     asTo                   : コピー先ファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/10/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_copyFile( _
+    byVal asFrom _
+    , byVal asTo _
+    ) 
+'    fs_copyFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "CopyFile")
+    If Not new_Fso().FileExists(asFrom) Then fs_copyFile = False
+    On Error Resume Next
+    Call new_Fso().CopyFile(asFrom, asTo)
+    fs_copyFile = True
+    If Err.Number Then
+        Err.Clear
+        fs_copyFile = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_copyFolder()
+'Overview                    : フォルダをコピーする
+'Detailed Description        : FileSystemObjectのCopyFolder()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asFrom                 : コピー元フォルダのフルパス
+'     asTo                   : コピー先フォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_copyFolder( _
+    byVal asFrom _
+    , byVal asTo _
+    ) 
+'    fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
+    If Not new_Fso().FolderExists(asFrom) Then fs_copyFolder = False
+    On Error Resume Next
+    Call new_Fso().CopyFolder(asFrom, asTo)
+    fs_copyFolder = True
+    If Err.Number Then
+        Err.Clear
+        fs_copyFolder = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_createFolder()
+'Overview                    : フォルダを作成する
+'Detailed Description        : FileSystemObjectのCreateFolder()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asPath                 : 作成するフォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/30         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_createFolder( _
+    byVal asPath _
+    )
+    fs_createFolder = func_FsGeneralExecutor(True, True, Array(asPath), "CreateFolder")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_deleteFile()
+'Overview                    : ファイルを削除する
+'Detailed Description        : FileSystemObjectのDeleteFile()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asPath                 : 削除するファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_deleteFile( _
+    byVal asPath _
+    )
+    fs_deleteFile = func_FsGeneralExecutor(False, False, Array(asPath), "DeleteFile")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_deleteFolder()
+'Overview                    : フォルダを削除する
+'Detailed Description        : FileSystemObjectのDeleteFolder()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asPath                 : 削除するフォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2022/11/12         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_deleteFolder( _
+    byVal asPath _
+    )
+    fs_deleteFolder = func_FsGeneralExecutor(True, False, Array(asPath), "DeleteFolder")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_moveFile()
+'Overview                    : ファイルを移動する
+'Detailed Description        : FileSystemObjectのMoveFile()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asFrom                 : 移動元ファイルのフルパス
+'     asTo                   : 移動先ファイルのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_moveFile( _
+    byVal asFrom _
+    , byVal asTo _
+    ) 
+'    fs_moveFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "MoveFile")
+    If Not new_Fso().FileExists(asFrom) Then fs_moveFile = False
+    On Error Resume Next
+    Call new_Fso().MoveFile(asFrom, asTo)
+    fs_moveFile = True
+    If Err.Number Then
+        Err.Clear
+        fs_moveFile = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_moveFolder()
+'Overview                    : フォルダを移動する
+'Detailed Description        : FileSystemObjectのMoveFolder()と同等
+'                              func_FsGeneralExecutor()に委譲する
+'Argument
+'     asFrom                 : 移動元フォルダのフルパス
+'     asTo                   : 移動先フォルダのフルパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_moveFolder( _
+    byVal asFrom _
+    , byVal asTo _
+    )
+'    fs_moveFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "MoveFolder")
+    If Not new_Fso().FolderExists(asFrom) Then fs_moveFolder = False
+    On Error Resume Next
+    Call new_Fso().MoveFolder(asFrom, asTo)
+    fs_moveFolder = True
+    If Err.Number Then
+        Err.Clear
+        fs_moveFolder = False
+    End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_readFile()
+'Overview                    : Unicode形式のファイルを読んで中身を取得する
+'Detailed Description        : func_FsReadFile()に委譲し以下の設定で読込む
+'                               ファイルの形式         ：Unicode形式
+'Argument
+'     asPath                 : 入力先のフルパス
+'Return Value
+'     ファイルの内容
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_readFile( _
+    byVal asPath _
+    )
+    fs_readFile = func_FsReadFile(asPath, -1)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fs_writeFile()
 'Overview                    : Unicode形式でファイル出力する
 'Detailed Description        : func_FsWriteFile()に委譲し以下の設定で出力する
@@ -1847,110 +2055,6 @@ Private Function fs_writeFileDefault( _
     fs_writeFileDefault = func_FsWriteFile(asPath, 2, True, -2, asCont)
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : fs_readFile()
-'Overview                    : Unicode形式のファイルを読んで中身を取得する
-'Detailed Description        : func_FsReadFile()に委譲し以下の設定で読込む
-'                               ファイルの形式         ：Unicode形式
-'Argument
-'     asPath                 : 入力先のフルパス
-'Return Value
-'     ファイルの内容
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/12/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fs_readFile( _
-    byVal asPath _
-    )
-    fs_readFile = func_FsReadFile(asPath, -1)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : fs_deleteFile()
-'Overview                    : ファイルを削除する
-'Detailed Description        : FileSystemObjectのDeleteFile()と同等
-'                              func_FsGeneralExecutor()に委譲する
-'Argument
-'     asPath                 : 削除するファイルのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fs_deleteFile( _
-    byVal asPath _
-    )
-    fs_deleteFile = func_FsGeneralExecutor(False, False, asPath, "DeleteFile")
-'    fs_deleteFile = False
-'    If Not new_Fso().FileExists(asPath) Then Exit function
-'
-'    On Error Resume Next
-'    new_Fso().DeleteFile asPath
-'    If Err.Number=0 Then fs_deleteFile = True
-'    On Error Goto 0
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : fs_deleteFolder()
-'Overview                    : フォルダを削除する
-'Detailed Description        : FileSystemObjectのDeleteFolder()と同等
-'                              func_FsGeneralExecutor()に委譲する
-'Argument
-'     asPath                 : 削除するフォルダのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/11/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fs_deleteFolder( _
-    byVal asPath _
-    )
-    fs_deleteFolder = func_FsGeneralExecutor(True, False, asPath, "DeleteFolder")
-'    fs_deleteFolder = False
-'    If Not new_Fso().FolderExists(asPath) Then Exit function
-'
-'    On Error Resume Next
-'    new_Fso().DeleteFolder asPath
-'    If Err.Number=0 Then fs_deleteFolder = True
-'    On Error Goto 0
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : fs_createFolder()
-'Overview                    : フォルダを作成する
-'Detailed Description        : FileSystemObjectのCreateFolder()と同等
-'                              func_FsGeneralExecutor()に委譲する
-'Argument
-'     asPath                 : パス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/12/30         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fs_createFolder( _
-    byVal asPath _
-    )
-    fs_createFolder = func_FsGeneralExecutor(True, True, asPath, "CreateFolder")
-'    fs_createFolder = False
-'    If new_Fso().FolderExists(asPath) Then Exit function
-'
-'    On Error Resume Next
-'    new_Fso().CreateFolder asPath
-'    If Err.Number=0 Then fs_createFolder = True
-'    On Error Goto 0
-End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : fs_getAllFiles()
@@ -2122,20 +2226,40 @@ End Function
 Private Function func_FsGeneralExecutor( _
     byVal asIsFolder _
     , byVal aboFlg _
-    , byVal asPath _
+    , byRef asPath _
     , byVal asCmd _
     )
     func_FsGeneralExecutor=False
-    If asIsFolder Then
-        If new_Fso().FolderExists(asPath)=aboFlg Then Exit Function
-    Else
-        If new_Fso().FileExists(asPath)=aboFlg Then Exit Function
-    End If
-
-    On Error Resume Next
-    Eval("new_Fso()." & asCmd & "(" & Chr(34) & asPath & Chr(34) & ")")
-    If Err.Number=0 Then func_FsGeneralExecutor=True
-    On Error Goto 0
+    With new_Fso()
+        If asIsFolder Then
+            If .FolderExists(asPath(0))=aboFlg Then Exit Function
+        Else
+            If .FileExists(asPath(0))=aboFlg Then Exit Function
+        End If
+    
+        On Error Resume Next
+        Select Case asCmd
+            Case "CopyFile":
+                .CopyFile asPath(0), asPath(1)
+            Case "CopyFolder":
+                .CopyFolder asPath(0), asPath(1)
+            Case "CreateFolder":
+                .CreateFolder asPath(0)
+            Case "DeleteFile":
+                .DeleteFile asPath(0)
+            Case "DeleteFolder":
+                .DeleteFolder asPath(0)
+            Case "MoveFile":
+                .MoveFile asPath(0), asPath(1)
+            Case "MoveFolder":
+                .MoveFolder asPath(0), asPath(1)
+            Case Else
+                Err.Raise 9999, "libCom.vbs:func_FsGeneralExecutor()", "不正な実行コマンド："&asCmd
+        End Select
+'        Eval("new_Fso()." & asCmd & "(" & Chr(34) & asPath & Chr(34) & ")")
+        If Err.Number=0 Then func_FsGeneralExecutor=True
+        On Error Goto 0
+    End With
 End Function
 
 '***************************************************************************************************
@@ -2299,122 +2423,6 @@ End Function
 '###################################################################################################
 'ファイル操作系
 '###################################################################################################
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsCopyFile ()
-'Overview                    : ファイルをコピーする
-'Detailed Description        : FileSystemObjectのCopyFile()と同等
-'Argument
-'     asPathFrom             : コピー元ファイルのフルパス
-'     asPathTo               : コピー先ファイルのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/24         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsCopyFile( _
-    byVal asPathFrom _
-    , byVal asPathTo _
-    ) 
-    If Not new_Fso().FileExists(asPathFrom) Then func_CM_FsCopyFile = False
-    On Error Resume Next
-    Call new_Fso().CopyFile(asPathFrom, asPathTo)
-    func_CM_FsCopyFile = True
-    If Err.Number Then
-        Err.Clear
-        func_CM_FsCopyFile = False
-    End If
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsCopyFolder ()
-'Overview                    : フォルダをコピーする
-'Detailed Description        : FileSystemObjectのCopyFolder()と同等
-'Argument
-'     asPathFrom             : コピー元フォルダのフルパス
-'     asPathTo               : コピー先フォルダのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsCopyFolder( _
-    byVal asPathFrom _
-    , byVal asPathTo _
-    ) 
-    If Not new_Fso().FolderExists(asPathFrom) Then func_CM_FsCopyFolder = False
-    On Error Resume Next
-    Call new_Fso().CopyFolder(asPathFrom, asPathTo)
-    func_CM_FsCopyFolder = True
-    If Err.Number Then
-        Err.Clear
-        func_CM_FsCopyFolder = False
-    End If
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsMoveFile ()
-'Overview                    : ファイルを移動する
-'Detailed Description        : FileSystemObjectのMoveFile()と同等
-'Argument
-'     asPathFrom             : 移動元ファイルのフルパス
-'     asPathTo               : 移動先ファイルのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsMoveFile( _
-    byVal asPathFrom _
-    , byVal asPathTo _
-    ) 
-    If Not new_Fso().FileExists(asPathFrom) Then func_CM_FsMoveFile = False
-    On Error Resume Next
-    Call new_Fso().MoveFile(asPathFrom, asPathTo)
-    func_CM_FsMoveFile = True
-    If Err.Number Then
-        Err.Clear
-        func_CM_FsMoveFile = False
-    End If
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsMoveFolder ()
-'Overview                    : フォルダを移動する
-'Detailed Description        : FileSystemObjectのMoveFolder()と同等
-'Argument
-'     asPathFrom             : 移動元フォルダのフルパス
-'     asPathTo               : 移動先フォルダのフルパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsMoveFolder( _
-    byVal asPathFrom _
-    , byVal asPathTo _
-    ) 
-    If Not new_Fso().FolderExists(asPathFrom) Then func_CM_FsMoveFolder = False
-    On Error Resume Next
-    Call new_Fso().MoveFolder(asPathFrom, asPathTo)
-    func_CM_FsMoveFolder = True
-    If Err.Number Then
-        Err.Clear
-        func_CM_FsMoveFolder = False
-    End If
-End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_FsGetFiles()

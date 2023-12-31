@@ -29,6 +29,113 @@ Sub TearDown()
 End Sub
 
 '###################################################################################################
+'fs_copyFile()
+
+'###################################################################################################
+'fs_copyFolder()
+
+'###################################################################################################
+'fs_createFolder()
+
+'###################################################################################################
+'fs_deleteFile()
+Sub Test_fs_deleteFile
+    Dim path,e,d,a,ret
+    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    'ファイルを作成
+    d = "For" & vbNewLine & "Delete Normal"
+    With CreateObject("ADODB.Stream")
+        .Charset = "UTF-8"
+        .Open
+        .WriteText d, 0
+        .SaveToFile path, 2
+        .Close
+    End With
+    AssertEqualWithMessage True, new_Fso().FileExists(path), "before delete file exists"
+
+    e = True
+    a = fs_deleteFile(path)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage False, new_Fso().FileExists(path), "after delete file exists"
+End Sub
+Sub Test_fs_deleteFile_Err_NotExists
+    Dim path,e,d,a,ret
+    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(path), "before delete file exists"
+
+    e = False
+    a = fs_deleteFile(path)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage False, new_Fso().FileExists(path), "after delete file exists"
+End Sub
+Sub Test_fs_deleteFile_Err_FileLocked
+    Dim path,e,d,a
+    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    d = "For" & vbNewLine & "Delete Err FileLocked"
+    '適当なファイルを一旦作成
+    With CreateObject("ADODB.Stream")
+        .Charset = "Unicode"
+        .Open
+        .WriteText d, 0
+        .SaveToFile path, 2
+        .Close
+    End With
+    
+    'TextstreamをAppendモードで作成し閉じない状態でfs_deleteFile()実行エラーにする
+    With new_Ts(path, 8, True, -1)
+        e = False
+        a = fs_deleteFile(path)
+        
+        AssertEqualWithMessage e, a, "ret"
+        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    'ファイルが削除されていないことを確認
+    AssertEqualWithMessage True, new_Fso().FileExists(path), "before delete file exists"
+End Sub
+
+'###################################################################################################
+'fs_deleteFolder()
+
+'###################################################################################################
+'fs_moveFile()
+
+'###################################################################################################
+'fs_moveFolder()
+
+'###################################################################################################
+'fs_readFile()
+Sub Test_fs_readFile
+    Dim path,e,d,a
+    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    d = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
+    e = d
+    'ファイルを作成
+    With CreateObject("ADODB.Stream")
+        .Charset = "Unicode"
+        .Open
+        .WriteText d, 0
+        .SaveToFile path, 2
+        .Close
+    End With
+    a = fs_readFile(path)
+
+    AssertEqualWithMessage e, a, "ret"
+End Sub
+Sub Test_fs_readFile_Err
+    Dim path,e,a
+    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(path), "before read file exists"
+
+    e = empty
+    a = fs_readFile(path)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+End Sub
+
+'###################################################################################################
 'fs_writeFile()
 Sub Test_fs_writeFile
     Dim path,ec,ea,d,a,cont
@@ -135,95 +242,6 @@ Sub Test_fs_writeFileDefault
 
     AssertEqualWithMessage ea, a, "ret"
     AssertEqualWithMessage ec, cont, "cont"
-End Sub
-
-'###################################################################################################
-'fs_readFile()
-Sub Test_fs_readFile
-    Dim path,e,d,a
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    d = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
-    e = d
-    'ファイルを作成
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    a = fs_readFile(path)
-
-    AssertEqualWithMessage e, a, "ret"
-End Sub
-Sub Test_fs_readFile_Err
-    Dim path,e,a
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before read file exists"
-
-    e = empty
-    a = fs_readFile(path)
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-End Sub
-
-'###################################################################################################
-'fs_deleteFile()
-Sub Test_fs_deleteFile
-    Dim path,e,d,a,ret
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    'ファイルを作成
-    d = "For" & vbNewLine & "Delete Normal"
-    With CreateObject("ADODB.Stream")
-        .Charset = "UTF-8"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before delete file exists"
-
-    e = True
-    a = fs_deleteFile(path)
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "after delete file exists"
-End Sub
-Sub Test_fs_deleteFile_Err_NotExists
-    Dim path,e,d,a,ret
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before delete file exists"
-
-    e = False
-    a = fs_deleteFile(path)
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "after delete file exists"
-End Sub
-Sub Test_fs_deleteFile_Err_FileLocked
-    Dim path,e,d,a
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    d = "For" & vbNewLine & "Delete Err FileLocked"
-    '適当なファイルを一旦作成
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    
-    'TextstreamをAppendモードで作成し閉じない状態でfs_deleteFile()実行エラーにする
-    With new_Ts(path, 8, True, -1)
-        e = False
-        a = fs_deleteFile(path)
-        
-        AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-        .Close
-    End With
-
-    'ファイルが削除されていないことを確認
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before delete file exists"
 End Sub
 
 '###################################################################################################

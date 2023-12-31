@@ -20,7 +20,8 @@ Dim PsPathTempFolder,PsPathData1,PsPathData2
 'SetUp()/TearDown()
 Sub SetUp()
     PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedReader_regression")
-    If Not(new_Fso().FolderExists(PsPathTempFolder)) Then fs_createFolder(PsPathTempFolder)
+    If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
+'    fs_createFolder PsPathTempFolder
     PsPathData1 = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With new_Ts(PsPathData1, ForWriting, True, -2)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCrLf & vbCr & "abcde" & vbLf & vbLf & "12" & vbCr & "345")
@@ -33,7 +34,8 @@ Sub SetUp()
     End With
 End Sub
 Sub TearDown()
-    fs_deleteFolder PsPathTempFolder
+    new_Fso().DeleteFolder PsPathTempFolder
+'    fs_deleteFolder PsPathTempFolder
 End Sub
 
 
