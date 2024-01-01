@@ -40,52 +40,44 @@ End Sub
 '###################################################################################################
 'fs_deleteFile()
 Sub Test_fs_deleteFile
-    Dim path,e,d,a,ret
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    Dim c,p,d
     'ファイルを作成
-    d = "For" & vbNewLine & "Delete Normal"
-    With CreateObject("ADODB.Stream")
-        .Charset = "UTF-8"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before delete file exists"
+    c = "UTF-8"
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    d = "For" & vbNewLine & "DeleteFile Normal"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before delete file exists"
 
+    Dim e,a
     e = True
-    a = fs_deleteFile(path)
+    a = fs_deleteFile(p)
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "after delete file exists"
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "after delete file exists"
 End Sub
 Sub Test_fs_deleteFile_Err_NotExists
-    Dim path,e,d,a,ret
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before delete file exists"
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before delete file exists"
 
+    Dim e,a
     e = False
-    a = fs_deleteFile(path)
+    a = fs_deleteFile(p)
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "after delete file exists"
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "after delete file exists"
 End Sub
 Sub Test_fs_deleteFile_Err_FileLocked
-    Dim path,e,d,a
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    d = "For" & vbNewLine & "Delete Err FileLocked"
-    '適当なファイルを一旦作成
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    
-    'TextstreamをAppendモードで作成し閉じない状態でfs_deleteFile()実行エラーにする
-    With new_Ts(path, 8, True, -1)
+    Dim c,p,d,f
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "Unicode"
+    d = "For" & vbNewLine & "DeleteFile Err FileLocked"
+    f = -1    'TristateTrue(Unicode)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c,p,d,f)
+        Dim e,a
         e = False
-        a = fs_deleteFile(path)
+        a = fs_deleteFile(p)
         
+        'fs_deleteFile()がエラーになることを確認する
         AssertEqualWithMessage e, a, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
@@ -93,11 +85,29 @@ Sub Test_fs_deleteFile_Err_FileLocked
     End With
 
     'ファイルが削除されていないことを確認
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before delete file exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before delete file exists"
 End Sub
 
 '###################################################################################################
 'fs_deleteFolder()
+Sub Test_fs_deleteFolder
+    Dim c,p,fp,d
+    'フォルダを作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder p
+    'フォルダの下にファイルを作成
+    c = "UTF-8"
+    fp = new_Fso().BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    d = "For" & vbNewLine & "DeleteFolder Normal"
+    writeTestFile c,fp,d
+    AssertEqualWithMessage True, new_Fso().FolderExists(p), "before delete folder exists"
+
+    Dim e,a
+    e = True
+    a = fs_deleteFolder(p)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage False, new_Fso().FolderExists(p), "after delete folder exists"
+End Sub
 
 '###################################################################################################
 'fs_moveFile()
@@ -108,29 +118,26 @@ End Sub
 '###################################################################################################
 'fs_readFile()
 Sub Test_fs_readFile
-    Dim path,e,d,a
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    Dim c,p,d,e
+    'ファイルを作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "Unicode"
     d = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
     e = d
-    'ファイルを作成
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    a = fs_readFile(path)
+    writeTestFile c,p,d
 
+    Dim a
+    a = fs_readFile(p)
     AssertEqualWithMessage e, a, "ret"
 End Sub
 Sub Test_fs_readFile_Err
-    Dim path,e,a
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before read file exists"
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before read file exists"
 
+    Dim e,a
     e = empty
-    a = fs_readFile(path)
+    a = fs_readFile(p)
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage 0, Err.Number, "Err.Number"
 End Sub
@@ -138,348 +145,275 @@ End Sub
 '###################################################################################################
 'fs_writeFile()
 Sub Test_fs_writeFile
-    Dim path,ec,ea,d,a,cont
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before write file exists"
 
+    Dim d,ec,ea,a
     d = "abc" & vbNewLine & "あいう" & vbNewLine & "123" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
     ec = d : ea = True
-    a = fs_writeFile(path, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = fs_writeFile(p, d)
 
+    Dim c,ct
+    c = "Unicode"
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_fs_writeFile_Rewrite
-    Dim path,ec,ea,d,a,cont
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    '適当なファイルを一旦作成
+    Dim p,c,d
+    '上書きするファイルを一旦作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "UTF-8"
     d = "For" & vbNewLine & "Rewrite"
-    With CreateObject("ADODB.Stream")
-        .Charset = "UTF-8"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before write file exists"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before write file exists"
 
     '上書きすることを確認
     d = "abc" & vbNewLine & "①②③" & vbNewLine & "!#$" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
+    Dim a,ec,ea
     ec = d : ea = True
-    a = fs_writeFile(path, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = fs_writeFile(p, d)
 
+    Dim ct
+    c = "Unicode"
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_fs_writeFile_Err
-    Dim path,ec,ea,d,a,cont
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    Dim p,c,d,f,ec
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "Unicode"
     d = "For" & vbNewLine & "Write Error"
+    f = -1    'TristateTrue(Unicode)
     ec = d
-    '適当なファイルを一旦作成
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    
-    'TextstreamをAppendモードで作成し閉じない状態でfs_writeFile()実行エラーにする
-    With new_Ts(path, 8, True, -1)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c, p ,d,f)
         d = "error" & vbNewLine & "test"
+        Dim ea,a
         ea = False
-        a = fs_writeFile(path, d)
+        a = fs_writeFile(p, d)
         
+        'fs_writeFile()がエラーになることを確認する
         AssertEqualWithMessage ea, a, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
         .Close
     End With
 
+    Dim ct
     '上書きしていないことを確認
-    With CreateObject("ADODB.Stream")
-        .Charset = "Unicode"
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
-    AssertEqualWithMessage ec, cont, "cont"
+    ct = readTestFile(c, p)
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 
 '###################################################################################################
 'fs_writeFileDefault()
 Sub Test_fs_writeFileDefault
-    Dim path,ec,ea,d,a,cont
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before write file exists"
 
+    Dim d,ec,ea,a
     d = "abc" & vbNewLine & "あいう" & vbNewLine & "123"
     ec = d : ea = True
-    a = fs_writeFileDefault(path, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = "shift-jis"
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = fs_writeFileDefault(p, d)
 
+    Dim c,ct
+    c = "shift-jis"
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 
 '###################################################################################################
 'func_FsWriteFile()
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Normal__Format_SystemDefault
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before write file exists"
+
+    Dim d,iomode,create,f,ec,ea,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForWriting_Normal__Format_SystemDefault"
     iomode = 2     'ForWriting
     create = True
-    format = -2    'TristateUseDefault
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+    f = -2         'TristateUseDefault
     ec = d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
 
+    Dim c,ct
+    c = "shift-jis"
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p,c,d
+    '上書きするファイルを一旦作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "Unicode"
+    d = "For" & vbNewLine & "Rewrite"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before write file exists"
+
+    Dim iomode,create,f,ec,ea,a
+    '上書きすることを確認
     iomode = 2     'ForWriting
     create = True
-    format = -1    'TristateTrue(Unicode)
-    charset = "Unicode"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    '適当なファイルを一旦作成
-    d = "For" & vbNewLine & "Rewrite"
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before write file exists"
-
-    '上書きすることを確認
+    f = -1    'TristateTrue(Unicode)
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForWriting_Rewrite__Format_Unicode"
     ec = d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
+
+    Dim ct
+    c = "Unicode"
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Normal__Format_Ascii
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before write file exists"
+
+    Dim d,iomode,create,f,ec,ea,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForAppending_Normal__Format_Ascii"
     iomode = 8     'ForAppending
     create = True
-    format = 0     'TristateTrue(Ascii)
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+    f = 0          'TristateFalse(Ascii)
     ec = d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
 
+    Dim c,ct
+    c = "shift-jis"
+    ct = readTestFile(c,p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p,c,d
+    '追記するファイルを一旦作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "shift-jis"
+    d = "For" & vbNewLine & "Append"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before write file exists"
+
+    Dim iomode,create,f,ec,ea,a
+    '追記することを確認
     iomode = 8     'ForAppending
     create = True
-    format = -2    'TristateUseDefault
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    '適当なファイルを一旦作成
-    d = "For" & vbNewLine & "Append"
+    f = -2         'TristateUseDefault
     ec = d
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before write file exists"
-
-    '追記することを確認
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForAppending_Append__Format_SystemDefault"
     ec = ec & d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
+
+    Dim ct
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Normal__Format_Unicode
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before write file exists"
+
+    Dim d,iomode,create,f,ec,ea,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_True_Normal__Format_Unicode"
     iomode = 2     'ForWriting
     create = True
-    format = -1    'TristateTrue(Unicode)
-    charset = "Unicode"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+    f = -1         'TristateTrue(Unicode)
     ec = d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
 
+    Dim c,ct
+    c = "Unicode"
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p,c,d
+    '上書きするファイルを一旦作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "shift-jis"
+    d = "For" & vbNewLine & "Rewrite"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before write file exists"
+
+    Dim iomode,create,f,ec,ea,a
+    '上書きすることを確認
     iomode = 2     'ForWriting
     create = True
-    format = 0     'TristateTrue(Ascii)
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    '適当なファイルを一旦作成
-    d = "For" & vbNewLine & "Rewrite"
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before write file exists"
-
-    '上書きすることを確認
+    f = 0          'TristateFalse(Ascii)
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_True_Rewrite__Format_Ascii"
     ec = d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
+
+    Dim ct
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Err
-    Dim path,e,d,a,cont,iomode,create,format
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before write file exists"
+
+    Dim d,iomode,create,f,e,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_False_Err"
     iomode = 2     'ForWriting
     create = False
-    format = -1    'TristateTrue(Unicode)
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before write file exists"
+    f = -1         'TristateTrue(Unicode)
     e = False
-    a = func_FsWriteFile(path, iomode, create, format, d)
+    a = func_FsWriteFile(p, iomode, create, f, d)
 
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "after write file exists"
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "after write file exists"
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p,c,d
+    '上書きするファイルを一旦作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    c = "Unicode"
+    d = "For" & vbNewLine & "Rewrite"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before write file exists"
+
+    Dim ec,ea,a,iomode,create,f
+    '上書きすることを確認
     iomode = 2     'ForWriting
     create = False
-    format = -1    'TristateTrue(Unicode)
-    charset = "Unicode"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    '適当なファイルを一旦作成
-    d = "For" & vbNewLine & "Rewrite"
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before write file exists"
-
-    '上書きすることを確認
+    f = -1         'TristateTrue(Unicode)
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_False_Rewrite__Format_Unicode"
     ec = d : ea = True
-    a = func_FsWriteFile(path, iomode, create, format, d)
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
+    a = func_FsWriteFile(p, iomode, create, f, d)
+
+    Dim ct
+    ct = readTestFile(c, p)
     AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, cont, "cont"
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Err_FileLocked
-    Dim path,ec,ea,d,a,cont,iomode,create,format,charset
+    Dim p,d,iomode,create,f,c,ec,ea,a
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    d = "error" & vbNewLine & "FileLocked"
     iomode = 2     'ForWriting
     create = False
-    format = 0     'TristateTrue(Ascii)
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    '適当なファイルを一旦作成
-    d = "error" & vbNewLine & "FileLocked"
+    f = 0          'TristateFalse(Ascii)
+    c = "shift-jis"
     ec = d
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    AssertEqualWithMessage True, new_Fso().FileExists(path), "before write file exists"
-    
-    'TextstreamをAppendモードで作成し閉じない状態でfunc_FsWriteFile()実行エラーにする
-    With new_Ts(path, 8, True, format)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c, p ,d, f)
+        AssertEqualWithMessage True, new_Fso().FileExists(p), "before write file exists"
+
         d = "error" & vbNewLine & "test"
         ea = False
-        a = func_FsWriteFile(path, iomode, create, format, d)
+        a = func_FsWriteFile(p, iomode, create, f, d)
         
+        'func_FsWriteFile()がエラーになることを確認する
         AssertEqualWithMessage ea, a, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
@@ -487,87 +421,100 @@ Sub Test_func_FsWriteFile_Err_FileLocked
     End With
 
     '上書きしていないことを確認
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .LoadFromFile path
-        cont = .ReadText
-        .Close
-    End With
-    AssertEqualWithMessage ec, cont, "cont"
+    Dim ct
+    ct = readTestFile(c, p)
+    AssertEqualWithMessage ec, ct, "cont"
 End Sub
 
 '###################################################################################################
 'func_FsReadFile()
 Sub Test_func_FsReadFile_Normal__Format_SystemDefault
-    Dim path,e,d,a,format,charset
-    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_SystemDefault"
-    format = -2    'TristateUseDefault
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    e = d
-    'ファイルを作成
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    a = func_FsReadFile(path,format)
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
+    Dim d,f,c,e,a
+    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_SystemDefault"
+    f = -2         'TristateUseDefault
+    c = "shift-jis"
+    e = d
+    writeTestFile c,p,d
+
+    a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
 End Sub
 Sub Test_func_FsReadFile_Normal__Format_Unicode
-    Dim path,e,d,a,format,charset
-    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Unicode"
-    format = -1    'TristateTrue(Unicode)
-    charset = "Unicode"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    e = d
-    'ファイルを作成
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    a = func_FsReadFile(path,format)
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
+    Dim d,f,c,e,a
+    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Unicode"
+    f = -1         'TristateTrue(Unicode)
+    c = "Unicode"
+    e = d
+    writeTestFile c,p,d
+
+    a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
 End Sub
 Sub Test_func_FsReadFile_Normal__Format_Ascii
-    Dim path,e,d,a,format,charset
-    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Ascii"
-    format = 0     'TristateTrue(Ascii)
-    charset = "shift-jis"
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    e = d
-    'ファイルを作成
-    With CreateObject("ADODB.Stream")
-        .Charset = charset
-        .Open
-        .WriteText d, 0
-        .SaveToFile path, 2
-        .Close
-    End With
-    a = func_FsReadFile(path,format)
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
+    Dim d,f,c,e,a
+    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Ascii"
+    f = 0          'TristateFalse(Ascii)
+    c = "shift-jis"
+    e = d
+    writeTestFile c,p,d
+    
+    a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
 End Sub
 Sub Test_func_FsReadFile_Err
-    Dim path,e,a,format
-    format = -2    'TristateUseDefault
-    path = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    AssertEqualWithMessage False, new_Fso().FileExists(path), "before read file exists"
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
+    Dim f,e,a
+    f = -2         'TristateUseDefault
+    AssertEqualWithMessage False, new_Fso().FileExists(p), "before read file exists"
     e = empty
-    a = func_FsReadFile(path,format)
+
+    a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage 0, Err.Number, "Err.Number"
 End Sub
 
+'###################################################################################################
+'common
+Sub writeTestFile(c,p,d)
+    With CreateObject("ADODB.Stream")
+        .Charset = c
+        .Open
+        .WriteText d, 0
+        .SaveToFile p, 2
+        .Close
+    End With
+End Sub
+Function readTestFile(c,p)
+    With CreateObject("ADODB.Stream")
+        .Charset = c
+        .Open
+        .LoadFromFile p
+        readTestFile = .ReadText
+        .Close
+    End With
+End Function
+Function createFileAndLocked(c,p,d,f)
+    With CreateObject("ADODB.Stream")
+        .Charset = c
+        .Open
+        .WriteText d, 0
+        .SaveToFile p, 2
+        .Close
+    End With
+    'Textstreamを作成して返却
+    Set createFileAndLocked = new_Ts(p, 8, True, f)
+End Function
 
 ' Local Variables:
 ' mode: Visual-Basic
