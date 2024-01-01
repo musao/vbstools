@@ -30,12 +30,515 @@ End Sub
 
 '###################################################################################################
 'fs_copyFile()
+Sub Test_fs_copyFile
+    Dim from
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+
+    Dim c,d
+    'ファイルを作成
+    c = "Unicode"
+    d = "For" & vbNewLine & "copyFile Normal"
+    writeTestFile c,from,d
+    AssertEqualWithMessage True, new_Fso().FileExists(from), "before copy fromfile exists"
+    
+    Dim toto
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(toto), "before copy tofile exists"
+
+    Dim ea,ec,a,ct
+    ea = True : ec = d
+    a = fs_copyFile(from,toto)
+    ct = readTestFile(c, toto)
+    AssertEqualWithMessage ea, a, "ret"
+    AssertEqualWithMessage ec, ct, "cont"
+    AssertEqualWithMessage True, new_Fso().FileExists(from), "after copy fromfile exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(toto), "after copy tofile exists"
+End Sub
+Sub Test_fs_copyFile_OverRide
+    Dim from
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+
+    Dim c,df
+    'ファイルを作成
+    c = "Unicode"
+    df = "For" & vbNewLine & "copyFile OverRide"
+    writeTestFile c,from,df
+    AssertEqualWithMessage True, new_Fso().FileExists(from), "before copy fromfile exists"
+    
+    Dim toto
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_.txt"))
+    
+    Dim dt
+    'ファイルを作成
+    c = "Unicode"
+    dt = "For" & vbNewLine & "copyFile ToFile"
+    writeTestFile c,toto,dt
+    AssertEqualWithMessage True, new_Fso().FileExists(toto), "before copy tofile exists"
+
+    Dim ea,ec,a,ct
+    ea = True : ec = df
+    a = fs_copyFile(from,toto)
+    ct = readTestFile(c, toto)
+    AssertEqualWithMessage ea, a, "ret"
+    AssertEqualWithMessage ec, ct, "cont"
+    AssertEqualWithMessage True, new_Fso().FileExists(from), "after copy fromfile exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(toto), "after copy tofile exists"
+End Sub
+Sub Test_fs_copyFile_Err_FromFileNoExists
+    Dim from
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(from), "before copy fromfile exists"
+    
+    Dim toto
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_.txt"))
+    AssertEqualWithMessage False, new_Fso().FileExists(toto), "before copy tofile exists"
+
+    Dim e,a,ct
+    e = False
+    a = fs_copyFile(from,toto)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    AssertEqualWithMessage False, new_Fso().FileExists(from), "after copy fromfile exists"
+    AssertEqualWithMessage False, new_Fso().FileExists(toto), "after copy tofile exists"
+End Sub
+Sub Test_fs_copyFile_Err_ToFileLocked
+    Dim from
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+
+    Dim c,df
+    'ファイルを作成
+    c = "Unicode"
+    df = "For" & vbNewLine & "copyFile OverRide"
+    writeTestFile c,from,df
+    AssertEqualWithMessage True, new_Fso().FileExists(from), "before copy fromfile exists"
+    
+    Dim toto
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_.txt"))
+    
+    Dim dt,f
+    dt = "For" & vbNewLine & "copyFile ToFile"
+    f = -1    'TristateTrue(Unicode)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c,toto,dt,f)
+        Dim ea,a
+        ea = False
+        a = fs_copyFile(from,toto)
+        
+        'fs_copyFile()がエラーになることを確認する
+        AssertEqualWithMessage ea, a, "ret"
+        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    Dim ec,ct
+    ec = dt
+    ct = readTestFile(c, toto)
+    AssertEqualWithMessage ec, ct, "cont"
+    AssertEqualWithMessage True, new_Fso().FileExists(from), "after copy fromfile exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(toto), "after copy tofile exists"
+End Sub
 
 '###################################################################################################
 'fs_copyFolder()
+Sub Test_fs_copyFolder
+    Dim from
+    'コピー元フォルダを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder from
+    AssertEqualWithMessage True, new_Fso().FolderExists(from), "before copy fromfolder exists"
+    
+    Dim c,fp,fn1,fn2,fn3,df1,df2
+    'フォルダの下にファイルとフォルダを作成
+    c = "Unicode"
+    fn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
+    df1 = "For" & vbNewLine & "copyFolder Normal fn1"
+    fp = new_Fso().BuildPath(from, fn1)
+    writeTestFile c,fp,df1
+    fn2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
+    df2 = "For" & vbNewLine & "copyFolder Normal fn2"
+    fp = new_Fso().BuildPath(from, fn2)
+    writeTestFile c,fp,df2
+    fn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
+    fp = new_Fso().BuildPath(from, fn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn1)), "before copy fromfolderfile1 exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn2)), "before copy fromfolderfile2 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "before copy fromfolderfolder3 exists"
+    
+    Dim toto
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
+    AssertEqualWithMessage False, new_Fso().FileExists(toto), "before copy tofile exists"
+
+    Dim ea,a
+    ea = True
+    a = fs_copyFolder(from,toto)
+    AssertEqualWithMessage ea, a, "ret"
+    AssertEqualWithMessage 2, new_Fso().GetFolder(from).Files.Count, "fromfolderFiles Count"
+    AssertEqualWithMessage 1, new_Fso().GetFolder(from).SubFolders.Count, "fromfolderSubFolders Count"
+    AssertEqualWithMessage 2, new_Fso().GetFolder(toto).Files.Count, "tofolderFiles Count"
+    AssertEqualWithMessage 1, new_Fso().GetFolder(toto).SubFolders.Count, "tofolderSubFolders Count"
+
+    Dim ec,ct
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn1))
+    AssertEqualWithMessage ec, ct, "cont file1"
+
+    ec = df2
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn2))
+    AssertEqualWithMessage ec, ct, "cont file2"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(toto, fn3)), "exists folder3"
+End Sub
+Sub Test_fs_copyFolder_OverRide
+    Dim from
+    'コピー元フォルダを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder from
+    AssertEqualWithMessage True, new_Fso().FolderExists(from), "before copy fromfolder exists"
+    
+    Dim c,fp,fn1,fn2,fn3,df1,df2
+    'フォルダの下にファイルとフォルダを作成
+    c = "Unicode"
+    fn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
+    df1 = "For" & vbNewLine & "copyFolder OverRide fn1"
+    fp = new_Fso().BuildPath(from, fn1)
+    writeTestFile c,fp,df1
+    fn2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
+    df2 = "For" & vbNewLine & "copyFolder OverRide fn2"
+    fp = new_Fso().BuildPath(from, fn2)
+    writeTestFile c,fp,df2
+    fn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
+    fp = new_Fso().BuildPath(from, fn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn1)), "before copy fromfolderfile1 exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn2)), "before copy fromfolderfile2 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "before copy fromfolderfolder3 exists"
+    
+    Dim toto
+    'コピー先フォルダを作成
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
+    new_Fso().CreateFolder toto
+    AssertEqualWithMessage True, new_Fso().FolderExists(toto), "before copy tofolder exists"
+    
+    Dim tn1,tn2,tn3,dt1,dt2
+    'フォルダの下にファイルとフォルダを作成
+    tn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
+    dt1 = "For" & vbNewLine & "copyFolder OverRide tn1"
+    fp = new_Fso().BuildPath(toto, tn1)
+    writeTestFile c,fp,dt1
+    tn2 = fn2
+    dt2 = "For" & vbNewLine & "copyFolder OverRide tn2"
+    fp = new_Fso().BuildPath(toto, tn2)
+    writeTestFile c,fp,dt2
+    tn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
+    fp = new_Fso().BuildPath(toto, tn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(toto, tn1)), "before copy tofolderfile1 exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(toto, tn2)), "before copy tofolderfile2 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(toto, tn3)), "before copy tofolderfolder3 exists"
+
+    Dim ea,a
+    ea = True
+    a = fs_copyFolder(from,toto)
+    AssertEqualWithMessage ea, a, "ret"
+    AssertEqualWithMessage 2, new_Fso().GetFolder(from).Files.Count, "fromfolderFiles Count"
+    AssertEqualWithMessage 1, new_Fso().GetFolder(from).SubFolders.Count, "fromfolderSubFolders Count"
+    AssertEqualWithMessage 3, new_Fso().GetFolder(toto).Files.Count, "tofolderFiles Count"
+    AssertEqualWithMessage 2, new_Fso().GetFolder(toto).SubFolders.Count, "tofolderSubFolders Count"
+
+    Dim ec,ct
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(from, fn1))
+    AssertEqualWithMessage ec, ct, "cont fromfile1"
+
+    ec = df2
+    ct = readTestFile(c, new_Fso().BuildPath(from, fn2))
+    AssertEqualWithMessage ec, ct, "cont fromfile2"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "exists from-fromfolder3"
+
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn1))
+    AssertEqualWithMessage ec, ct, "cont fromfile1"
+
+    ec = df2
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn2))
+    AssertEqualWithMessage ec, ct, "cont fromfile2"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(toto, fn3)), "exists to-fromfolder3"
+
+    ec = dt1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, tn1))
+    AssertEqualWithMessage ec, ct, "cont tofile1"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(toto, tn3)), "exists to-tofolder3"
+End Sub
+Sub Test_fs_copyFolder_OverRideWithUnrelatedFileLocked
+    Dim from
+    'コピー元フォルダを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder from
+    AssertEqualWithMessage True, new_Fso().FolderExists(from), "before copy fromfolder exists"
+    
+    Dim c,fp,fn1,fn2,fn3,df1,df2
+    'フォルダの下にファイルとフォルダを作成
+    c = "Unicode"
+    fn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
+    df1 = "For" & vbNewLine & "copyFolder OverRideWithUnrelatedFileLocked fn1"
+    fp = new_Fso().BuildPath(from, fn1)
+    writeTestFile c,fp,df1
+    fn2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
+    df2 = "For" & vbNewLine & "copyFolder OverRideWithUnrelatedFileLocked fn2"
+    fp = new_Fso().BuildPath(from, fn2)
+    writeTestFile c,fp,df2
+    fn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
+    fp = new_Fso().BuildPath(from, fn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn1)), "before copy fromfolderfile1 exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn2)), "before copy fromfolderfile2 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "before copy fromfolderfolder3 exists"
+    
+    Dim toto
+    'コピー先フォルダを作成
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
+    new_Fso().CreateFolder toto
+    AssertEqualWithMessage True, new_Fso().FolderExists(toto), "before copy tofolder exists"
+    
+    Dim tn2,tn3,dt2
+    'フォルダの下にファイルとフォルダを作成
+    tn2 = fn2
+    dt2 = "For" & vbNewLine & "copyFolder OverRideWithUnrelatedFileLocked tn2"
+    fp = new_Fso().BuildPath(toto, tn2)
+    writeTestFile c,fp,dt2
+    tn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
+    fp = new_Fso().BuildPath(toto, tn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(toto, tn2)), "before copy tofolderfile2 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(toto, tn3)), "before copy tofolderfolder3 exists"
+
+    Dim tn1,dt1,f
+    tn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
+    dt1 = "For" & vbNewLine & "copyFolder OverRideWithUnrelatedFileLocked tn1"
+    fp = new_Fso().BuildPath(toto, tn1)
+    f = -1    'TristateTrue(Unicode)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c,fp,dt1,f)
+        AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(toto, tn1)), "before copy tofolderfile1 exists"
+        
+        Dim e,a
+        e = True
+        a = fs_copyFolder(from,toto)
+        
+        'fs_copyFolder()がエラーにならないことを確認する
+        AssertEqualWithMessage e, a, "ret"
+        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    AssertEqualWithMessage 2, new_Fso().GetFolder(from).Files.Count, "fromfolderFiles Count"
+    AssertEqualWithMessage 1, new_Fso().GetFolder(from).SubFolders.Count, "fromfolderSubFolders Count"
+    AssertEqualWithMessage 3, new_Fso().GetFolder(toto).Files.Count, "tofolderFiles Count"
+    AssertEqualWithMessage 2, new_Fso().GetFolder(toto).SubFolders.Count, "tofolderSubFolders Count"
+
+    'コピー先フォルダのファイルをロックしているが、上書きしないファイルのためコピーが正常に完了する
+
+    Dim ec,ct
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(from, fn1))
+    AssertEqualWithMessage ec, ct, "cont fromfile1"
+
+    ec = df2
+    ct = readTestFile(c, new_Fso().BuildPath(from, fn2))
+    AssertEqualWithMessage ec, ct, "cont fromfile2"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "exists from-fromfolder3"
+
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn1))
+    AssertEqualWithMessage ec, ct, "cont fromfile1"
+
+    ec = df2
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn2))
+    AssertEqualWithMessage ec, ct, "cont fromfile2"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(toto, fn3)), "exists to-fromfolder3"
+
+    ec = dt1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, tn1))
+    AssertEqualWithMessage ec, ct, "cont tofile1"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(toto, tn3)), "exists to-tofolder3"
+End Sub
+Sub Test_fs_copyFolder_Err_FromFileNoExists
+    Dim from
+    'コピー元フォルダを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    AssertEqualWithMessage False, new_Fso().FolderExists(from), "before copy fromfolder exists"
+    
+    Dim toto
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
+    AssertEqualWithMessage False, new_Fso().FolderExists(toto), "before copy tofolder exists"
+
+    Dim ea,a
+    ea = False
+    a = fs_copyFolder(from,toto)
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    AssertEqualWithMessage False, new_Fso().FolderExists(from), "after copy fromfolder exists"
+    AssertEqualWithMessage False, new_Fso().FolderExists(from), "after copy tofolder exists"
+End Sub
+Sub Test_fs_copyFolder_ToFileLocked
+    Dim from
+    'コピー元フォルダを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder from
+    AssertEqualWithMessage True, new_Fso().FolderExists(from), "before copy fromfolder exists"
+    
+    Dim c,fp,fn1,fn2,fn3,df1,df2
+    'フォルダの下にファイルとフォルダを作成
+    c = "Unicode"
+    fn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
+    df1 = "For" & vbNewLine & "copyFolder ToFileLocked fn1"
+    fp = new_Fso().BuildPath(from, fn1)
+    writeTestFile c,fp,df1
+    fn2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
+    df2 = "For" & vbNewLine & "copyFolder ToFileLocked fn2"
+    fp = new_Fso().BuildPath(from, fn2)
+    writeTestFile c,fp,df2
+    fn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
+    fp = new_Fso().BuildPath(from, fn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn1)), "before copy fromfolderfile1 exists"
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(from, fn2)), "before copy fromfolderfile2 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "before copy fromfolderfolder3 exists"
+    
+    Dim toto
+    'コピー先フォルダを作成
+    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
+    new_Fso().CreateFolder toto
+    AssertEqualWithMessage True, new_Fso().FolderExists(toto), "before copy tofolder exists"
+    
+    Dim tn1,tn3,dt1
+    'フォルダの下にファイルとフォルダを作成
+    tn1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
+    dt1 = "For" & vbNewLine & "copyFolder ToFileLocked tn1"
+    fp = new_Fso().BuildPath(toto, tn1)
+    writeTestFile c,fp,dt1
+    tn3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
+    fp = new_Fso().BuildPath(toto, tn3)
+    new_Fso().CreateFolder fp
+    AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(toto, tn1)), "before copy tofolderfile1 exists"
+    AssertEqualWithMessage True, new_Fso().FolderExists(new_Fso().BuildPath(toto, tn3)), "before copy tofolderfolder3 exists"
+
+    Dim tn2,dt2,f
+    tn2 = fn2
+    dt2 = "For" & vbNewLine & "copyFolder ToFileLocked tn2"
+    fp = new_Fso().BuildPath(toto, tn2)
+    f = -1    'TristateTrue(Unicode)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c,fp,dt2,f)
+        AssertEqualWithMessage True, new_Fso().FileExists(new_Fso().BuildPath(toto, tn2)), "before copy tofolderfile2 exists"
+        
+        Dim e,a
+        e = False
+        a = fs_copyFolder(from,toto)
+        
+        'fs_copyFolder()がエラーになることを確認する
+        AssertEqualWithMessage e, a, "ret"
+        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    AssertEqualWithMessage 2, new_Fso().GetFolder(from).Files.Count, "fromfolderFiles Count"
+    AssertEqualWithMessage 1, new_Fso().GetFolder(from).SubFolders.Count, "fromfolderSubFolders Count"
+    AssertEqualWithMessage 3, new_Fso().GetFolder(toto).Files.Count, "tofolderFiles Count"
+    AssertEqualWithMessage 1, new_Fso().GetFolder(toto).SubFolders.Count, "tofolderSubFolders Count"
+
+    '1つ目のファイルfn1はコピーまたは移動し、2つ目のファイルfn2のコピーまたは移動が失敗する、3つ目のフォルダfn3はコピーまたは移動しない
+
+    Dim ec,ct
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(from, fn1))
+    AssertEqualWithMessage ec, ct, "cont fromfile1"
+
+    ec = df2
+    ct = readTestFile(c, new_Fso().BuildPath(from, fn2))
+    AssertEqualWithMessage ec, ct, "cont fromfile2"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(from, fn3)), "exists from-fromfolder3"
+
+    ec = df1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, fn1))
+    AssertEqualWithMessage ec, ct, "cont fromfile1"
+
+    ec = dt1
+    ct = readTestFile(c, new_Fso().BuildPath(toto, tn1))
+    AssertEqualWithMessage ec, ct, "cont tofile1"
+
+    ec = dt2
+    ct = readTestFile(c, new_Fso().BuildPath(toto, tn2))
+    AssertEqualWithMessage ec, ct, "cont tofile1"
+
+    ec = True
+    AssertEqualWithMessage ec, new_Fso().FolderExists(new_Fso().BuildPath(toto, tn3)), "exists to-tofolder3"
+End Sub
 
 '###################################################################################################
 'fs_createFolder()
+Sub Test_fs_createFolder
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    AssertEqualWithMessage False, new_Fso().FolderExists(p), "before create folder exists"
+    
+    Dim a,e
+    e = True
+    a = fs_createFolder(p)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage True, new_Fso().FolderExists(p), "after create folder exists"
+End Sub
+Sub Test_fs_createFolder_ErrExistsFile
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+
+    Dim c,d
+    'ファイルを作成
+    c = "UTF-8"
+    d = "For" & vbNewLine & "CreateFolder Err-ExistsFile"
+    writeTestFile c,p,d
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "before create folder file exists"
+    
+    Dim a,e
+    e = False
+    a = fs_createFolder(p)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage True, new_Fso().FileExists(p), "after create folder file exists"
+    AssertEqualWithMessage False, new_Fso().FolderExists(p), "after create folder folder exists"
+End Sub
+Sub Test_fs_createFolder_ErrExistsFile
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+
+    Dim c,d
+    'フォルダを作成
+    new_Fso().CreateFolder p
+    AssertEqualWithMessage True, new_Fso().FolderExists(p), "before create folder folder exists"
+    
+    Dim a,e
+    e = False
+    a = fs_createFolder(p)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage True, new_Fso().FolderExists(p), "after create folder folder exists"
+End Sub
 
 '###################################################################################################
 'fs_deleteFile()
@@ -63,6 +566,7 @@ Sub Test_fs_deleteFile_Err_NotExists
     e = False
     a = fs_deleteFile(p)
     AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
     AssertEqualWithMessage False, new_Fso().FileExists(p), "after delete file exists"
 End Sub
 Sub Test_fs_deleteFile_Err_FileLocked
@@ -107,6 +611,44 @@ Sub Test_fs_deleteFolder
     a = fs_deleteFolder(p)
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage False, new_Fso().FolderExists(p), "after delete folder exists"
+End Sub
+Sub Test_fs_deleteFolder_Err_NotExists
+    Dim p
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    AssertEqualWithMessage False, new_Fso().FolderExists(p), "before delete folder exists"
+
+    Dim e,a
+    e = False
+    a = fs_deleteFolder(p)
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    AssertEqualWithMessage False, new_Fso().FolderExists(p), "after delete folder exists"
+End Sub
+Sub Test_fs_deleteFolder_Err_FileLocked
+    Dim c,p,fp,d,f
+    'フォルダを作成
+    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder p
+    'フォルダの下にファイルを作成
+    c = "UTF-8"
+    fp = new_Fso().BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    d = "For" & vbNewLine & "DeleteFolder Err FileLocked"
+    f = -1    'TristateTrue(Unicode)
+    'ファイルを一旦作成してロックする
+    With createFileAndLocked(c,fp,d,f)
+        Dim e,a
+        e = False
+        a = fs_deleteFolder(p)
+        
+        'fs_deleteFolder()がエラーになることを確認する
+        AssertEqualWithMessage e, a, "ret"
+        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    'フォルダが削除されていないことを確認
+    AssertEqualWithMessage True, new_Fso().FolderExists(p), "after delete folder exists"
 End Sub
 
 '###################################################################################################
@@ -371,6 +913,7 @@ Sub Test_func_FsWriteFile_Create_False_Err
     a = func_FsWriteFile(p, iomode, create, f, d)
 
     AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
     AssertEqualWithMessage False, new_Fso().FileExists(p), "after write file exists"
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode
