@@ -1817,15 +1817,7 @@ Private Function fs_copyFile( _
     byVal asFrom _
     , byVal asTo _
     ) 
-'    fs_copyFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "CopyFile")
-    If Not new_Fso().FileExists(asFrom) Then fs_copyFile = False
-    On Error Resume Next
-    Call new_Fso().CopyFile(asFrom, asTo)
-    fs_copyFile = True
-    If Err.Number Then
-        Err.Clear
-        fs_copyFile = False
-    End If
+    fs_copyFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "CopyFile")
 End Function
 
 '***************************************************************************************************
@@ -1848,15 +1840,7 @@ Private Function fs_copyFolder( _
     byVal asFrom _
     , byVal asTo _
     ) 
-'    fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
-    If Not new_Fso().FolderExists(asFrom) Then fs_copyFolder = False
-    On Error Resume Next
-    Call new_Fso().CopyFolder(asFrom, asTo)
-    fs_copyFolder = True
-    If Err.Number Then
-        Err.Clear
-        fs_copyFolder = False
-    End If
+    fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
 End Function
 
 '***************************************************************************************************
@@ -1942,15 +1926,7 @@ Private Function fs_moveFile( _
     byVal asFrom _
     , byVal asTo _
     ) 
-'    fs_moveFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "MoveFile")
-    If Not new_Fso().FileExists(asFrom) Then fs_moveFile = False
-    On Error Resume Next
-    Call new_Fso().MoveFile(asFrom, asTo)
-    fs_moveFile = True
-    If Err.Number Then
-        Err.Clear
-        fs_moveFile = False
-    End If
+    fs_moveFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "MoveFile")
 End Function
 
 '***************************************************************************************************
@@ -1973,15 +1949,7 @@ Private Function fs_moveFolder( _
     byVal asFrom _
     , byVal asTo _
     )
-'    fs_moveFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "MoveFolder")
-    If Not new_Fso().FolderExists(asFrom) Then fs_moveFolder = False
-    On Error Resume Next
-    Call new_Fso().MoveFolder(asFrom, asTo)
-    fs_moveFolder = True
-    If Err.Number Then
-        Err.Clear
-        fs_moveFolder = False
-    End If
+    fs_moveFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "MoveFolder")
 End Function
 
 '***************************************************************************************************
