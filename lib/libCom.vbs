@@ -949,6 +949,26 @@ Private Function new_AdptFileOf( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_Ret()
+'Overview                    : 戻り値クラスオブジェクトの生成関数
+'Detailed Description        : 工事中
+'Argument
+'     avRet                  : 戻り値
+'Return Value
+'     生成した戻り値クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/01/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Ret( _
+    byRef avRet _
+    )
+    Set new_Ret = (New clsCmReturnValue).setValue(avRet)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_Shell()
 'Overview                    : Wscript.Shellオブジェクト生成関数
 'Detailed Description        : 工事中
