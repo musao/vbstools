@@ -75,14 +75,14 @@ Class clsCmBufferedReader
         byVal alReadSize _
         )
         Dim boFlg : boFlg = False
-        If func_CM_ValidationlIsWithinTheRangeOf(alReadSize, 2) Then
-            If CLng(alReadSize)>0 Then
+        If cf_isNumeric(alReadSize) Then
+            If CDbl(alReadSize)>0 Then
                 boFlg = True
             End If
         End If
         
         If boFlg Then
-            PlReadSize = CLng(alReadSize)
+            PlReadSize = CDbl(alReadSize)
         Else
             Err.Raise 1031, "clsCmBufferedReader.vbs:clsCmBufferedReader+readSize()", "ïsê≥Ç»êîéöÇ≈Ç∑ÅB"
         End If

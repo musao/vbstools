@@ -88,6 +88,40 @@ Private Function cf_isAvailableObject( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_isNumeric()
+'Overview                    : 数値か判定する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     結果 True:数値 / False:数値でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/01/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isNumeric( _
+    byRef avTgt _
+    )
+    If IsEmpty(avTgt) Or IsNull(avTgt) Or IsObject(avTgt) Or IsArray(avTgt) Then
+    'Empty,Null,Object,Arrayの場合はFalse
+        cf_isNumeric=False
+        Exit Function
+    End If
+    If VarType(avTgt)=vbInteger Or VarType(avTgt)=vbLong Or VarType(avTgt)=vbSingle Or VarType(avTgt)=vbDouble Then
+    'Integer,Long,Single,Doubleの場合はTrue
+        cf_isNumeric=True
+        Exit Function
+    End If
+    cf_isNumeric=False
+    If VarType(avTgt)=vbString Then
+    'Stringの場合はIsNumeric関数の戻り値を返す
+        cf_isNumeric=IsNumeric(avTgt)
+    End If
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_isSame()
 'Overview                    : 同一か判定する
 'Detailed Description        : 工事中
@@ -2628,58 +2662,58 @@ End Function
 'チェック系
 '###################################################################################################
 
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_ValidationlIsWithinTheRangeOf()
-'Overview                    : 数値型の範囲内にあるか検査する
-'Detailed Description        : 工事中
-'Argument
-'     avNumber               : 数値
-'     alType                 : 変数の型
-'                                1:整数型（Integer）
-'                                2:長整数型（Long）
-'                                3:バイト型（Byte）
-'                                4:単精度浮動小数点型（Single）
-'                                5:倍精度浮動小数点型（Double）
-'                                6:通貨型（Currency）
-'Return Value
-'     整形した浮動小数点型
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_ValidationlIsWithinTheRangeOf( _
-    byVal avNumber _
-    , byVal alType _
-    )
-    Dim vMin,vMax
-    Select Case alType
-        Case 1:                   '整数型（Integer）
-            vMin = -1 * 2^15
-            vMax = 2^15 - 1
-        Case 2:                   '長整数型（Long）
-            vMin = -1 * 2^31
-            vMax = 2^31 - 1
-        Case 3:                   'バイト型（Byte）
-            vMin = 0
-            vMax = 2^8 - 1
-        Case 4:                   '単精度浮動小数点型（Single）
-            vMin = -3.402823E38
-            vMax = 3.402823E38
-        Case 5:                   '倍精度浮動小数点型（Double）
-            vMin = -1.79769313486231E308
-            vMax = 1.79769313486231E308
-        Case 6:                   '通貨型（Currency）
-            vMin = -1 * 2^59 / 1000
-            vMax = ( 2^59 - 1 ) / 1000
-    End Select
-    
-    func_CM_ValidationlIsWithinTheRangeOf = False
-    If vMin<=avNumber And avNumber<=vMax Then
-        func_CM_ValidationlIsWithinTheRangeOf = True
-    End If
-End Function
+''***************************************************************************************************
+''Function/Sub Name           : func_CM_ValidationlIsWithinTheRangeOf()
+''Overview                    : 数値型の範囲内にあるか検査する
+''Detailed Description        : 工事中
+''Argument
+''     avNumber               : 数値
+''     alType                 : 変数の型
+''                                1:整数型（Integer）
+''                                2:長整数型（Long）
+''                                3:バイト型（Byte）
+''                                4:単精度浮動小数点型（Single）
+''                                5:倍精度浮動小数点型（Double）
+''                                6:通貨型（Currency）
+''Return Value
+''     整形した浮動小数点型
+''---------------------------------------------------------------------------------------------------
+''Histroy
+''Date               Name                     Reason for Changes
+''----------         ----------------------   -------------------------------------------------------
+''2023/08/26         Y.Fujii                  First edition
+''***************************************************************************************************
+'Private Function func_CM_ValidationlIsWithinTheRangeOf( _
+'    byVal avNumber _
+'    , byVal alType _
+'    )
+'    Dim vMin,vMax
+'    Select Case alType
+'        Case 1:                   '整数型（Integer）
+'            vMin = -1 * 2^15
+'            vMax = 2^15 - 1
+'        Case 2:                   '長整数型（Long）
+'            vMin = -1 * 2^31
+'            vMax = 2^31 - 1
+'        Case 3:                   'バイト型（Byte）
+'            vMin = 0
+'            vMax = 2^8 - 1
+'        Case 4:                   '単精度浮動小数点型（Single）
+'            vMin = -3.402823E38
+'            vMax = 3.402823E38
+'        Case 5:                   '倍精度浮動小数点型（Double）
+'            vMin = -1.79769313486231E308
+'            vMax = 1.79769313486231E308
+'        Case 6:                   '通貨型（Currency）
+'            vMin = -1 * 2^59 / 1000
+'            vMax = ( 2^59 - 1 ) / 1000
+'    End Select
+'    
+'    func_CM_ValidationlIsWithinTheRangeOf = False
+'    If vMin<=avNumber And avNumber<=vMax Then
+'        func_CM_ValidationlIsWithinTheRangeOf = True
+'    End If
+'End Function
 
 
 '###################################################################################################

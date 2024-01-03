@@ -33,15 +33,17 @@ Sub Test_clsCmBufferedReader_readSize
 
     e = 1
     a.readSize = e
-    AssertEqual e, a.readSize
+    AssertEqualWithMessage e, a.readSize, "e="&e
     
     e = 10.5
     a.readSize = e
-    AssertEqual CLng(e), a.readSize
+'    AssertEqual CLng(e), a.readSize
+    AssertEqualWithMessage CDbl(e), a.readSize, "e="&e
     
     e = 2^31-1
     a.readSize = e
-    AssertEqual e, a.readSize
+'    AssertEqual e, a.readSize
+    AssertEqualWithMessage e, a.readSize, "e="&e
 End Sub
 Sub Test_clsCmBufferedReader_readSize_Err_Zero
     On Error Resume Next
@@ -71,18 +73,18 @@ Sub Test_clsCmBufferedReader_readSize_Err_OverLower
 End Sub
 Sub Test_clsCmBufferedReader_readSize_Err_OverUpper
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedReader
     
     e = 100
     a.readSize = e
 
-    d = 2^31
+    d = 2^(2^10)
     a.readSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.readSize
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.readSize, "e="&e
 End Sub
 Sub Test_clsCmBufferedReader_readSize_Err_NonNumeric
     On Error Resume Next

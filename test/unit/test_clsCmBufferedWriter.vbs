@@ -51,63 +51,63 @@ Sub Test_clsCmBufferedWriter_writeBufferSize
     Dim a,e
     Set a = new clsCmBufferedWriter
 
-    AssertEqual 5000, a.writeBufferSize
+    AssertEqualWithMessage 5000, a.writeBufferSize, "1"
     
     e = -1*2^31
     a.writeBufferSize = e
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
     
     e = -1
     a.writeBufferSize = e
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 
     e = 0
     a.writeBufferSize = e
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 
     e = 1
     a.writeBufferSize = e
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
     
     e = 10.5
     a.writeBufferSize = e
-    AssertEqual CLng(e), a.writeBufferSize
+    AssertEqualWithMessage CDbl(e), a.writeBufferSize, "e="&e
     
     e = 2^31-1
     a.writeBufferSize = e
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverLower
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedWriter
     
     e = a.writeBufferSize
-    d = -1*2^31 -1
+    d = -1*2^(2^1024)
     a.writeBufferSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverUpper
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedWriter
     
     e = 100
     a.writeBufferSize = e
 
-    d = 2^31
+    d = 2^(2^1024)
     a.writeBufferSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeBufferSize_Err_NonNumeric
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedWriter
     
     e = a.writeBufferSize
@@ -115,9 +115,9 @@ Sub Test_clsCmBufferedWriter_writeBufferSize_Err_NonNumeric
     d = "abc"
     a.writeBufferSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.writeBufferSize
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 
 '###################################################################################################
@@ -126,63 +126,63 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime
     Dim a,e
     Set a = new clsCmBufferedWriter
 
-    AssertEqual 0, a.writeIntervalTime
+    AssertEqualWithMessage 0, a.writeIntervalTime, "1"
     
     e = -1*2^31
     a.writeIntervalTime = e
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
     
     e = -1
     a.writeIntervalTime = e
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 
     e = 0
     a.writeIntervalTime = e
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 
     e = 1
     a.writeIntervalTime = e
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
     
     e = 10.5
     a.writeIntervalTime = e
-    AssertEqual CLng(e), a.writeIntervalTime
+    AssertEqualWithMessage CDbl(e), a.writeIntervalTime, "e="&e
     
     e = 2^31-1
     a.writeIntervalTime = e
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverLower
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedWriter
     
     e = a.writeIntervalTime
-    d = -1*2^31 -1
+    d = -1*2^(2^10)
     a.writeIntervalTime = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverUpper
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedWriter
     
     e = 100
     a.writeIntervalTime = e
 
-    d = 2^31
+    d = 2^(2^10)
     a.writeIntervalTime = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_NonNumeric
     On Error Resume Next
-    Dim a,d
+    Dim a,d,e
     Set a = new clsCmBufferedWriter
     
     e = a.writeIntervalTime
@@ -190,9 +190,9 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_NonNumeric
     d = "abc"
     a.writeIntervalTime = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.writeIntervalTime
+    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
+    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 
 '###################################################################################################
@@ -299,7 +299,7 @@ Sub Test_clsCmBufferedWriter_lastWriteTime
     With ao
         .setTextStream(ts)
         .writeBufferSize = 5000
-        .writeIntervalTime = 1
+        .writeIntervalTime = 0.03
         sz = new_Fso().GetFile(pt).Size
         
         d = "abあいcう"
@@ -310,7 +310,7 @@ Sub Test_clsCmBufferedWriter_lastWriteTime
         AssertEqualWithMessage e, a, "1-1"
         AssertEqualWithMessage sz, nsz, "1-2"
         
-        wscript.sleep 1100
+        wscript.sleep 50
 
         d = "dえeお"
         e = new_Now()
@@ -321,7 +321,7 @@ Sub Test_clsCmBufferedWriter_lastWriteTime
         AssertWithMessage sz<nsz, "2-2"
         AssertWithMessage Not IsEmpty(a), "2-3"
         
-        wscript.sleep 1100
+        wscript.sleep 50
         
         d = "かfきgくhけiこj"
         e = new_Now()

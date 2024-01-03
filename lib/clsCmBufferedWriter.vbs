@@ -76,8 +76,8 @@ Class clsCmBufferedWriter
     Public Property Let writeBufferSize( _
         byVal alWriteBufferSize _
         )
-        If func_CM_ValidationlIsWithinTheRangeOf(alWriteBufferSize, 2) Then
-            PlWriteBufferSize = CLng(alWriteBufferSize)
+        If cf_isNumeric(alWriteBufferSize) Then
+            PlWriteBufferSize = CDbl(alWriteBufferSize)
         Else
             Err.Raise 1031, "clsCmBufferedWriter.vbs:clsCmBufferedWriter+writeBufferSize()", "不正な数字です。"
         End If
@@ -119,8 +119,8 @@ Class clsCmBufferedWriter
     Public Property Let writeIntervalTime( _
         byVal alWriteIntervalTime _
         )
-        If func_CM_ValidationlIsWithinTheRangeOf(alWriteIntervalTime, 2) Then
-            PlWriteIntervalTime = CLng(alWriteIntervalTime)
+        If cf_isNumeric(alWriteIntervalTime) Then
+            PlWriteIntervalTime = CDbl(alWriteIntervalTime)
         Else
             Err.Raise 1031, "clsCmBufferedWriter.vbs:clsCmBufferedWriter+writeIntervalTime()", "不正な数字です。"
         End If

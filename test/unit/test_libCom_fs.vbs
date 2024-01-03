@@ -144,13 +144,17 @@ Sub Test_fs_deleteFile_Err_NotExists
     assertExistsFile p, False, "after", "deleteFile", "file"
 End Sub
 Sub Test_fs_deleteFile_Err_FileLocked
-    Dim c,p,d,f
+    Dim c,p,d
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "For" & vbNewLine & "DeleteFile Err FileLocked"
+    writeTestFile c,p,d
+    assertExistsFile p, True, "before", "deleteFile", "file"
+
+    Dim f
+    'ファイルをロックする
     f = -1    'TristateTrue(Unicode)
-    'ファイルを一旦作成してロックする
-    With createFileAndLocked(c,p,d,f)
+    With lockFile(p, f)
         Dim e,a
         e = False
         a = fs_deleteFile(p)
@@ -199,7 +203,7 @@ Sub Test_fs_deleteFolder_Err_NotExists
     assertExistsFolder p, False, "after", "deleteFolder", "folder"
 End Sub
 Sub Test_fs_deleteFolder_Err_FileLocked
-    Dim c,p,pf,d,f
+    Dim c,p,pf,d
     'フォルダを作成
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
     new_Fso().CreateFolder p
@@ -207,9 +211,12 @@ Sub Test_fs_deleteFolder_Err_FileLocked
     c = "UTF-8"
     pf = new_Fso().BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     d = "For" & vbNewLine & "DeleteFolder Err FileLocked"
+    writeTestFile c,pf,d
+
+    Dim f
+    'ファイルをロックする
     f = -1    'TristateTrue(Unicode)
-    'ファイルを一旦作成してロックする
-    With createFileAndLocked(c,pf,d,f)
+    With lockFile(pf,f)
         Dim e,a
         e = False
         a = fs_deleteFolder(p)
@@ -267,15 +274,15 @@ End Sub
 '###################################################################################################
 'fs_readFile()
 Sub Test_fs_readFile
-    Dim c,p,d,e
+    Dim c,p,d
     'ファイルを作成
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
-    e = d
     writeTestFile c,p,d
 
-    Dim a
+    Dim e,a
+    e = d
     a = fs_readFile(p)
     AssertEqualWithMessage e, a, "ret"
 End Sub
@@ -298,16 +305,17 @@ Sub Test_fs_writeFile
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "writeFile", "file"
 
-    Dim d,ec,ea,a
+    Dim d,e,a
     d = "abc" & vbNewLine & "あいう" & vbNewLine & "123" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
-    ec = d : ea = True
+    e = True
     a = fs_writeFile(p, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim c,ct
+    Dim c
     c = "Unicode"
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_fs_writeFile_Rewrite
     Dim p,c,d
@@ -320,41 +328,44 @@ Sub Test_fs_writeFile_Rewrite
 
     '上書きすることを確認
     d = "abc" & vbNewLine & "①②③" & vbNewLine & "!#$" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
-    Dim a,ec,ea
-    ec = d : ea = True
+    Dim e,a
+    e = True
     a = fs_writeFile(p, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim ct
     c = "Unicode"
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_fs_writeFile_Err
-    Dim p,c,d,f,ec
+    Dim p,c,d
+    'ロックするファイルを一旦作成
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "For" & vbNewLine & "Write Error"
+    writeTestFile c,p,d
+
+    Dim de,f
+    'ファイルをロックする
     f = -1    'TristateTrue(Unicode)
-    ec = d
-    'ファイルを一旦作成してロックする
-    With createFileAndLocked(c, p ,d,f)
-        d = "error" & vbNewLine & "test"
-        Dim ea,a
-        ea = False
-        a = fs_writeFile(p, d)
+    With lockFile(p,f)
+        de = "error" & vbNewLine & "test"
+        Dim e,a
+        e = False
+        a = fs_writeFile(p, de)
         
         'fs_writeFile()がエラーになることを確認する
-        AssertEqualWithMessage ea, a, "ret"
+        AssertEqualWithMessage e, a, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
         .Close
     End With
 
-    Dim ct
     '上書きしていないことを確認
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 
 '###################################################################################################
@@ -364,16 +375,17 @@ Sub Test_fs_writeFileDefault
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "writeFileDefault", "file"
 
-    Dim d,ec,ea,a
+    Dim d,e,a
     d = "abc" & vbNewLine & "あいう" & vbNewLine & "123"
-    ec = d : ea = True
+    e = True
     a = fs_writeFileDefault(p, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim c,ct
+    Dim c
     c = "shift-jis"
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 
 '###################################################################################################
@@ -383,19 +395,20 @@ Sub Test_func_FsWriteFile_Iomode_ForWriting_Normal__Format_SystemDefault
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
-    Dim d,iomode,create,f,ec,ea,a
+    Dim d,iomode,create,f,e,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForWriting_Normal__Format_SystemDefault"
     iomode = 2     'ForWriting
     create = True
     f = -2         'TristateUseDefault
-    ec = d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim c,ct
+    Dim c
     c = "shift-jis"
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode
     Dim p,c,d
@@ -406,39 +419,40 @@ Sub Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "func_FsWriteFile", "file"
 
-    Dim iomode,create,f,ec,ea,a
+    Dim iomode,create,f,e,a
     '上書きすることを確認
     iomode = 2     'ForWriting
     create = True
     f = -1    'TristateTrue(Unicode)
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForWriting_Rewrite__Format_Unicode"
-    ec = d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim ct
     c = "Unicode"
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Normal__Format_Ascii
     Dim p
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
-    Dim d,iomode,create,f,ec,ea,a
+    Dim d,iomode,create,f,e,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForAppending_Normal__Format_Ascii"
     iomode = 8     'ForAppending
     create = True
     f = 0          'TristateFalse(Ascii)
-    ec = d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim c,ct
+    Dim c
     c = "shift-jis"
-    ct = readTestFile(c,p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c,p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault
     Dim p,c,d
@@ -449,39 +463,40 @@ Sub Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "func_FsWriteFile", "file"
 
-    Dim iomode,create,f,ec,ea,a
+    Dim iomode,create,f,ec,e,a
     '追記することを確認
     iomode = 8     'ForAppending
     create = True
     f = -2         'TristateUseDefault
     ec = d
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForAppending_Append__Format_SystemDefault"
-    ec = ec & d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim ct
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    ec = ec & d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage ec, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Normal__Format_Unicode
     Dim p
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
-    Dim d,iomode,create,f,ec,ea,a
+    Dim d,iomode,create,f,e,a
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_True_Normal__Format_Unicode"
     iomode = 2     'ForWriting
     create = True
     f = -1         'TristateTrue(Unicode)
-    ec = d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim c,ct
+    Dim c
     c = "Unicode"
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii
     Dim p,c,d
@@ -492,19 +507,19 @@ Sub Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "func_FsWriteFile", "file"
 
-    Dim iomode,create,f,ec,ea,a
+    Dim iomode,create,f,e,a
     '上書きすることを確認
     iomode = 2     'ForWriting
     create = True
     f = 0          'TristateFalse(Ascii)
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_True_Rewrite__Format_Ascii"
-    ec = d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim ct
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Err
     Dim p
@@ -521,7 +536,7 @@ Sub Test_func_FsWriteFile_Create_False_Err
 
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage 0, Err.Number, "Err.Number"
-    AssertEqualWithMessage False, new_Fso().FileExists(p), "after write file exists"
+    assertExistsFile p, False, "after", "func_FsWriteFile", "file"
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode
     Dim p,c,d
@@ -532,48 +547,52 @@ Sub Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "func_FsWriteFile", "file"
 
-    Dim ec,ea,a,iomode,create,f
+    Dim e,a,iomode,create,f
     '上書きすることを確認
     iomode = 2     'ForWriting
     create = False
     f = -1         'TristateTrue(Unicode)
     d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_False_Rewrite__Format_Unicode"
-    ec = d : ea = True
+    e = True
     a = func_FsWriteFile(p, iomode, create, f, d)
+    AssertEqualWithMessage e, a, "ret"
 
-    Dim ct
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ea, a, "ret"
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Err_FileLocked
-    Dim p,d,iomode,create,f,c,ec,ea,a
+    Dim p,d,c
+    'ロックするファイルを一旦作成
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    d = "error" & vbNewLine & "FileLocked"
-    iomode = 2     'ForWriting
-    create = False
-    f = 0          'TristateFalse(Ascii)
     c = "shift-jis"
-    ec = d
-    'ファイルを一旦作成してロックする
-    With createFileAndLocked(c, p ,d, f)
-        assertExistsFile p, True, "before", "func_FsWriteFile", "file(Locked)"
+    d = "error" & vbNewLine & "FileLocked"
+    writeTestFile c,p,d
+    assertExistsFile p, True, "before", "func_FsWriteFile", "file"
 
-        d = "error" & vbNewLine & "test"
-        ea = False
-        a = func_FsWriteFile(p, iomode, create, f, d)
+    Dim f
+    f = 0          'TristateFalse(Ascii)
+    'ファイルをロックする
+    With lockFile(p,f)
+
+        Dim iomode,create,de,e,a
+        iomode = 2     'ForWriting
+        create = False
+        de = "error" & vbNewLine & "test"
+        e = False
+        a = func_FsWriteFile(p, iomode, create, f, de)
         
         'func_FsWriteFile()がエラーになることを確認する
-        AssertEqualWithMessage ea, a, "ret"
+        AssertEqualWithMessage e, a, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
         .Close
     End With
 
     '上書きしていないことを確認
-    Dim ct
-    ct = readTestFile(c, p)
-    AssertEqualWithMessage ec, ct, "cont"
+    e = d
+    a = readTestFile(c, p)
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 
 '###################################################################################################
@@ -582,13 +601,14 @@ Sub Test_func_FsReadFile_Normal__Format_SystemDefault
     Dim p
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
-    Dim d,f,c,e,a
+    Dim d,f,c
     d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_SystemDefault"
     f = -2         'TristateUseDefault
     c = "shift-jis"
-    e = d
     writeTestFile c,p,d
 
+    Dim e,a
+    e = d
     a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
 End Sub
@@ -596,13 +616,14 @@ Sub Test_func_FsReadFile_Normal__Format_Unicode
     Dim p
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
-    Dim d,f,c,e,a
+    Dim d,f,c
     d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Unicode"
     f = -1         'TristateTrue(Unicode)
     c = "Unicode"
-    e = d
     writeTestFile c,p,d
 
+    Dim e,a
+    e = d
     a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
 End Sub
@@ -610,25 +631,25 @@ Sub Test_func_FsReadFile_Normal__Format_Ascii
     Dim p
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
-    Dim d,f,c,e,a
+    Dim d,f,c
     d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Ascii"
     f = 0          'TristateFalse(Ascii)
     c = "shift-jis"
-    e = d
     writeTestFile c,p,d
     
+    Dim e,a
+    e = d
     a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
 End Sub
 Sub Test_func_FsReadFile_Err
     Dim p
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    assertExistsFile p, False, "before", "func_FsReadFile", "file"
 
     Dim f,e,a
     f = -2         'TristateUseDefault
-    assertExistsFile p, False, "before", "func_FsReadFile", "file"
     e = empty
-
     a = func_FsReadFile(p,f)
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage 0, Err.Number, "Err.Number"
@@ -636,45 +657,6 @@ End Sub
 
 '###################################################################################################
 'common
-Sub writeTestFile(c,p,d)
-    With CreateObject("ADODB.Stream")
-        .Charset = c
-        .Open
-        .WriteText d, 0
-        .SaveToFile p, 2
-        .Close
-    End With
-End Sub
-Function readTestFile(c,p)
-    With CreateObject("ADODB.Stream")
-        .Charset = c
-        .Open
-        .LoadFromFile p
-        readTestFile = .ReadText
-        .Close
-    End With
-End Function
-Function createFileAndLocked(c,p,d,f)
-    With CreateObject("ADODB.Stream")
-        .Charset = c
-        .Open
-        .WriteText d, 0
-        .SaveToFile p, 2
-        .Close
-    End With
-    'Textstreamを作成して返却
-    Set createFileAndLocked = new_Ts(p, 8, True, f)
-End Function
-Sub assertExistsFile(path, expect, timestr, acton, tgt)
-    AssertEqualWithMessage expect, new_Fso().FileExists(path), timestr & " " & acton & " " & tgt & " exists"
-End Sub
-Sub assertExistsFolder(path, expect, timestr, acton, tgt)
-    AssertEqualWithMessage expect, new_Fso().FolderExists(path), timestr & " " & acton & " " & tgt & " exists"
-End Sub
-Sub assertFilesSubfoldersCount(path, expectfilecnt, expectfoldercnt, tgt)
-    AssertEqualWithMessage expectfilecnt, new_Fso().GetFolder(path).Files.Count, tgt & " folderFiles Count"
-    AssertEqualWithMessage expectfoldercnt, new_Fso().GetFolder(path).SubFolders.Count, tgt & " folderSubFolders Count"
-End Sub
 Sub com_CopyOrMoveFile_Normal(IsCopy)
     Dim from
     'fromパスを作成
@@ -776,22 +758,25 @@ Sub com_CopyOrMoveFile_OverRide(IsCopy)
     End If
 End Sub
 Sub com_CopyOrMoveFile_FromFileLocked(IsCopy)
+    Dim from
+    'fromパスを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    Dim c,df
+    'fromファイルを作成
+    c = "Unicode"
+    df = "For" & vbNewLine & "copy/moveFile FromFileLocked"
+    writeTestFile c,from,df
+    assertExistsFile from, True, "before", "copy/moveFile", "fromfile"
+
     Dim toto
     'toパスを作成
     toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_.txt"))
     assertExistsFile toto, False, "before", "copy/moveFile", "tofile"
 
-    Dim from
-    'fromパスを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    Dim c,df,f
-    'fromファイルを作成してロックする
-    c = "Unicode"
-    df = "For" & vbNewLine & "copy/moveFile FromFileLocked"
+    Dim f
+    'fromファイルをロックする
     f = -1    'TristateTrue(Unicode)
-    With createFileAndLocked(c,from,df,f)
-        assertExistsFile from, True, "before", "copy/moveFile", "fromfile(Locked)"
-        
+    With lockFile(from,f)
         Dim e,a
         '実行結果の確認
         If IsCopy Then
@@ -862,19 +847,23 @@ Sub com_CopyOrMoveFile_ToFileLocked(IsCopy)
     Dim c,df
     'fromファイルを作成
     c = "Unicode"
-    df = "For" & vbNewLine & "copy/moveFile OverRide"
+    df = "For" & vbNewLine & "copy/moveFile fromfile ToFileLocked"
     writeTestFile c,from,df
     assertExistsFile from, True, "before", "copy/move", "fromfile"
     
     Dim toto
     'toパスを作成
     toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_.txt"))
-    
-    Dim dt,f
-    'toファイルを作成してロックする
+    Dim dt
+    'toファイルを作成
     dt = "For" & vbNewLine & "copy/moveFile ToFileLocked"
+    writeTestFile c,toto,dt
+    assertExistsFile toto, True, "before", "copy/moveFile", "tofile"
+
+    Dim f
+    'toファイルをロックする
     f = -1    'TristateTrue(Unicode)
-    With createFileAndLocked(c,toto,dt,f)
+    With lockFile(toto,f)
         assertExistsFile toto, True, "before", "copy/move", "tofile"
         
         Dim e,a
@@ -1094,8 +1083,12 @@ Sub com_CopyOrMoveFolder_OverRideWithUnrelatedFileLocked(IsCopy)
     'toフォルダを作成
     toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
     new_Fso().CreateFolder toto
-    Dim ft2,ft3,dt2
+    Dim ft1,ft2,ft3,dt1,dt2
     'toフォルダの下にファイルとフォルダを作成
+    ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
+    dt1 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ft1"
+    p = new_Fso().BuildPath(toto, ft1)
+    writeTestFile c,p,dt1
     ft2 = ff2
     dt2 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ft2"
     p = new_Fso().BuildPath(toto, ft2)
@@ -1104,18 +1097,15 @@ Sub com_CopyOrMoveFolder_OverRideWithUnrelatedFileLocked(IsCopy)
     p = new_Fso().BuildPath(toto, ft3)
     new_Fso().CreateFolder p
     assertExistsFolder toto, True, "before", "copy/moveFolder", "tofolder"
+    assertExistsFile new_Fso().BuildPath(toto, ft1), True, "before", "copy/moveFolder", "tofolder-file1"
     assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
     assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
     
-    Dim ft1,dt1,f
-    ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
-    dt1 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ft1"
+    Dim f
     p = new_Fso().BuildPath(toto, ft1)
     f = -1    'TristateTrue(Unicode)
-    'toフォルダのファイル（ft1）を作成してロックする
-    With createFileAndLocked(c,p,dt1,f)
-        assertExistsFile p, True, "before", "copy/moveFolder", "tofolder-file1(locked)"
-        
+    'toフォルダのファイル（ft1）をロックする
+    With lockFile(p,f)
         Dim e,a
         '実行結果の確認
         If isCopy Then
@@ -1174,18 +1164,40 @@ Sub com_CopyOrMoveFolder_OverRideWithUnrelatedFileLocked(IsCopy)
     End If
 End Sub
 Sub com_CopyOrMoveFolder_FromFileLocked(IsCopy)
+    Dim from
+    'fromフォルダを作成
+    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    new_Fso().CreateFolder from
+    Dim c,ff1,ff2,ff3,df1,df2
+    'fromフォルダの下にファイルとフォルダを作成
+    c = "Unicode"
+    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
+    df1 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ff1"
+    p = new_Fso().BuildPath(from, ff1)
+    writeTestFile c,p,df1
+    ff2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
+    df2 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ff2"
+    p = new_Fso().BuildPath(from, ff2)
+    writeTestFile c,p,df2
+    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
+    p = new_Fso().BuildPath(from, ff3)
+    new_Fso().CreateFolder p
+    assertExistsFolder from, True, "before", "copy/moveFolder", "fromfolder"
+    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
+    assertExistsFile new_Fso().BuildPath(from, ff2), True, "before", "copy/moveFolder", "fromfolder-file2"
+    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
+    
     Dim toto
     'toフォルダを作成
     toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
     new_Fso().CreateFolder toto
-    Dim c,p,ft1,ft2,ft3,dt1,dt2
-    c = "Unicode"
+    Dim p,ft1,ft2,ft3,dt1,dt2
     'toフォルダの下にファイルとフォルダを作成
     ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
     dt1 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ft1"
     p = new_Fso().BuildPath(toto, ft1)
     writeTestFile c,p,dt1
-    ft2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
+    ft2 = ff2
     dt2 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ft2"
     p = new_Fso().BuildPath(toto, ft2)
     writeTestFile c,p,dt2
@@ -1197,32 +1209,11 @@ Sub com_CopyOrMoveFolder_FromFileLocked(IsCopy)
     assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
     assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
 
-    Dim from
-    'fromフォルダを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder from
-    Dim ff1,ff3,df1
-    'fromフォルダの下にファイルとフォルダを作成
-    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
-    df1 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ff1"
-    p = new_Fso().BuildPath(from, ff1)
-    writeTestFile c,p,df1
-    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
-    p = new_Fso().BuildPath(from, ff3)
-    new_Fso().CreateFolder p
-    assertExistsFolder from, True, "before", "copy/moveFolder", "fromfolder"
-    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
-    
-    Dim ff2,df2,f
-    ff2 = ft2
-    df2 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ff2"
+    Dim f
     p = new_Fso().BuildPath(from, ff2)
     f = -1    'TristateTrue(Unicode)
-    'toフォルダのファイル（ff2）を作成してロックする
-    With createFileAndLocked(c,p,df2,f)
-        assertExistsFile p, True, "before", "copy/moveFolder", "fromfolder-file2(locked)"
-        
+    'fromフォルダのファイル（ff2）をロックする
+    With lockFile(p,f)
         'copyは正常（上書きする）moveは異常（上書きしない）になる
         Dim e,a
         '実行結果の確認
@@ -1337,28 +1328,29 @@ Sub com_CopyOrMoveFolder_ToFileLocked(IsCopy)
     'コピー先フォルダを作成
     toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
     new_Fso().CreateFolder toto
-    Dim ft1,ft3,dt1
+    Dim ft1,ft2,ft3,dt1,dt2
     'フォルダの下にファイルとフォルダを作成
     ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
     dt1 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ft1"
     p = new_Fso().BuildPath(toto, ft1)
     writeTestFile c,p,dt1
+    ft2 = ff2
+    dt2 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ft2"
+    p = new_Fso().BuildPath(toto, ft2)
+    writeTestFile c,p,dt2
     ft3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
     p = new_Fso().BuildPath(toto, ft3)
     new_Fso().CreateFolder p
     assertExistsFolder toto, True, "before", "copy/moveFolder", "tofolder"
     assertExistsFile new_Fso().BuildPath(toto, ft1), True, "before", "copy/moveFolder", "tofolder-file1"
+    assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
     assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
 
-    Dim ft2,dt2,f
-    ft2 = ff2
-    dt2 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ft2"
+    Dim f
     p = new_Fso().BuildPath(toto, ft2)
     f = -1    'TristateTrue(Unicode)
-    'toフォルダのファイル（ft2）を作成してロックする
-    With createFileAndLocked(c,p,dt2,f)
-        assertExistsFile p, True, "before", "copy/moveFolder", "tofolder-file2(locked)"
-        
+    'toフォルダのファイル（ft2）をロックする
+    With lockFile(p,f)
         Dim e,a
         '実行結果の確認
         e = False
@@ -1415,6 +1407,38 @@ Sub com_CopyOrMoveFolder_ToFileLocked(IsCopy)
         assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
     End If
 End Sub
+Sub writeTestFile(c,p,d)
+    With CreateObject("ADODB.Stream")
+        .Charset = c
+        .Open
+        .WriteText d, 0
+        .SaveToFile p, 2
+        .Close
+    End With
+End Sub
+Function readTestFile(c,p)
+    With CreateObject("ADODB.Stream")
+        .Charset = c
+        .Open
+        .LoadFromFile p
+        readTestFile = .ReadText
+        .Close
+    End With
+End Function
+Function lockFile(p,f)
+    Set lockFile = new_Ts(p, 8, True, f)
+End Function
+Sub assertExistsFile(path, expect, timestr, acton, tgt)
+    AssertEqualWithMessage expect, new_Fso().FileExists(path), timestr & " " & acton & " " & tgt & " exists"
+End Sub
+Sub assertExistsFolder(path, expect, timestr, acton, tgt)
+    AssertEqualWithMessage expect, new_Fso().FolderExists(path), timestr & " " & acton & " " & tgt & " exists"
+End Sub
+Sub assertFilesSubfoldersCount(path, expectfilecnt, expectfoldercnt, tgt)
+    AssertEqualWithMessage expectfilecnt, new_Fso().GetFolder(path).Files.Count, tgt & " folderFiles Count"
+    AssertEqualWithMessage expectfoldercnt, new_Fso().GetFolder(path).SubFolders.Count, tgt & " folderSubFolders Count"
+End Sub
+
 
 ' Local Variables:
 ' mode: Visual-Basic
