@@ -23,7 +23,7 @@ Sub Test_clsCmReturnValue
 End Sub
 
 '###################################################################################################
-'clsCmBroker.returnValue()
+'clsCmReturnValue.returnValue()
 Sub Test_clsCmReturnValue_returnValue
     Dim data
     data = Array( _
@@ -78,7 +78,7 @@ Sub Test_clsCmReturnValue_returnValue
 End Sub
 
 '###################################################################################################
-'clsCmBroker.isErr()
+'clsCmReturnValue.isErr()
 Sub Test_clsCmReturnValue_isErr_Normal
     Dim o : Set o = new clsCmReturnValue
     o.setValue "abc"
@@ -111,7 +111,7 @@ Sub Test_clsCmReturnValue_isErr_Initial
 End Sub
 
 '###################################################################################################
-'clsCmBroker.setValue()
+'clsCmReturnValue.setValue()
 Sub Test_clsCmReturnValue_setValue_Normal
     Dim o : Set o = new clsCmReturnValue
     Dim d : d = "abc"
@@ -215,7 +215,7 @@ Sub Test_clsCmReturnValue_setValue_Initial
 End Sub
 
 '###################################################################################################
-'clsCmBroker.toString()
+'clsCmReturnValue.toString()
 Sub Test_clsCmReturnValue_toString
     Dim o : Set o = new clsCmReturnValue
 

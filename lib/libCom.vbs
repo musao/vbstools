@@ -305,65 +305,6 @@ Private Function cf_toString( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : cf_tryCatch()
-'Overview                    : 処理の実行とエラー発生時の処理実行
-'Detailed Description        : 他の言語のtry-chatch文に準拠
-'Argument
-'     aoTry                  : 実行する処理（tryブロックの処理）
-'     aoArgs                 : 実行する処理の引数
-'     aoCatch                : エラー発生時の処理（catchブロックの処理）
-'     aoFinary               : エラーの有無に依らず最後に実行する処理（finaryブロックの処理）
-'Return Value
-'     処理結果
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/01         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function cf_tryCatch( _
-    byRef aoTry _
-    , byRef aoArgs _
-    , byRef aoCatch _
-    , byRef aoFinary _
-    )
-    Dim oRet, oErr, boFlg
-    Set oErr = Nothing : boFlg = True
-    
-    'tryブロックの処理
-    On Error Resume Next
-    If cf_isValid(aoArgs) Then
-        cf_bind oRet, aoTry(aoArgs)
-    Else
-        cf_bind oRet, aoTry()
-    End If
-    If Err.Number<>0 Then
-        boFlg = False
-        Set oErr = fw_storeErr()
-    End If
-    On Error GoTo 0
-
-    'catchブロックの処理
-    If Not boFlg And cf_isAvailableObject(aoCatch) Then
-        If IsEmpty(aoArgs) Then
-            cf_bind oRet, aoCatch()
-        Else
-            cf_bind oRet, aoCatch(aoArgs)
-        End If
-    End If
-    
-    'finaryブロックの処理
-    If cf_isAvailableObject(aoFinary) Then
-        cf_bind oRet, aoFinary(oRet)
-    End If
-    
-    '結果を返却
-    Set cf_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
-    Set oRet = Nothing
-    Set oErr = Nothing
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CfToString()
 'Overview                    : 引数の内容を文字列で表示する
 'Detailed Description        : 表示型式は以下のとおり
@@ -532,7 +473,7 @@ Private Sub fw_excuteSub( _
     End If
     
     '関数の実行
-    Dim oRet : Set oRet = cf_tryCatch(GetRef(asSubName), aoArg, Empty, Empty)
+    Dim oRet : Set oRet = fw_tryCatch(GetRef(asSubName), aoArg, Empty, Empty)
     
     '実行後の出版（Publish） 処理
     If cf_isAvailableObject(aoBroker) Then
@@ -546,6 +487,83 @@ Private Sub fw_excuteSub( _
     
     Set oRet = Nothing
 End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_getLogPath()
+'Overview                    : 実行中のスクリプトのログファイルパスを返す
+'Detailed Description        : 実行中のスクリプトがあるフォルダのlogフォルダ以下に
+'                              スクリプトファイル名＋".log"形式のファイル名で作成する
+'                              fw_getPrivatePath()に委譲する
+'Argument
+'     なし
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getLogPath( _
+    )
+    fw_getLogPath = fw_getPrivatePath("log", new_Fso().GetBaseName(WScript.ScriptName) & ".log" )
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_getPrivatePath()
+'Overview                    : 実行中のスクリプトがあるフォルダ以下のフルパスを返す
+'Detailed Description        : 親フォルダ名の指定があればそのフォルダ以下のパスを返す
+'                              親フォルダ名の指定がない場合は実行中のスクリプトがあるフォルダ直下のパスを返す
+'Argument
+'     asParentFolderName     : 親フォルダ名
+'     asFileName             : ファイル名
+'Return Value
+'     フルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getPrivatePath( _
+    byVal asParentFolderName _
+    , byVal asFileName _
+    )
+    '実行中のスクリプトがあるフォルダのパスを取得
+    Dim sParentFolderPath : sParentFolderPath = new_Fso().GetParentFolderName(WScript.ScriptFullName)
+    
+    'ファイルの上位ディレクトリを決める
+    If Len(asParentFolderName)>0 Then
+    '引数で指定したディレクトリ名がある場合
+        sParentFolderPath = new_Fso().BuildPath(sParentFolderPath ,asParentFolderName)
+    End If
+
+    '上位ディレクトリが存在しない場合は作成する
+    fs_createFolder(sParentFolderPath)
+    
+    'パスを返す
+    fw_getPrivatePath = new_Fso().BuildPath(sParentFolderPath, asFileName)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_getTempPath()
+'Overview                    : 一時ファイルのパスを返す
+'Detailed Description        : 実行中のスクリプトがあるフォルダのtmpフォルダ以下に作成する
+'                              fw_getPrivatePath()に委譲する
+'Argument
+'     なし
+'Return Value
+'     ファイルのフルパス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getTempPath( _
+    )
+    fw_getTempPath = fw_getPrivatePath("tmp", new_Fso().GetTempName())
+End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : fw_logger()
@@ -667,80 +685,62 @@ Private Function fw_storeArguments( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : fw_getPrivatePath()
-'Overview                    : 実行中のスクリプトがあるフォルダ以下のフルパスを返す
-'Detailed Description        : 親フォルダ名の指定があればそのフォルダ以下のパスを返す
-'                              親フォルダ名の指定がない場合は実行中のスクリプトがあるフォルダ直下のパスを返す
+'Function/Sub Name           : fw_tryCatch()
+'Overview                    : 処理の実行とエラー発生時の処理実行
+'Detailed Description        : 他の言語のtry-chatch文に準拠
 'Argument
-'     asParentFolderName     : 親フォルダ名
-'     asFileName             : ファイル名
+'     aoTry                  : 実行する処理（tryブロックの処理）
+'     aoArgs                 : 実行する処理の引数
+'     aoCatch                : エラー発生時の処理（catchブロックの処理）
+'     aoFinary               : エラーの有無に依らず最後に実行する処理（finaryブロックの処理）
 'Return Value
-'     フルパス
+'     処理結果
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
+'2023/10/01         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function fw_getPrivatePath( _
-    byVal asParentFolderName _
-    , byVal asFileName _
+Private Function fw_tryCatch( _
+    byRef aoTry _
+    , byRef aoArgs _
+    , byRef aoCatch _
+    , byRef aoFinary _
     )
-    '実行中のスクリプトがあるフォルダのパスを取得
-    Dim sParentFolderPath : sParentFolderPath = new_Fso().GetParentFolderName(WScript.ScriptFullName)
+    Dim oRet, oErr, boFlg
+    Set oErr = Nothing : boFlg = True
     
-    'ファイルの上位ディレクトリを決める
-    If Len(asParentFolderName)>0 Then
-    '引数で指定したディレクトリ名がある場合
-        sParentFolderPath = new_Fso().BuildPath(sParentFolderPath ,asParentFolderName)
+    'tryブロックの処理
+    On Error Resume Next
+    If cf_isValid(aoArgs) Then
+        cf_bind oRet, aoTry(aoArgs)
+    Else
+        cf_bind oRet, aoTry()
     End If
+    If Err.Number<>0 Then
+        boFlg = False
+        Set oErr = fw_storeErr()
+    End If
+    On Error GoTo 0
 
-    '上位ディレクトリが存在しない場合は作成する
-    fs_createFolder(sParentFolderPath)
+    'catchブロックの処理
+    If Not boFlg And cf_isAvailableObject(aoCatch) Then
+        If IsEmpty(aoArgs) Then
+            cf_bind oRet, aoCatch()
+        Else
+            cf_bind oRet, aoCatch(aoArgs)
+        End If
+    End If
     
-    'パスを返す
-    fw_getPrivatePath = new_Fso().BuildPath(sParentFolderPath, asFileName)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : fw_getTempPath()
-'Overview                    : 一時ファイルのパスを返す
-'Detailed Description        : 実行中のスクリプトがあるフォルダのtmpフォルダ以下に作成する
-'                              fw_getPrivatePath()に委譲する
-'Argument
-'     なし
-'Return Value
-'     ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fw_getTempPath( _
-    )
-    fw_getTempPath = fw_getPrivatePath("tmp", new_Fso().GetTempName())
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : fw_getLogPath()
-'Overview                    : 実行中のスクリプトのログファイルパスを返す
-'Detailed Description        : 実行中のスクリプトがあるフォルダのlogフォルダ以下に
-'                              スクリプトファイル名＋".log"形式のファイル名で作成する
-'                              fw_getPrivatePath()に委譲する
-'Argument
-'     なし
-'Return Value
-'     ファイルのフルパス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fw_getLogPath( _
-    )
-    fw_getLogPath = fw_getPrivatePath("log", new_Fso().GetBaseName(WScript.ScriptName) & ".log" )
+    'finaryブロックの処理
+    If cf_isAvailableObject(aoFinary) Then
+        cf_bind oRet, aoFinary(oRet)
+    End If
+    
+    '結果を返却
+    Set fw_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
+    Set oRet = Nothing
+    Set oErr = Nothing
 End Function
 
 '###################################################################################################

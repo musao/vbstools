@@ -149,6 +149,107 @@ Sub subNoArgErr()
 End Sub
 
 '###################################################################################################
+'fw_getLogPath()
+Sub Test_fw_getLogPath
+    Dim a,e
+    e = "^.*\\log\\TestRunner\.log$"
+    a = fw_getLogPath()
+
+    AssertMatchWithMessage e, a, "ret"
+
+'    new_Fso().DeleteFolder(new_Fso().GetParentFolderName(a))
+End Sub
+Sub Test_fw_getLogPath_FolderExists
+'    new_Fso().CreateFolder( _
+'        new_Fso().BuildPath( _
+'            new_Fso().GetParentFolderName( _
+'                new_Fso().GetParentFolderName(WScript.ScriptName) _
+'            ) _
+'            , "log" _
+'        ) _
+'    )
+    
+    Dim a,e
+    e = "^.*\\log\\TestRunner\.log$"
+    a = fw_getLogPath()
+
+    AssertMatchWithMessage e, a, "ret"
+
+    new_Fso().DeleteFolder(new_Fso().GetParentFolderName(a))
+End Sub
+
+'###################################################################################################
+'fw_getPrivatePath()
+Sub Test_fw_getPrivatePath_Parent
+    Dim dpf,dfn
+    dpf="pfolder"
+    dfn="test.txt"
+
+    Dim a,e
+    e = "^.*\\"&dpf&"\\"&dfn&"$"
+    a = fw_getPrivatePath(dpf,dfn)
+
+    AssertMatchWithMessage e, a, "ret"
+
+'    new_Fso().DeleteFolder(new_Fso().GetParentFolderName(a))
+End Sub
+Sub Test_fw_getPrivatePath_ParentFolderExists
+    Dim dpf,dfn
+    dpf="pfolder"
+    dfn="test.txt"
+
+    Dim a,e
+    e = "^.*\\"&dpf&"\\"&dfn&"$"
+    a = fw_getPrivatePath(dpf,dfn)
+
+    AssertMatchWithMessage e, a, "ret"
+
+    new_Fso().DeleteFolder(new_Fso().GetParentFolderName(a))
+End Sub
+Sub Test_fw_getPrivatePath_NoParent
+    Dim dpf,dfn
+    dpf=vbNullString
+    dfn="test.txt"
+
+    Dim a,e
+    e = "^.*\\"&dfn&"$"
+    a = fw_getPrivatePath(dpf,dfn)
+
+    AssertMatchWithMessage e, a, "ret"
+
+End Sub
+
+'###################################################################################################
+'fw_getTempPath()
+Sub Test_fw_getTempPath
+    Dim a,e
+    e = "^.*\\tmp\\[\d\w]{8}\.tmp$"
+    a = fw_getTempPath()
+
+    AssertMatchWithMessage e, a, "ret"
+
+'    new_Fso().DeleteFolder(new_Fso().GetParentFolderName(a))
+End Sub
+Sub Test_fw_getTempPath_FolderExists
+'    new_Fso().CreateFolder( _
+'        new_Fso().BuildPath( _
+'            new_Fso().GetParentFolderName( _
+'                new_Fso().GetParentFolderName(WScript.ScriptName) _
+'            ) _
+'            , "tmp" _
+'        ) _
+'    )
+
+    Dim a,e
+    e = "^.*\\tmp\\[\d\w]{8}\.tmp$"
+    a = fw_getTempPath()
+
+    AssertMatchWithMessage e, a, "ret"
+
+    new_Fso().DeleteFolder(new_Fso().GetParentFolderName(a))
+End Sub
+
+'###################################################################################################
 'fw_logger()
 Sub Test_fw_logger
     Const RE_DATE = "^\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}\.\d{3}$"
@@ -217,6 +318,147 @@ Sub Test_fw_storeArguments
 '    AssertEqualWithMessage 0, a.Item(k).Count, k
 '    k = "Unnamed"
 '    AssertEqualWithMessage 0, Ubound(a.Item(k)), k
+End Sub
+
+'###################################################################################################
+'fw_tryCatch()
+Sub Test_cf_tryCatch_TryOnly_Normal
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Nothing, Empty)
+    
+    AssertEqual 0, Err.Number
+    AssertEqual True, oRet.Item("Result")
+    AssertEqual 1/2, oRet.Item("Return")
+    AssertSame Nothing, oRet.Item("Err")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatch_Normal
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, new_Func("a=>a"), Nothing)
+    
+    AssertEqual 0, Err.Number
+    AssertEqual True, oRet.Item("Result")
+    AssertEqual 1/2, oRet.Item("Return")
+    AssertSame Nothing, oRet.Item("Err")
+End Sub
+Sub Test_cf_tryCatch_TryAndFinary_Normal
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Empty, new_Func("r=>1/2+r"))
+    
+    AssertEqual 0, Err.Number
+    AssertEqual True, oRet.Item("Result")
+    AssertEqual 1/2+1/2, oRet.Item("Return")
+    AssertSame Nothing, oRet.Item("Err")
+End Sub
+Sub Test_cf_tryCatch_TryAndFinary_Normal_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Empty, new_Func("r=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Normal
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, new_Func("a=>a"), new_Func("r=>1/2+r"))
+    
+    AssertEqual 0, Err.Number
+    AssertEqual True, oRet.Item("Result")
+    AssertEqual 1/2+1/2, oRet.Item("Return")
+    AssertSame Nothing, oRet.Item("Err")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Normal_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, new_Func("a=>a"), new_Func("r=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryOnly_Err
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, Empty, Empty)
+    
+    AssertEqual 0, Err.Number
+    AssertEqual False, oRet.Item("Result")
+    AssertEqual Empty, oRet.Item("Return")
+    AssertEqual 11, oRet.Item("Err").Item("Number")
+    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatch_Err
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a"), Empty)
+    
+    AssertEqual 0, Err.Number
+    AssertEqual False, oRet.Item("Result")
+    AssertEqual 0, oRet.Item("Return")
+    AssertEqual 11, oRet.Item("Err").Item("Number")
+    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatch_Err_CatchErr
+    On Error Resume Next
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a(0)"), Empty)
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryAndFinary_Err
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, Nothing, new_Func("r=>2"))
+    
+    AssertEqual 0, Err.Number
+    AssertEqual False, oRet.Item("Result")
+    AssertEqual 2, oRet.Item("Return")
+    AssertEqual 11, oRet.Item("Err").Item("Number")
+    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+End Sub
+Sub Test_cf_tryCatch_TryAndFinary_Err_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, Nothing, new_Func("r=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a"), new_Func("r=>2"))
+    
+    AssertEqual 0, Err.Number
+    AssertEqual False, oRet.Item("Result")
+    AssertEqual 2, oRet.Item("Return")
+    AssertEqual 11, oRet.Item("Err").Item("Number")
+    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err_CatchErr
+    On Error Resume Next
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a(0)"), new_Func("r=>2"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err_FinaryErr
+    On Error Resume Next
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a"), new_Func("r=>r(0)"))
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, oRet
+End Sub
+Sub Test_cf_tryCatch_TryOnly_ArgEmpty
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("()=>1/2"), Empty, Nothing, Empty)
+    
+    AssertEqual 0, Err.Number
+    AssertEqual True, oRet.Item("Result")
+    AssertEqual 1/2, oRet.Item("Return")
+    AssertSame Nothing, oRet.Item("Err")
+End Sub
+Sub Test_cf_tryCatch_TryAndCatch_ArgEmpty
+    Dim oRet : Set oRet = fw_tryCatch(new_Func("=>1/0"), Empty, new_Func("=>1/2"), Nothing)
+    
+    AssertEqual 0, Err.Number
+    AssertEqual False, oRet.Item("Result")
+    AssertEqual 1/2, oRet.Item("Return")
+    AssertEqual 11, oRet.Item("Err").Item("Number")
+    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
 End Sub
 
 '###################################################################################################

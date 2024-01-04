@@ -337,19 +337,19 @@ wscript.quit
 '                                                                                '{"[00000021] Hyper-V Virtual Ethernet Adapter"=>{"v4"=>"192.168.11.52","v6"=>"fe80::ba87:1e93:59ab:28f7"}}
 'inputbox "", "", cf_toString( new_Func("a=>dim x,i:set x=new_dic():for each i in a.keys:if left(a.item(i).item(""v4""), 3)<>""172"" then:x.add i, a.item(i):end if:next:return x")(util_getIpAddress()).Items()(0) )
 
-''Test cf_tryCatch()
+''Test fw_tryCatch()
 'Dim oFuncTry, oArguments, oFuncCatch, oFuncFinary, oReturn
 '
 ''normal
 'Set oFuncTry = new_Func("a=>msgbox(""ok"")")
-'Call cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)           'ok
+'Call fw_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)           'ok
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
 '                                                                               '
 '
 ''normal2
 'Set oFuncTry = new_Func("a=>a(0)+a(1)")
 'oArguments = Array(1,2)
-'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = fw_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",cf_toString(oReturn)                                       '{"Result"=>True,"Return"=>3,"Err"=><Nothing>}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -358,7 +358,7 @@ wscript.quit
 'Set oFuncTry = new_Func("a=>a(0)+a(1)")
 'oArguments = Array(1,2)
 'Set oFuncFinary = new_Func("a=>""anser is ""&a")
-'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = fw_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",cf_toString(oReturn)                                       '{"Result"=>True,"Return"=>"anser is 3","Err"=><Nothing>}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -368,7 +368,7 @@ wscript.quit
 'Set oFuncTry = new_Func("a=>a(0)/a(1)")
 'oFuncFinary = empty
 'oArguments = Array(1,0)
-'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = fw_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",cf_toString(oReturn)                                       '{"Result"=>False,"Return"=><empty>,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -378,7 +378,7 @@ wscript.quit
 'Set oFuncTry = new_Func("a=>a(0)/a(1)")
 'oArguments = Array(1,0)
 'Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
-'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = fw_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",cf_toString(oReturn)                                       '{"Result"=>False,"Return"=>1,"Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}
@@ -389,7 +389,7 @@ wscript.quit
 'oArguments = Array(1,0)
 'Set oFuncCatch = new_Func("(a,e)=>a(0)+a(1)")
 'Set oFuncFinary = new_Func("a=>""anser is ""&a")
-'Set oReturn = cf_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
+'Set oReturn = fw_tryCatch(oFuncTry, oArguments, oFuncCatch, oFuncFinary)
 'inputbox "","",cf_toString(oReturn)                                       '{"Result"=>False,"Return"=>"anser is 1","Err"=>{"Number"=>11,"Description"=>"0 で除算しました。","Source"=>"Microsoft VBScript 実行時エラー"}}
 '                                                                               '
 'inputbox "","",func_CM_ToStringErr()                                           '<Err> {"Number"=>0,"Description"=>"","Source"=>""}

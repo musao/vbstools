@@ -325,7 +325,7 @@ Class clsCompareExcel
         '★ログ出力
         Call sub_CmpExcelPublish("log", 3, sMyName, "Attempt to unprotect Excel file." )
         '文書の保護を解除する
-        Call sub_CmpExcelTryCatchAfterProc(cf_tryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName)
+        Call sub_CmpExcelTryCatchAfterProc(fw_tryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName)
         
         With oWorkBook
             'ワークシートのリネーム情報格納用配列（clsCmArray型）
@@ -342,11 +342,11 @@ Class clsCompareExcel
                     
                     'シート保護の解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to unprotect a sheet.")
-                    Call sub_CmpExcelTryCatchAfterProc(cf_tryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet, empty, empty), sMyName)
+                    Call sub_CmpExcelTryCatchAfterProc(fw_tryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet, empty, empty), sMyName)
                     
                     'オートフィルタの解除
                     Call sub_CmpExcelPublish("log", 3, sMyName, "Try to clear the AutoFilter.")
-                    Call sub_CmpExcelTryCatchAfterProc(cf_tryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty), sMyName)
+                    Call sub_CmpExcelTryCatchAfterProc(fw_tryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty), sMyName)
                     
                     'ワークシート名取得および変更する名称を決める
                     sNewSheetName = func_CmpExcelMakeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
@@ -583,13 +583,13 @@ Class clsCompareExcel
         'オートシェイプの比較
         Dim oAutoshapeA, oAutoshapeB, oRet, sTextA
         For Each oAutoshapeA In aoWorkbookForResults.Worksheets(asSheetNameA).Shapes
-            Set oRet = cf_tryCatch(new_Func("(a)=>a(0).Item(a(1))"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
+            Set oRet = fw_tryCatch(new_Func("(a)=>a(0).Item(a(1))"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
             If oRet.Item("Result") Then
                 Set oAutoshapeB = oRet.Item("Return")
-                Set oRet = cf_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA, Empty, Empty)
+                Set oRet = fw_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA, Empty, Empty)
                 If oRet.Item("Result") Then
                     sTextA = oRet.Item("Return")
-                    Set oRet = cf_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB, Empty, Empty)
+                    Set oRet = fw_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB, Empty, Empty)
                 End If
                 If oRet.Item("Result") Then
                     If cf_isSame(sTextA, oRet.Item("Return")) Then
@@ -644,7 +644,7 @@ Class clsCompareExcel
     'Overview                    : TryCatchでエラー時の処理
     'Detailed Description        : 工事中
     'Argument
-    '     aoRet                  : cf_tryCatch()の戻り値
+    '     aoRet                  : fw_tryCatch()の戻り値
     '     asYourName             : 処理を実行した関数名
     'Return Value
     '     なし

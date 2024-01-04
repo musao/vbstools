@@ -120,8 +120,8 @@ Private Sub sub_GetFileInfoGetParameters( _
     Dim oParam, oRet, oItem
     Set oParam = new_Arr()
     For Each oItem In oArg.Item("Unnamed")
-        Set oRet = cf_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
-        If Not oRet.Item("Result") Then Set oRet = cf_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
+        Set oRet = fw_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
+        If Not oRet.Item("Result") Then Set oRet = fw_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
         If oRet.Item("Result") Then
             oParam.push oRet.Item("Return")
         Else
