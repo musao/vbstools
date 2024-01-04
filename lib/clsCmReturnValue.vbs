@@ -112,30 +112,22 @@ Class clsCmReturnValue
     End Property
 
     '***************************************************************************************************
-    'Function/Sub Name           : setValue()
-    'Overview                    : 戻り値の取得とエラーがあればErrオブジェクトの情報を格納する
+    'Function/Sub Name           : getErr()
+    'Overview                    : エラー情報を返却する
     'Detailed Description        : 工事中
     'Argument
-    '     avRet                  : 戻り値
+    '     なし
     'Return Value
-    '     自身のインスタンス
+    '     エラー情報
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Function setValue( _
-        byRef avRet _
+    Function getErr( _
         )
-        cf_bind PvValue, avRet
-        If Err.Number=0 Then
-            PboIsErr = False
-        Else
-            PboIsErr = True
-            Set PoErr = fw_storeErr()
-        End If
-        Set setValue = Me
+        Set getErr = PoErr
     End Function
 
     '***************************************************************************************************
@@ -158,22 +150,55 @@ Class clsCmReturnValue
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : getErr()
-    'Overview                    : エラー情報を返却する
+    'Function/Sub Name           : setValue()
+    'Overview                    : 戻り値の取得とエラーがあればErrオブジェクトの情報を格納する
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     avRet                  : 戻り値
     'Return Value
-    '     エラー情報
+    '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Function getErr( _
+    Function setValue( _
+        byRef avRet _
         )
-        Set getErr = PoErr
+        cf_bind PvValue, avRet
+        If Err.Number=0 Then
+            PboIsErr = False
+            Set PoErr = Nothing
+        Else
+            PboIsErr = True
+            Set PoErr = fw_storeErr()
+        End If
+        Set setValue = Me
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : toString()
+    'Overview                    : オブジェクトの内容を文字列で表示する
+    'Detailed Description        : cf_toString()準拠
+    'Argument
+    '     なし
+    'Return Value
+    '     文字列に変換したオブジェクトの内容
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/04         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function toString( _
+        )
+        toString = _
+            "<" & TypeName(Me) & ">[" _
+            & "returnValue:" & cf_toString(PvValue) _
+            & ",isErr:" & cf_toString(PboIsErr) _
+            & ",getErr:" & cf_toString(PoErr) _
+            & "]"
     End Function
 
 End Class

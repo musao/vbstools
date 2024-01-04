@@ -37,6 +37,7 @@ Sub sub_import( _
     End With
 End Sub
 'import
+sub_import "clsAdptFile.vbs"
 sub_import "clsCmArray.vbs"
 sub_import "clsCmBroker.vbs"
 sub_import "clsCmBufferedReader.vbs"
@@ -45,6 +46,7 @@ sub_import "clsCmCalendar.vbs"
 sub_import "clsCmCharacterType.vbs"
 sub_import "clsCmCssGenerator.vbs"
 sub_import "clsCmHtmlGenerator.vbs"
+sub_import "clsCmReturnValue.vbs"
 sub_import "libCom.vbs"
 
 'ÉÅÉCÉìä÷êîé¿çs

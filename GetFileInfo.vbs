@@ -40,6 +40,7 @@ sub_import "clsCmCalendar.vbs"
 sub_import "clsCmCharacterType.vbs"
 sub_import "clsCmCssGenerator.vbs"
 sub_import "clsCmHtmlGenerator.vbs"
+sub_import "clsCmReturnValue.vbs"
 sub_import "libCom.vbs"
 
 'ƒƒCƒ“ŠÖ”Às

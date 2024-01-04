@@ -1,4 +1,5 @@
 ' clsCmCalendar.vbs: test.
+' @import ../../lib/clsAdptFile.vbs
 ' @import ../../lib/clsCmArray.vbs
 ' @import ../../lib/clsCmBroker.vbs
 ' @import ../../lib/clsCmBufferedReader.vbs
@@ -7,6 +8,7 @@
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
+' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs
 ' @import ../../lib/libCom.vbs
 

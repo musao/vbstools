@@ -1871,7 +1871,7 @@ Private Function fs_copyFile( _
     byVal asFrom _
     , byVal asTo _
     ) 
-    fs_copyFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "CopyFile")
+    Set fs_copyFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "CopyFile")
 End Function
 
 '***************************************************************************************************
@@ -1894,7 +1894,7 @@ Private Function fs_copyFolder( _
     byVal asFrom _
     , byVal asTo _
     ) 
-    fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
+    Set fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
 End Function
 
 '***************************************************************************************************
@@ -1915,7 +1915,7 @@ End Function
 Private Function fs_createFolder( _
     byVal asPath _
     )
-    fs_createFolder = func_FsGeneralExecutor(True, True, Array(asPath), "CreateFolder")
+    Set fs_createFolder = func_FsGeneralExecutor(True, True, Array(asPath), "CreateFolder")
 End Function
 
 '***************************************************************************************************
@@ -1936,7 +1936,7 @@ End Function
 Private Function fs_deleteFile( _
     byVal asPath _
     )
-    fs_deleteFile = func_FsGeneralExecutor(False, False, Array(asPath), "DeleteFile")
+    Set fs_deleteFile = func_FsGeneralExecutor(False, False, Array(asPath), "DeleteFile")
 End Function
 
 '***************************************************************************************************
@@ -1957,7 +1957,7 @@ End Function
 Private Function fs_deleteFolder( _
     byVal asPath _
     )
-    fs_deleteFolder = func_FsGeneralExecutor(True, False, Array(asPath), "DeleteFolder")
+    Set fs_deleteFolder = func_FsGeneralExecutor(True, False, Array(asPath), "DeleteFolder")
 End Function
 
 '***************************************************************************************************
@@ -1979,8 +1979,8 @@ End Function
 Private Function fs_moveFile( _
     byVal asFrom _
     , byVal asTo _
-    ) 
-    fs_moveFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "MoveFile")
+    )
+    Set fs_moveFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "MoveFile")
 End Function
 
 '***************************************************************************************************
@@ -2003,7 +2003,7 @@ Private Function fs_moveFolder( _
     byVal asFrom _
     , byVal asTo _
     )
-    fs_moveFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "MoveFolder")
+    Set fs_moveFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "MoveFolder")
 End Function
 
 '***************************************************************************************************
@@ -2251,7 +2251,7 @@ Private Function func_FsGeneralExecutor( _
     , byRef asPath _
     , byVal asCmd _
     )
-    func_FsGeneralExecutor=False
+    Set func_FsGeneralExecutor=new_Ret(False)
     With new_Fso()
         If asIsFolder Then
             If .FolderExists(asPath(0))=aboFlg Then Exit Function
@@ -2279,7 +2279,9 @@ Private Function func_FsGeneralExecutor( _
                 Err.Raise 9999, "libCom.vbs:func_FsGeneralExecutor()", "不正な実行コマンド："&asCmd
         End Select
 '        Eval("new_Fso()." & asCmd & "(" & Chr(34) & asPath & Chr(34) & ")")
-        If Err.Number=0 Then func_FsGeneralExecutor=True
+'        If Err.Number=0 Then func_FsGeneralExecutor=True
+        Dim boRet : If Err.Number=0 Then boRet=True Else boRet=False
+        Set func_FsGeneralExecutor = new_Ret(boRet)
         On Error Goto 0
     End With
 End Function
