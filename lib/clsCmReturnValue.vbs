@@ -29,7 +29,7 @@ Class clsCmReturnValue
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        Set PvValue = Nothing
+        PvValue = Empty
         Set PoErr = Nothing
         PboIsErr = Empty
     End Sub

@@ -144,7 +144,7 @@ End Sub
 'new_Ret()
 Sub Test_new_Ret
     Dim e : Set e = new clsCmReturnValue
-    Dim a : Set a = new_Ret(Nothing)
+    Dim a : Set a = new_Ret(Empty)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)

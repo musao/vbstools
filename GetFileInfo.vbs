@@ -121,9 +121,9 @@ Private Sub sub_GetFileInfoGetParameters( _
     Set oParam = new_Arr()
     For Each oItem In oArg.Item("Unnamed")
         Set oRet = fw_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
-        If Not oRet.Item("Result") Then Set oRet = fw_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
-        If oRet.Item("Result") Then
-            oParam.push oRet.Item("Return")
+        If oRet.isErr() Then Set oRet = fw_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
+        If Not oRet.isErr() Then
+            oParam.push oRet.returnValue
         Else
             'ÅöÉçÉOèoóÕ
             sub_GetFileInfoLogger Array(3, "sub_GetFileInfoGetParameters", oItem & "is an invalid argument.")

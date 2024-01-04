@@ -477,9 +477,9 @@ Private Sub fw_excuteSub( _
     
     '実行後の出版（Publish） 処理
     If cf_isAvailableObject(aoBroker) Then
-        If oRet.Item("Result")=False Then
+        If oRet.isErr() Then
         'エラー
-            aoBroker.publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.Item("Err")))
+            aoBroker.publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.getErr()))
         End If
         aoBroker.publish Cs_TOPIC, Array(5, asSubName, "End")
         aoBroker.publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArg))
@@ -707,40 +707,38 @@ Private Function fw_tryCatch( _
     , byRef aoCatch _
     , byRef aoFinary _
     )
-    Dim oRet, oErr, boFlg
-    Set oErr = Nothing : boFlg = True
+    Dim oRet, oRetF, oErr
     
     'tryブロックの処理
     On Error Resume Next
     If cf_isValid(aoArgs) Then
-        cf_bind oRet, aoTry(aoArgs)
+        cf_bind oRetF, aoTry(aoArgs)
     Else
-        cf_bind oRet, aoTry()
+        cf_bind oRetF, aoTry()
     End If
-    If Err.Number<>0 Then
-        boFlg = False
-        Set oErr = fw_storeErr()
-    End If
+    Set oRet = new_Ret(oRetF)
     On Error GoTo 0
 
     'catchブロックの処理
-    If Not boFlg And cf_isAvailableObject(aoCatch) Then
-        If IsEmpty(aoArgs) Then
-            cf_bind oRet, aoCatch()
+    If oRet.isErr() And cf_isAvailableObject(aoCatch) Then
+        If cf_isValid(aoArgs) Then
+            cf_bind oRetF, aoCatch(aoArgs)
         Else
-            cf_bind oRet, aoCatch(aoArgs)
+            cf_bind oRetF, aoCatch()
         End If
+        if IsObject(oRetF) Then Set oRet.returnValue=oRetF Else oRet.returnValue=oRetF
     End If
     
     'finaryブロックの処理
     If cf_isAvailableObject(aoFinary) Then
-        cf_bind oRet, aoFinary(oRet)
+        cf_bind oRetF, aoFinary(oRetF)
+        if IsObject(oRetF) Then Set oRet.returnValue=oRetF Else oRet.returnValue=oRetF
     End If
     
     '結果を返却
-    Set fw_tryCatch = new_DicWith(Array("Result", boFlg, "Return", oRet, "Err", oErr))
+    Set fw_tryCatch = oRet
     Set oRet = Nothing
-    Set oErr = Nothing
+    Set oRetF = Nothing
 End Function
 
 '###################################################################################################

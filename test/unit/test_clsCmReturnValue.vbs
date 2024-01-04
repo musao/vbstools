@@ -18,7 +18,7 @@ Option Explicit
 'clsCmReturnValue
 Sub Test_clsCmReturnValue
     Dim a : Set a = new clsCmReturnValue
-    AssertEqual 9, VarType(a)
+    AssertEqual 0, VarType(a)
     AssertEqual "clsCmReturnValue", TypeName(a)
 End Sub
 
@@ -57,7 +57,7 @@ Sub Test_clsCmReturnValue_returnValue
         Else
             cf_bind e, data(i).Item("Expect")
         End if
-        if IsObject(d) Then Set o.returnValue = d Else o.returnValue=d
+        if IsObject(d) Then Set o.returnValue=d Else o.returnValue=d
         cf_bind a, o.returnValue
 
         If IsObject(e) and IsObject(a) Then
@@ -201,9 +201,9 @@ Sub Test_clsCmReturnValue_setValue_Initial
     Dim o : Set o = new clsCmReturnValue
 
     Dim e,a
-    Set e = Nothing
-    Set a = o.returnValue
-    AssertSameWithMessage e,a,"returnValue"
+    e = Empty
+    a = o.returnValue
+    AssertEqualWithMessage e,a,"returnValue"
 
     e = Empty
     a = o.isErr()
@@ -220,9 +220,9 @@ Sub Test_clsCmReturnValue_toString
     Dim o : Set o = new clsCmReturnValue
 
     Dim e,a
-    e = "<clsCmReturnValue>[returnValue:<Nothing>,isErr:<Empty>,getErr:<Nothing>]"
+    e = "<clsCmReturnValue>[returnValue:<Empty>,isErr:<Empty>,getErr:<Nothing>]"
     a = o.toString()
-    AssertEqualWithMessage e,a,"TypInitial"
+    AssertEqualWithMessage e,a,"Initial"
 
     Dim d : d = "abc"
     o.setValue(d)

@@ -75,10 +75,17 @@ Sub Test_fs_createFolder
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
     assertExistsFolder p, False, "before", "createfolder", "folder"
     
-    Dim a,e
+    Dim ao,e
     e = True
-    a = fs_createFolder(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_createFolder(p)
+    AssertEqualWithMessage e, ao, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = False
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
     assertExistsFolder p, True, "after", "createfolder", "folder"
 End Sub
 Sub Test_fs_createFolder_ErrExistsFile
@@ -92,10 +99,21 @@ Sub Test_fs_createFolder_ErrExistsFile
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "createfolder", "file"
     
-    Dim a,e
+    Dim ao,e
     e = False
-    a = fs_createFolder(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_createFolder(p)
+    AssertEqualWithMessage e, ao, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = True
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
+    e = 58
+    a = ao.getErr().Item("Number")
+    AssertEqualWithMessage e, a, "getErr().Item('Number')"
+
     assertExistsFile p, True, "after", "createfolder", "file"
     assertExistsFolder p, False, "after", "createfolder", "folder"
 End Sub
@@ -108,10 +126,17 @@ Sub Test_fs_createFolder_ErrExistsFolder
     new_Fso().CreateFolder p
     assertExistsFolder p, True, "before", "createfolder", "folder"
     
-    Dim a,e
+    Dim ao,e
     e = False
-    a = fs_createFolder(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_createFolder(p)
+    AssertEqualWithMessage e, ao, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = False
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
     assertExistsFolder p, True, "after", "createfolder", "folder"
 End Sub
 
@@ -126,10 +151,17 @@ Sub Test_fs_deleteFile
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "deleteFile", "file"
 
-    Dim e,a
+    Dim e,ao
     e = True
-    a = fs_deleteFile(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_deleteFile(p)
+    AssertEqualWithMessage e, ao, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = False
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
     assertExistsFile p, False, "after", "deleteFile", "file"
 End Sub
 Sub Test_fs_deleteFile_Err_NotExists
@@ -137,11 +169,17 @@ Sub Test_fs_deleteFile_Err_NotExists
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "deleteFile", "file"
 
-    Dim e,a
+    Dim e,ao
     e = False
-    a = fs_deleteFile(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_deleteFile(p)
+    AssertEqualWithMessage e, ao, "ret"
     AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = False
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
     assertExistsFile p, False, "after", "deleteFile", "file"
 End Sub
 Sub Test_fs_deleteFile_Err_FileLocked
@@ -156,16 +194,25 @@ Sub Test_fs_deleteFile_Err_FileLocked
     'ファイルをロックする
     f = -1    'TristateTrue(Unicode)
     With lockFile(p, f)
-        Dim e,a
+        Dim e,ao
         e = False
-        a = fs_deleteFile(p)
+        Set ao = fs_deleteFile(p)
         
         'fs_deleteFile()がエラーになることを確認する
-        AssertEqualWithMessage e, a, "ret"
+        AssertEqualWithMessage e, ao, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
         .Close
     End With
+
+    Dim a
+    e = True
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
+    e = 70
+    a = ao.getErr().Item("Number")
+    AssertEqualWithMessage e, a, "getErr().Item('Number')"
 
     'ファイルが削除されていないことを確認
     assertExistsFile p, True, "after", "deleteFile", "file"
@@ -185,10 +232,17 @@ Sub Test_fs_deleteFolder
     writeTestFile c,pf,d
     assertExistsFolder p, True, "before", "deleteFolder", "folder"
 
-    Dim e,a
+    Dim e,ao
     e = True
-    a = fs_deleteFolder(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_deleteFolder(p)
+    AssertEqualWithMessage e, ao, "ret"
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = False
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
     assertExistsFolder p, False, "after", "deleteFolder", "folder"
 End Sub
 Sub Test_fs_deleteFolder_Err_NotExists
@@ -196,11 +250,17 @@ Sub Test_fs_deleteFolder_Err_NotExists
     p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
     assertExistsFolder p, False, "before", "deleteFolder", "folder"
 
-    Dim e,a
+    Dim e,ao
     e = False
-    a = fs_deleteFolder(p)
-    AssertEqualWithMessage e, a, "ret"
+    Set ao = fs_deleteFolder(p)
+    AssertEqualWithMessage e, ao, "ret"
     AssertEqualWithMessage 0, Err.Number, "Err.Number"
+
+    Dim a
+    e = False
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
     assertExistsFolder p, False, "after", "deleteFolder", "folder"
 End Sub
 Sub Test_fs_deleteFolder_Err_FileLocked
@@ -218,16 +278,25 @@ Sub Test_fs_deleteFolder_Err_FileLocked
     'ファイルをロックする
     f = -1    'TristateTrue(Unicode)
     With lockFile(pf,f)
-        Dim e,a
+        Dim e,ao
         e = False
-        a = fs_deleteFolder(p)
+        Set ao = fs_deleteFolder(p)
         
         'fs_deleteFolder()がエラーになることを確認する
-        AssertEqualWithMessage e, a, "ret"
+        AssertEqualWithMessage e, ao, "ret"
         AssertEqualWithMessage 0, Err.Number, "Err.Number"
 
         .Close
     End With
+
+    Dim a
+    e = True
+    a = ao.isErr()
+    AssertEqualWithMessage e, a, "isErr()"
+
+    e = 70
+    a = ao.getErr().Item("Number")
+    AssertEqualWithMessage e, a, "getErr().Item('Number')"
 
     'フォルダが削除されていないことを確認
     assertExistsFolder p, True, "after", "deleteFolder", "folder"

@@ -584,15 +584,15 @@ Class clsCompareExcel
         Dim oAutoshapeA, oAutoshapeB, oRet, sTextA
         For Each oAutoshapeA In aoWorkbookForResults.Worksheets(asSheetNameA).Shapes
             Set oRet = fw_tryCatch(new_Func("(a)=>a(0).Item(a(1))"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
-            If oRet.Item("Result") Then
-                Set oAutoshapeB = oRet.Item("Return")
+            If Not oRet.isErr() Then
+                Set oAutoshapeB = oRet.returnValue
                 Set oRet = fw_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA, Empty, Empty)
-                If oRet.Item("Result") Then
-                    sTextA = oRet.Item("Return")
+                If Not oRet.isErr() Then
+                    sTextA = oRet.returnValue
                     Set oRet = fw_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB, Empty, Empty)
                 End If
-                If oRet.Item("Result") Then
-                    If cf_isSame(sTextA, oRet.Item("Return")) Then
+                If Not oRet.isErr() Then
+                    If cf_isSame(sTextA, oRet.returnValue) Then
                     'オートシェイプの名前とテキストが一致する（差異がない）場合は灰色にする
                         sub_CmpExcelSetAutoshapeColor oAutoshapeA
                     End If
@@ -658,7 +658,7 @@ Class clsCompareExcel
         byRef aoRet _
         , byVal asYourName _
         )
-        If aoRet.Item("Result") Then Exit Sub
+        If Not aoRet.isErr() Then Exit Sub
         sub_CmpExcelPublish "log", 3, asYourName, "It couldn't."
         sub_CmpExcelPublish "log", 9, asYourName, "<Err> " & cf_toString(aoRet.Item("Err"))
     End Sub

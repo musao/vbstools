@@ -326,25 +326,22 @@ Sub Test_cf_tryCatch_TryOnly_Normal
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Nothing, Empty)
     
     AssertEqual 0, Err.Number
-    AssertEqual True, oRet.Item("Result")
-    AssertEqual 1/2, oRet.Item("Return")
-    AssertSame Nothing, oRet.Item("Err")
+    AssertEqual False, oRet.isErr()
+    AssertEqual 1/2, oRet
 End Sub
 Sub Test_cf_tryCatch_TryAndCatch_Normal
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, new_Func("a=>a"), Nothing)
     
     AssertEqual 0, Err.Number
-    AssertEqual True, oRet.Item("Result")
-    AssertEqual 1/2, oRet.Item("Return")
-    AssertSame Nothing, oRet.Item("Err")
+    AssertEqual False, oRet.isErr()
+    AssertEqual 1/2, oRet
 End Sub
 Sub Test_cf_tryCatch_TryAndFinary_Normal
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Empty, new_Func("r=>1/2+r"))
     
     AssertEqual 0, Err.Number
-    AssertEqual True, oRet.Item("Result")
-    AssertEqual 1/2+1/2, oRet.Item("Return")
-    AssertSame Nothing, oRet.Item("Err")
+    AssertEqual False, oRet.isErr()
+    AssertEqual 1/2+1/2, oRet
 End Sub
 Sub Test_cf_tryCatch_TryAndFinary_Normal_FinaryErr
     On Error Resume Next
@@ -358,9 +355,8 @@ Sub Test_cf_tryCatch_TryAndCatchAndFinary_Normal
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, new_Func("a=>a"), new_Func("r=>1/2+r"))
     
     AssertEqual 0, Err.Number
-    AssertEqual True, oRet.Item("Result")
-    AssertEqual 1/2+1/2, oRet.Item("Return")
-    AssertSame Nothing, oRet.Item("Err")
+    AssertEqual False, oRet.isErr()
+    AssertEqual 1/2+1/2, oRet
 End Sub
 Sub Test_cf_tryCatch_TryAndCatchAndFinary_Normal_FinaryErr
     On Error Resume Next
@@ -374,21 +370,21 @@ Sub Test_cf_tryCatch_TryOnly_Err
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, Empty, Empty)
     
     AssertEqual 0, Err.Number
-    AssertEqual False, oRet.Item("Result")
-    AssertEqual Empty, oRet.Item("Return")
-    AssertEqual 11, oRet.Item("Err").Item("Number")
-    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
-    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+    AssertEqual True, oRet.isErr()
+    AssertEqual Empty, oRet
+    AssertEqual 11, oRet.getErr().Item("Number")
+    AssertEqual "0 で除算しました。", oRet.getErr().Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.getErr().Item("Source")
 End Sub
 Sub Test_cf_tryCatch_TryAndCatch_Err
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a"), Empty)
     
     AssertEqual 0, Err.Number
-    AssertEqual False, oRet.Item("Result")
-    AssertEqual 0, oRet.Item("Return")
-    AssertEqual 11, oRet.Item("Err").Item("Number")
-    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
-    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+    AssertEqual True, oRet.isErr()
+    AssertEqual 0, oRet
+    AssertEqual 11, oRet.getErr().Item("Number")
+    AssertEqual "0 で除算しました。", oRet.getErr().Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.getErr().Item("Source")
 End Sub
 Sub Test_cf_tryCatch_TryAndCatch_Err_CatchErr
     On Error Resume Next
@@ -402,11 +398,11 @@ Sub Test_cf_tryCatch_TryAndFinary_Err
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, Nothing, new_Func("r=>2"))
     
     AssertEqual 0, Err.Number
-    AssertEqual False, oRet.Item("Result")
-    AssertEqual 2, oRet.Item("Return")
-    AssertEqual 11, oRet.Item("Err").Item("Number")
-    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
-    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+    AssertEqual True, oRet.isErr()
+    AssertEqual 2, oRet
+    AssertEqual 11, oRet.getErr().Item("Number")
+    AssertEqual "0 で除算しました。", oRet.getErr().Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.getErr().Item("Source")
 End Sub
 Sub Test_cf_tryCatch_TryAndFinary_Err_FinaryErr
     On Error Resume Next
@@ -420,11 +416,11 @@ Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 0, new_Func("a=>a"), new_Func("r=>2"))
     
     AssertEqual 0, Err.Number
-    AssertEqual False, oRet.Item("Result")
-    AssertEqual 2, oRet.Item("Return")
-    AssertEqual 11, oRet.Item("Err").Item("Number")
-    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
-    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+    AssertEqual True, oRet.isErr()
+    AssertEqual 2, oRet
+    AssertEqual 11, oRet.getErr().Item("Number")
+    AssertEqual "0 で除算しました。", oRet.getErr().Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.getErr().Item("Source")
 End Sub
 Sub Test_cf_tryCatch_TryAndCatchAndFinary_Err_CatchErr
     On Error Resume Next
@@ -446,19 +442,18 @@ Sub Test_cf_tryCatch_TryOnly_ArgEmpty
     Dim oRet : Set oRet = fw_tryCatch(new_Func("()=>1/2"), Empty, Nothing, Empty)
     
     AssertEqual 0, Err.Number
-    AssertEqual True, oRet.Item("Result")
-    AssertEqual 1/2, oRet.Item("Return")
-    AssertSame Nothing, oRet.Item("Err")
+    AssertEqual False, oRet.isErr()
+    AssertEqual 1/2, oRet
 End Sub
 Sub Test_cf_tryCatch_TryAndCatch_ArgEmpty
     Dim oRet : Set oRet = fw_tryCatch(new_Func("=>1/0"), Empty, new_Func("=>1/2"), Nothing)
     
     AssertEqual 0, Err.Number
-    AssertEqual False, oRet.Item("Result")
-    AssertEqual 1/2, oRet.Item("Return")
-    AssertEqual 11, oRet.Item("Err").Item("Number")
-    AssertEqual "0 で除算しました。", oRet.Item("Err").Item("Description")
-    AssertEqual "Microsoft VBScript 実行時エラー", oRet.Item("Err").Item("Source")
+    AssertEqual True, oRet.isErr()
+    AssertEqual 1/2, oRet
+    AssertEqual 11, oRet.getErr().Item("Number")
+    AssertEqual "0 で除算しました。", oRet.getErr().Item("Description")
+    AssertEqual "Microsoft VBScript 実行時エラー", oRet.getErr().Item("Source")
 End Sub
 
 '###################################################################################################
