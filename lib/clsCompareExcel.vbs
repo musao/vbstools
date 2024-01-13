@@ -129,10 +129,10 @@ Class clsCompareExcel
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Set broker()
-    'Overview                    : 出版-購読型（Publish/Subscribe）クラスのオブジェクトを設定する
+    'Overview                    : ブローカークラスのオブジェクトを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     aoBroker               : 出版-購読型（Publish/Subscribe）クラスのインスタンス
+    '     aoBroker               : ブローカークラスのインスタンス
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -149,12 +149,12 @@ Class clsCompareExcel
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get broker()
-    'Overview                    : 出版-購読型（Publish/Subscribe）クラスのオブジェクトを返す
+    'Overview                    : ブローカークラスのオブジェクトを返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     出版-購読型（Publish/Subscribe）クラスのインスタンス
+    '     ブローカークラスのインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -666,7 +666,7 @@ Class clsCompareExcel
     '***************************************************************************************************
     'Function/Sub Name           : sub_CmpExcelPublish()
     'Overview                    : 出版（Publish）処理
-    'Detailed Description        : 出版-購読型（Publish/subscribe）クラスがあれば出版（Publish）処理する
+    'Detailed Description        : ブローカークラスがあれば出版（Publish）処理する
     'Argument
     '     asTopic                : トピック
     '     alLevel                : レベル

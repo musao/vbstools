@@ -2205,22 +2205,21 @@ Private Function func_FsGetAllFilesByDir( _
     byVal asPath _
     )
     Dim sDir : sDir = "dir /S /B /A-D " & Chr(34) & asPath & Chr(34)
-    Dim sLists
     Dim sTmpPath : sTmpPath = fw_getTempPath()
     new_Shell().run "cmd /U /C " & sDir & " > " & Chr(34) & sTmpPath & Chr(34), 0, True
-    sLists = fs_readFile(sTmpPath)
+    Dim sLists : sLists = fs_readFile(sTmpPath)
     fs_deleteFile sTmpPath
     
-    Dim vRet(), sList
-    For Each sList In Split(sLists, vbNewLine)
-        If Len(Trim(sList))>0 Then
-            If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompare)=0 Then
-            'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
-                cf_pushMulti vRet, func_FsGetAllFilesByShell(sList)
-            Else
-            'zipファイル以外の場合、ファイル情報を取得する
-                cf_push vRet, new_AdptFileOf(sList)
-            End If
+    Dim vArrList : vArrList = Split(sLists, vbNewLine)
+    Redim Preserve vArrList(Ubound(vArrList)-1)
+    Dim sList, vRet()
+    For Each sList In vArrList
+        If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompare)=0 Then
+        'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
+            cf_pushMulti vRet, func_FsGetAllFilesByShell(sList)
+        Else
+        'zipファイル以外の場合、ファイル情報を取得する
+            cf_push vRet, new_AdptFileOf(sList)
         End If
     Next
     func_FsGetAllFilesByDir = vRet
@@ -3030,7 +3029,7 @@ Private Function func_CM_UtilSortMergeMerge( _
             cf_push vRet, avSecond(lPosS)
             lPosS = lPosS + 1
         Else
-            Call cf_push(vRet, avFirst(lPosF))
+            cf_push vRet, avFirst(lPosF)
             lPosF = lPosF + 1
         End If
     Loop

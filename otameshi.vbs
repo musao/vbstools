@@ -23,10 +23,68 @@ Call sub_import("clsCmArray.vbs")
 Call sub_import("clsCmBufferedWriter.vbs")
 Call sub_import("clsCmCalendar.vbs")
 Call sub_import("clsCmBroker.vbs")
+Call sub_import("clsCmReturnValue.vbs")
 Call sub_import("clsCompareExcel.vbs")
+Call sub_import("clsCmSort.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
+dim pvinfo
+
+sub getevent(a)
+    dim temptemp
+    cf_push temptemp, new_Now()
+    cf_pushMulti temptemp, a
+    cf_push pvinfo, temptemp
+end sub
+Dim aaa : Set aaa = new_Sort
+Dim PoBroker : Set PoBroker = new_Broker()
+PoBroker.subscribe "event", GetRef("getevent")
+Set aaa.broker = PoBroker
+
+Dim ofncsot : Set ofncsot = new_Func("(c,n)=>c>n")
+
+Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
+Dim res2
+res2 = aaa.sort(vArray, ofncsot, True)
+
+inputbox "","",cf_toString(res2)
+
+fs_writeFile fw_getTempPath(), cf_toString(pvinfo)
+wscript.quit
+
+
+'Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
+'Dim vArray1,vArray2,res1,res2
+'vArray1 = vArray
+'vArray2 = vArray
+'Dim aaa : Set aaa = new_Sort
+'
+'Dim dtStt,dbTime1,dbTime2,lCntx,ofncsot
+'Set ofncsot = new_Func("(c,n)=>c>n")
+'
+'Set dtStt = new_Now()
+'For lCntx=1 To 1000
+'    vArray1 = vArray
+'    res1 = func_CM_UtilSortBubble(vArray1, ofncsot, True)
+'Next
+'dbTime1 = new_Now().differenceFrom(dtStt)
+'
+'Set dtStt = new_Now()
+'For lCntx=1 To 1000
+'    vArray2 = vArray
+'    res2 = aaa.sort(vArray2, ofncsot, True)
+'Next
+'dbTime2 = new_Now().differenceFrom(dtStt)
+'
+'msgbox cf_isSame( cf_toString(res1), cf_toString(res2))
+'
+'inputbox "","",dbTime1&" " &dbTime2
+'
+'
+'wscript.quit
+'
+'
 
 dim ada
 'ada = eval("new_Fso().FileExists(WScript.ScriptFullName)")

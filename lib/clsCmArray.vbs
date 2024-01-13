@@ -1225,7 +1225,8 @@ Class clsCmArray
         byRef aoFunc _
         , byVal aboOrder _
         )
-        PvArr = func_CM_UtilSortHeap(PvArr, aoFunc, aboOrder)
+'        PvArr = func_CM_UtilSortHeap(PvArr, aoFunc, aboOrder)
+        PvArr = func_CM_UtilSortMerge(PvArr, aoFunc, aboOrder)
         Set func_CmArraySort = Me
     End Function
 
@@ -1321,8 +1322,10 @@ Class clsCmArray
         For Each oEle In PvArr
             If Not oDic.Exists(oEle) Then oDic.Add oEle, Empty
         Next
-        '新しい配列を作成
-        PvArr = oDic.Keys()
+        If oDic.Count<func_CmArrayLength() Then
+        '重複があった場合は新しい配列を作成
+            PvArr = oDic.Keys()
+        End If
         '自身のインスタンスを返す
         Set func_CmArrayUniq = Me
 
@@ -1387,20 +1390,20 @@ Class clsCmArray
     Private Function func_CmArrayCopyArray( _
         aboOrder _
         )
-        Dim lIdx, vArr, vRet(), lStt, lEnd, lStep
-
-        '配列の全ての要素
+        Dim vArr, vRet
         If func_CmArrayLength()>0 Then
-            
             If aboOrder Then
-                lStt = 0 : lEnd = Ubound(PvArr) : lStep = 1
+                vRet=PvArr
             Else
-                lStt = Ubound(PvArr) : lEnd = 0 : lStep = -1
+                Redim vRet(func_CmArrayLength()-1)
+                Dim lIdx, lIdxR : lIdxR = 0
+                For lIdx=Ubound(PvArr) To 0 Step -1
+                    cf_bind vRet(lIdxR), PvArr(lIdx)
+                    lIdxR = lIdxR + 1
+                Next
             End If
-
-            For lIdx=lStt To lEnd Step lStep
-                cf_push vRet, PvArr(lIdx)
-            Next
+        Else
+            vRet=Array()
         End If
 
         func_CmArrayCopyArray = vRet

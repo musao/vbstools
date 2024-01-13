@@ -120,6 +120,30 @@ Sub Test_clsCmArray_items
     AssertEqual TypeName(e), TypeName(a.items)
     AssertEqual a.length-1, Ubound(a.items)
 End Sub
+Sub Test_clsCmArray_items_AllItems
+    Dim e,d,ao,a
+    Set ao = new clsCmArray
+    d = Array(1,"b",Nothing)
+    ao.pushMulti d
+
+    e = d
+    a = ao.items()
+    assertAllElementsArray e, a
+
+    Dim d2 : d2 = d
+    d(1) = "Z"
+    ao(1) = "X"
+    e = d2
+    assertAllElementsArray e, a
+End Sub
+Sub Test_clsCmArray_items_NoData
+    Dim e,ao,a
+    Set ao = new clsCmArray
+
+    e = Array()
+    a = ao.items()
+    assertAllElementsArray e, a
+End Sub
 
 '###################################################################################################
 'clsCmArray.length()
@@ -946,6 +970,17 @@ End Sub
 'common
 Sub assertAllElements(e,a)
     AssertEqual Ubound(e)+1, a.length
+    Dim i
+    For i=0 To Ubound(e)
+        If IsObject(e(i)) Then
+            AssertSame e(i), a(i)
+        Else
+            AssertEqual e(i), a(i)
+        End If
+    Next
+End Sub
+Sub assertAllElementsArray(e,a)
+    AssertEqual Ubound(e), Ubound(a)
     Dim i
     For i=0 To Ubound(e)
         If IsObject(e(i)) Then
