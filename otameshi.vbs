@@ -25,7 +25,6 @@ Call sub_import("clsCmCalendar.vbs")
 Call sub_import("clsCmBroker.vbs")
 Call sub_import("clsCmReturnValue.vbs")
 Call sub_import("clsCompareExcel.vbs")
-Call sub_import("clsCmSort.vbs")
 Call sub_import("libCom.vbs")
 Call sub_import("clsCmCharacterType.vbs")
 
@@ -37,7 +36,7 @@ sub getevent(a)
     cf_pushMulti temptemp, a
     cf_push pvinfo, temptemp
 end sub
-Dim aaa : Set aaa = new_Sort
+Dim aaa : Set aaa = new_Arr()
 Dim PoBroker : Set PoBroker = new_Broker()
 PoBroker.subscribe "event", GetRef("getevent")
 Set aaa.broker = PoBroker
@@ -46,9 +45,10 @@ Dim ofncsot : Set ofncsot = new_Func("(c,n)=>c>n")
 
 Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
 Dim res2
-res2 = aaa.sort(vArray, ofncsot, True)
+aaa.pushMulti vArray
+aaa.sortUsing(ofncsot)
 
-inputbox "","",cf_toString(res2)
+inputbox "","",aaa.toString
 
 fs_writeFile fw_getTempPath(), cf_toString(pvinfo)
 wscript.quit

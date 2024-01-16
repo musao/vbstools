@@ -439,6 +439,7 @@ Private Function func_CfToStringObjectDictionary( _
     End If
 End Function
 
+
 '###################################################################################################
 'フレームワーク系の関数
 '###################################################################################################
@@ -740,6 +741,7 @@ Private Function fw_tryCatch( _
     Set oRet = Nothing
     Set oRetF = Nothing
 End Function
+
 
 '###################################################################################################
 'インスタンス生成関数
@@ -1534,6 +1536,7 @@ Private Function func_NewGenerate( _
     Set func_NewGenerate = Getref(asFuncName)
 End Function
 
+
 '###################################################################################################
 '数学系の関数
 '###################################################################################################
@@ -1767,6 +1770,7 @@ Private Function func_MathLog( _
     func_MathLog = log(adbAntilogarithm)/log(adbBase)
 End Function
 
+
 '###################################################################################################
 'ユーティリティ系の関数
 '###################################################################################################
@@ -1844,6 +1848,7 @@ Private Function util_getIpAddress( _
     Set oAddress = Nothing
     Set oAdapter = Nothing
 End Function
+
 
 '###################################################################################################
 'ファイル操作系
@@ -2442,73 +2447,6 @@ End Function
 
 
 '###################################################################################################
-'ファイル操作系
-'###################################################################################################
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFiles()
-'Overview                    : 指定したフォルダ以下のFilesコレクションを取得する
-'Detailed Description        : FileSystemObjectのFolderオブジェクトのFilesコレクションと同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     Filesコレクション
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/23         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFiles( _
-    byVal asPath _
-    ) 
-    Set func_CM_FsGetFiles = new_Fso().GetFolder(asPath).Files
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsGetFolders()
-'Overview                    : 指定したフォルダ以下のFoldersコレクションを取得する
-'Detailed Description        : FileSystemObjectのFolderオブジェクトのSubFoldersコレクションと同等
-'Argument
-'     asPath                 : パス
-'Return Value
-'     Foldersコレクション
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2022/10/23         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsGetFolders( _
-    byVal asPath _
-    ) 
-    Set func_CM_FsGetFolders = new_Fso().GetFolder(asPath).SubFolders
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_FsIsSame()
-'Overview                    : 指定したパスが同じファイル/フォルダか検査する
-'Detailed Description        : 工事中
-'Argument
-'     asPathA                : ファイル/フォルダのフルパス
-'     asPathB                : ファイル/フォルダのフルパス
-'Return Value
-'     結果 True:同一 / False:同一でない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/19         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FsIsSame( _
-    byVal asPathA _
-    , byVal asPathB _
-    )
-    func_CM_FsIsSame = (func_CM_FsGetFsObject(asPathA) Is func_CM_FsGetFsObject(asPathB))
-End Function
-
-
-'###################################################################################################
 '文字列操作系
 '###################################################################################################
 
@@ -2644,6 +2582,7 @@ Private Function func_CM_StrLen( _
     func_CM_StrLen = lLength
 End Function
 
+
 '###################################################################################################
 '配列系
 '###################################################################################################
@@ -2676,63 +2615,6 @@ Private Function func_CM_ArrayGetDimensionNumber( _
    Err.Clear
    func_CM_ArrayGetDimensionNumber = lNum - 1
 End Function
-
-'###################################################################################################
-'チェック系
-'###################################################################################################
-
-''***************************************************************************************************
-''Function/Sub Name           : func_CM_ValidationlIsWithinTheRangeOf()
-''Overview                    : 数値型の範囲内にあるか検査する
-''Detailed Description        : 工事中
-''Argument
-''     avNumber               : 数値
-''     alType                 : 変数の型
-''                                1:整数型（Integer）
-''                                2:長整数型（Long）
-''                                3:バイト型（Byte）
-''                                4:単精度浮動小数点型（Single）
-''                                5:倍精度浮動小数点型（Double）
-''                                6:通貨型（Currency）
-''Return Value
-''     整形した浮動小数点型
-''---------------------------------------------------------------------------------------------------
-''Histroy
-''Date               Name                     Reason for Changes
-''----------         ----------------------   -------------------------------------------------------
-''2023/08/26         Y.Fujii                  First edition
-''***************************************************************************************************
-'Private Function func_CM_ValidationlIsWithinTheRangeOf( _
-'    byVal avNumber _
-'    , byVal alType _
-'    )
-'    Dim vMin,vMax
-'    Select Case alType
-'        Case 1:                   '整数型（Integer）
-'            vMin = -1 * 2^15
-'            vMax = 2^15 - 1
-'        Case 2:                   '長整数型（Long）
-'            vMin = -1 * 2^31
-'            vMax = 2^31 - 1
-'        Case 3:                   'バイト型（Byte）
-'            vMin = 0
-'            vMax = 2^8 - 1
-'        Case 4:                   '単精度浮動小数点型（Single）
-'            vMin = -3.402823E38
-'            vMax = 3.402823E38
-'        Case 5:                   '倍精度浮動小数点型（Double）
-'            vMin = -1.79769313486231E308
-'            vMax = 1.79769313486231E308
-'        Case 6:                   '通貨型（Currency）
-'            vMin = -1 * 2^59 / 1000
-'            vMax = ( 2^59 - 1 ) / 1000
-'    End Select
-'    
-'    func_CM_ValidationlIsWithinTheRangeOf = False
-'    If vMin<=avNumber And avNumber<=vMax Then
-'        func_CM_ValidationlIsWithinTheRangeOf = True
-'    End If
-'End Function
 
 
 '###################################################################################################
@@ -2831,337 +2713,10 @@ Private Function func_CM_FormatDecimalNumber( _
                                                           )
 End Function
 
+
 '###################################################################################################
 'ユーティリティ系
 '###################################################################################################
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilSortBubble()
-'Overview                    : バブルソート
-'Detailed Description        : 計算回数はO(N^2)
-'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
-'                              引数の関数の引数は以下のとおり
-'                                currentValue :配列の要素
-'                                nextValue    :次の配列の要素
-'Argument
-'     avArr                  : 配列
-'     aoFunc                 : 関数
-'     aboFlg                 : 判定方法
-'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
-'                                False :降順（関数の結果がFalseの場合に入れ替える）
-'Return Value
-'     ソート後の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilSortBubble( _
-    byRef avArr _
-    , byRef aoFunc _
-    , byVal aboFlg _
-    )
-    func_CM_UtilSortBubble = avArr
-    If Not new_Arr().hasElement(avArr) Then Exit Function
-    If Ubound(avArr)=0 Then Exit Function
-    
-    Dim lEnd, lPos
-    lEnd = Ubound(avArr)
-    Do While lEnd>0
-        For lPos=0 To lEnd-1
-            If aoFunc(avArr(lPos), avArr(lPos+1))=aboFlg Then
-            'lPos番目の要素と(lPos+1)番目の要素を入れ替える
-                cf_swap avArr(lPos), avArr(lPos+1)
-            End If
-        Next
-        lEnd = lEnd-1
-    Loop
-    func_CM_UtilSortBubble = avArr
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilSortQuick()
-'Overview                    : クイックソート
-'Detailed Description        : 計算回数は平均O(N*logN)、最悪はO(N^2)
-'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
-'                              引数の関数の引数は以下のとおり
-'                                currentValue :配列の要素
-'                                nextValue    :次の配列の要素
-'Argument
-'     avArr                  : 配列
-'     aoFunc                 : 関数
-'     aboFlg                 : 判定方法
-'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
-'                                False :降順（関数の結果がFalseの場合に入れ替える）
-'Return Value
-'     ソート後の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilSortQuick( _
-    byRef avArr _
-    , byRef aoFunc _
-    , byVal aboFlg _
-    )
-    func_CM_UtilSortQuick = avArr
-    If Not new_Arr().hasElement(avArr) Then Exit Function
-    If Ubound(avArr)=0 Then Exit Function
-    
-    '0番目の要素をピボットに決める
-    Dim oPivot : Call cf_bind(oPivot, avArr(0))
-    
-    'ピボットと要素を関数で判定し判定方法に合致するグループをRight、そうでないグループをLeftとする
-    Dim lPos, vRight, vLeft
-    For lPos=1 To Ubound(avArr)
-        If aoFunc(avArr(lPos), oPivot)=aboFlg Then
-            cf_push vRight, avArr(lPos)
-        Else
-            cf_push vLeft, avArr(lPos)
-        End If
-    Next
-    
-    '上述で分けたRight、Leftのグループごとに再帰処理する
-    vLeft = func_CM_UtilSortQuick(vLeft, aoFunc, aboFlg)
-    vRight = func_CM_UtilSortQuick(vRight, aoFunc, aboFlg)
-    
-    'Leftにピボット＋Rightを結合する
-    cf_push vLeft, oPivot
-    If new_Arr().hasElement(vRight) Then
-        For lPos=0 To Ubound(vRight)
-            cf_push vLeft, vRight(lPos)
-        Next
-    End If
-    
-    func_CM_UtilSortQuick = vLeft
-    Set oPivot = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilSortMerge()
-'Overview                    : マージソート
-'Detailed Description        : 計算回数はO(N*logN)
-'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
-'                              マージ処理はfunc_CM_UtilSortMergeMerge()に委譲する
-'Argument
-'     avArr                  : 配列
-'     aoFunc                 : 関数
-'     aboFlg                 : 判定方法
-'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
-'                                False :降順（関数の結果がFalseの場合に入れ替える）
-'Return Value
-'     ソート後の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilSortMerge( _
-    byRef avArr _
-    , byRef aoFunc _
-    , byVal aboFlg _
-    )
-    func_CM_UtilSortMerge = avArr
-    If Not new_Arr().hasElement(avArr) Then Exit Function
-    If Ubound(avArr)=0 Then Exit Function
-    
-    '2つの配列に分解する
-    Dim lLength, lMedian
-    lLength = Ubound(avArr) - Lbound(avArr) + 1
-    lMedian = math_roundUp(lLength/2, 0)
-    Dim lPos, vFirst, vSecond
-    For lPos=Lbound(avArr) To lMedian-1
-        cf_push vFirst, avArr(lPos)
-    Next
-    For lPos=lMedian To Ubound(avArr)
-        cf_push vSecond, avArr(lPos)
-    Next
-    
-    '再帰処理で配列の要素が1つになるまで分解する
-    vFirst = func_CM_UtilSortMerge(vFirst, aoFunc, aboFlg)
-    vSecond = func_CM_UtilSortMerge(vSecond, aoFunc, aboFlg)
-    
-    'マージをしながら上位に戻す
-    func_CM_UtilSortMerge = func_CM_UtilSortMergeMerge(vFirst, vSecond, aoFunc, aboFlg)
-    
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilSortMergeMerge()
-'Overview                    : マージソートのマージ処理
-'Detailed Description        : func_CM_UtilSortMerge()から呼び出す
-'                              引数の関数の引数は以下のとおり
-'                                currentValue :配列の要素
-'                                nextValue    :次の配列の要素
-'Argument
-'     avFirst                : マージするソート済みの配列
-'     avSecond               : マージするソート済みの配列
-'     aoFunc                 : 関数
-'     aboFlg                 : 判定方法
-'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
-'                                False :降順（関数の結果がFalseの場合に入れ替える）
-'Return Value
-'     マージ済の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilSortMergeMerge( _
-    byRef avFirst _
-    , byRef avSecond _
-    , byRef aoFunc _
-    , byVal aboFlg _
-    )
-    Dim lPosF, lPosS, lEndF, lEndS
-    lPosF = Lbound(avFirst) : lPosS = Lbound(avSecond)
-    lEndF = Ubound(avFirst) : lEndS = Ubound(avSecond)
-    
-    '双方の配列の先頭の要素同士を関数で判定して戻り値の配列に追加する
-    Dim vRet
-    Do While lPosF<=lEndF And lPosS<=lEndS
-        If aoFunc(avFirst(lPosF), avSecond(lPosS))=aboFlg Then
-            cf_push vRet, avSecond(lPosS)
-            lPosS = lPosS + 1
-        Else
-            cf_push vRet, avFirst(lPosF)
-            lPosF = lPosF + 1
-        End If
-    Loop
-    
-    'それぞれ残っている方の配列の要素を追加する
-    Dim lPos
-    If lPosF<=lEndF Then
-        For lPos=lPosF To lEndF
-            cf_push vRet, avFirst(lPos)
-        Next
-    End If
-    If lPosS<=lEndS Then
-        For lPos=lPosS To lEndS
-            cf_push vRet, avSecond(lPos)
-        Next
-    End If
-    
-    'マージ済の配列を返す
-    func_CM_UtilSortMergeMerge = vRet
-    
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilSortHeap()
-'Overview                    : ヒープソート
-'Detailed Description        : 計算回数はO(N*logN)
-'                              配列（avArr）が無効な配列の場合は配列（avArr）をそのまま返す
-'Argument
-'     avArr                  : 配列
-'     aoFunc                 : 関数
-'     aboFlg                 : 判定方法
-'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
-'                                False :降順（関数の結果がFalseの場合に入れ替える）
-'Return Value
-'     ソート後の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/21         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilSortHeap( _
-    byRef avArr _
-    , byRef aoFunc _
-    , byVal aboFlg _
-    )
-    func_CM_UtilSortHeap = avArr
-    If Not new_Arr().hasElement(avArr) Then Exit Function
-    If Ubound(avArr)=0 Then Exit Function
-    
-    'ヒープの作成
-    Dim lLb, lUb, lSize, lParent
-    lLb = Lbound(avArr) : lUb = Ubound(avArr)
-    lSize = lUb - lLb + 1
-    '子を持つ最下部のノードから上位に向けて順番にノード単位の処理を行う
-    For lParent=lSize\2-1 To lLb Step -1
-        sub_CM_UtilSortHeapPerNodeProc avArr, lSize, lParent, aoFunc, aboFlg
-    Next
-    
-    'ヒープの先頭（最大/最小値）を順番に取り出す
-    Do While lSize>0
-        'ヒープの先頭と末尾を入れ替える
-        cf_swap avArr(lLb), avArr(lSize-1)
-        'ヒープサイズを１つ減らして再作成
-        lSize = lSize - 1
-        sub_CM_UtilSortHeapPerNodeProc avArr, lSize, 0, aoFunc, aboFlg
-    Loop
-    
-    'ソート済の配列を返す
-    func_CM_UtilSortHeap = avArr
-    
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilSortHeapPerNodeProc()
-'Overview                    : ヒープソートのノード単位の処理
-'Detailed Description        : func_CM_UtilSortHeap()から呼び出す
-'                              引数の関数の引数は以下のとおり
-'                                currentValue :配列の要素
-'                                nextValue    :次の配列の要素
-'Argument
-'     avArr                  : 配列
-'     alSize                 : ヒープのサイズ
-'     alParent               : ノードの親の配列番号
-'     aoFunc                 : 関数
-'     aboFlg                 : 判定方法
-'                                True  :昇順（関数の結果がTrueの場合に入れ替える）
-'                                False :降順（関数の結果がFalseの場合に入れ替える）
-'Return Value
-'     ソート後の配列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/21         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub sub_CM_UtilSortHeapPerNodeProc( _
-    byRef avArr _
-    , byVal alSize _
-    , byVal alParent _
-    , byRef aoFunc _
-    , byVal aboFlg _
-    )
-    Dim lRight, lLeft, lToSwap
-    lLeft = alParent*2 + 1
-    lRight = lLeft + 1
-    lToSwap = alParent
-    
-    If lRight<alSize Then
-    '右側の子がある場合
-        If aoFunc(avArr(lRight), avArr(alParent))=aboFlg Then
-        '親と右側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
-            lToSwap = lRight
-        End If
-    End If
-    
-    If lLeft<alSize Then
-    '左側の子がある場合
-        If aoFunc(avArr(lLeft), avArr(lToSwap))=aboFlg Then
-        '親と右側の子の勝者と左側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
-            lToSwap = lLeft
-        End If
-    End If
-    
-    If lToSwap<>alParent Then
-        '親と子の要素を入れ替える
-        cf_swap avArr(alParent), avArr(lToSwap)
-        '入れ替えた子の要素以下のノードを再処理する
-        sub_CM_UtilSortHeapPerNodeProc avArr, alSize, lToSwap, aoFunc, aboFlg
-    End If
-    
-End Sub
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilSortDefaultFunc()

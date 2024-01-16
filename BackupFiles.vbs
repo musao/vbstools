@@ -246,11 +246,13 @@ Private Sub sub_BackupFileProcForFolder( _
     )
     
     Dim oItem
-    For Each oItem In func_CM_FsGetFolders(asPath)
+    For Each oItem In new_Fso().GetFolder(asPath).SubFolders
+'    For Each oItem In func_CM_FsGetFolders(asPath)
     'フォルダ内のサブフォルダの処理
         Call sub_BackupFileProcForFolder(aoParams, oItem.Path)
     Next
-    For Each oItem In func_CM_FsGetFiles(asPath)
+    For Each oItem In new_Fso().GetFolder(asPath).Files
+'    For Each oItem In func_CM_FsGetFiles(asPath)
     'フォルダ内のファイルの処理
         Call sub_BackupFileProcForOneFile(aoParams, oItem.Path)
     Next
@@ -397,7 +399,8 @@ Private Sub sub_BackupFileFindPreviousFile( _
         Dim sDate : sDate = "00010101"
         Dim lSeq : lSeq = 1
         Dim oItem : Dim sItemName : Dim sDateToComp : Dim sSeqToComp
-        For Each oItem In func_CM_FsGetFiles(sTargetFolder)
+        For Each oItem In new_Fso().GetFolder(sTargetFolder).Files
+'        For Each oItem In func_CM_FsGetFiles(sTargetFolder)
             sItemName = oItem.Name
             If .Test(sItemName) Then
             'バックアップ履歴の場合

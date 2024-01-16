@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class clsCmArray
     'クラス内変数、定数
-    Private PvArr
+    Private PvArr,PoBroker,PlCnt
 
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -27,6 +27,8 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
+        Set PoBroker = Nothing
+        PlCnt = 0
     End Sub
 
     '***************************************************************************************************
@@ -44,7 +46,46 @@ Class clsCmArray
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
+        Set PoBroker = Nothing
     End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Set broker()
+    'Overview                    : ブローカークラスのオブジェクトを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoBroker               : ブローカークラスのインスタンス
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/06         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Set broker( _
+        byRef aoBroker _
+        )
+        Set PoBroker = aoBroker
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get broker()
+    'Overview                    : ブローカークラスのオブジェクトを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     ブローカークラスのインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/06         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get broker()
+        Set broker = PoBroker
+    End Property
 
     '***************************************************************************************************
     'Function/Sub Name           : Property Get count()
@@ -740,26 +781,33 @@ Class clsCmArray
 
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmArrayItem()
-    'Overview                    : 配列の指定したインデックスの要素を返す
-    'Detailed Description        : 工事中
+    'Function/Sub Name           : func_CmArrayComparison()
+    'Overview                    : 比較処理
+    'Detailed Description        : 必要に応じて統計情報を取得する
     'Argument
-    '     alIdx                  : インデックス
+    '     avEleA                 : 比較する要素A
+    '     avEleB                 : 比較する要素B
     'Return Value
-    '     指定したインデックスの要素
+    '     比較結果
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/09/08         Y.Fujii                  First edition
+    '2024/01/06         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmArrayItem( _
-        byVal alIdx _
+    Private Function func_CmArrayComparison( _
+        byRef aoFunc _
+        , byRef avEleA _
+        , byRef avEleB _
         )
-        If func_CmArrayInspectIndex(alIdx) Then
-            cf_bind func_CmArrayItem, PvArr(alIdx)
+        If PoBroker Is Nothing Then
+            cf_bind func_CmArrayComparison, aoFunc(avEleA, avEleB)
         Else
-            Err.Raise 9, "clsCmArray.vbs:clsCmArray-func_CmArrayItem()", "インデックスが有効範囲にありません。"
+            Dim lCnt : lCnt = func_CmArrayGetCount()
+            sub_CmArrayPublish "event", Array("Comparison", lCnt, "0Start", avEleA, avEleB)
+            Dim vRet : cf_bind vRet, aoFunc(avEleA, avEleB)
+            cf_bind func_CmArrayComparison, vRet
+            sub_CmArrayPublish "event", Array("Comparison", lCnt, "1End", vRet)
         End If
     End Function
 
@@ -929,6 +977,25 @@ Class clsCmArray
     End Sub
 
     '***************************************************************************************************
+    'Function/Sub Name           : func_CmArrayGetCount()
+    'Overview                    : 連番取得
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     連番
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/06         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArrayGetCount( _
+        )
+        PlCnt = PlCnt + 1 : func_CmArrayGetCount = PlCnt
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : func_CmArrayHasElement()
     'Overview                    : 配列が要素を含むか検査する
     'Detailed Description        : 初期状態の配列はFalseを返す
@@ -1006,6 +1073,30 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
+    'Function/Sub Name           : func_CmArrayItem()
+    'Overview                    : 配列の指定したインデックスの要素を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     alIdx                  : インデックス
+    'Return Value
+    '     指定したインデックスの要素
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/08         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArrayItem( _
+        byVal alIdx _
+        )
+        If func_CmArrayInspectIndex(alIdx) Then
+            cf_bind func_CmArrayItem, PvArr(alIdx)
+        Else
+            Err.Raise 9, "clsCmArray.vbs:clsCmArray-func_CmArrayItem()", "インデックスが有効範囲にありません。"
+        End If
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : func_CmArrayMap()
     'Overview                    : 配列から引数の関数で生成した配列を返す
     'Detailed Description        : 引数の関数の引数は以下のとおり
@@ -1043,6 +1134,28 @@ Class clsCmArray
             Set func_CmArrayMap = new_Arr()
         End If
     End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmArrayPublish()
+    'Overview                    : 出版（Publish）処理
+    'Detailed Description        : 工事中
+    'Argument
+    '     asTopic                : トピック
+    '     asCont                 : 内容
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/06         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmArrayPublish( _
+        byVal asTopic _
+        , byRef avCont _
+        )
+        PoBroker.Publish asTopic, avCont
+    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : func_CmArrayPop()
@@ -1244,10 +1357,378 @@ Class clsCmArray
         byRef aoFunc _
         , byVal aboOrder _
         )
-'        PvArr = func_CM_UtilSortHeap(PvArr, aoFunc, aboOrder)
-        PvArr = func_CM_UtilSortMerge(PvArr, aoFunc, aboOrder)
+'        sub_CmArraySortBubble aoFunc, aboOrder
+'        sub_CmArraySortQuick aoFunc, aboOrder
+        sub_CmArraySortMerge aoFunc, aboOrder
+'        sub_CmArraySortHeap aoFunc, aboOrder
+        
         Set func_CmArraySort = Me
     End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmArraySortBubble()
+    'Overview                    : バブルソート
+    'Detailed Description        : 計算回数はO(N^2)
+    '                              配列の要素がないまたは1つの場合は何もしない
+    'Argument
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/06         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmArraySortBubble( _
+        byRef aoFunc _
+        , byVal aboFlg _
+        )
+        If func_CmArrayLength()<2 Then Exit Sub
+        Dim vArr : vArr = PvArr
+        
+        Dim lEnd, lPos
+        lEnd = Ubound(vArr)
+        Do While lEnd>0
+            For lPos=0 To lEnd-1
+                If func_CmArrayComparison(aoFunc, vArr(lPos), vArr(lPos+1))=aboFlg Then
+                'lPos番目の要素と(lPos+1)番目の要素を入れ替える
+                    cf_swap vArr(lPos), vArr(lPos+1)
+                End If
+            Next
+            lEnd = lEnd-1
+        Loop
+        PvArr = vArr
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmArraySortQuick()
+    'Overview                    : クイックソート
+    'Detailed Description        : 計算回数は平均O(N*logN)、最悪はO(N^2)
+    '                              配列の要素がないまたは1つの場合は何もしない
+    '                              引数の関数の引数は以下のとおり
+    '                                currentValue :配列の要素
+    '                                nextValue    :次の配列の要素
+    'Argument
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/18         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmArraySortQuick( _
+        byRef aoFunc _
+        , byVal aboFlg _
+        )
+        If func_CmArrayLength()<2 Then Exit Sub
+        PvArr = func_CmArraySortQuick(PvArr, aoFunc, aboFlg)
+    End Sub
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArraySortQuick()
+    'Overview                    : クイックソートの再帰処理
+    'Detailed Description        : sub_CmArraySortQuick()参照
+    'Argument
+    '     avArr                  : 配列
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     ソート後の配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/18         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArraySortQuick( _
+        byRef avArr _
+        , byRef aoFunc _
+        , byVal aboFlg _
+        )
+        func_CmArraySortQuick = avArr
+        If Not func_CmArrayHasElement(avArr) Then Exit Function
+        If Ubound(avArr)=0 Then Exit Function
+        
+        '0番目の要素をピボットに決める
+        Dim oPivot : cf_bind oPivot, avArr(0)
+        
+        'ピボットと要素を関数で判定し判定方法に合致するグループをRight、そうでないグループをLeftとする
+        Dim lPos, vRight, vLeft
+        For lPos=1 To Ubound(avArr)
+            If func_CmArrayComparison(aoFunc, avArr(lPos), oPivot)=aboFlg Then
+                cf_push vRight, avArr(lPos)
+            Else
+                cf_push vLeft, avArr(lPos)
+            End If
+        Next
+        
+        '上述で分けたRight、Leftのグループごとに再帰処理する
+        vLeft = func_CmArraySortQuick(vLeft, aoFunc, aboFlg)
+        vRight = func_CmArraySortQuick(vRight, aoFunc, aboFlg)
+        
+        'Leftにピボット＋Rightを結合する
+        cf_push vLeft, oPivot
+        If func_CmArrayHasElement(vRight) Then cf_pushMulti vLeft, vRight
+        
+        func_CmArraySortQuick = vLeft
+        Set oPivot = Nothing
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmArraySortMerge()
+    'Overview                    : マージソート
+    'Detailed Description        : 計算回数はO(N*logN)
+    '                              配列の要素がないまたは1つの場合は何もしない
+    '                              引数の関数の引数は以下のとおり
+    '                                currentValue :配列の要素
+    '                                nextValue    :次の配列の要素
+    'Argument
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/18         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmArraySortMerge( _
+        byRef aoFunc _
+        , byVal aboFlg _
+        )
+        If func_CmArrayLength()<2 Then Exit Sub
+        PvArr = func_CmArraySortMerge(PvArr, aoFunc, aboFlg)
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArraySortMerge()
+    'Overview                    : マージソートの再帰処理
+    'Detailed Description        : sub_CmArraySortMerge()参照
+    '                              マージ処理はfunc_CmArraySortMergeMerge()に委譲する
+    'Argument
+    '     avArr                  : 配列
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     ソート後の配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/18         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArraySortMerge( _
+        byRef avArr _
+        , byRef aoFunc _
+        , byVal aboFlg _
+        )
+        func_CmArraySortMerge = avArr
+        If Not func_CmArrayHasElement(avArr) Then Exit Function
+        If Ubound(avArr)=0 Then Exit Function
+        
+        '2つの配列に分解する
+        Dim lLength, lMedian
+        lLength = Ubound(avArr) - Lbound(avArr) + 1
+        lMedian = math_roundUp(lLength/2, 0)
+        Dim lPos, vFirst, vSecond
+        For lPos=Lbound(avArr) To lMedian-1
+            cf_push vFirst, avArr(lPos)
+        Next
+        For lPos=lMedian To Ubound(avArr)
+            cf_push vSecond, avArr(lPos)
+        Next
+        
+        '再帰処理で配列の要素が1つになるまで分解する
+        vFirst = func_CmArraySortMerge(vFirst, aoFunc, aboFlg)
+        vSecond = func_CmArraySortMerge(vSecond, aoFunc, aboFlg)
+        
+        'マージをしながら上位に戻す
+        func_CmArraySortMerge = func_CmArraySortMergeMerge(vFirst, vSecond, aoFunc, aboFlg)
+        
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmArraySortMergeMerge()
+    'Overview                    : マージソートのマージ処理
+    'Detailed Description        : func_CmArraySortMerge()から呼び出す
+    '                              引数の関数の引数は以下のとおり
+    '                                currentValue :配列の要素
+    '                                nextValue    :次の配列の要素
+    'Argument
+    '     avFirst                : マージするソート済みの配列
+    '     avSecond               : マージするソート済みの配列
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     マージ済の配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/18         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmArraySortMergeMerge( _
+        byRef avFirst _
+        , byRef avSecond _
+        , byRef aoFunc _
+        , byVal aboFlg _
+        )
+        Dim lPosF, lPosS, lEndF, lEndS
+        lPosF = Lbound(avFirst) : lPosS = Lbound(avSecond)
+        lEndF = Ubound(avFirst) : lEndS = Ubound(avSecond)
+        
+        '双方の配列の先頭の要素同士を関数で判定して戻り値の配列に追加する
+        Dim vRet
+        Do While lPosF<=lEndF And lPosS<=lEndS
+            If func_CmArrayComparison(aoFunc, avFirst(lPosF), avSecond(lPosS))=aboFlg Then
+                cf_push vRet, avSecond(lPosS)
+                lPosS = lPosS + 1
+            Else
+                cf_push vRet, avFirst(lPosF)
+                lPosF = lPosF + 1
+            End If
+        Loop
+        
+        'それぞれ残っている方の配列の要素を追加する
+        Dim lPos
+        If lPosF<=lEndF Then
+            For lPos=lPosF To lEndF
+                cf_push vRet, avFirst(lPos)
+            Next
+        End If
+        If lPosS<=lEndS Then
+            For lPos=lPosS To lEndS
+                cf_push vRet, avSecond(lPos)
+            Next
+        End If
+        
+        'マージ済の配列を返す
+        func_CmArraySortMergeMerge = vRet
+        
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmArraySortHeap()
+    'Overview                    : ヒープソート
+    'Detailed Description        : 計算回数はO(N*logN)
+    '                              配列の要素がないまたは1つの場合は何もしない
+    'Argument
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     ソート後の配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/21         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmArraySortHeap( _
+        byRef aoFunc _
+        , byVal aboFlg _
+        )
+        If func_CmArrayLength()<2 Then Exit Sub
+        Dim vArr : vArr = PvArr
+        
+        'ヒープの作成
+        Dim lLb, lUb, lSize, lParent
+        lLb = Lbound(vArr) : lUb = Ubound(vArr)
+        lSize = lUb - lLb + 1
+        '子を持つ最下部のノードから上位に向けて順番にノード単位の処理を行う
+        For lParent=lSize\2-1 To lLb Step -1
+            sub_CmArraySortHeapPerNodeProc vArr, lSize, lParent, aoFunc, aboFlg
+        Next
+        
+        'ヒープの先頭（最大/最小値）を順番に取り出す
+        Do While lSize>0
+            'ヒープの先頭と末尾を入れ替える
+            cf_swap vArr(lLb), vArr(lSize-1)
+            'ヒープサイズを１つ減らして再作成
+            lSize = lSize - 1
+            sub_CmArraySortHeapPerNodeProc vArr, lSize, 0, aoFunc, aboFlg
+        Loop
+
+        PvArr = vArr
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmArraySortHeapPerNodeProc()
+    'Overview                    : ヒープソートのノード単位の処理
+    'Detailed Description        : sub_CmArraySortHeap()から呼び出す
+    '                              引数の関数の引数は以下のとおり
+    '                                currentValue :配列の要素
+    '                                nextValue    :次の配列の要素
+    'Argument
+    '     avArr                  : 配列
+    '     alSize                 : ヒープのサイズ
+    '     alParent               : ノードの親の配列番号
+    '     aoFunc                 : 関数
+    '     aboFlg                 : 判定方法
+    '                                True  :昇順（関数の結果がTrueの場合に入れ替える）
+    '                                False :降順（関数の結果がFalseの場合に入れ替える）
+    'Return Value
+    '     ソート後の配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2023/09/21         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmArraySortHeapPerNodeProc( _
+        byRef avArr _
+        , byVal alSize _
+        , byVal alParent _
+        , byRef aoFunc _
+        , byVal aboFlg _
+        )
+        Dim lRight, lLeft, lToSwap
+        lLeft = alParent*2 + 1
+        lRight = lLeft + 1
+        lToSwap = alParent
+        
+        If lRight<alSize Then
+        '右側の子がある場合
+            If func_CmArrayComparison(aoFunc, avArr(lRight), avArr(alParent))=aboFlg Then
+            '親と右側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
+                lToSwap = lRight
+            End If
+        End If
+        
+        If lLeft<alSize Then
+        '左側の子がある場合
+            If func_CmArrayComparison(aoFunc, avArr(lLeft), avArr(lToSwap))=aboFlg Then
+            '親と右側の子の勝者と左側の子の要素を関数で判定し判定方法に合致する場合は入れ替える
+                lToSwap = lLeft
+            End If
+        End If
+        
+        If lToSwap<>alParent Then
+            '親と子の要素を入れ替える
+            cf_swap avArr(alParent), avArr(lToSwap)
+            '入れ替えた子の要素以下のノードを再処理する
+            sub_CmArraySortHeapPerNodeProc avArr, alSize, lToSwap, aoFunc, aboFlg
+        End If
+        
+    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : func_CmArraySplice()
