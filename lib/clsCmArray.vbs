@@ -630,6 +630,25 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
+    'Function/Sub Name           : toArray()
+    'Overview                    : 配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/16         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function toArray( _
+        )
+        toArray = func_CmArrayCopyArray(True)
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : toString()
     'Overview                    : オブジェクトの内容を文字列で表示する
     'Detailed Description        : cf_toString()準拠

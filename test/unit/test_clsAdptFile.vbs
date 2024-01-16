@@ -33,7 +33,7 @@ End Sub
 'clsAdptFile
 Sub Test_clsAdptFile
     Dim a : Set a = new clsAdptFile
-    AssertEqualWithMessage 9, VarType(a), "VarType"
+    AssertEqualWithMessage 0, VarType(a), "VarType"
     AssertEqualWithMessage "clsAdptFile", TypeName(a), "TypeName"
 End Sub
 

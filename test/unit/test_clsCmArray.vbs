@@ -931,6 +931,44 @@ Sub Test_clsCmArray_splice_Empty
 End Sub
 
 '###################################################################################################
+'clsCmArray.toArray()
+Sub Test_clsCmArray_toArray
+    Dim e()
+    Dim a : Set a = new clsCmArray
+    
+    a.push CreateObject("Scripting.Dictionary")
+    a.push "hoge"
+    
+    AssertEqual VarType(e), VarType(a.toArray())
+    AssertEqual TypeName(e), TypeName(a.toArray())
+    AssertEqual a.length-1, Ubound(a.toArray())
+End Sub
+Sub Test_clsCmArray_toArray_AllItems
+    Dim e,d,ao,a
+    Set ao = new clsCmArray
+    d = Array(1,"b",Nothing)
+    ao.pushMulti d
+
+    e = d
+    a = ao.toArray()
+    assertAllElementsArray e, a
+
+    Dim d2 : d2 = d
+    d(1) = "Z"
+    ao(1) = "X"
+    e = d2
+    assertAllElementsArray e, a
+End Sub
+Sub Test_clsCmArray_toArray_NoData
+    Dim e,ao,a
+    Set ao = new clsCmArray
+
+    e = Array()
+    a = ao.toArray()
+    assertAllElementsArray e, a
+End Sub
+
+'###################################################################################################
 'clsCmArray.toString()
 Sub Test_clsCmArray_toString
     Dim e,d,a
