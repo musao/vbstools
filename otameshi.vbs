@@ -1,32 +1,19 @@
 Option Explicit
 
-
-'íËêî
+'lib import
 Private Const Cs_FOLDER_LIB = "lib"
-Private Const Cs_FOLDER_TEMP = "tmp"
+With CreateObject("Scripting.FileSystemObject")
+    Dim sParentFolderPath : sParentFolderPath = .GetParentFolderName(WScript.ScriptFullName)
+    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, Cs_FOLDER_LIB)
+    Dim oLibFile
+    For Each oLibFile In CreateObject("Shell.Application").Namespace(sLibFolderPath).Items
+        If Not oLibFile.IsFolder Then
+            If StrComp(.GetExtensionName(oLibFile.Path), "vbs", vbTextCompare)=0 Then ExecuteGlobal .OpenTextfile(oLibFile.Path).ReadAll
+        End If
+    Next
+End With
+Set oLibFile = Nothing
 
-'importíËã`
-Sub sub_import( _
-    byVal asIncludeFileName _
-    )
-    With CreateObject("Scripting.FileSystemObject")
-        Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
-        Dim sIncludeFilePath
-        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_LIB)
-        sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
-        ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
-    End With
-End Sub
-'import
-Call sub_import("clsAdptFile.vbs")
-Call sub_import("clsCmArray.vbs")
-Call sub_import("clsCmBufferedWriter.vbs")
-Call sub_import("clsCmCalendar.vbs")
-Call sub_import("clsCmBroker.vbs")
-Call sub_import("clsCmReturnValue.vbs")
-Call sub_import("clsCompareExcel.vbs")
-Call sub_import("libCom.vbs")
-Call sub_import("clsCmCharacterType.vbs")
 
 dim pvinfo
 

@@ -14,34 +14,22 @@
 '***************************************************************************************************
 Option Explicit
 
-'íËêî
-Private Const Cs_FOLDER_LIB = "lib"
+'ïœêî
 Private PoWriter, PoBroker
 
-'importíËã`
-Sub sub_import( _
-    byVal asIncludeFileName _
-    )
-    With CreateObject("Scripting.FileSystemObject")
-        Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
-        Dim sIncludeFilePath
-        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_LIB)
-        sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
-        ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
-    End With
-End Sub
-'import
-sub_import "clsAdptFile.vbs"
-sub_import "clsCmArray.vbs"
-sub_import "clsCmBroker.vbs"
-sub_import "clsCmBufferedReader.vbs"
-sub_import "clsCmBufferedWriter.vbs"
-sub_import "clsCmCalendar.vbs"
-sub_import "clsCmCharacterType.vbs"
-sub_import "clsCmCssGenerator.vbs"
-sub_import "clsCmHtmlGenerator.vbs"
-sub_import "clsCmReturnValue.vbs"
-sub_import "libCom.vbs"
+'lib import
+Private Const Cs_FOLDER_LIB = "lib"
+With CreateObject("Scripting.FileSystemObject")
+    Dim sParentFolderPath : sParentFolderPath = .GetParentFolderName(WScript.ScriptFullName)
+    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, Cs_FOLDER_LIB)
+    Dim oLibFile
+    For Each oLibFile In CreateObject("Shell.Application").Namespace(sLibFolderPath).Items
+        If Not oLibFile.IsFolder Then
+            If StrComp(.GetExtensionName(oLibFile.Path), "vbs", vbTextCompare)=0 Then ExecuteGlobal .OpenTextfile(oLibFile.Path).ReadAll
+        End If
+    Next
+End With
+Set oLibFile = Nothing
 
 'ÉÅÉCÉìä÷êîé¿çs
 Call Main()
