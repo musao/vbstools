@@ -14,6 +14,127 @@
 Option Explicit
 
 '###################################################################################################
+'new_AdptFile()
+'###################################################################################################
+'new_AdptFileOf()
+
+'###################################################################################################
+'new_Arr()
+Sub Test_new_Arr
+    Dim e : Set e = New clsCmArray
+    Dim a : Set a = new_Arr()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+    AssertEqual 0, a.Length
+End Sub
+
+'###################################################################################################
+'new_ArrSplit()
+Sub Test_new_ArrSplit
+    Dim e : Set e = New clsCmArray
+    Dim es : es = "one,弐,3"
+    Dim ev : ev = Split(es, ",")
+    Dim a : Set a = new_ArrSplit(es, ",")
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+    AssertEqual Ubound(ev)+1, a.Length
+    AssertEqual ev(0), a(0)
+    AssertEqual ev(1), a(1)
+    AssertEqual ev(2), a(2)
+End Sub
+
+'###################################################################################################
+'new_ArrWith()
+Sub Test_new_ArrWith_Array
+    Dim e : Set e = New clsCmArray
+    Dim ev : ev = Array(1,Nothing,"三")
+    Dim a : Set a = new_ArrWith(ev)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+    AssertEqual Ubound(ev)+1, a.Length
+    AssertEqual ev(0), a(0)
+    AssertSame ev(1), a(1)
+    AssertEqual ev(2), a(2)
+End Sub
+Sub Test_new_ArrWith_Array_0
+    Dim e : Set e = New clsCmArray
+    Dim ev : ev = Array()
+    Dim a : Set a = new_ArrWith(ev)
+    
+    AssertEqual 0, a.Length
+End Sub
+Sub Test_new_ArrWith_Variable
+    Dim ev : ev = "abc"
+    Dim a : Set a = new_ArrWith(ev)
+    
+    AssertEqual 1, a.Length
+    AssertEqual "abc", a(0)
+End Sub
+
+'###################################################################################################
+'new_Broker()
+Sub Test_new_Broker
+    Dim e : Set e = New clsCmBroker
+    Dim a : Set a = new_Broker()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
+'new_CalAt()
+Sub Test_new_CalAt
+    Dim e : Set e = New clsCmCalendar
+    Dim ed : ed = CDate("2024/2/29")
+    Dim a : Set a = new_CalAt(ed)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+    AssertEqual Cstr(DatePart("yyyy", ed)), a.formatAs("YYYY")
+    AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
+    AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
+End Sub
+Sub Test_new_CalAt_Err
+    On Error Resume Next
+    Dim a : Set a = new_CalAt(vbNullString)
+    
+    AssertEqual 13, Err.Number
+    AssertEqual "型が一致しません。", Err.Description
+    AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
+'new_Char()
+Sub Test_new_Char
+    Dim e : Set e = New clsCmCharacterType
+    Dim a : Set a = new_Char()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
+'new_CssOf()
+Sub Test_new_CssOf
+    Dim e : Set e = New clsCmCssGenerator
+    Dim a : Set a = new_CssOf(".hoge")
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+'Sub Test_new_CssOf_Err
+'    On Error Resume Next
+'    Dim a : Set a = new_CssOf("．Ｈｏｇｅ")
+'    
+'    AssertEqual 1032, Err.Number
+'    AssertEqual "セレクタには半角以外の文字を指定できません。", Err.Description
+'    AssertEqual Empty, a
+'End Sub
+
+'###################################################################################################
 'new_Dic()
 Sub Test_new_Dic
     Dim e : Set e = CreateObject("Scripting.Dictionary")
@@ -53,27 +174,19 @@ Sub Test_new_DicWith_OddNumber
 End Sub
 
 '###################################################################################################
-'new_Fso()
-Sub Test_new_Fso
-    Dim e : Set e = CreateObject("Scripting.FileSystemObject")
-    Dim a : Set a = new_Fso()
+'new_DriveOf()
+Sub Test_new_DriveOf
+    Dim d,e,a
+    d = "c"
+    Set e = CreateObject("Scripting.FileSystemObject").GetDrive(d)
+    Set a = new_DriveOf(d)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-
-'###################################################################################################
-'new_Ts()
-Sub Test_new_Ts
-    Dim e : Set e = CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName, 1, False, -2)
-    Dim a : Set a = new_Ts(WScript.ScriptFullName, 1, False, -2)
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-End Sub
-Sub Test_new_WriterTo_Err
+Sub Test_new_DriveOf_Err
     On Error Resume Next
-    Dim a : Set a = new_Ts(vbNullString, 8, False, -2)
+    Dim a : Set a = new_DriveOf(vbNullString)
     
     AssertEqual 5, Err.Number
     AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
@@ -121,44 +234,106 @@ Sub Test_new_FolderOf_Err
 End Sub
 
 '###################################################################################################
-'new_DriveOf()
-Sub Test_new_DriveOf
-    Dim d,e,a
-    d = "c"
-    Set e = CreateObject("Scripting.FileSystemObject").GetDrive(d)
-    Set a = new_DriveOf(d)
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-End Sub
-Sub Test_new_DriveOf_Err
-    On Error Resume Next
-    Dim a : Set a = new_DriveOf(vbNullString)
-    
-    AssertEqual 5, Err.Number
-    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
-    AssertEqual Empty, a
-End Sub
-
-'###################################################################################################
-'new_Ret()
-Sub Test_new_Ret
-    Dim e : Set e = new clsCmReturnValue
-    Dim a : Set a = new_Ret(Empty)
+'new_Fso()
+Sub Test_new_Fso
+    Dim e : Set e = CreateObject("Scripting.FileSystemObject")
+    Dim a : Set a = new_Fso()
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
 
 '###################################################################################################
-'new_Shell()
-Sub Test_new_Shell
-    Dim e : Set e = CreateObject("Wscript.Shell")
-    Dim a : Set a = new_Shell()
+'new_Func()
+Sub Test_new_Func_Normal_1Line_0Return
+    Dim code :  code = "function () {dim x}"
+    Dim e : e = Empty
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a()
+End Sub
+Sub Test_new_Func_Normal_1Line_1Return
+    Dim code :  code = "function (a){return 'ans='&a}"
+    Dim d : d = 2
+    Dim e : e = "ans="&d
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(d)
+End Sub
+Sub Test_new_Func_Normal_nLine_0Return
+    Dim code :  code = "function (a,b) {dim y:y= _:a+b:y=a* _:b}"
+    Dim e : e = Empty
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(3,6)
+End Sub
+Sub Test_new_Func_Normal_nLine_1Return
+    Dim code :  code = "function (a,b)  {dim y:y= _:a+b:return y* _:b}"
+    Dim e : e = 80
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(2,8)
+End Sub
+Sub Test_new_Func_Normal_nLine_nReturn
+    Dim code :  code = "function (a,b){ if a>b Then  :return b  :else:return a :  end if}"
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual 2, a(2,3)
+    AssertEqual 5, a(5,9)
+End Sub
+Sub Test_new_Func_Arrow_1Line_0Return
+    Dim code :  code = "=> vbNullString"
+    Dim e : e = vbNullString
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a()
+End Sub
+Sub Test_new_Func_Arrow_1Line_1Return
+    Dim code :  code = "a=>  return _:  a^2"
+    Dim e : e = 9^2
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(9)
+End Sub
+Sub Test_new_Func_Arrow_nLine_0Return
+    Dim code :  code = "(a,b)  =>{dim z:z=a^b}"
+    Dim e : e = Empty
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(1,2)
+End Sub
+Sub Test_new_Func_Arrow_nLine_1Return
+    Dim code :  code = "(a,b) => {dim z:z=a^b:return z+1}"
+    Dim e : e = 10
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual e, a(3,2)
+End Sub
+Sub Test_new_Func_Arrow_nLine_nReturn
+    Dim code :  code = "(a,b)=>{if a>b Then  :return b  :else:return a :  end if}"
+    Dim a : Set a = new_Func(code)
+    
+    AssertEqual 2, a(2,3)
+    AssertEqual 5, a(5,9)
+End Sub
+
+'###################################################################################################
+'new_HtmlOf()
+Sub Test_new_HtmlOf
+    Dim e : Set e = New clsCmHtmlGenerator
+    Dim a : Set a = new_HtmlOf("hoge")
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
+'Sub Test_new_HtmlOf_Err
+'    On Error Resume Next
+'    Dim a : Set a = new_HtmlOf("Ｈｏｇｅ")
+'    
+'    AssertEqual 1032, Err.Number
+'    AssertEqual "要素（element）には半角以外の文字を指定できません。", Err.Description
+'    AssertEqual Empty, a
+'End Sub
 
 '###################################################################################################
 'new_Network()
@@ -171,13 +346,17 @@ Sub Test_new_Network
 End Sub
 
 '###################################################################################################
-'new_ShellApp()
-Sub Test_new_ShellApp
-    Dim e : Set e = CreateObject("Shell.Application")
-    Dim a : Set a = new_ShellApp()
+'new_Now()
+Sub Test_new_Now
+    Dim e : Set e = New clsCmCalendar
+    Dim ed : ed = Now()
+    Dim a : Set a = new_Now()
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
+    AssertEqual Cstr(DatePart("yyyy", ed)), a.formatAs("YYYY")
+    AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
+    AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
 End Sub
 
 '###################################################################################################
@@ -263,6 +442,54 @@ Sub Test_new_ReaderFrom_Err
 End Sub
 
 '###################################################################################################
+'new_Ret()
+Sub Test_new_Ret
+    Dim e : Set e = new clsCmReturnValue
+    Dim a : Set a = new_Ret(Empty)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
+'new_Shell()
+Sub Test_new_Shell
+    Dim e : Set e = CreateObject("Wscript.Shell")
+    Dim a : Set a = new_Shell()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
+'new_ShellApp()
+Sub Test_new_ShellApp
+    Dim e : Set e = CreateObject("Shell.Application")
+    Dim a : Set a = new_ShellApp()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
+'new_Ts()
+Sub Test_new_Ts
+    Dim e : Set e = CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName, 1, False, -2)
+    Dim a : Set a = new_Ts(WScript.ScriptFullName, 1, False, -2)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_WriterTo_Err
+    On Error Resume Next
+    Dim a : Set a = new_Ts(vbNullString, 8, False, -2)
+    
+    AssertEqual 5, Err.Number
+    AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
+    AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
 'new_Writer()
 Sub Test_new_Writer
     Dim e : Set e = New clsCmBufferedWriter
@@ -292,227 +519,6 @@ Sub Test_new_WriterTo_Err
     AssertEqual Empty, a
 End Sub
 
-'###################################################################################################
-'new_Now()
-Sub Test_new_Now
-    Dim e : Set e = New clsCmCalendar
-    Dim ed : ed = Now()
-    Dim a : Set a = new_Now()
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-    AssertEqual Cstr(DatePart("yyyy", ed)), a.formatAs("YYYY")
-    AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
-    AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
-End Sub
-
-'###################################################################################################
-'new_CalAt()
-Sub Test_new_CalAt
-    Dim e : Set e = New clsCmCalendar
-    Dim ed : ed = CDate("2024/2/29")
-    Dim a : Set a = new_CalAt(ed)
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-    AssertEqual Cstr(DatePart("yyyy", ed)), a.formatAs("YYYY")
-    AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
-    AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
-End Sub
-Sub Test_new_CalAt_Err
-    On Error Resume Next
-    Dim a : Set a = new_CalAt(vbNullString)
-    
-    AssertEqual 13, Err.Number
-    AssertEqual "型が一致しません。", Err.Description
-    AssertEqual Empty, a
-End Sub
-
-'###################################################################################################
-'new_Broker()
-Sub Test_new_Broker
-    Dim e : Set e = New clsCmBroker
-    Dim a : Set a = new_Broker()
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-End Sub
-
-'###################################################################################################
-'new_Arr()
-Sub Test_new_Arr
-    Dim e : Set e = New clsCmArray
-    Dim a : Set a = new_Arr()
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-    AssertEqual 0, a.Length
-End Sub
-
-'###################################################################################################
-'new_ArrWith()
-Sub Test_new_ArrWith_Array
-    Dim e : Set e = New clsCmArray
-    Dim ev : ev = Array(1,Nothing,"三")
-    Dim a : Set a = new_ArrWith(ev)
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-    AssertEqual Ubound(ev)+1, a.Length
-    AssertEqual ev(0), a(0)
-    AssertSame ev(1), a(1)
-    AssertEqual ev(2), a(2)
-End Sub
-Sub Test_new_ArrWith_Array_0
-    Dim e : Set e = New clsCmArray
-    Dim ev : ev = Array()
-    Dim a : Set a = new_ArrWith(ev)
-    
-    AssertEqual 0, a.Length
-End Sub
-Sub Test_new_ArrWith_Variable
-    Dim ev : ev = "abc"
-    Dim a : Set a = new_ArrWith(ev)
-    
-    AssertEqual 1, a.Length
-    AssertEqual "abc", a(0)
-End Sub
-
-'###################################################################################################
-'new_ArrSplit()
-Sub Test_new_ArrSplit
-    Dim e : Set e = New clsCmArray
-    Dim es : es = "one,弐,3"
-    Dim ev : ev = Split(es, ",")
-    Dim a : Set a = new_ArrSplit(es, ",")
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-    AssertEqual Ubound(ev)+1, a.Length
-    AssertEqual ev(0), a(0)
-    AssertEqual ev(1), a(1)
-    AssertEqual ev(2), a(2)
-End Sub
-
-'###################################################################################################
-'new_HtmlOf()
-Sub Test_new_HtmlOf
-    Dim e : Set e = New clsCmHtmlGenerator
-    Dim a : Set a = new_HtmlOf("hoge")
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-End Sub
-'Sub Test_new_HtmlOf_Err
-'    On Error Resume Next
-'    Dim a : Set a = new_HtmlOf("Ｈｏｇｅ")
-'    
-'    AssertEqual 1032, Err.Number
-'    AssertEqual "要素（element）には半角以外の文字を指定できません。", Err.Description
-'    AssertEqual Empty, a
-'End Sub
-
-'###################################################################################################
-'new_CssOf()
-Sub Test_new_CssOf
-    Dim e : Set e = New clsCmCssGenerator
-    Dim a : Set a = new_CssOf(".hoge")
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-End Sub
-'Sub Test_new_CssOf_Err
-'    On Error Resume Next
-'    Dim a : Set a = new_CssOf("．Ｈｏｇｅ")
-'    
-'    AssertEqual 1032, Err.Number
-'    AssertEqual "セレクタには半角以外の文字を指定できません。", Err.Description
-'    AssertEqual Empty, a
-'End Sub
-
-'###################################################################################################
-'new_Char()
-Sub Test_new_Char
-    Dim e : Set e = New clsCmCharacterType
-    Dim a : Set a = new_Char()
-    
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
-End Sub
-
-'###################################################################################################
-'new_Func()
-Sub Test_new_Func_Normal_1Line_0Return
-    Dim code :  code = "function () {dim x}"
-    Dim e : e = Empty
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a()
-End Sub
-Sub Test_new_Func_Normal_1Line_1Return
-    Dim code :  code = "function (a){return 'ans='&a}"
-    Dim d : d = 2
-    Dim e : e = "ans="&d
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a(d)
-End Sub
-Sub Test_new_Func_Normal_nLine_0Return
-    Dim code :  code = "function (a,b) {dim y:y= _:a+b:y=a* _:b}"
-    Dim e : e = Empty
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a(3,6)
-End Sub
-Sub Test_new_Func_Normal_nLine_1Return
-    Dim code :  code = "function (a,b)  {dim y:y= _:a+b:return y* _:b}"
-    Dim e : e = 80
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a(2,8)
-End Sub
-Sub Test_new_Func_Normal_nLine_nReturn
-    Dim code :  code = "function (a,b){ if a>b Then  :return b  :else:return a :  end if}"
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual 2, a(2,3)
-    AssertEqual 5, a(5,9)
-End Sub
-Sub Test_new_Func_Arrow_1Line_0Return
-    Dim code :  code = "=> vbNullString"
-    Dim e : e = vbNullString
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a()
-End Sub
-Sub Test_new_Func_Arrow_1Line_1Return
-    Dim code :  code = "a=>  return _:  a^2"
-    Dim e : e = 9^2
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a(9)
-End Sub
-Sub Test_new_Func_Arrow_nLine_0Return
-    Dim code :  code = "(a,b)  =>{dim z:z=a^b}"
-    Dim e : e = Empty
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a(1,2)
-End Sub
-Sub Test_new_Func_Arrow_nLine_1Return
-    Dim code :  code = "(a,b) => {dim z:z=a^b:return z+1}"
-    Dim e : e = 10
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual e, a(3,2)
-End Sub
-Sub Test_new_Func_Arrow_nLine_nReturn
-    Dim code :  code = "(a,b)=>{if a>b Then  :return b  :else:return a :  end if}"
-    Dim a : Set a = new_Func(code)
-    
-    AssertEqual 2, a(2,3)
-    AssertEqual 5, a(5,9)
-End Sub
 
 '###################################################################################################
 'func_NewAnalyze()

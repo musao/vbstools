@@ -748,6 +748,191 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
+'Function/Sub Name           : new_AdptFile()
+'Overview                    : Fileオブジェクトのアダプター生成関数
+'Detailed Description        : 工事中
+'Argument
+'     aoFile                 : ファイルのオブジェクト
+'Return Value
+'     生成したFileオブジェクトのアダプターのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_AdptFile( _
+    byRef aoFile _
+    )
+    Set new_AdptFile = (New clsAdptFile).setFileObject(aoFile)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_AdptFileOf()
+'Overview                    : Fileオブジェクトのアダプター生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : ファイルのパス
+'Return Value
+'     生成したFileオブジェクトのアダプターのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/26         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_AdptFileOf( _
+    byVal asPath _
+    )
+    Set new_AdptFileOf = (New clsAdptFile).setFilePath(asPath)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Arr()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 生成した同クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Arr( _
+    )
+    Set new_Arr = (New clsCmArray)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ArrSplit()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : vbscriptのSplit関数と同等の機能、同クラスのインスタンスを返す
+'Argument
+'     asTarget               : 部分文字列と区切り文字を含む文字列表現
+'     asDelimiter            : 区切り文字
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArrSplit( _
+    byVal asTarget _
+    , byVal asDelimiter _
+    )
+    Set new_ArrSplit = new_ArrWith(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ArrWith()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
+'Argument
+'     avArr                  : 配列に追加する要素（配列）
+'Return Value
+'     同クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/08         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ArrWith( _
+    byRef avArr _
+    )
+    Dim oArr : Set oArr = new_Arr()
+    oArr.PushMulti avArr
+    Set new_ArrWith = oArr
+    Set oArr = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Broker()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 出版-購読型（Publish/Subscribe）クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     出版-購読型（Publish/Subscribe）クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Broker( _
+    )
+    Set new_Broker = (New clsCmBroker)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_CalAt()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 指定した日付時刻で生成した日付クラスのインスタンスを返す
+'Argument
+'     avDateTime             : 設定する日付時刻
+'Return Value
+'     日付クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_CalAt( _
+    ByVal avDateTime _
+    )
+    Set new_CalAt = (New clsCmCalendar).setDateTime(avDateTime)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Char()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 文字種類管理クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     文字種類管理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/31         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Char( _
+    )
+    Set new_Char = (New clsCmCharacterType)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_CssOf()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : CSS生成クラスのインスタンスを返す
+'Argument
+'     asSelector             : セレクタ
+'Return Value
+'     CSS生成クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_CssOf( _
+    byVal asSelector _
+    )
+    Dim oCss : Set oCss = New clsCmCssGenerator
+    oCss.selector = asSelector
+    Set new_CssOf = oCss
+    Set oCss = Nothing
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_Dic()
 'Overview                    : Dictionaryオブジェクト生成関数
 'Detailed Description        : 工事中
@@ -804,48 +989,23 @@ Private Function new_DicWith( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_Fso()
-'Overview                    : FileSystemObjectオブジェクト生成関数
+'Function/Sub Name           : new_DriveOf()
+'Overview                    : Driveオブジェクト生成関数
 'Detailed Description        : 工事中
 'Argument
-'     なし
+'     asDriveName            : ドライブ名
 'Return Value
-'     生成したFileSystemObjectオブジェクトのインスタンス
+'     生成したDriveオブジェクトのインスタンス
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/10/13         Y.Fujii                  First edition
+'2023/11/11         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_Fso( _
+Private Function new_DriveOf( _
+    byVal asDriveName _
     )
-    Set new_Fso = CreateObject("Scripting.FileSystemObject")
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Ts()
-'Overview                    : TextStreamオブジェクト生成関数
-'Detailed Description        : FileSystemObjectのOpenTextFile()と同等
-'Argument
-'     asPath                 : パス
-'     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
-'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
-'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
-'Return Value
-'     生成したTextStreamオブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/01/09         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Ts( _
-    byVal asPath _
-    , byVal alIomode _
-    , byVal aboCreate _
-    , byVal alFileFormat _
-    )
-    Set new_Ts = new_Fso().OpenTextFile(asPath, alIomode, aboCreate, alFileFormat)
+    Set new_DriveOf = new_Fso().GetDrive(asDriveName)
 End Function
 
 '***************************************************************************************************
@@ -889,449 +1049,22 @@ Private Function new_FolderOf( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_DriveOf()
-'Overview                    : Driveオブジェクト生成関数
-'Detailed Description        : 工事中
-'Argument
-'     asDriveName            : ドライブ名
-'Return Value
-'     生成したDriveオブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/11         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_DriveOf( _
-    byVal asDriveName _
-    )
-    Set new_DriveOf = new_Fso().GetDrive(asDriveName)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_AdptFile()
-'Overview                    : Fileオブジェクトのアダプター生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoFile                 : ファイルのオブジェクト
-'Return Value
-'     生成したFileオブジェクトのアダプターのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_AdptFile( _
-    byRef aoFile _
-    )
-    Set new_AdptFile = (New clsAdptFile).setFileObject(aoFile)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_AdptFileOf()
-'Overview                    : Fileオブジェクトのアダプター生成関数
-'Detailed Description        : 工事中
-'Argument
-'     asPath                 : ファイルのパス
-'Return Value
-'     生成したFileオブジェクトのアダプターのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_AdptFileOf( _
-    byVal asPath _
-    )
-    Set new_AdptFileOf = (New clsAdptFile).setFilePath(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Ret()
-'Overview                    : 戻り値クラスオブジェクトの生成関数
-'Detailed Description        : 工事中
-'Argument
-'     avRet                  : 戻り値
-'Return Value
-'     生成した戻り値クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2024/01/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Ret( _
-    byRef avRet _
-    )
-    Set new_Ret = (New clsCmReturnValue).setValue(avRet)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Shell()
-'Overview                    : Wscript.Shellオブジェクト生成関数
+'Function/Sub Name           : new_Fso()
+'Overview                    : FileSystemObjectオブジェクト生成関数
 'Detailed Description        : 工事中
 'Argument
 '     なし
 'Return Value
-'     生成したWscript.Shellオブジェクトのインスタンス
+'     生成したFileSystemObjectオブジェクトのインスタンス
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/12/19         Y.Fujii                  First edition
+'2023/10/13         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_Shell( _
+Private Function new_Fso( _
     )
-    Set new_Shell = CreateObject("Wscript.Shell")
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Network()
-'Overview                    : WScript.Networkオブジェクト生成関数
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     生成したWScript.Networkオブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/12/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Network( _
-    )
-    Set new_Network = CreateObject("WScript.Network")
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_ShellApp()
-'Overview                    : Shell.Applicationオブジェクト生成関数
-'Detailed Description        : 工事中
-'Argument
-'     なし
-'Return Value
-'     生成したShell.Applicationオブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/25         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_ShellApp( _
-    )
-    Set new_ShellApp = CreateObject("Shell.Application")
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Re()
-'Overview                    : 正規表現オブジェクト生成関数
-'Detailed Description        : 工事中
-'Argument
-'     asPattern              : 正規表現のパターン
-'     asOptions              : この引数内にある文字の有無で正規表現の以下のプロパティをTrueにする
-'                                "i":大文字と小文字を区別する（.IgnoreCase = True）
-'                                "g"文字列全体を検索する（.Global = True）
-'                                "m"文字列を複数行として扱う（.Multiline = True）
-'Return Value
-'     生成した正規表現オブジェクトのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Re( _
-    byVal asPattern _
-    , byVal asOptions _
-    )
-    Dim oRe, sOpts
-    
-    Set oRe = New RegExp
-    oRe.Pattern = asPattern
-    
-    sOpts = LCase(asOptions)
-    If InStr(sOpts, "i") > 0 Then oRe.IgnoreCase = True
-    If InStr(sOpts, "g") > 0 Then oRe.Global = True
-    If InStr(sOpts, "m") > 0 Then oRe.Multiline = True
-    
-    Set new_Re = oRe
-    Set oRe = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Reader()
-'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoTextStream           : テキストストリームオブジェクト
-'Return Value
-'     生成したファイル読込バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/02         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Reader( _
-    byRef aoTextStream _
-    )
-    Set new_Reader = (New clsCmBufferedReader).setTextStream(aoTextStream)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_ReaderFrom()
-'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     asPath                 : 読み込むファイルのパス
-'Return Value
-'     生成したファイル読込バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/09         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_ReaderFrom( _
-    byVal asPath _
-    )
-    Set new_ReaderFrom = (New clsCmBufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Writer()
-'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoTextStream           : テキストストリームオブジェクト
-'Return Value
-'     生成したファイル出力バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/08/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Writer( _
-    byRef aoTextStream _
-    )
-    Set new_Writer = (New clsCmBufferedWriter).setTextStream(aoTextStream)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_WriterTo()
-'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
-'Detailed Description        : 工事中
-'Argument
-'     asPath                 : 書き込むファイルのパス
-'     alIomode               : 出力モード 2:ForWriting,8:ForAppending
-'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
-'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
-'Return Value
-'     生成したファイル出力バッファリング処理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/09         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_WriterTo( _
-    byVal asPath _
-    , byVal alIomode _
-    , byVal aboCreate _
-    , byVal alFileFormat _
-    )
-    Set new_WriterTo = (New clsCmBufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Now()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 今の日付時刻で生成した日付クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     日付クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/01/04         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Now( _
-    )
-    Set new_Now = (New clsCmCalendar).getNow()
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_CalAt()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 指定した日付時刻で生成した日付クラスのインスタンスを返す
-'Argument
-'     avDateTime             : 設定する日付時刻
-'Return Value
-'     日付クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_CalAt( _
-    ByVal avDateTime _
-    )
-    Set new_CalAt = (New clsCmCalendar).setDateTime(avDateTime)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Broker()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 出版-購読型（Publish/Subscribe）クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     出版-購読型（Publish/Subscribe）クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Broker( _
-    )
-    Set new_Broker = (New clsCmBroker)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Arr()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 生成した同クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/08         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Arr( _
-    )
-    Set new_Arr = (New clsCmArray)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_ArrWith()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
-'Argument
-'     avArr                  : 配列に追加する要素（配列）
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/08         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_ArrWith( _
-    byRef avArr _
-    )
-    Dim oArr : Set oArr = new_Arr()
-    oArr.PushMulti avArr
-    Set new_ArrWith = oArr
-    Set oArr = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_ArrSplit()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : vbscriptのSplit関数と同等の機能、同クラスのインスタンスを返す
-'Argument
-'     asTarget               : 部分文字列と区切り文字を含む文字列表現
-'     asDelimiter            : 区切り文字
-'Return Value
-'     同クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/08         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_ArrSplit( _
-    byVal asTarget _
-    , byVal asDelimiter _
-    )
-    Set new_ArrSplit = new_ArrWith(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_HtmlOf()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : HTML生成クラスのインスタンスを返す
-'Argument
-'     asElement              : 要素
-'Return Value
-'     HTML生成クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_HtmlOf( _
-    byVal asElement _
-    )
-    Dim oHtml : Set oHtml = New clsCmHtmlGenerator
-    oHtml.element = asElement
-    Set new_HtmlOf = oHtml
-    Set oHtml = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_CssOf()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : CSS生成クラスのインスタンスを返す
-'Argument
-'     asSelector             : セレクタ
-'Return Value
-'     CSS生成クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_CssOf( _
-    byVal asSelector _
-    )
-    Dim oCss : Set oCss = New clsCmCssGenerator
-    oCss.selector = asSelector
-    Set new_CssOf = oCss
-    Set oCss = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_Char()
-'Overview                    : インスタンス生成関数
-'Detailed Description        : 文字種類管理クラスのインスタンスを返す
-'Argument
-'     なし
-'Return Value
-'     文字種類管理クラスのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/31         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_Char( _
-    )
-    Set new_Char = (New clsCmCharacterType)
+    Set new_Fso = CreateObject("Scripting.FileSystemObject")
 End Function
 
 '***************************************************************************************************
@@ -1416,6 +1149,275 @@ Private Function new_Func( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_HtmlOf()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : HTML生成クラスのインスタンスを返す
+'Argument
+'     asElement              : 要素
+'Return Value
+'     HTML生成クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_HtmlOf( _
+    byVal asElement _
+    )
+    Dim oHtml : Set oHtml = New clsCmHtmlGenerator
+    oHtml.element = asElement
+    Set new_HtmlOf = oHtml
+    Set oHtml = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Network()
+'Overview                    : WScript.Networkオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したWScript.Networkオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Network( _
+    )
+    Set new_Network = CreateObject("WScript.Network")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Now()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 今の日付時刻で生成した日付クラスのインスタンスを返す
+'Argument
+'     なし
+'Return Value
+'     日付クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Now( _
+    )
+    Set new_Now = (New clsCmCalendar).getNow()
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Re()
+'Overview                    : 正規表現オブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPattern              : 正規表現のパターン
+'     asOptions              : この引数内にある文字の有無で正規表現の以下のプロパティをTrueにする
+'                                "i":大文字と小文字を区別する（.IgnoreCase = True）
+'                                "g"文字列全体を検索する（.Global = True）
+'                                "m"文字列を複数行として扱う（.Multiline = True）
+'Return Value
+'     生成した正規表現オブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Re( _
+    byVal asPattern _
+    , byVal asOptions _
+    )
+    Dim oRe, sOpts
+    
+    Set oRe = New RegExp
+    oRe.Pattern = asPattern
+    
+    sOpts = LCase(asOptions)
+    If InStr(sOpts, "i") > 0 Then oRe.IgnoreCase = True
+    If InStr(sOpts, "g") > 0 Then oRe.Global = True
+    If InStr(sOpts, "m") > 0 Then oRe.Multiline = True
+    
+    Set new_Re = oRe
+    Set oRe = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Reader()
+'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     aoTextStream           : テキストストリームオブジェクト
+'Return Value
+'     生成したファイル読込バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Reader( _
+    byRef aoTextStream _
+    )
+    Set new_Reader = (New clsCmBufferedReader).setTextStream(aoTextStream)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ReaderFrom()
+'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 読み込むファイルのパス
+'Return Value
+'     生成したファイル読込バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ReaderFrom( _
+    byVal asPath _
+    )
+    Set new_ReaderFrom = (New clsCmBufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Ret()
+'Overview                    : 戻り値クラスオブジェクトの生成関数
+'Detailed Description        : 工事中
+'Argument
+'     avRet                  : 戻り値
+'Return Value
+'     生成した戻り値クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/01/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Ret( _
+    byRef avRet _
+    )
+    Set new_Ret = (New clsCmReturnValue).setValue(avRet)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Shell()
+'Overview                    : Wscript.Shellオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したWscript.Shellオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/12/19         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Shell( _
+    )
+    Set new_Shell = CreateObject("Wscript.Shell")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_ShellApp()
+'Overview                    : Shell.Applicationオブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     生成したShell.Applicationオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/25         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_ShellApp( _
+    )
+    Set new_ShellApp = CreateObject("Shell.Application")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Ts()
+'Overview                    : TextStreamオブジェクト生成関数
+'Detailed Description        : FileSystemObjectのOpenTextFile()と同等
+'Argument
+'     asPath                 : パス
+'     alIomode               : 入力/出力モード 1:ForReading,2:ForWriting,8:ForAppending
+'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
+'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
+'Return Value
+'     生成したTextStreamオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Ts( _
+    byVal asPath _
+    , byVal alIomode _
+    , byVal aboCreate _
+    , byVal alFileFormat _
+    )
+    Set new_Ts = new_Fso().OpenTextFile(asPath, alIomode, aboCreate, alFileFormat)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Writer()
+'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     aoTextStream           : テキストストリームオブジェクト
+'Return Value
+'     生成したファイル出力バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/08/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Writer( _
+    byRef aoTextStream _
+    )
+    Set new_Writer = (New clsCmBufferedWriter).setTextStream(aoTextStream)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_WriterTo()
+'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : 書き込むファイルのパス
+'     alIomode               : 出力モード 2:ForWriting,8:ForAppending
+'     aboCreate              : asPathが存在しない場合 True:新しいファイルを作成する、False:作成しない
+'     alFileFormat           : ファイルの形式 -2:TristateUseDefault,-1:TristateTrue,0:TristateFalse
+'Return Value
+'     生成したファイル出力バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/10/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_WriterTo( _
+    byVal asPath _
+    , byVal alIomode _
+    , byVal aboCreate _
+    , byVal alFileFormat _
+    )
+    Set new_WriterTo = (New clsCmBufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
+End Function
+
+'---------------------------------------------------------------------------------------------------
+
+'***************************************************************************************************
 'Function/Sub Name           : func_NewAnalyze()
 'Overview                    : ソースコードを解釈する
 'Detailed Description        : new_Func()から使用する
@@ -1451,6 +1453,40 @@ Private Function func_NewAnalyze( _
     
     func_NewAnalyze = oCode.Items()
     Set oCode = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_NewGenerate()
+'Overview                    : 引数の情報で関数のインスタンスを生成する
+'Detailed Description        : new_Func()から使用する
+'Argument
+'     asFuncName             : 関数名
+'     asArgStr               : ソースの引数部分のソースコード
+'     asProcStr              : ソースの処理内容部分のソースコード
+'Return Value
+'     生成した関数のインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/09/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_NewGenerate( _
+    byVal asFuncName _
+    , byVal asArgStr _
+    , byVal asProcStr _
+    )
+    Dim sCode
+    'ソースコード作成
+    sCode = _
+        "Private Function " & asFuncName & "(" & asArgStr & ")" & vbNewLine _
+        & asProcStr & vbNewLine _
+        & "End Function"
+    
+'inputbox "","",sCode
+    '関数の生成
+    ExecuteGlobal sCode
+    Set func_NewGenerate = Getref(asFuncName)
 End Function
 
 '***************************************************************************************************
@@ -1501,41 +1537,6 @@ Private Function func_NewRewriteReturnPhrase( _
     func_NewRewriteReturnPhrase = Join(avCode, ":")
     
 End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_NewGenerate()
-'Overview                    : 引数の情報で関数のインスタンスを生成する
-'Detailed Description        : new_Func()から使用する
-'Argument
-'     asFuncName             : 関数名
-'     asArgStr               : ソースの引数部分のソースコード
-'     asProcStr              : ソースの処理内容部分のソースコード
-'Return Value
-'     生成した関数のインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/09/27         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_NewGenerate( _
-    byVal asFuncName _
-    , byVal asArgStr _
-    , byVal asProcStr _
-    )
-    Dim sCode
-    'ソースコード作成
-    sCode = _
-        "Private Function " & asFuncName & "(" & asArgStr & ")" & vbNewLine _
-        & asProcStr & vbNewLine _
-        & "End Function"
-    
-'inputbox "","",sCode
-    '関数の生成
-    ExecuteGlobal sCode
-    Set func_NewGenerate = Getref(asFuncName)
-End Function
-
 
 '###################################################################################################
 '数学系の関数
