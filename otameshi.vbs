@@ -14,6 +14,19 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+Dim efe : efe = fw_getTempPath()
+fs_writeFile efe, "test"
+Dim xxd : Set xxd = new_FileOf(efe)
+
+inputbox "","",xxd.name
+
+xxd.name = "fujii.txt"
+
+inputbox "","",xxd.name
+
+
+
+wscript.quit
 
 dim pvinfo
 

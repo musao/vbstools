@@ -28,8 +28,7 @@ Class clsAdptFile
     '***************************************************************************************************
     Private Sub Class_Initialize()
         PsTypeName = "FolderItem2"
-        Set PoFile = Nothing
-        PsPath = Empty
+        sub_AdptFileInitialization
     End Sub
     
     '***************************************************************************************************
@@ -83,6 +82,9 @@ Class clsAdptFile
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get Name()
+'        Dim sMyName : sMyName="+Name()"
+'        sub_AdptFileFileExists sMyName, PsPath
+
         Name = new_Fso().GetFileName(PsPath)
     End Property
     
@@ -101,6 +103,9 @@ Class clsAdptFile
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get ParentFolder()
+'        Dim sMyName : sMyName="+ParentFolder()"
+'        sub_AdptFileFileExists sMyName, PsPath
+
 '        ParentFolder = PoFile.Parent.Self.Path
         ParentFolder = new_Fso().GetParentFolderName(PsPath)
     End Property
@@ -120,6 +125,9 @@ Class clsAdptFile
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Default Property Get Path()
+'        Dim sMyName : sMyName="+Path()"
+'        sub_AdptFileFileExists sMyName, PsPath
+
         Path = PsPath
     End Property
     
@@ -176,9 +184,9 @@ Class clsAdptFile
     Public Function setFileObject( _
         byRef aoFile _
         )
+        sub_AdptFileInitialization
+
         If Not cf_isSame(PsTypeName, Typename(aoFile)) Then
-            PsPath = Empty
-            Set PoFile = Nothing
             Err.Raise 438, "clsAdptFile.vbs:clsAdptFile+setFileObject()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
             Exit Function
         End If
@@ -206,17 +214,64 @@ Class clsAdptFile
     Public Function setFilePath( _
         byVal asPath _
         )
-        If Not new_Fso().FileExists(asPath) Then
-            PsPath = Empty
-            Set PoFile = Nothing
-            Err.Raise 76, "clsAdptFile.vbs:clsAdptFile+setFilePath()", "パスが見つかりません。"
-            Exit Function
-        End If
+        sub_AdptFileInitialization
+
+        Dim sMyName : sMyName="+setFilePath()"
+        sub_AdptFileFileExists sMyName, asPath
         
         PsPath = asPath
         Set PoFile = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
 
         Set setFilePath = Me
     End Function
+    
+
+
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_AdptFileFileExists()
+    'Overview                    : パス存在確認
+    'Detailed Description        : パスがない場合はエラーを発生させる
+    'Argument
+    '     asFuncName             : 関数名
+    '     asPath                 : パス
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/21         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_AdptFileFileExists( _
+        byVal asFuncName _
+        , byVal asPath _
+        )
+        If IsEmpty(asPath) Then Exit Sub
+'        If Not(new_ShellApp().Namespace(asPath).IsFileSystem) Then
+'        If Not(new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath)).IsFileSystem) Then
+        If Not(new_Fso().FileExists(asPath)) Then
+            Err.Raise 76, "clsAdptFile.vbs:clsAdptFile"&asFuncName, "パスが見つかりません。"
+            Exit Sub
+        End If
+    End Sub
+
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_AdptFileInitialization()
+    'Overview                    : 内部変数の初期化
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/21         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_AdptFileInitialization( _
+        )
+        PsPath = Empty : Set PoFile = Nothing
+    End Sub
 
 End Class
