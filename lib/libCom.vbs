@@ -237,20 +237,20 @@ Private Sub cf_pushMulti( _
     Dim lUbAdd,lIdx : lUbAdd = Ubound(avAdd)
     If Err.Number=0 Then
     '追加する配列（avAdd）が要素を持つ場合
+        '配列（avArr）を拡張する
         Dim lUb : lUb = Ubound(avArr)
-        If Err.Number=0 Then 
-        '配列（avArr）が要素を持つ場合
+        If Err.Number=0 Then
             Redim Preserve avArr(lUb+lUbAdd+1)
-            For lIdx=0 To lUbAdd
-                cf_bind avArr(lUb+1+lIdx), avAdd(lIdx)
-            Next
         Else
-        '配列（avArr）が要素を持たない場合
-            Redim avArr(Ubound(avAdd))
-            For lIdx=0 To Ubound(avArr)
-                cf_bind avArr(lIdx), avAdd(lIdx)
-            Next
+        '配列（avArr）が要素を持たない場合はlUbを-1にする
+            lUb = -1
+            Redim avArr(lUbAdd)
         End If
+
+        '配列（avArr）に追加する要素の配列（avAdd）を追加する
+        For lIdx=0 To lUbAdd
+            cf_bind avArr(lUb+1+lIdx), avAdd(lIdx)
+        Next
     Elseif Not IsArray(avAdd) Then
     '追加する配列（avAdd）が要素を持たず配列でない場合
         cf_push avArr, avAdd
@@ -598,6 +598,27 @@ Private Sub fw_logger( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : fw_runShellSilently()
+'Overview                    : シェルをサイレント実行する
+'Detailed Description        : 同期処理、シェルの実行完了後に制御を戻す
+'Argument
+'     asCmd                  : 実行するコマンド
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_runShellSilently( _
+    byVal asCmd _
+    )
+    fw_runShellSilently = False
+    If 0 = new_Shell().Run(asCmd, 0, True) Then fw_runShellSilently = True
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fw_storeErr()
 'Overview                    : Errオブジェクトの内容をオブジェクトに変換する
 'Detailed Description        : 変換したオブジェクトの構成
@@ -746,6 +767,25 @@ End Function
 '###################################################################################################
 'インスタンス生成関数
 '###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Adodb()
+'Overview                    : ADOストリームオブジェクトの生成関数
+'Detailed Description        : 工事中
+'Argument
+'     なし
+'Return Value
+'     ADOストリームオブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/01/29         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_Adodb( _
+    )
+    Set new_Adodb = CreateObject("ADODB.Stream")
+End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : new_AdptFile()
@@ -1777,33 +1817,6 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
-'Function/Sub Name           : util_randStr()
-'Overview                    : ランダムな文字列を生成する
-'Detailed Description        : 指定した文字（配列）、指定した回数でランダムな文字列を生成する
-'Argument
-'     avStrings              : 文字の配列
-'     alTimes                : 回数
-'Return Value
-'     生成した文字列
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/03         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function util_randStr( _
-    byRef avStrings _
-    , byVal alTimes _
-    )
-    Dim lPos, sRet, lUb
-    sRet = "" : lUb = Ubound(avStrings)
-    For lPos = 1 To alTimes
-        sRet = sRet & avStrings( math_rand(0, lUb, 0) )
-    Next
-    util_randStr = sRet
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : util_getIpAddress()
 'Overview                    : 自身のIPアドレスを取得する
 'Detailed Description        : IPアドレスを格納したオブジェクトを返す
@@ -1848,6 +1861,91 @@ Private Function util_getIpAddress( _
     
     Set oAddress = Nothing
     Set oAdapter = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : util_isZipWithPassword()
+'Overview                    : パスワード付きzipファイルか判定する
+'Detailed Description        : https://vbavb.com/zip/
+'Argument
+'     asPath                 : パス
+'Return Value
+'     結果 True:パスワード付きzipファイル / False:パスワード付きzipファイルでない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/01/29         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_isZipWithPassword( _
+    byVal asPath _
+    )
+    util_isZipWithPassword = False
+    If Not new_Fso().FileExists(asPath) Then Exit Function
+    With new_Adodb()
+        .Type = 1       'adTypeBinary
+        .Open
+        .LoadFromFile asPath
+        .Position = 6
+        If Hex(AscB(.Read(1)))=1 Then util_isZipWithPassword = True
+        .Close
+    End With
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : util_randStr()
+'Overview                    : ランダムな文字列を生成する
+'Detailed Description        : 指定した文字（配列）、指定した回数でランダムな文字列を生成する
+'Argument
+'     avStrings              : 文字の配列
+'     alTimes                : 回数
+'Return Value
+'     生成した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/11/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_randStr( _
+    byRef avStrings _
+    , byVal alTimes _
+    )
+    Dim lPos, sRet, lUb
+    sRet = "" : lUb = Ubound(avStrings)
+    For lPos = 1 To alTimes
+        sRet = sRet & avStrings( math_rand(0, lUb, 0) )
+    Next
+    util_randStr = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : util_unzip()
+'Overview                    : zipファイルを解凍する
+'Detailed Description        : https://excel-vba.work/2021/12/10/%E3%80%90vba%E3%80%91zip%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92%E8%A7%A3%E5%87%8D%E5%B1%95%E9%96%8B%E3%81%99%E3%82%8B/#google_vignette
+'Argument
+'     asPath                 : zipファイルのパス
+'     asDestination          : 解凍先
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_unzip( _
+    byVal asPath _
+    , byVal asDestination _
+    )
+    util_unzip=False
+    'PowerShellのコマンドを作成
+    Dim sCmd : sCmd = _
+        "powershell -NoProfile -ExecutionPolicy Unrestricted Expand-Archive -Force" _
+        & " -Path " & fs_wrapInQuotes(asPath) _
+        & " -DestinationPath " & fs_wrapInQuotes(asDestination)
+    '作成したコマンドをサイレント実行する
+    util_unzip = fw_runShellSilently(sCmd)
 End Function
 
 
@@ -2032,6 +2130,26 @@ Private Function fs_readFile( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : fs_wrapInQuotes()
+'Overview                    : 引用符（"：ダブルクォーテーション）で囲む
+'Detailed Description        : 対象に引用符（"：ダブルクォーテーション）を含む場合はエスケープする
+'Argument
+'     asTgt                  : 対象
+'Return Value
+'     対象を引用符（"：ダブルクォーテーション）で囲んだ文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_wrapInQuotes( _
+    byVal asTgt _
+    )
+    fs_wrapInQuotes = Chr(34) & Replace(asTgt, Chr(34), Chr(34)&Chr(34)) & Chr(34)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fs_writeFile()
 'Overview                    : Unicode形式でファイル出力する
 'Detailed Description        : func_FsWriteFile()に委譲し以下の設定で出力する
@@ -2210,9 +2328,9 @@ End Function
 Private Function func_FsGetAllFilesByDir( _
     byVal asPath _
     )
-    Dim sDir : sDir = "dir /S /B /A-D " & Chr(34) & asPath & Chr(34)
+    Dim sDir : sDir = "dir /S /B /A-D " & fs_wrapInQuotes(asPath)
     Dim sTmpPath : sTmpPath = fw_getTempPath()
-    new_Shell().run "cmd /U /C " & sDir & " > " & Chr(34) & sTmpPath & Chr(34), 0, True
+    fw_runShellSilently "cmd /U /C " & sDir & " > " & fs_wrapInQuotes(sTmpPath)
     Dim sLists : sLists = fs_readFile(sTmpPath)
     fs_deleteFile sTmpPath
     

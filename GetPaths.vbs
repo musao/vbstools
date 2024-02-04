@@ -130,7 +130,7 @@ Private Sub sub_GetPathsProc( _
     '一時ファイルに連結した引数を出力
     Dim sTempFilePaths : sTempFilePaths = fw_getTempPath() 
     fs_writeFileDefault sTempFilePaths, oParam.join(vbNewLine)
-    new_Shell().Run "cmd /c clip <""" & sTempFilePaths & """", 0, True
+    fw_runShellSilently "cmd /c clip <" & fs_wrapInQuotes(sTempFilePaths)
     
     '一時ファイルを削除
     fs_deleteFile sTempFilePaths

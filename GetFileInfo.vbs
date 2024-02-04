@@ -205,7 +205,7 @@ Private Sub sub_GetFileInfoReport( _
     '★ログ出力
     sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before open reportfile.")
     'レポートを開く
-    new_Shell().Run sPath, 1
+    fw_runShellSilently fs_wrapInQuotes(sPath)
     
 End Sub
 

@@ -14,6 +14,16 @@
 Option Explicit
 
 '###################################################################################################
+'new_Adodb()
+Sub Test_new_Adodb
+    Dim e : Set e = CreateObject("ADODB.Stream")
+    Dim a : Set a = new_Adodb()
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
 'new_AdptFile()
 '###################################################################################################
 'new_AdptFileOf()

@@ -14,6 +14,81 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+inputbox "","",util_unzip("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\8-1_zipファイル.zip", vbnullstring)
+wscript.quit
+
+'inputbox "","",util_isZipWithPassword(vbNullString)
+'inputbox "","",util_isZipWithPassword(fw_getTempPath())
+'inputbox "","",util_isZipWithPassword(WScript.ScriptFullName)
+'inputbox "","",util_isZipWithPassword("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip")
+'inputbox "","",util_isZipWithPassword("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-2_zipファイルを含むパスワード付きzipファイル.zip")
+'
+'
+'wscript.quit
+'
+'
+'With WScript.CreateObject("ADODB.Stream")
+'    .Type = 1 '  adTypeBinary
+'    .Open
+''    .LoadFromFile "C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip"
+'    .LoadFromFile "C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-2_zipファイルを含むパスワード付きzipファイル.zip"
+'    .Position = 6
+'    inputbox "","",Hex(AscB(.Read(1)))
+'    .Close
+'End With
+'wscript.quit
+
+
+
+Dim stmppath : stmppath = fw_getTempPath()
+fs_createFolder stmppath
+'new_ShellApp().Namespace(stmppath).CopyHere "C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-2_zipファイルを含むパスワード付きzipファイル.zip\7-1_パスワード付きzipファイルの中のパスワードなしzipファイル.zip"
+new_ShellApp().Namespace(stmppath).CopyHere "C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip\9-1_zipファイルの中のzipファイル.zip"
+'msgbox fs_copyFile("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip\9-1_zipファイルの中のzipファイル.zip", new_Fso().BuildPath(stmppath, "9-1_zipファイルの中のzipファイル.zip"))
+
+wscript.quit
+
+
+
+Dim oFolder
+Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-2_zipファイルを含むパスワード付きzipファイル.zip")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\8-1_zipファイル.zip\a_zipファイルの中のフォルダ")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\a_中身があるフォルダ")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip\9-1_zipファイルの中のzipファイル.zip")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\8-1_zipファイル.zip")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip")
+'Set oFolder = new_ShellApp().Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip")
+'Set oFolder = new_ShellApp().Namespace(WScript.ScriptFullName)  'ファイルを指定するとエラー
+'Set oFolder = new_ShellApp().Namespace(new_Fso().GetParentFolderName(WScript.ScriptFullName))
+Dim vArr,oFile2
+For Each oFile2 In oFolder.Items
+    cf_push vArr, Array( _
+        oFolder.GetDetailsOf(oFile2, 0) _
+        , oFolder.GetDetailsOf(oFile2, 1) _
+        , oFolder.GetDetailsOf(oFile2, 2) _
+        , oFolder.GetDetailsOf(oFile2, 3) _
+        , oFolder.GetDetailsOf(oFile2, 4) _
+        , oFile2.IsBrowsable _
+        , oFile2.IsFileSystem _
+        , oFile2.IsFolder _
+        , oFile2.IsLink _
+        , oFile2.ModifyDate _
+        , oFile2.Name _
+        , oFile2.Parent _
+        , oFile2.Path _
+        , oFile2.Size _
+        , oFile2.Type _
+        )
+Next
+fs_writeFile fw_getTempPath(), cf_toString(vArr)
+
+
+wscript.quit
+
+
+
 Dim efe : efe = fw_getTempPath()
 fs_writeFile efe, "test"
 Dim xxd : Set xxd = new_FileOf(efe)

@@ -272,6 +272,23 @@ Sub Test_fw_logger
 End Sub
 
 '###################################################################################################
+'fw_runShellSilently()
+Sub Test_fw_runShellSilently
+    Dim d,e,a
+    d = "cmd /U /C dir"
+    e = True
+    a = fw_runShellSilently(d)
+    AssertEqualWithMessage e, a, "ret"
+End Sub
+Sub Test_fw_runShellSilently_Ng
+    Dim d,e,a
+    d = "cmd /U /C dirx"
+    e = False
+    a = fw_runShellSilently(d)
+    AssertEqualWithMessage e, a, "ret"
+End Sub
+
+'###################################################################################################
 'fw_storeErr()
 Sub Test_fw_storeErr_NoErr
     dim a : Set a = fw_storeErr()

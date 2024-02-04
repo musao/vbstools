@@ -199,7 +199,7 @@ Private Sub sub_GnrtPwGenerate( _
         '一時ファイルに生成したパスワードを出力
         fs_writeFileDefault sPath, sPw
         'クリップボードに一時ファイルの内容を出力
-        new_Shell().Run "cmd /c clip <""" & sPath & """", 0, True
+        fw_runShellSilently "cmd /c clip <" & fs_wrapInQuotes(sPath)
         '一時ファイルを削除
         fs_deleteFile sPath
         '★ログ出力

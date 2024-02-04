@@ -369,6 +369,25 @@ Sub Test_fs_readFile_Err
 End Sub
 
 '###################################################################################################
+'fs_wrapInQuotes()
+Sub Test_fs_wrapInQuotes
+    Dim data
+    data = Array( _
+            Array("data", Chr(34) & "data" & Chr(34)) _
+            , Array(Chr(34), Chr(34) & Chr(34)&Chr(34) & Chr(34)) _
+            , Array(" ", Chr(34) & " " & Chr(34)) _
+            )
+    
+    Dim i,d,e,a
+    For i=0 To Ubound(data)
+        d = data(i)(0)
+        e = data(i)(1)
+        a = fs_wrapInQuotes(d)
+        AssertEqualWithMessage e, a, "i=" & i
+    Next
+End Sub
+
+'###################################################################################################
 'fs_writeFile()
 Sub Test_fs_writeFile
     Dim p
