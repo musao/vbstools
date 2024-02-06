@@ -28,6 +28,27 @@ Sub TearDown()
 End Sub
 
 '###################################################################################################
+'util_escapeForPs()
+Sub Test_util_escapeForPs
+    Dim data
+    data = Array( _
+            Array("normal", "normal") _
+            , Array("(abc", "`(abc") _
+            , Array("ab)c", "ab`)c") _
+            , Array("abc ", "abc` ") _
+            , Array(" a(b)c", "` a`(b`)c") _
+            )
+    
+    Dim i,d,e,a
+    For i=0 To Ubound(data)
+        d = data(i)(0)
+        e = data(i)(1)
+        a = util_escapeForPs(d)
+        AssertEqualWithMessage e, a, "i=" & i
+    Next
+End Sub
+
+'###################################################################################################
 'util_getIpAddress()
 Sub Test_util_getIpAddress
     Const RE_IP4 = "^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"

@@ -1817,6 +1817,34 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
+'Function/Sub Name           : util_escapeForPs()
+'Overview                    : powershell用の特殊文字エスケープを行う
+'Detailed Description        : 公式サイトに書いていないがshellから起動する場合にいくつか対応しないと動作しないものがある
+'                              https://learn.microsoft.com/ja-jp/powershell/module/microsoft.powershell.core/about/about_special_characters?view=powershell-7.4
+'Argument
+'     asTgt                  : 対象
+'Return Value
+'     対象にエスケープ処理した文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/05         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_escapeForPs( _
+    byVal asTgt _
+    )
+    Const Cs_BACKQUOTE = "`"
+    Dim vLst : vLst = Array("(",")"," ")
+    
+    Dim i, sRet : sRet = asTgt
+    For Each i In vLst
+        sRet = Replace(sRet, i, Cs_BACKQUOTE&i)
+    Next
+    util_escapeForPs = sRet
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : util_getIpAddress()
 'Overview                    : 自身のIPアドレスを取得する
 'Detailed Description        : IPアドレスを格納したオブジェクトを返す
@@ -1942,10 +1970,45 @@ Private Function util_unzip( _
     'PowerShellのコマンドを作成
     Dim sCmd : sCmd = _
         "powershell -NoProfile -ExecutionPolicy Unrestricted Expand-Archive -Force" _
-        & " -Path " & fs_wrapInQuotes(asPath) _
-        & " -DestinationPath " & fs_wrapInQuotes(asDestination)
+        & " -Path " & fs_wrapInQuotes(util_escapeForPs(asPath)) _
+        & " -DestinationPath " & fs_wrapInQuotes(util_escapeForPs(asDestination))
     '作成したコマンドをサイレント実行する
     util_unzip = fw_runShellSilently(sCmd)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : util_zip()
+'Overview                    : zipファイルを作成する
+'Detailed Description        : https://learn.microsoft.com/ja-jp/powershell/module/microsoft.powershell.archive/compress-archive?view=powershell-7.4
+'Argument
+'     asPath                 : 圧縮するファイルのパス
+'     asDestination          : zipファイルのパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/05         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_zip( _
+    byRef asPath _
+    , byVal asDestination _
+    )
+    util_zip=False
+    If new_Fso().FileExists(asDestination) Then Exit Function
+
+    '圧縮するファイルのパスを連結
+    Dim sPath : sPath = new_ArrWith(asPath).map(new_Func("(e,i,a)=>fs_wrapInQuotes(util_escapeForPs(e))")).join(",")
+
+    'PowerShellのコマンドを作成
+    Dim sCmd : sCmd = _
+        "powershell -NoProfile -ExecutionPolicy Unrestricted Compress-Archive" _
+        & " -Path " & sPath _
+        & " -DestinationPath " & fs_wrapInQuotes(util_escapeForPs(asDestination))
+
+    '作成したコマンドをサイレント実行する
+    util_zip = fw_runShellSilently(sCmd)
 End Function
 
 

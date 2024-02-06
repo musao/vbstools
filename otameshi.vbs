@@ -14,6 +14,14 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+Dim dete
+'dete="G:\マイドライブ\30_プライベート\20_研修\240116_Udm_【CLF-C02版】これだけでOK! AWS認定クラウドプラクティショナー試験突破講座（豊富な試験問題300問付き）\セクション8：その他の重要サービス\AWS_practioner_8_others.pdf"
+dete=Array("G:\マイドライブ\30_プライベート\20_研修\240116_Udm_【CLF-C02版】これだけでOK! AWS認定クラウドプラクティショナー試験突破講座（豊富な試験問題300問付き）\セクション8：その他の重要サービス\AWS_practioner_8_others.pdf", "G:\マイドライブ\30_プライベート\20_研修\240116_Udm_【CLF-C02版】これだけでOK! AWS認定クラウドプラクティショナー試験突破講座（豊富な試験問題300問付き）\セクション8：その他の重要サービス\AWS_Service_all_CLFC02.pdf")
+'dete="C:\Users\89585\Documents\dev\vbs\ファイルリスト取得高速化2.xlsm"
+'dete=Array("C:\Users\89585\Documents\dev\vbs\ファイルリスト取得高速化2.xlsm", "C:\Users\89585\Documents\dev\vbs\BackupFiles.vbs")
+inputbox "","",util_zip(dete, "C:\Users\89585\Documents\dev\vbs\test.zip")
+wscript.quit
+
 inputbox "","",util_unzip("C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\8-1_zipファイル.zip", vbnullstring)
 wscript.quit
 
