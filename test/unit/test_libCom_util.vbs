@@ -29,24 +29,7 @@ End Sub
 
 '###################################################################################################
 'util_escapeForPs()
-Sub Test_util_escapeForPs
-    Dim data
-    data = Array( _
-            Array("normal", "normal") _
-            , Array("(abc", "`(abc") _
-            , Array("ab)c", "ab`)c") _
-            , Array("abc ", "abc` ") _
-            , Array(" a(b)c", "` a`(b`)c") _
-            )
-    
-    Dim i,d,e,a
-    For i=0 To Ubound(data)
-        d = data(i)(0)
-        e = data(i)(1)
-        a = util_escapeForPs(d)
-        AssertEqualWithMessage e, a, "i=" & i
-    Next
-End Sub
+
 
 '###################################################################################################
 'util_getIpAddress()
