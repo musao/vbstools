@@ -14,6 +14,32 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+Dim sstmppath
+sstmppath = "C:\Users\89585\Downloads\新契約お手続きBOOK.zip\新契約お手続きBOOK.pdf"
+'sstmppath = WScript.ScriptFullName
+inputbox "","",VarType(new_ShellApp().Namespace(new_Fso().GetParentFolderName(sstmppath)).Items().Item(new_Fso().GetFileName(sstmppath)))
+inputbox "","",TypeName(new_ShellApp().Namespace(new_Fso().GetParentFolderName(sstmppath)).Items().Item(new_Fso().GetFileName(sstmppath)))
+wscript.quit
+
+fs_createFolder sstmppath
+'new_ShellApp().Namespace(sstmppath).CopyHere "C:\Users\89585\Downloads\新契約お手続きBOOK.zip\新契約お手続きBOOK.pdf"
+'new_ShellApp().Namespace(sstmppath).CopyHere "C:\Users\89585\Documents\dev\vbs\test\trial\forFsa\9-1_zipファイルを含むzipファイル.zip\9-1_zipファイルの中のzipファイル.zip"
+'new_ShellApp().Namespace(sstmppath).CopyHere "C:\Users\89585\Downloads\ServiceStudio-11.54.41.63060.zip\ServiceStudio-11.54.41.63060.exe"
+new_ShellApp().Namespace(sstmppath).CopyHere "C:\Users\89585\Documents\dev\vbs\tmp\rad9B0B9.tmp\新契約お手続きBOOK.pdf"
+dim arrarr,befbef,sttstt
+Set sttstt = new_Now()
+do
+    befbef = new_FileOf(sstmppath & "\新契約お手続きBOOK.pdf").Size
+'    befbef = new_FileOf(sstmppath & "\9-1_zipファイルの中のzipファイル.zip").Size
+'    befbef = new_FileOf(sstmppath & "\ServiceStudio-11.54.41.63060.exe").Size
+    cf_push arrarr, befbef
+    wscript.Sleep 1
+loop until befbef>0
+
+inputbox "","",cf_toString(arrarr)
+inputbox "","",new_Now().differenceFrom(sttstt)
+wscript.quit
+
 Dim dete
 'dete="G:\マイドライブ\30_プライベート\20_研修\240116_Udm_【CLF-C02版】これだけでOK! AWS認定クラウドプラクティショナー試験突破講座（豊富な試験問題300問付き）\セクション8：その他の重要サービス\AWS_practioner_8_others.pdf"
 dete=Array("G:\マイドライブ\30_プライベート\20_研修\240116_Udm_【CLF-C02版】これだけでOK! AWS認定クラウドプラクティショナー試験突破講座（豊富な試験問題300問付き）\セクション8：その他の重要サービス\AWS_practioner_8_others.pdf", "G:\マイドライブ\30_プライベート\20_研修\240116_Udm_【CLF-C02版】これだけでOK! AWS認定クラウドプラクティショナー試験突破講座（豊富な試験問題300問付き）\セクション8：その他の重要サービス\AWS_Service_all_CLFC02.pdf")

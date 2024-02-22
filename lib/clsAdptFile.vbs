@@ -220,7 +220,8 @@ Class clsAdptFile
         sub_AdptFileFileExists sMyName, asPath
         
         PsPath = asPath
-        Set PoFile = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
+        Set PoFile = new_FolderItem2Of(asPath)
+'        Set PoFile = new_ShellApp().Namespace(new_Fso().GetParentFolderName(asPath)).Items().Item(new_Fso().GetFileName(asPath))
 
         Set setFilePath = Me
     End Function

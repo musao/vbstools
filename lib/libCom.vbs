@@ -1069,6 +1069,28 @@ Private Function new_FileOf( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_FolderItem2Of()
+'Overview                    : FolderItem2オブジェクト生成関数
+'Detailed Description        : 工事中
+'Argument
+'     asPath                 : パス
+'Return Value
+'     生成したFolderItem2オブジェクトのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/02/22         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_FolderItem2Of( _
+    byVal asPath _
+    )
+    With new_Fso()
+        Set new_FolderItem2Of = new_ShellApp().Namespace(.GetParentFolderName(asPath)).Items().Item(.GetFileName(asPath))
+    End With
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_FolderOf()
 'Overview                    : Folderオブジェクト生成関数
 'Detailed Description        : 工事中
@@ -2009,6 +2031,43 @@ Private Function util_zip( _
 
     '作成したコマンドをサイレント実行する
     util_zip = fw_runShellSilently(sCmd)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : util_copyHere()
+'Overview                    : フォルダまたはファイルをフォルダーにコピーする
+'Detailed Description        : Windowsシェル関数のfolder.Copyhere()準拠
+'                              https://learn.microsoft.com/ja-jp/windows/win32/shell/folder-copyhere
+'                              コピー先フォルダが存在しない場合は作成する
+'Argument
+'     asPath                 : コピーするフォルダまたはファイルのパス
+'     asDestination          : コピー先フォルダのパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function util_copyHere( _
+    byVal asPath _
+    , byVal asDestination _
+    )
+    util_copyHere=False
+    With new_Fso()
+        If .FileExists(asDestination) Then Exit Function
+        If Not .FolderExists(asDestination) Then fs_createFolder asDestination
+
+        On Error Resume Next
+        new_ShellApp().Namespace(asDestination).CopyHere asPath
+        If Err.Number<>0 Then Exit Function
+        On Error Goto 0
+
+        Dim sPath : sPath = .BuildPath(asDestination, .GetFileName(asPath))
+        If .FileExists(sPath) Then util_copyHere=True
+        If .FolderExists(sPath) Then util_copyHere=True
+    End With    
 End Function
 
 

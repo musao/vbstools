@@ -224,6 +224,28 @@ Sub Test_new_FileOf_Err
 End Sub
 
 '###################################################################################################
+'new_FolderItem2Of()
+Sub Test_new_FolderItem2Of
+    Dim p,e,a
+    p = WScript.ScriptFullName
+    With CreateObject("Scripting.FileSystemObject")
+        Set e = CreateObject("Shell.Application").Namespace(.GetParentFolderName(p)).Items().Item(.GetFileName(p))
+    End With
+    Set a = new_FolderItem2Of(p)
+    
+    AssertEqual VarType(e), VarType(a)
+    AssertEqual TypeName(e), TypeName(a)
+End Sub
+Sub Test_new_FolderItem2Of_Err
+    On Error Resume Next
+    Dim a : Set a = new_FolderItem2Of(vbNullString)
+    
+    AssertEqual 424, Err.Number
+    AssertEqual "オブジェクトがありません。", Err.Description
+    AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
 'new_FolderOf()
 Sub Test_new_FolderOf
     Dim p,e,a
