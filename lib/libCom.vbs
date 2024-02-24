@@ -536,7 +536,7 @@ Private Function fw_getPrivatePath( _
     'ファイルの上位ディレクトリを決める
     If Len(asParentFolderName)>0 Then
     '引数で指定したディレクトリ名がある場合
-        sParentFolderPath = new_Fso().BuildPath(sParentFolderPath ,asParentFolderName)
+        sParentFolderPath = new_Fso().BuildPath(sParentFolderPath, asParentFolderName)
     End If
 
     '上位ディレクトリが存在しない場合は作成する
@@ -2033,44 +2033,6 @@ Private Function util_zip( _
     util_zip = fw_runShellSilently(sCmd)
 End Function
 
-'***************************************************************************************************
-'Function/Sub Name           : util_copyHere()
-'Overview                    : フォルダまたはファイルをフォルダーにコピーする
-'Detailed Description        : Windowsシェル関数のfolder.Copyhere()準拠
-'                              https://learn.microsoft.com/ja-jp/windows/win32/shell/folder-copyhere
-'                              コピー先フォルダが存在しない場合は作成する
-'Argument
-'     asPath                 : コピーするフォルダまたはファイルのパス
-'     asDestination          : コピー先フォルダのパス
-'Return Value
-'     結果 True:成功 / False:失敗
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2024/02/18         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function util_copyHere( _
-    byVal asPath _
-    , byVal asDestination _
-    )
-    util_copyHere=False
-    With new_Fso()
-        If .FileExists(asDestination) Then Exit Function
-        If Not .FolderExists(asDestination) Then fs_createFolder asDestination
-
-        On Error Resume Next
-        new_ShellApp().Namespace(asDestination).CopyHere asPath
-        If Err.Number<>0 Then Exit Function
-        On Error Goto 0
-
-        Dim sPath : sPath = .BuildPath(asDestination, .GetFileName(asPath))
-        If .FileExists(sPath) Then util_copyHere=True
-        If .FolderExists(sPath) Then util_copyHere=True
-    End With    
-End Function
-
-
 '###################################################################################################
 'ファイル操作系
 '###################################################################################################
@@ -2119,6 +2081,63 @@ Private Function fs_copyFolder( _
     , byVal asTo _
     ) 
     Set fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fs_copyHere()
+'Overview                    : フォルダまたはファイルをフォルダーにコピーする
+'Detailed Description        : Windowsシェル関数のfolder.Copyhere()準拠
+'                              https://learn.microsoft.com/ja-jp/windows/win32/shell/folder-copyhere
+'                              コピー先フォルダが存在しない場合は作成する
+'Argument
+'     asPath                 : コピーするフォルダまたはファイルのパス
+'     asDestination          : コピー先フォルダのパス
+'Return Value
+'     結果 True:成功 / False:失敗
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/02/18         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fs_copyHere( _
+    byVal asPath _
+    , byVal asDestination _
+    )
+
+    On Error Resume Next
+    'コピーするフォルダまたはファイルの存在確認
+    new_FolderItem2Of(asPath)
+    If Err.Number<>0 Then
+        Set fs_copyHere = new_Ret(False)
+        Err.Clear
+        Exit Function
+    End If
+
+    'コピー
+    new_ShellApp().Namespace(asDestination).CopyHere asPath
+    If Err.Number<>0 Then
+        Set fs_copyHere = new_Ret(False)
+        Err.Clear
+        Exit Function
+    End If
+    On Error Goto 0
+
+    'コピー先の存在確認
+    With new_Fso()
+        Dim sPath : sPath = .BuildPath(asDestination, .GetFileName(asPath))
+    End With
+    On Error Resume Next
+    new_FolderItem2Of(sPath)
+    If Err.Number<>0 Then
+        Set fs_copyHere = new_Ret(False)
+        Err.Clear
+        Exit Function
+    End If
+    On Error Goto 0
+
+    Set fs_copyHere = new_Ret(True)
+
 End Function
 
 '***************************************************************************************************
