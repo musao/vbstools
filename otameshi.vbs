@@ -14,6 +14,9 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+inputbox "","",new_Shell().ExpandEnvironmentStrings("%UserProfile%")
+wscript.quit
+
 Dim sstmppath
 sstmppath = "C:\Users\89585\Downloads\VŒ_–ñ‚¨è‘±‚«BOOK.zip\VŒ_–ñ‚¨è‘±‚«BOOK.pdf"
 'sstmppath = WScript.ScriptFullName

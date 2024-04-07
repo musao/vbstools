@@ -16,56 +16,269 @@ Option Explicit
 
 Const MY_NAME = "test_libCom_fs.vbs"
 Dim PsPathTempFolder
+Dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
 
 '###################################################################################################
 'SetUp()/TearDown()
 Sub SetUp()
     '実行スクリプト直下に当ファイル名で一時フォルダ作成
-    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), MY_NAME)
-    If Not (new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
+    PsPathTempFolder = fso.BuildPath(fso.GetParentFolderName(WScript.ScriptFullName), MY_NAME)
+    If Not (fso.FolderExists(PsPathTempFolder)) Then fso.CreateFolder(PsPathTempFolder)
 End Sub
 Sub TearDown()
     '当テストで作成した一時フォルダを削除する
-    new_Fso().DeleteFolder PsPathTempFolder
+    fso.DeleteFolder PsPathTempFolder
 End Sub
 
 '###################################################################################################
 'fs_copyFile()
 Sub Test_fs_copyFile_Normal
-    com_CopyOrMoveFile_Normal(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,False,"Test_fs_copyFile_Normal"))
+    
+    '実行
+    Dim a : Set a = fs_copyFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = True
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFile(d))
 End Sub
 Sub Test_fs_copyFile_Normal_OverRide
-    com_CopyOrMoveFile_OverRide(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,True,"Test_fs_copyFile_Normal_OverRide"))
+    
+    '実行
+    Dim a : Set a = fs_copyFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = True
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFile(d))
 End Sub
 Sub Test_fs_copyFile_Normal_FromFileLocked
-    com_CopyOrMoveFile_FromFileLocked(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,False,"Test_fs_copyFile_Normal_FromFileLocked"))
+    
+    'fromファイルをロックする
+    With lockFile(d.Item("from").Item("path"))
+       '実行
+        Dim a : Set a = fs_copyFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = True
+        AssertEqualWithMessage e, a, "ret"
+        e = False
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFile(d))
 End Sub
 Sub Test_fs_copyFile_Err_FromFileNoExists
-    com_CopyOrMoveFile_FromFileNoExists(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(False,False,"Test_fs_copyFile_Err_FromFileNoExists"))
+
+    '実行
+    Dim a : Set a = fs_copyFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+    '戻り値の検証
+    Dim e
+    e = False
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_copyFile_Err_ToFileLocked
-    com_CopyOrMoveFile_ToFileLocked(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,True,"Test_fs_copyFile_Err_ToFileLocked"))
+    
+    'toファイルをロックする
+    With lockFile(d.Item("to").Item("path"))
+       '実行
+        Dim a : Set a = fs_copyFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 
 '###################################################################################################
 'fs_copyFolder()
 Sub Test_fs_copyFolder_Normal
-    com_CopyOrMoveFolder_Normal(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,False,"Test_fs_copyFolder_Normal"))
+    
+    '実行
+    Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+    
+    '戻り値の検証
+    Dim e
+    e = True
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 Sub Test_fs_copyFolder_Normal_OverRide
-    com_CopyOrMoveFolder_OverRide(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_copyFolder_Normal_OverRide"))
+
+    '実行
+    Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = True
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 Sub Test_fs_copyFolder_Normal_OverRideWithUnrelatedFileLocked
-    com_CopyOrMoveFolder_OverRideWithUnrelatedFileLocked(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_copyFolder_Normal_OverRideWithUnrelatedFileLocked"))
+    
+    '上書きしないtoフォルダのファイル（to-fla）をロックする
+    With lockFile(d.Item("to-fla").Item("path"))
+       '実行
+        Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = True
+        AssertEqualWithMessage e, a, "ret"
+        e = False
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 Sub Test_fs_copyFolder_Normal_FromFileLocked
-    com_CopyOrMoveFolder_FromFileLocked(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_copyFolder_Normal_FromFileLocked"))
+    
+    'fromフォルダのファイル（from-fl1）をロックする
+    With lockFile(d.Item("from-fl1").Item("path"))
+       '実行
+        Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = True
+        AssertEqualWithMessage e, a, "ret"
+        e = False
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 Sub Test_fs_copyFolder_Err_FromFileNoExists
-    com_CopyOrMoveFolder_FromFileNoExists(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(False,False,"Test_fs_copyFolder_Err_FromFileNoExists"))
+
+    '実行
+    Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = False
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_copyFolder_Err_ToFileLocked
-    com_CopyOrMoveFolder_ToFileLocked(True)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_copyFolder_Err_ToFileLocked"))
+    
+    'toフォルダの上書きするファイル（to-flb）をロックする
+    With lockFile(d.Item("to-flb").Item("path"))
+       '実行
+        Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+'    assertFolderItems(createExpectDefinitionUnchange("to",d))
+    assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 
 '###################################################################################################
@@ -82,7 +295,7 @@ Sub Test_fs_copyHere_Normal_file2folder
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
 
-    With CreateObject("Scripting.FileSystemObject")
+    With fso
         e = .GetFile(from).Size
         a = .GetFile(.BuildPath(toto, .GetFileName(from))).Size
         AssertEqualWithMessage e, a, "Size"
@@ -100,7 +313,7 @@ Sub Test_fs_copyHere_Normal_folder2folder
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
 
-    With CreateObject("Scripting.FileSystemObject")
+    With fso
         e = .GetFolder(from).Size
         a = .GetFolder(.BuildPath(toto, .GetFileName(from))).Size
         AssertEqualWithMessage e, a, "Size"
@@ -108,7 +321,7 @@ Sub Test_fs_copyHere_Normal_folder2folder
 End Sub
 
 Function CreateFileForCopyhere(c)
-    With CreateObject("Scripting.FileSystemObject")
+    With fso
         Dim p : p = .BuildPath(PsPathTempFolder, .GetTempName())
         Dim ts : Set ts = .OpenTextFile(p, 2, True, -1)
     End With
@@ -119,7 +332,7 @@ Function CreateFileForCopyhere(c)
     CreateFileForCopyhere = p
 End Function
 Function CreateFolderForCopyhere()
-    With CreateObject("Scripting.FileSystemObject")
+    With fso
         Dim p : p = .BuildPath(PsPathTempFolder, .GetTempName())
         .CreateFolder p
     End With
@@ -130,7 +343,7 @@ End Function
 'fs_createFolder()
 Sub Test_fs_createFolder
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
     assertExistsFolder p, False, "before", "createfolder", "folder"
     
     Dim ao,e
@@ -148,7 +361,7 @@ Sub Test_fs_createFolder
 End Sub
 Sub Test_fs_createFolder_ErrExistsFile
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
 
     Dim c,d
     'ファイルを作成
@@ -177,11 +390,11 @@ Sub Test_fs_createFolder_ErrExistsFile
 End Sub
 Sub Test_fs_createFolder_ErrExistsFolder
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
 
     Dim c,d
     'フォルダを作成
-    new_Fso().CreateFolder p
+    fso.CreateFolder p
     assertExistsFolder p, True, "before", "createfolder", "folder"
     
     Dim ao,e
@@ -204,7 +417,7 @@ Sub Test_fs_deleteFile
     Dim c,p,d
     'ファイルを作成
     c = "UTF-8"
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     d = "For" & vbNewLine & "DeleteFile Normal"
     writeTestFile c,p,d
     assertExistsFile p, True, "before", "deleteFile", "file"
@@ -224,7 +437,7 @@ Sub Test_fs_deleteFile
 End Sub
 Sub Test_fs_deleteFile_Err_NotExists
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "deleteFile", "file"
 
     Dim e,ao
@@ -242,7 +455,7 @@ Sub Test_fs_deleteFile_Err_NotExists
 End Sub
 Sub Test_fs_deleteFile_Err_FileLocked
     Dim c,p,d
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "For" & vbNewLine & "DeleteFile Err FileLocked"
     writeTestFile c,p,d
@@ -279,11 +492,11 @@ End Sub
 Sub Test_fs_deleteFolder
     Dim c,p,pf,d
     'フォルダを作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder p
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    fso.CreateFolder p
     'フォルダの下にファイルを作成
     c = "UTF-8"
-    pf = new_Fso().BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    pf = fso.BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     d = "For" & vbNewLine & "DeleteFolder Normal"
     writeTestFile c,pf,d
     assertExistsFolder p, True, "before", "deleteFolder", "folder"
@@ -303,7 +516,7 @@ Sub Test_fs_deleteFolder
 End Sub
 Sub Test_fs_deleteFolder_Err_NotExists
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
     assertExistsFolder p, False, "before", "deleteFolder", "folder"
 
     Dim e,ao
@@ -322,11 +535,11 @@ End Sub
 Sub Test_fs_deleteFolder_Err_FileLocked
     Dim c,p,pf,d
     'フォルダを作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder p
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    fso.CreateFolder p
     'フォルダの下にファイルを作成
     c = "UTF-8"
-    pf = new_Fso().BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    pf = fso.BuildPath(p, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     d = "For" & vbNewLine & "DeleteFolder Err FileLocked"
     writeTestFile c,pf,d
 
@@ -359,40 +572,251 @@ End Sub
 '###################################################################################################
 'fs_moveFile()
 Sub Test_fs_moveFile_Normal
-    com_CopyOrMoveFile_Normal(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,False,"Test_fs_moveFile_Normal"))
+    
+    '実行
+    Dim a : Set a = fs_moveFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = True
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionDisappearFromFile(d))
+    assertFolderItems(createExpectDefinitionMergeFile(d))
 End Sub
 Sub Test_fs_moveFile_Err_OverRide
-    com_CopyOrMoveFile_OverRide(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,True,"Test_fs_moveFile_Err_OverRide"))
+    
+    '実行
+    Dim a : Set a = fs_moveFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = False
+    AssertEqualWithMessage e, a, "ret"
+    e = True
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFile_Err_FromFileLocked
-    com_CopyOrMoveFile_FromFileLocked(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,False,"Test_fs_moveFile_Err_FromFileLocked"))
+    
+    'fromファイルをロックする
+    With lockFile(d.Item("from").Item("path"))
+       '実行
+        Dim a : Set a = fs_moveFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFile_Err_FromFileNoExists
-    com_CopyOrMoveFile_FromFileNoExists(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(False,False,"Test_fs_moveFile_Err_FromFileNoExists"))
+
+    '実行
+    Dim a : Set a = fs_moveFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+    '戻り値の検証
+    Dim e
+    e = False
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFile_Err_ToFileLocked
-    com_CopyOrMoveFile_ToFileLocked(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,True,"Test_fs_moveFile_Err_ToFileLocked"))
+    
+    'toファイルをロックする
+    With lockFile(d.Item("to").Item("path"))
+       '実行
+        Dim a : Set a = fs_moveFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 
 '###################################################################################################
 'fs_moveFolder()
 Sub Test_fs_moveFolder_Normal
-    com_CopyOrMoveFolder_Normal(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,False,"Test_fs_moveFolder_Normal"))
+    
+    '実行
+    Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = True
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionDisappearFromFolder(d))
+    assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 Sub Test_fs_moveFolder_Err_OverRide
-    com_CopyOrMoveFolder_OverRide(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_moveFolder_Err_OverRide"))
+    
+    '実行
+    Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = False
+    AssertEqualWithMessage e, a, "ret"
+    e = True
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFolder_Err_OverRideWithUnrelatedFileLocked
-    com_CopyOrMoveFolder_OverRideWithUnrelatedFileLocked(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_moveFolder_Err_OverRideWithUnrelatedFileLocked"))
+    
+    'to-flaをロックする
+    With lockFile(d.Item("to-fla").Item("path"))
+       '実行
+        Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFolder_Err_FromFileLocked
-    com_CopyOrMoveFolder_FromFileLocked(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_moveFolder_Err_FromFileLocked"))
+    
+    'fromフォルダのファイル（from-fl1）をロックする
+    With lockFile(d.Item("from-fl1").Item("path"))
+       '実行
+        Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFolder_Err_FromFileNoExists
-    com_CopyOrMoveFolder_FromFileNoExists(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(False,False,"Test_fs_moveFolder_Err_FromFileNoExists"))
+    
+    '実行
+    Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+    '戻り値の検証
+    Dim e
+    e = False
+    AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 0
+    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 Sub Test_fs_moveFolder_Err_ToFileLocked
-    com_CopyOrMoveFolder_ToFileLocked(False)
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_moveFolder_Err_ToFileLocked"))
+    
+    'toフォルダの上書きするファイル（to-flb）をロックする
+    With lockFile(d.Item("to-flb").Item("path"))
+       '実行
+        Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
+
+        '戻り値の検証
+        Dim e
+        e = False
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 0
+        AssertEqualWithMessage e, Err.Number, "Err.Number"
+
+        .Close
+    End With
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("from",d))
+    assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
 
 '###################################################################################################
@@ -400,7 +824,7 @@ End Sub
 Sub Test_fs_readFile
     Dim c,p,d
     'ファイルを作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
     writeTestFile c,p,d
@@ -412,7 +836,7 @@ Sub Test_fs_readFile
 End Sub
 Sub Test_fs_readFile_Err
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "readFile", "file"
 
     Dim e,a
@@ -445,7 +869,7 @@ End Sub
 'fs_writeFile()
 Sub Test_fs_writeFile
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "writeFile", "file"
 
     Dim d,e,a
@@ -463,7 +887,7 @@ End Sub
 Sub Test_fs_writeFile_Rewrite
     Dim p,c,d
     '上書きするファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "UTF-8"
     d = "For" & vbNewLine & "Rewrite"
     writeTestFile c,p,d
@@ -484,7 +908,7 @@ End Sub
 Sub Test_fs_writeFile_Err
     Dim p,c,d
     'ロックするファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "For" & vbNewLine & "Write Error"
     writeTestFile c,p,d
@@ -514,7 +938,7 @@ End Sub
 'fs_writeFileDefault()
 Sub Test_fs_writeFileDefault
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "writeFileDefault", "file"
 
     Dim d,e,a
@@ -534,7 +958,7 @@ End Sub
 'func_FsWriteFile()
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Normal__Format_SystemDefault
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
     Dim d,iomode,create,f,e,a
@@ -555,7 +979,7 @@ End Sub
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode
     Dim p,c,d
     '上書きするファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "For" & vbNewLine & "Rewrite"
     writeTestFile c,p,d
@@ -578,7 +1002,7 @@ Sub Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Normal__Format_Ascii
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
     Dim d,iomode,create,f,e,a
@@ -599,7 +1023,7 @@ End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault
     Dim p,c,d
     '追記するファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "shift-jis"
     d = "For" & vbNewLine & "Append"
     writeTestFile c,p,d
@@ -622,7 +1046,7 @@ Sub Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Normal__Format_Unicode
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
     Dim d,iomode,create,f,e,a
@@ -643,7 +1067,7 @@ End Sub
 Sub Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii
     Dim p,c,d
     '上書きするファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "shift-jis"
     d = "For" & vbNewLine & "Rewrite"
     writeTestFile c,p,d
@@ -665,7 +1089,7 @@ Sub Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Err
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsWriteFile", "file"
 
     Dim d,iomode,create,f,e,a
@@ -683,7 +1107,7 @@ End Sub
 Sub Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode
     Dim p,c,d
     '上書きするファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
     d = "For" & vbNewLine & "Rewrite"
     writeTestFile c,p,d
@@ -706,7 +1130,7 @@ End Sub
 Sub Test_func_FsWriteFile_Err_FileLocked
     Dim p,d,c
     'ロックするファイルを一旦作成
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     c = "Unicode"
 '    c = "shift-jis"
     d = "error" & vbNewLine & "FileLocked"
@@ -741,7 +1165,7 @@ End Sub
 'func_FsReadFile()
 Sub Test_func_FsReadFile_Normal__Format_SystemDefault
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
     Dim d,f,c
     d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_SystemDefault"
@@ -756,7 +1180,7 @@ Sub Test_func_FsReadFile_Normal__Format_SystemDefault
 End Sub
 Sub Test_func_FsReadFile_Normal__Format_Unicode
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
     Dim d,f,c
     d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Unicode"
@@ -771,7 +1195,7 @@ Sub Test_func_FsReadFile_Normal__Format_Unicode
 End Sub
 Sub Test_func_FsReadFile_Normal__Format_Ascii
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
 
     Dim d,f,c
     d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Ascii"
@@ -786,7 +1210,7 @@ Sub Test_func_FsReadFile_Normal__Format_Ascii
 End Sub
 Sub Test_func_FsReadFile_Err
     Dim p
-    p = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
     assertExistsFile p, False, "before", "func_FsReadFile", "file"
 
     Dim f,e,a
@@ -799,710 +1223,6 @@ End Sub
 
 '###################################################################################################
 'common
-Sub com_CopyOrMoveFile_Normal(IsCopy)
-    'fromパスを作成
-    Dim from : from = getTempPath(PsPathTempFolder)
-    'fromファイルを作成
-    createTextFile from, "For" & vbNewLine & "copy/moveFile Normal"
-    assertExistsFile from, True, "before", "copy/moveFile", "fromfile"
-    Dim sf : sf = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-    
-    'toパスを作成
-    Dim toto : toto = getTempPath(PsPathTempFolder)
-    assertExistsFile toto, False, "before", "copy/moveFile", "tofile"
-
-    Dim e,a
-    '実行結果の確認
-    If IsCopy Then
-        Set a = fs_copyFile(from,toto)
-    Else
-        Set a = fs_moveFile(from,toto)
-    End If
-    AssertEqualWithMessage True, a, "ret"
-    AssertEqualWithMessage False, a.isErr, "isErr"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    'fromファイルの確認
-    If isCopy Then
-        assertExistsFile from, True, "after", "copy/moveFile", "fromfile"
-        e = sf
-        a = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-        AssertEqualWithMessage e, a, "Size"
-    Else
-        assertExistsFile from, False, "after", "copy/moveFile", "fromfile"
-    End If
-
-    'toファイルの確認
-    assertExistsFile toto, True, "after", "copy/moveFile", "tofile"
-    e = sf
-    a = CreateObject("Scripting.FileSystemObject").GetFile(toto).Size
-    AssertEqualWithMessage e, a, "Size"
-End Sub
-Sub com_CopyOrMoveFile_OverRide(IsCopy)
-    'fromパスを作成
-    Dim from : from = getTempPath(PsPathTempFolder)
-    'fromファイルを作成
-    createTextFile from, "For" & vbNewLine & "copy/moveFile OverRide"
-    assertExistsFile from, True, "before", "copy/moveFile", "fromfile"
-    Dim sf : sf = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-    
-    'toパスを作成
-    Dim toto : toto = getTempPath(PsPathTempFolder)
-    'toファイルを作成
-    createTextFile toto, "For" & vbNewLine & "copy/moveFile ToFile"
-    assertExistsFile toto, True, "before", "copy/moveFile", "tofile"
-    Dim st : st = CreateObject("Scripting.FileSystemObject").GetFile(toto).Size
-
-    'copyは正常（上書きする）moveは異常（上書きしない）になる
-    Dim e,a
-    '実行結果の確認
-    If IsCopy Then
-        e = True
-        Set a = fs_copyFile(from,toto)
-    Else
-        e = False
-        Set a = fs_moveFile(from,toto)
-    End If
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage Not(e), a.isErr, "isErr"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    'fromファイルの確認
-    assertExistsFile from, True, "after", "copy/moveFile", "fromfile"
-    e = sf
-    a = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-    AssertEqualWithMessage e, a, "Size"
-
-    'toファイルの確認
-    assertExistsFile toto, True, "after", "copy/moveFile", "tofile"
-    If isCopy Then e = sf Else e = st
-    a = CreateObject("Scripting.FileSystemObject").GetFile(toto).Size
-    AssertEqualWithMessage e, a, "Size"
-End Sub
-Sub com_CopyOrMoveFile_FromFileLocked(IsCopy)
-    'fromパスを作成
-    Dim from : from = getTempPath(PsPathTempFolder)
-    'fromファイルを作成
-    createTextFile from, "For" & vbNewLine & "copy/moveFile FromFileLocked"
-    assertExistsFile from, True, "before", "copy/moveFile", "fromfile"
-    Dim sf : sf = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-
-    'toパスを作成
-    Dim toto : toto = getTempPath(PsPathTempFolder)
-    assertExistsFile toto, False, "before", "copy/moveFile", "tofile"
-
-    Dim e,a
-    'fromファイルをロックする
-    With lockFile(from)
-        '実行結果の確認
-        If IsCopy Then
-            e = True
-            Set a = fs_copyFile(from,toto)
-        Else
-            e = False
-            Set a = fs_moveFile(from,toto)
-        End If
-        AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage Not(e), a.isErr, "isErr"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-        .Close
-    End With
-
-    'fromファイルの確認
-    assertExistsFile from, True, "after", "copy/moveFile", "fromfile"
-    e = sf
-    a = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-    AssertEqualWithMessage e, a, "Size"
-
-    'toファイルの確認
-    If isCopy Then
-        assertExistsFile toto, True, "after", "copy/moveFile", "tofile"
-        e = sf
-        a = CreateObject("Scripting.FileSystemObject").GetFile(toto).Size
-        AssertEqualWithMessage e, a, "Size"
-    Else
-        assertExistsFile toto, False, "after", "copy/moveFile", "tofile"
-    End If
-End Sub
-Sub com_CopyOrMoveFile_FromFileNoExists(IsCopy)
-    'fromパスを作成
-    Dim from : from = getTempPath(PsPathTempFolder)
-    assertExistsFile from, False, "before", "copy/moveFile", "fromfile"
-    
-    'toパスを作成
-    Dim toto : toto = getTempPath(PsPathTempFolder)
-    assertExistsFile toto, False, "before", "copy/moveFile", "tofile"
-
-    Dim e,a
-    '実行結果の確認
-    If isCopy Then
-        Set a = fs_copyFile(from,toto)
-    Else
-        Set a = fs_moveFile(from,toto)
-    End If
-    AssertEqualWithMessage False, a, "ret"
-    AssertEqualWithMessage False, a.isErr, "isErr"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    'fromファイルの確認
-    assertExistsFile from, False, "after", "copy/moveFile", "fromfile"
-
-    'toファイルの確認
-    assertExistsFile toto, False, "after", "copy/moveFile", "tofile"
-End Sub
-Sub com_CopyOrMoveFile_ToFileLocked(IsCopy)
-    'fromパスを作成
-    Dim from : from = getTempPath(PsPathTempFolder)
-    'fromファイルを作成
-    createTextFile from, "For" & vbNewLine & "copy/moveFile fromfile ToFileLocked"
-    assertExistsFile from, True, "before", "copy/move", "fromfile"
-    Dim sf : sf = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-    
-    'toパスを作成
-    Dim toto : toto = getTempPath(PsPathTempFolder)
-    'toファイルを作成
-    createTextFile toto, "For" & vbNewLine & "copy/moveFile ToFileLocked"
-    assertExistsFile toto, True, "before", "copy/moveFile", "tofile"
-    Dim st : st = CreateObject("Scripting.FileSystemObject").GetFile(toto).Size
-
-    Dim e,a
-    'toファイルをロックする
-    With lockFile(toto)
-        '実行結果の確認
-        If isCopy Then
-            Set a = fs_copyFile(from,toto)
-        Else
-            Set a = fs_moveFile(from,toto)
-        End If
-        AssertEqualWithMessage False, a, "ret"
-        AssertEqualWithMessage True, a.isErr, "isErr"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-        .Close
-    End With
-
-    'fromファイルの確認
-    assertExistsFile from, True, "after", "copy/move", "fromfile"
-    e = sf
-    a = CreateObject("Scripting.FileSystemObject").GetFile(from).Size
-    AssertEqualWithMessage e, a, "Size"
-
-    'toファイルの確認
-    assertExistsFile toto, True, "after", "copy/moveFile", "tofile"
-    e = st
-    a = CreateObject("Scripting.FileSystemObject").GetFile(toto).Size
-    AssertEqualWithMessage e, a, "Size"
-End Sub
-Sub com_CopyOrMoveFolder_Normal(IsCopy)
-    Dim from
-    'fromフォルダを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder from
-    Dim c,p,ff1,ff2,ff3,df1,df2
-    'fromフォルダの下にファイルとフォルダを作成
-    c = "Unicode"
-    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
-    df1 = "For" & vbNewLine & "copy/moveFolder Normal ff1"
-    p = new_Fso().BuildPath(from, ff1)
-    writeTestFile c,p,df1
-    ff2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
-    df2 = "For" & vbNewLine & "copy/moveFolder Normal ff2"
-    p = new_Fso().BuildPath(from, ff2)
-    writeTestFile c,p,df2
-    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
-    p = new_Fso().BuildPath(from, ff3)
-    new_Fso().CreateFolder p
-    assertExistsFolder from, True, "before", "copy/moveFolder", "fromfolder"
-    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
-    assertExistsFile new_Fso().BuildPath(from, ff2), True, "before", "copy/moveFolder", "fromfolder-file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
-    
-    Dim toto
-    'toパスを作成（フォルダは作成しない）
-    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
-    assertExistsFolder toto, False, "before", "copy/moveFolder", "toFolder"
-
-    Dim e,a
-    '実行結果の確認
-    e = True
-    If isCopy Then
-        a = fs_copyFolder(from,toto)
-    Else
-        a = fs_moveFolder(from,toto)
-    End If
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    'fromフォルダの確認
-    If isCopy Then
-        assertExistsFolder from, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount from, 2, 1, "from"
-        e = df1
-        a = readTestFile(c, new_Fso().BuildPath(from, ff1))
-        AssertEqualWithMessage e, a, "cont file1"
-        e = df2
-        a = readTestFile(c, new_Fso().BuildPath(from, ff2))
-        AssertEqualWithMessage e, a, "cont file2"
-        assertExistsFolder new_Fso().BuildPath(from, ff3), True, "after", "copy/moveFolder", "fromfolder-folder3"
-    Else
-        assertExistsFolder from, False, "after", "copy/moveFolder", "toFolder"
-    End If
-
-    'toフォルダの確認
-    assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-    assertFilesSubfoldersCount toto, 2, 1, "to"
-    e = df1
-    a = readTestFile(c, new_Fso().BuildPath(toto, ff1))
-    AssertEqualWithMessage e, a, "cont file1"
-    e = df2
-    a = readTestFile(c, new_Fso().BuildPath(toto, ff2))
-    AssertEqualWithMessage e, a, "cont file2"
-    assertExistsFolder new_Fso().BuildPath(toto, ff3), True, "after", "copy/moveFolder", "tofolder-folder3"
-End Sub
-Sub com_CopyOrMoveFolder_OverRide(IsCopy)
-    Dim from
-    'fromフォルダを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder from
-    Dim c,p,ff1,ff2,ff3,df1,df2
-    'fromフォルダの下にファイルとフォルダを作成
-    c = "Unicode"
-    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
-    df1 = "For" & vbNewLine & "copy/moveFolder OverRide ff1"
-    p = new_Fso().BuildPath(from, ff1)
-    writeTestFile c,p,df1
-    ff2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
-    df2 = "For" & vbNewLine & "copy/moveFolder OverRide ff2"
-    p = new_Fso().BuildPath(from, ff2)
-    writeTestFile c,p,df2
-    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
-    p = new_Fso().BuildPath(from, ff3)
-    new_Fso().CreateFolder p
-    assertExistsFolder from, True, "before", "copy/move", "fromfolder"
-    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
-    assertExistsFile new_Fso().BuildPath(from, ff2), True, "before", "copy/moveFolder", "fromfolder-file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
-    
-    Dim toto
-    'toフォルダを作成
-    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
-    new_Fso().CreateFolder toto
-    Dim ft1,ft2,ft3,dt1,dt2
-    'toフォルダの下にファイルとフォルダを作成
-    ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
-    dt1 = "For" & vbNewLine & "copy/moveFolder OverRide ft1"
-    p = new_Fso().BuildPath(toto, ft1)
-    writeTestFile c,p,dt1
-    ft2 = ff2
-    dt2 = "For" & vbNewLine & "copy/moveFolder OverRide ft2"
-    p = new_Fso().BuildPath(toto, ft2)
-    writeTestFile c,p,dt2
-    ft3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
-    p = new_Fso().BuildPath(toto, ft3)
-    new_Fso().CreateFolder p
-    assertExistsFolder toto, True, "before", "copy/moveFolder", "tofolder"
-    assertExistsFile new_Fso().BuildPath(toto, ft1), True, "before", "copy/moveFolder", "tofolder-file1"
-    assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
-    assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
-
-    'copyは正常（上書きする）moveは異常（上書きしない）になる
-    Dim e,a
-    '実行結果の確認
-    If isCopy Then
-        e = True
-        a = fs_copyFolder(from,toto)
-    Else
-        e = False
-        a = fs_moveFolder(from,toto)
-    End If
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    'fromフォルダの確認
-    assertExistsFolder from, True, "after", "copy/moveFolder", "fromFolder"
-    assertFilesSubfoldersCount from, 2, 1, "from"
-    e = df1
-    a = readTestFile(c, new_Fso().BuildPath(from, ff1))
-    AssertEqualWithMessage e, a, "cont file1"
-    e = df2
-    a = readTestFile(c, new_Fso().BuildPath(from, ff2))
-    AssertEqualWithMessage e, a, "cont file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "after", "copy/moveFolder", "fromfolder-folder3"
-
-    'toフォルダの確認
-    If isCopy Then
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 3, 2, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-tofile1"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-tofolder3"
-        e = df1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = df2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ff3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    Else
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 2, 1, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = dt2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    End If
-End Sub
-Sub com_CopyOrMoveFolder_OverRideWithUnrelatedFileLocked(IsCopy)
-    Dim from
-    'fromフォルダを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder from
-    Dim c,p,ff1,ff2,ff3,df1,df2
-    'fromフォルダの下にファイルとフォルダを作成
-    c = "Unicode"
-    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
-    df1 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ff1"
-    p = new_Fso().BuildPath(from, ff1)
-    writeTestFile c,p,df1
-    ff2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
-    df2 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ff2"
-    p = new_Fso().BuildPath(from, ff2)
-    writeTestFile c,p,df2
-    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
-    p = new_Fso().BuildPath(from, ff3)
-    new_Fso().CreateFolder p
-    assertExistsFolder from, True, "before", "copy/moveFolder", "fromfolder"
-    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
-    assertExistsFile new_Fso().BuildPath(from, ff2), True, "before", "copy/moveFolder", "fromfolder-file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
-    
-    Dim toto
-    'toフォルダを作成
-    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
-    new_Fso().CreateFolder toto
-    Dim ft1,ft2,ft3,dt1,dt2
-    'toフォルダの下にファイルとフォルダを作成
-    ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
-    dt1 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ft1"
-    p = new_Fso().BuildPath(toto, ft1)
-    writeTestFile c,p,dt1
-    ft2 = ff2
-    dt2 = "For" & vbNewLine & "copy/moveFolder OverRideWithUnrelatedFileLocked ft2"
-    p = new_Fso().BuildPath(toto, ft2)
-    writeTestFile c,p,dt2
-    ft3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
-    p = new_Fso().BuildPath(toto, ft3)
-    new_Fso().CreateFolder p
-    assertExistsFolder toto, True, "before", "copy/moveFolder", "tofolder"
-    assertExistsFile new_Fso().BuildPath(toto, ft1), True, "before", "copy/moveFolder", "tofolder-file1"
-    assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
-    assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
-    
-    p = new_Fso().BuildPath(toto, ft1)
-    'toフォルダのファイル（ft1）をロックする
-    With lockFile(p)
-        Dim e,a
-        '実行結果の確認
-        If isCopy Then
-            e = True
-            a = fs_copyFolder(from,toto)
-        Else
-            e = False
-            a = fs_moveFolder(from,toto)
-        End If
-        
-        'fs_copyFolder()/fs_moveFolder()がエラーにならないことを確認する
-        AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-        .Close
-    End With
-
-    'toフォルダのファイル（ft1）をロックしているが、上書きしないためcopyは正常に完了する、moveはエラーになる
-
-    'fromフォルダの確認
-    assertExistsFolder from, True, "after", "copy/moveFolder", "fromFolder"
-    assertFilesSubfoldersCount from, 2, 1, "from"
-    e = df1
-    a = readTestFile(c, new_Fso().BuildPath(from, ff1))
-    AssertEqualWithMessage e, a, "cont file1"
-    e = df2
-    a = readTestFile(c, new_Fso().BuildPath(from, ff2))
-    AssertEqualWithMessage e, a, "cont file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "after", "copy/moveFolder", "fromfolder-folder3"
-
-    'toフォルダの確認
-    If isCopy Then
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 3, 2, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-tofile1"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-tofolder3"
-        e = df1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = df2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ff3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    Else
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 2, 1, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = dt2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    End If
-End Sub
-Sub com_CopyOrMoveFolder_FromFileLocked(IsCopy)
-    Dim from
-    'fromフォルダを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder from
-    Dim c,ff1,ff2,ff3,df1,df2
-    'fromフォルダの下にファイルとフォルダを作成
-    c = "Unicode"
-    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
-    df1 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ff1"
-    p = new_Fso().BuildPath(from, ff1)
-    writeTestFile c,p,df1
-    ff2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
-    df2 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ff2"
-    p = new_Fso().BuildPath(from, ff2)
-    writeTestFile c,p,df2
-    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
-    p = new_Fso().BuildPath(from, ff3)
-    new_Fso().CreateFolder p
-    assertExistsFolder from, True, "before", "copy/moveFolder", "fromfolder"
-    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
-    assertExistsFile new_Fso().BuildPath(from, ff2), True, "before", "copy/moveFolder", "fromfolder-file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
-    
-    Dim toto
-    'toフォルダを作成
-    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
-    new_Fso().CreateFolder toto
-    Dim p,ft1,ft2,ft3,dt1,dt2
-    'toフォルダの下にファイルとフォルダを作成
-    ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
-    dt1 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ft1"
-    p = new_Fso().BuildPath(toto, ft1)
-    writeTestFile c,p,dt1
-    ft2 = ff2
-    dt2 = "For" & vbNewLine & "copy/moveFolder FromFileLocked ft2"
-    p = new_Fso().BuildPath(toto, ft2)
-    writeTestFile c,p,dt2
-    ft3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
-    p = new_Fso().BuildPath(toto, ft3)
-    new_Fso().CreateFolder p
-    assertExistsFolder toto, True, "before", "copy/moveFolder", "tofolder"
-    assertExistsFile new_Fso().BuildPath(toto, ft1), True, "before", "copy/moveFolder", "tofolder-file1"
-    assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
-    assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
-
-    p = new_Fso().BuildPath(from, ff2)
-    'fromフォルダのファイル（ff2）をロックする
-    With lockFile(p)
-        'copyは正常（上書きする）moveは異常（上書きしない）になる
-        Dim e,a
-        '実行結果の確認
-        If isCopy Then
-            e = True
-            a = fs_copyFolder(from,toto)
-        Else
-            e = False
-            a = fs_moveFolder(from,toto)
-        End If
-        
-        'fs_copyFolder()/fs_moveFolder()がエラーにならないことを確認する
-        AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-        .Close
-    End With
-
-    'fromフォルダのファイル（ff2）をロックしていると、copyは正常、moveがエラーになる
-
-    'fromフォルダの確認
-    assertExistsFolder from, True, "after", "copy/moveFolder", "fromFolder"
-    assertFilesSubfoldersCount from, 2, 1, "from"
-    e = df1
-    a = readTestFile(c, new_Fso().BuildPath(from, ff1))
-    AssertEqualWithMessage e, a, "cont file1"
-    e = df2
-    a = readTestFile(c, new_Fso().BuildPath(from, ff2))
-    AssertEqualWithMessage e, a, "cont file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "after", "copy/moveFolder", "fromfolder-folder3"
-
-    'toフォルダの確認
-    If isCopy Then
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 3, 2, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-tofile1"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-tofolder3"
-        e = df1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = df2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ff3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    Else
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 2, 1, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = dt2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    End If
-End Sub
-Sub com_CopyOrMoveFolder_FromFileNoExists(IsCopy)
-    Dim from
-    'fromパスを作成（フォルダは作成しない）
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    assertExistsFolder from, False, "before", "copy/moveFolder", "fromfolder"
-    
-    Dim toto
-    'toパスを作成（フォルダは作成しない）
-    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
-    assertExistsFolder toto, False, "before", "copy/moveFolder", "tofolder"
-
-    Dim e,a
-    '実行結果の確認
-    e = False
-    If isCopy Then
-        a = fs_copyFolder(from,toto)
-    Else
-        a = fs_moveFolder(from,toto)
-    End If
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    'fromフォルダの確認
-    assertExistsFolder from, False, "after", "copy/moveFolder", "fromFolder"
-
-    'toフォルダの確認
-    assertExistsFolder toto, False, "after", "copy/moveFolder", "toFolder"
-End Sub
-Sub com_CopyOrMoveFolder_ToFileLocked(IsCopy)
-    Dim from
-    'fromフォルダを作成
-    from = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    new_Fso().CreateFolder from
-    Dim c,p,ff1,ff2,ff3,df1,df2
-    'fromフォルダの下にファイルとフォルダを作成
-    c = "Unicode"
-    ff1 = new_Now().formatAs("YYMMDD_hhmmss.000000_f1.txt")
-    df1 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ff1"
-    p = new_Fso().BuildPath(from, ff1)
-    writeTestFile c,p,df1
-    ff2 = new_Now().formatAs("YYMMDD_hhmmss.000000_f2.txt")
-    df2 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ff2"
-    p = new_Fso().BuildPath(from, ff2)
-    writeTestFile c,p,df2
-    ff3 = new_Now().formatAs("YYMMDD_hhmmss.000000_f3")
-    p = new_Fso().BuildPath(from, ff3)
-    new_Fso().CreateFolder p
-    assertExistsFolder from, True, "before", "copy/moveFolder", "fromfolder"
-    assertExistsFile new_Fso().BuildPath(from, ff1), True, "before", "copy/moveFolder", "fromfolder-file1"
-    assertExistsFile new_Fso().BuildPath(from, ff2), True, "before", "copy/moveFolder", "fromfolder-file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "before", "copy/moveFolder", "fromfolder-folder3"
-    
-    Dim toto
-    'コピー先フォルダを作成
-    toto = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000_"))
-    new_Fso().CreateFolder toto
-    Dim ft1,ft2,ft3,dt1,dt2
-    'フォルダの下にファイルとフォルダを作成
-    ft1 = new_Now().formatAs("YYMMDD_hhmmss.000000_t1.txt")
-    dt1 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ft1"
-    p = new_Fso().BuildPath(toto, ft1)
-    writeTestFile c,p,dt1
-    ft2 = ff2
-    dt2 = "For" & vbNewLine & "copy/moveFolder ToFileLocked ft2"
-    p = new_Fso().BuildPath(toto, ft2)
-    writeTestFile c,p,dt2
-    ft3 = new_Now().formatAs("YYMMDD_hhmmss.000000_t3")
-    p = new_Fso().BuildPath(toto, ft3)
-    new_Fso().CreateFolder p
-    assertExistsFolder toto, True, "before", "copy/moveFolder", "tofolder"
-    assertExistsFile new_Fso().BuildPath(toto, ft1), True, "before", "copy/moveFolder", "tofolder-file1"
-    assertExistsFile new_Fso().BuildPath(toto, ft2), True, "before", "copy/moveFolder", "tofolder-file2"
-    assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "before", "copy/moveFolder", "tofolder-folder3"
-
-    p = new_Fso().BuildPath(toto, ft2)
-    'toフォルダのファイル（ft2）をロックする
-    With lockFile(p)
-        Dim e,a
-        '実行結果の確認
-        e = False
-        If isCopy Then
-            a = fs_copyFolder(from,toto)
-        Else
-            a = fs_moveFolder(from,toto)
-        End If
-        
-        'fs_copyFolder()/fs_moveFolder()がエラーになることを確認する
-        AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-        .Close
-    End With
-
-    '1つ目のファイルfn1はコピーまたは移動し、2つ目のファイルfn2のコピーまたは移動が失敗する、3つ目のフォルダfn3はコピーまたは移動しない
-
-    'fromフォルダの確認
-    assertExistsFolder from, True, "after", "copy/move", "fromFolder"
-    assertFilesSubfoldersCount from, 2, 1, "from"
-    e = df1
-    a = readTestFile(c, new_Fso().BuildPath(from, ff1))
-    AssertEqualWithMessage e, a, "cont file1"
-    e = df2
-    a = readTestFile(c, new_Fso().BuildPath(from, ff2))
-    AssertEqualWithMessage e, a, "cont file2"
-    assertExistsFolder new_Fso().BuildPath(from, ff3), True, "after", "copy/move", "fromfolder-folder3"
-
-    'toフォルダの確認
-    If isCopy Then
-        assertExistsFolder toto, True, "after", "copy/move", "toFolder"
-        assertFilesSubfoldersCount toto, 3, 1, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-tofile1"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/move", "tofolder-tofolder3"
-        e = df1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = dt2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ff2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ff3), False, "after", "copy/move", "tofolder-fromfolder3"
-    Else
-        assertExistsFolder toto, True, "after", "copy/moveFolder", "toFolder"
-        assertFilesSubfoldersCount toto, 2, 1, "to"
-        e = dt1
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft1))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile1"
-        e = dt2
-        a = readTestFile(c, new_Fso().BuildPath(toto, ft2))
-        AssertEqualWithMessage e, a, "cont tofolder-fromfile2"
-        assertExistsFolder new_Fso().BuildPath(toto, ft3), True, "after", "copy/moveFolder", "tofolder-fromfolder3"
-    End If
-End Sub
 Sub writeTestFile(c,p,d)
     With CreateObject("ADODB.Stream")
         .Charset = c
@@ -1522,31 +1242,411 @@ Function readTestFile(c,p)
     End With
 End Function
 Function lockFile(p)
-    Set lockFile = new_Ts(p, 8, True, -1)
+    Set lockFile = fso.OpenTextFile(p, 8, True, -1)
 End Function
 Function getTempPath(pf)
-    With CreateObject("Scripting.FileSystemObject")
-        Dim p : p = .BuildPath(pf, .GetTempName())
-    End With
-    getTempPath = p
+    getTempPath = buildPath(pf, getTempName())
+End Function
+Function getTempName()
+    getTempName = fso.GetTempName()
+End Function
+Function buildPath(pf,p)
+    buildPath = fso.BuildPath(pf, p)
+End Function
+Function getFileName(p)
+    getFileName = fso.GetFileName(p)
 End Function
 Sub createTextFile(p,c)
-    With CreateObject("Scripting.FileSystemObject").OpenTextFile(p, 2, True, -1)
+    With fso.OpenTextFile(p, 2, True, -1)
         .Write c
         .Close
     End With
 End Sub
 Sub assertExistsFile(path, expect, timestr, action, tgt)
-    AssertEqualWithMessage expect, new_Fso().FileExists(path), timestr & " " & action & " " & tgt & " exists"
+    AssertEqualWithMessage expect, fso.FileExists(path), timestr & " " & action & " " & tgt & " exists"
 End Sub
 Sub assertExistsFolder(path, expect, timestr, action, tgt)
-    AssertEqualWithMessage expect, new_Fso().FolderExists(path), timestr & " " & action & " " & tgt & " exists"
+    AssertEqualWithMessage expect, fso.FolderExists(path), timestr & " " & action & " " & tgt & " exists"
 End Sub
 Sub assertFilesSubfoldersCount(path, expectfilecnt, expectfoldercnt, tgt)
-    AssertEqualWithMessage expectfilecnt, new_Fso().GetFolder(path).Files.Count, tgt & " folderFiles Count"
-    AssertEqualWithMessage expectfoldercnt, new_Fso().GetFolder(path).SubFolders.Count, tgt & " folderSubFolders Count"
+    AssertEqualWithMessage expectfilecnt, fso.GetFolder(path).Files.Count, tgt & " folderFiles Count"
+    AssertEqualWithMessage expectfoldercnt, fso.GetFolder(path).SubFolders.Count, tgt & " folderSubFolders Count"
 End Sub
 
+'TestItem作成
+Function createTestItems(a)
+    '定義生成
+    Dim i,d : Set d = CreateObject("Scripting.Dictionary")
+    For Each i In a
+        d.Add i(0), defineTestItem(i)
+    Next
+    'item作成
+    For Each i In d.Items
+        createTestItem i
+    Next
+    'info取得
+    For Each i In d.Items
+        getTestItemInfo i
+    Next
+    
+    Set createTestItems = d
+End Function
+Function defineTestItem(a)
+    Dim data : Set data = CreateObject("Scripting.Dictionary")
+    With data
+        .Add "type", a(1)
+        .Add "parentFolder", a(2)
+        .Add "relativePath", a(3)
+        .Add "name", getFileName(buildPath(a(2),a(3)))
+        .Add "path",  buildPath(PsPathTempFolder, buildPath(a(2),a(3)))
+        .Add "isSetup", a(4)
+        .Add "cont", a(5)
+    End With
+    Set defineTestItem = data
+End Function
+Sub createTestItem(i)
+    With i
+        If .Item("isSetup") Then
+            Dim p : p = .Item("path")
+            If .Item("type")="textfile" Then
+                createTextFile p, .Item("cont")
+            End If
+            If .Item("type")="folder" Then
+                fso.CreateFolder p
+            End If
+        End If
+    End With
+End Sub
+Sub getTestItemInfo(i)
+    With i
+        If .Item("isSetup") Then
+            Dim p : p = .Item("path")
+            If .Item("type")="textfile" Then
+                .Add "size", fso.GetFile(p).Size
+                .Add "DateLastModified", fso.GetFile(p).DateLastModified
+            End If
+            If .Item("type")="folder" Then
+                .Add "size", fso.GetFolder(p).Size
+                .Add "DateLastModified", fso.GetFolder(p).DateLastModified
+                .Add "Files.Count", fso.GetFolder(p).Files.Count
+                .Add "SubFolders.Count", fso.GetFolder(p).SubFolders.Count
+            End If
+        End If
+    End With
+End Sub
+Function createTestItemDefinitionForFile(f,t,n)
+    Dim fromFolder : fromFolder = getTempName()
+    Dim toFolder : toFolder = getTempName()
+    Dim ret : ret = Array( _
+        Array(  "from-folder", "folder"  , fromFolder, vbNullString , True , Empty) _
+        , Array("from"       , "textfile", fromFolder, getTempName(), False, Empty) _
+        , Array("to-folder"  , "folder"  , toFolder  , vbNullString , True , Empty) _
+        , Array("to"         , "textfile", toFolder  , getTempName(), False, Empty) _
+        )
+    If f Then ret(1) = _
+          Array("from"       , "textfile", fromFolder, getTempName(), True, "For " & n & " as FromFile.")
+    If t Then ret(3) = _
+          Array("to"         , "textfile", toFolder  , getTempName(), True, "For " & n & " as ToFile.")
+    createTestItemDefinitionForFile = ret
+End Function
+Function createTestItemDefinitionForFolder(f,t,n)
+    Dim fromFolder : fromFolder = getTempName()
+    Dim overRideFile : overRideFile = getTempName()
+    Dim overRideFolder : overRideFolder = getTempName()
+    Dim fa
+    If f Then
+        fa = Array( _
+            Array(  "from-folder" , "folder"  , fromFolder, vbNullString                            , True , Empty) _
+            , Array("from-fl1"    , "textfile", fromFolder, getTempName()                           , True , "For " & n & " as from-fl1.") _
+            , Array("from-fl2"    , "textfile", fromFolder, overRideFile                            , True , "For " & n & " as from-file2.") _
+            , Array("from-fd1"    , "folder"  , fromFolder, overRideFolder                          , True , Empty) _
+            , Array("from-fd1-fl1", "textfile", fromFolder, buildPath(overRideFolder, getTempName()), True , "For " & n & " as from-fd1-fl1.") _
+            , Array("from-fd2"    , "folder"  , fromFolder, getTempName()                           , True , Empty) _
+            )
+    Else
+        fa = Array( _
+            Array(  "from-folder" , "folder"  , fromFolder, vbNullString                            , False, Empty) _
+        )
+    End If
+
+    Dim toFolder : toFolder = getTempName()
+    Dim ta
+    If t Then
+        ta = Array( _
+            Array(  "to-folder"   , "folder"  , toFolder  , vbNullString                            , True, Empty) _
+            , Array("to-fla"      , "textfile", toFolder  , getTempName()                           , True, "For " & n & " as to-fl1.") _
+            , Array("to-flb"      , "textfile", toFolder  , overRideFile                            , True, "For " & n & " as to-filesecond.") _
+            , Array("to-fda"      , "folder"  , toFolder  , overRideFolder                          , True, Empty) _
+            , Array("to-fda-fla"  , "textfile", toFolder  , buildPath(overRideFolder, getTempName()), True, "For " & n & " as to-fd1-fileone.") _
+            , Array("to-fdb"      , "folder"  , toFolder  , getTempName()                           , True, Empty) _
+            )
+    Else
+        ta = Array( _
+            Array(  "to-folder"   , "folder"  , toFolder  , vbNullString                            , False, Empty) _
+            )
+    End If
+
+    Dim ubfa : ubfa = Ubound(fa)
+    Redim ret(ubfa)
+    Dim i
+    For i=0 To ubfa
+        ret(i) = fa(i)
+    Next
+    Redim Preserve ret(ubfa+Ubound(ta)+1)
+    For i=0 To Ubound(ta)
+        ret(ubfa+1+i) = ta(i)
+    Next
+    
+    createTestItemDefinitionForFolder = ret
+End Function
+
+'検証
+Sub assertFolderItems(a)
+    '定義生成
+    Dim i,d : Set d = CreateObject("Scripting.Dictionary")
+    For Each i In a
+        d.Add i(0), defineAssertItem(i)
+    Next
+    '検証
+    Dim p
+    For Each i In d.Keys
+        With d.Item(i)
+            p = buildPath(.Item("parentFolder"), .Item("relativePath"))
+            If .Item("type")="textfile" Then
+                assertFile i, .Item("expect"), p
+            End If
+            If .Item("type")="folder" Then
+                assertFolder i, .Item("expect"), p
+            End If
+            If .Item("type")="NotExistsFile" Then
+                AssertEqualWithMessage False, fso.FileExists(p), i&"-"&.Item("type")
+            End If
+            If .Item("type")="NotExistsFolder" Then
+                AssertEqualWithMessage False, fso.FolderExists(p), i&"-"&.Item("type")
+            End If
+        End With
+    Next
+End Sub
+Function defineAssertItem(a)
+    Dim data : Set data = CreateObject("Scripting.Dictionary")
+    With data
+        .Add "type",  a(1)
+        .Add "expect",  a(2)
+        .Add "parentFolder", a(3)
+        .Add "relativePath", a(4)
+    End With
+    Set defineAssertItem = data
+End Function
+Sub assertFile(n,d,p)
+    Dim e,a,i
+    i = "name"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFile(p).Name
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+    i = "size"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFile(p).Size
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+    i = "DateLastModified"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFile(p).DateLastModified
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+End Sub
+Sub assertFolder(n,d,p)
+    Dim e,a,i
+    i = "name"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFolder(p).Name
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+    i = "size"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFolder(p).Size
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+    i = "DateLastModified"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFolder(p).DateLastModified
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+    i = "Files.Count"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFolder(p).Files.Count
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+    i = "SubFolders.Count"
+    If d.Exists(i) Then
+        e = d.Item(i)
+        a = fso.GetFolder(p).SubFolders.Count
+        AssertEqualWithMessage e, a, n&"-"&i
+    End If
+End Sub
+
+Function createExpectDefinitionMergeFile(d)
+    Dim expToFolder : Set expToFolder = exclusionItem(d.Item("from-folder"), Array("DateLastModified")) : expToFolder.Item("name") = d.Item("to-folder").Item("name")
+    Dim expTo : Set expTo = exclusionItem(d.Item("from"), Array()) : expTo.Item("name") = d.Item("to").Item("name")
+    Dim ret : ret = Array( _
+        Array(  "to-folder"  , "folder"       , expToFolder          , d.Item("to-folder").Item("path")  , d.Item("to-folder").Item("relativePath")) _
+        , Array("to"         , "textfile"     , expTo                , d.Item("to-folder").Item("path")  , d.Item("to").Item("relativePath")) _
+        )
+    createExpectDefinitionMergeFile = ret
+End Function
+Function createExpectDefinitionDisappearFromFile(d)
+    Dim expFromFolder : Set expFromFolder = exclusionItem(d.Item("from-folder"), Array("DateLastModified"))
+    With expFromFolder
+        .Item("size") = 0
+        .Item("Files.Count") = 0
+    End With
+    Dim ret : ret = Array( _
+        Array(  "from-folder", "folder"       , expFromFolder        , d.Item("from-folder").Item("path"), d.Item("from-folder").Item("relativePath")) _
+        , Array("from"       , "NotExistsFile", Empty                , d.Item("from-folder").Item("path"), d.Item("from").Item("relativePath")) _
+        )
+    createExpectDefinitionDisappearFromFile = ret
+End Function
+Function createExpectDefinitionDisappearFromFolder(d)
+    createExpectDefinitionDisappearFromFolder = Array( _
+        Array(  "from-folder" , "NotExistsFolder", Empty             , d.Item("from-folder").Item("path"), d.Item("from-fl1").Item("relativePath")) _
+        )
+End Function
+
+Function createExpectDefinitionUnchange(kd,d)
+    Dim i,k,t : i=0
+    Redim a(d.Count-1)
+    For Each k In d.Keys
+        If StrComp(kd,Mid(k,1,Len(kd)),vbBinaryCompare)=0 Then
+            If d.Item(k).Item("isSetup") Then
+                a(i) = Array(k, d.Item(k).Item("type"), d.Item(k), d.Item(kd&"-folder").Item("path"), d.Item(k).Item("relativePath"))
+            Else
+                If StrComp(d.Item(k).Item("type"),"folder")=0 Then t="NotExistsFolder" Else t="NotExistsFile"
+                a(i) = Array(k, t                     , Empty    , d.Item(kd&"-folder").Item("path"), d.Item(k).Item("relativePath"))
+            End If
+            i = i + 1
+        End If
+    Next
+    If i>0 Then Redim Preserve a(i-1)
+    createExpectDefinitionUnchange = a
+End Function
+Function createExpectDefinitionMergeFolder(d)
+    'toの期待値をベースにする
+    Dim exps : exps = createExpectDefinitionUnchange("to",d)
+    Dim toFp : toFp = exps(0)(3)
+
+    'toのrelativePathとindexをrpに取得
+    Dim rps : Set rps = CreateObject("Scripting.Dictionary")
+    Dim i,rp,ele
+    For i=0 To Ubound(exps)
+        ele = exps(i)
+        rp = ele(4)
+        If Not rps.Exists(rp) Then rps.Add rp, i
+    Next
+
+    'fromの期待値を上書きする
+    Dim f : f = createExpectDefinitionUnchange("from",d)
+    For i=0 To Ubound(f)
+        ele = f(i)
+        rp = ele(4)
+
+        'フォルダパスをtoフォルダに書き換える
+        ele(3) = toFp
+        If Len(rp)=0 Then
+        'toフォルダ自身
+            'fromフォルダの期待値の"name"をtoフォルダ名で上書きする
+            ele(2).Item("name") = getFileName(toFp)
+        End If
+
+        If rps.Exists(rp) Then
+        'relativePathがtoの期待値にある場合は上書き
+            exps(rps.Item(rp)) = ele
+        Else
+        'relativePathがtoの期待値にない場合は追加
+            Redim Preserve exps(Ubound(exps)+1)
+            exps(Ubound(exps)) = ele
+            rps.Add rp, Ubound(exps)
+        End If
+    Next
+
+    'folderの期待値を書き換える
+    Dim exp,j
+    For i=0 To Ubound(exps)
+        ele = exps(i)
+        Set exp = ele(2)
+        If StrComp(ele(1),"folder",vbBinaryCompare)=0 Then
+        'folderの場合は期待値を修正する
+            'DateLastModifiedはクリアする
+            Set exp = exclusionItem(exp, Array("DateLastModified"))
+            '属性の値を再集計して設定
+            With createExpectDefinitionMergeFolderAggregate(exps,ele(4))
+                For Each j In Array("size","Files.Count","SubFolders.Count")
+                    exp.Item(j) = .Item(j)
+                Next
+            End With
+            Set exps(i)(2) = exp
+        End If
+    Next
+
+    createExpectDefinitionMergeFolder = exps
+End Function
+Function createExpectDefinitionMergeFolderAggregate(exps,rp)
+    'rp以下のアイテムをexpsから取得し集計する
+    Dim sz,flc,fdc : sz=0 : flc=0 : fdc=0
+    Dim i,p,t,e
+    For Each i In exps
+        t=i(1) : Set e=i(2) : p=i(4)
+        If StrComp(rp,Mid(p,1,Len(rp)),vbBinaryCompare)=0 Then
+            If StrComp(rp,p,vbBinaryCompare)<>0 Then
+                'サイズはフォルダ以下のファイルを全て集計する
+                If StrComp("folder",t,vbBinaryCompare)<>0 Then sz=sz+e.Item("size")
+                'フォルダとファイル数は直下のアイテムだけカウントする
+                If InStr(1,Mid(p,Len(rp)+2,Len(p)),"\",vbBinaryCompare)=0 Then
+                    If StrComp("folder",t,vbBinaryCompare)=0 Then
+                        fdc = fdc + 1
+                    Else
+                        flc = flc + 1
+                    End If
+                End If
+            End If
+        End If
+    Next
+    '戻り値を返却する
+    Dim ret : Set ret = CreateObject("Scripting.Dictionary")
+    With ret
+        .Add "size", sz
+        .Add "Files.Count", flc
+        .Add "SubFolders.Count", fdc
+    End With
+    Set createExpectDefinitionMergeFolderAggregate = ret
+End Function
+
+Function exclusionItem(o,e)
+    Dim ret : Set ret = CreateObject("Scripting.Dictionary")
+    Dim i
+    For Each i In o.Keys()
+        If inList(e,i)=False Then
+           ret.add i, o.Item(i)
+        End If
+    Next
+    Set exclusionItem = ret
+End Function
+Function inList(a,s)
+    inList = False
+    Dim i
+    For Each i In a
+        If i=s Then
+            inList = True
+            Exit Function
+        End If
+    Next
+End Function
 
 ' Local Variables:
 ' mode: Visual-Basic

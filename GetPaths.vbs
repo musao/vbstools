@@ -128,8 +128,8 @@ Private Sub sub_GetPathsProc( _
     Dim oParam : Set oParam = aoParams.Item("Param")
     
     '一時ファイルに連結した引数を出力
-    Dim sTempFilePaths : sTempFilePaths = fw_getTempPath() 
-    fs_writeFileDefault sTempFilePaths, Replace(oParam.join(vbNewLine),"C:\Users\89585", "%UserProfile%")
+    Dim sTempFilePaths : sTempFilePaths = fw_getTempPath()
+    fs_writeFileDefault sTempFilePaths, func_GetPathsReplaceEnvironmentStrings(oParam.join(vbNewLine))
     fw_runShellSilently "cmd /c clip <" & fs_wrapInQuotes(sTempFilePaths)
     
     '一時ファイルを削除
@@ -137,6 +137,36 @@ Private Sub sub_GetPathsProc( _
     
     Set oParam = Nothing
 End Sub
+
+'***************************************************************************************************
+'Processing Order            : 2-1
+'Function/Sub Name           : func_GetPathsReplaceEnvironmentStrings()
+'Overview                    : 環境変数に置き換える
+'Detailed Description        : 工事中
+'Argument
+'     asStr                  : 対象
+'Return Value
+'     環境変数に置き換えた文字列
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/04/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_GetPathsReplaceEnvironmentStrings( _
+    byVal asStr _
+    )
+    Dim sSettings
+    sSettings = Array("%UserProfile%")
+
+    Dim sRet : sRet = asStr
+    Dim i
+    For Each i In sSettings
+        sRet = Replace(sRet, new_Shell().ExpandEnvironmentStrings(i), i)
+    Next
+
+    func_GetPathsReplaceEnvironmentStrings = sRet
+End Function
 
 '***************************************************************************************************
 'Processing Order            : -
