@@ -259,7 +259,8 @@ Sub Test_fs_copyFolder_Err_ToFileLocked
     Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(True,True,"Test_fs_copyFolder_Err_ToFileLocked"))
     
     'toフォルダの上書きするファイル（to-flb）をロックする
-    With lockFile(d.Item("to-flb").Item("path"))
+    Dim lockedItem : Set lockedItem = d.Item("to-flb")
+    With lockFile(lockedItem.Item("path"))
        '実行
         Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
 
@@ -277,8 +278,8 @@ Sub Test_fs_copyFolder_Err_ToFileLocked
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
-'    assertFolderItems(createExpectDefinitionUnchange("to",d))
-    assertFolderItems(createExpectDefinitionMergeFolder(d))
+    'toフォルダで上書きするファイル（to-flb）まではコピーする
+    assertFolderItems(createExpectDefinitionMergeFolderUntilOverRideFile(d,lockedItem.Item("relativePath")))
 End Sub
 
 '###################################################################################################
@@ -1537,6 +1538,29 @@ Function createExpectDefinitionUnchange(kd,d)
     createExpectDefinitionUnchange = a
 End Function
 Function createExpectDefinitionMergeFolder(d)
+    '全てのfromの情報で期待値を上書きする
+    Dim f : f = createExpectDefinitionUnchange("from",d)
+    createExpectDefinitionMergeFolder = createExpectDefinitionMergeFolderProc(d,f)
+End Function
+Function createExpectDefinitionMergeFolderUntilOverRideFile(d,rp)
+    '期待値を上書きするfromの情報は指定したrpまで
+    Dim f : f = createExpectDefinitionUnchange("from",d)
+    Dim i,p
+    For i=0 to Ubound(f)
+       p = f(i)(4)
+       If StrComp(rp,p,vbBinaryCompare)=0 Then Exit For
+    Next
+    Dim ret
+    If i=0 Then
+        ret = Array()
+    Else
+        Redim Preserve f(i-1)
+        ret = f
+    End If
+    createExpectDefinitionMergeFolderUntilOverRideFile = f
+End Function
+
+Function createExpectDefinitionMergeFolderProc(d,f)
     'toの期待値をベースにする
     Dim exps : exps = createExpectDefinitionUnchange("to",d)
     Dim toFp : toFp = exps(0)(3)
@@ -1550,8 +1574,7 @@ Function createExpectDefinitionMergeFolder(d)
         If Not rps.Exists(rp) Then rps.Add rp, i
     Next
 
-    'fromの期待値を上書きする
-    Dim f : f = createExpectDefinitionUnchange("from",d)
+    '引数fで期待値を上書きする
     For i=0 To Ubound(f)
         ele = f(i)
         rp = ele(4)
@@ -1585,7 +1608,7 @@ Function createExpectDefinitionMergeFolder(d)
             'DateLastModifiedはクリアする
             Set exp = exclusionItem(exp, Array("DateLastModified"))
             '属性の値を再集計して設定
-            With createExpectDefinitionMergeFolderAggregate(exps,ele(4))
+            With createExpectDefinitionMergeFolderProcAggregate(exps,ele(4))
                 For Each j In Array("size","Files.Count","SubFolders.Count")
                     exp.Item(j) = .Item(j)
                 Next
@@ -1594,9 +1617,9 @@ Function createExpectDefinitionMergeFolder(d)
         End If
     Next
 
-    createExpectDefinitionMergeFolder = exps
+    createExpectDefinitionMergeFolderProc = exps
 End Function
-Function createExpectDefinitionMergeFolderAggregate(exps,rp)
+Function createExpectDefinitionMergeFolderProcAggregate(exps,rp)
     'rp以下のアイテムをexpsから取得し集計する
     Dim sz,flc,fdc : sz=0 : flc=0 : fdc=0
     Dim i,p,t,e
@@ -1624,7 +1647,7 @@ Function createExpectDefinitionMergeFolderAggregate(exps,rp)
         .Add "Files.Count", flc
         .Add "SubFolders.Count", fdc
     End With
-    Set createExpectDefinitionMergeFolderAggregate = ret
+    Set createExpectDefinitionMergeFolderProcAggregate = ret
 End Function
 
 Function exclusionItem(o,e)
