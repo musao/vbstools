@@ -45,8 +45,6 @@ Sub Test_fs_copyFile_Normal
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -65,8 +63,6 @@ Sub Test_fs_copyFile_Normal_OverRide
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -87,8 +83,6 @@ Sub Test_fs_copyFile_Normal_FromFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = False
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
 
         .Close
     End With
@@ -109,8 +103,6 @@ Sub Test_fs_copyFile_Err_FromFileNoExists
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -131,8 +123,10 @@ Sub Test_fs_copyFile_Err_ToFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 70
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "書き込みできません。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
@@ -157,8 +151,6 @@ Sub Test_fs_copyFolder_Normal
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -177,8 +169,6 @@ Sub Test_fs_copyFolder_Normal_OverRide
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -199,8 +189,6 @@ Sub Test_fs_copyFolder_Normal_OverRideWithUnrelatedFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = False
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
 
         .Close
     End With
@@ -224,8 +212,6 @@ Sub Test_fs_copyFolder_Normal_FromFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = False
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
 
         .Close
     End With
@@ -247,8 +233,6 @@ Sub Test_fs_copyFolder_Err_FromFileNoExists
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -270,8 +254,10 @@ Sub Test_fs_copyFolder_Err_ToFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 70
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "書き込みできません。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
@@ -585,8 +571,6 @@ Sub Test_fs_moveFile_Normal
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
 
     'データの検証
     assertFolderItems(createExpectDefinitionDisappearFromFile(d))
@@ -605,8 +589,10 @@ Sub Test_fs_moveFile_Err_OverRide
     AssertEqualWithMessage e, a, "ret"
     e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    e = 58
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "既に同名のファイルが存在しています。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -627,8 +613,10 @@ Sub Test_fs_moveFile_Err_FromFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 70
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "書き込みできません。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
@@ -649,8 +637,6 @@ Sub Test_fs_moveFile_Err_FromFileNoExists
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -671,8 +657,10 @@ Sub Test_fs_moveFile_Err_ToFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 58
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "既に同名のファイルが存在しています。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
@@ -697,8 +685,6 @@ Sub Test_fs_moveFolder_Normal
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
     
     'データの検証
     assertFolderItems(createExpectDefinitionDisappearFromFolder(d))
@@ -717,8 +703,10 @@ Sub Test_fs_moveFolder_Err_OverRide
     AssertEqualWithMessage e, a, "ret"
     e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
+    e = 58
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "既に同名のファイルが存在しています。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -739,8 +727,10 @@ Sub Test_fs_moveFolder_Err_OverRideWithUnrelatedFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 58
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "既に同名のファイルが存在しています。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
@@ -764,8 +754,10 @@ Sub Test_fs_moveFolder_Err_FromFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 70
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "書き込みできません。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
@@ -787,8 +779,6 @@ Sub Test_fs_moveFolder_Err_FromFileNoExists
     AssertEqualWithMessage e, a, "ret"
     e = False
     AssertEqualWithMessage e, a.isErr, "isErr"
-    e = 0
-    AssertEqualWithMessage e, Err.Number, "Err.Number"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -809,8 +799,10 @@ Sub Test_fs_moveFolder_Err_ToFileLocked
         AssertEqualWithMessage e, a, "ret"
         e = True
         AssertEqualWithMessage e, a.isErr, "isErr"
-        e = 0
-        AssertEqualWithMessage e, Err.Number, "Err.Number"
+        e = 58
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "既に同名のファイルが存在しています。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
