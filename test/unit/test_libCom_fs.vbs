@@ -387,77 +387,65 @@ End Sub
 '###################################################################################################
 'fs_deleteFile()
 Sub Test_fs_deleteFile
-    Dim c,p,d
-    'ファイルを作成
-    c = "UTF-8"
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    d = "For" & vbNewLine & "DeleteFile Normal"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "deleteFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForDeleteFile(True,"Test_fs_deleteFile"))
 
-    Dim e,ao
+    '実行
+    Dim a : Set a = fs_deleteFile(d.Item("target").Item("path"))
+
+    '戻り値の検証
+    Dim e
     e = True
-    Set ao = fs_deleteFile(p)
-    AssertEqualWithMessage e, ao, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    Dim a
+    AssertEqualWithMessage e, a, "ret"
     e = False
-    a = ao.isErr()
-    AssertEqualWithMessage e, a, "isErr()"
+    AssertEqualWithMessage e, a.isErr, "isErr"
 
-    assertExistsFile p, False, "after", "deleteFile", "file"
+    'データの検証
+    assertFolderItems(createExpectDefinitionDisappearFile("target",d))
 End Sub
 Sub Test_fs_deleteFile_Err_NotExists
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "deleteFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForDeleteFile(False,"Test_fs_deleteFile_Err_NotExists"))
 
-    Dim e,ao
+    '実行
+    Dim a : Set a = fs_deleteFile(d.Item("target").Item("path"))
+
+    '戻り値の検証
+    Dim e
     e = False
-    Set ao = fs_deleteFile(p)
-    AssertEqualWithMessage e, ao, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    Dim a
+    AssertEqualWithMessage e, a, "ret"
     e = False
-    a = ao.isErr()
-    AssertEqualWithMessage e, a, "isErr()"
+    AssertEqualWithMessage e, a.isErr, "isErr"
 
-    assertExistsFile p, False, "after", "deleteFile", "file"
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 Sub Test_fs_deleteFile_Err_FileLocked
-    Dim c,p,d
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "Unicode"
-    d = "For" & vbNewLine & "DeleteFile Err FileLocked"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "deleteFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForDeleteFile(True,"Test_fs_deleteFile_Err_FileLocked"))
 
-    'ファイルをロックする
-    With lockFile(p)
-        Dim e,ao
+    'targetファイルをロックする
+    Dim target : target = d.Item("target").Item("path")
+    With lockFile(target)
+       '実行
+        Dim a : Set a = fs_deleteFile(target)
+
+        '戻り値の検証
+        Dim e
         e = False
-        Set ao = fs_deleteFile(p)
-        
-        'fs_deleteFile()がエラーになることを確認する
-        AssertEqualWithMessage e, ao, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+        AssertEqualWithMessage e, a, "ret"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 70
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "書き込みできません。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
 
-    Dim a
-    e = True
-    a = ao.isErr()
-    AssertEqualWithMessage e, a, "isErr()"
-
-    e = 70
-    a = ao.getErr().Item("Number")
-    AssertEqualWithMessage e, a, "getErr().Item('Number')"
-
-    'ファイルが削除されていないことを確認
-    assertExistsFile p, True, "after", "deleteFile", "file"
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 
 '###################################################################################################
@@ -559,7 +547,7 @@ Sub Test_fs_moveFile_Normal
     AssertEqualWithMessage e, a.isErr, "isErr"
 
     'データの検証
-    assertFolderItems(createExpectDefinitionDisappearFromFile(d))
+    assertFolderItems(createExpectDefinitionDisappearFile("from",d))
     assertFolderItems(createExpectDefinitionMergeFile(d))
 End Sub
 Sub Test_fs_moveFile_Err_OverRide
@@ -673,7 +661,7 @@ Sub Test_fs_moveFolder_Normal
     AssertEqualWithMessage e, a.isErr, "isErr"
     
     'データの検証
-    assertFolderItems(createExpectDefinitionDisappearFromFolder(d))
+    assertFolderItems(createExpectDefinitionDisappearFolder("from",d))
     assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
 Sub Test_fs_moveFolder_Err_OverRide
@@ -1390,6 +1378,14 @@ Function createTestItemDefinitionForCreateFolder(cfl,cfd,n)
         Array(  "target", tp, getTempName(), vbNullString , flg, n) _
         )
 End Function
+'For Test_fs_deleteFile*()
+Function createTestItemDefinitionForDeleteFile(f,n)
+    Dim targetFolder : targetFolder = getTempName()
+    createTestItemDefinitionForDeleteFile = Array( _
+        Array(  "target-folder", "folder"  , targetFolder, vbNullString , True, Empty) _
+        , Array("target"       , "textfile", targetFolder, getTempName(), f   , n) _
+        )
+End Function
 
 '検証
 Sub assertFolderItems(a)
@@ -1524,23 +1520,23 @@ Function createExpectDefinitionCreateFolder(d)
         Array(  "target", "folder", exp, d.Item("target").Item("path"), d.Item("target").Item("relativePath")) _
         )
 End Function
-'For Test_fs_moveFile_*()
-Function createExpectDefinitionDisappearFromFile(d)
-    Dim expFromFolder : Set expFromFolder = exclusionItem(d.Item("from-folder"), Array("DateLastModified"))
+'For Test_fs_moveFile_*(),Test_fs_deleteFile*()
+Function createExpectDefinitionDisappearFile(k,d)
+    Dim expFromFolder : Set expFromFolder = exclusionItem(d.Item(k&"-folder"), Array("DateLastModified"))
     With expFromFolder
         .Item("size") = 0
         .Item("Files.Count") = 0
     End With
     Dim ret : ret = Array( _
-        Array(  "from-folder", "folder"       , expFromFolder        , d.Item("from-folder").Item("path"), d.Item("from-folder").Item("relativePath")) _
-        , Array("from"       , "NotExistsFile", Empty                , d.Item("from-folder").Item("path"), d.Item("from").Item("relativePath")) _
+        Array(  k&"-folder", "folder"       , expFromFolder, d.Item(k&"-folder").Item("path"), d.Item(k&"-folder").Item("relativePath")) _
+        , Array(k          , "NotExistsFile", Empty        , d.Item(k&"-folder").Item("path"), d.Item(k).Item("relativePath")) _
         )
-    createExpectDefinitionDisappearFromFile = ret
+    createExpectDefinitionDisappearFile = ret
 End Function
 'For Test_fs_moveFolder_*()
-Function createExpectDefinitionDisappearFromFolder(d)
-    createExpectDefinitionDisappearFromFolder = Array( _
-        Array(  "from-folder" , "NotExistsFolder", Empty             , d.Item("from-folder").Item("path"), d.Item("from-fl1").Item("relativePath")) _
+Function createExpectDefinitionDisappearFolder(k,d)
+    createExpectDefinitionDisappearFolder = Array( _
+        Array( k&"-folder", "NotExistsFolder", Empty       , d.Item(k&"-folder").Item("path"), d.Item(k&"-folder").Item("relativePath")) _
         )
 End Function
 'For Test_fs_copyFolder_*(),Test_fs_moveFolder_*()
