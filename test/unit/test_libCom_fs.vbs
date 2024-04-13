@@ -329,73 +329,59 @@ End Function
 '###################################################################################################
 'fs_createFolder()
 Sub Test_fs_createFolder
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
-    assertExistsFolder p, False, "before", "createfolder", "folder"
-    
-    Dim ao,e
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForCreateFolder(False,False,"Test_fs_createFolder"))
+
+    '実行
+    Dim a : Set a = fs_createFolder(d.Item("target").Item("path"))
+
+    '戻り値の検証
+    Dim e
     e = True
-    Set ao = fs_createFolder(p)
-    AssertEqualWithMessage e, ao, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    Dim a
+    AssertEqualWithMessage e, a, "ret"
     e = False
-    a = ao.isErr()
-    AssertEqualWithMessage e, a, "isErr()"
+    AssertEqualWithMessage e, a.isErr, "isErr"
 
-    assertExistsFolder p, True, "after", "createfolder", "folder"
+    'データの検証
+    assertFolderItems(createExpectDefinitionCreateFolder(d))
 End Sub
 Sub Test_fs_createFolder_ErrExistsFile
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForCreateFolder(True,False,"Test_fs_createFolder_ErrExistsFile"))
 
-    Dim c,d
-    'ファイルを作成
-    c = "UTF-8"
-    d = "For" & vbNewLine & "CreateFolder Err-ExistsFile"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "createfolder", "file"
-    
-    Dim ao,e
+    '実行
+    Dim a : Set a = fs_createFolder(d.Item("target").Item("path"))
+
+    '戻り値の検証
+    Dim e
     e = False
-    Set ao = fs_createFolder(p)
-    AssertEqualWithMessage e, ao, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    Dim a
+    AssertEqualWithMessage e, a, "ret"
     e = True
-    a = ao.isErr()
-    AssertEqualWithMessage e, a, "isErr()"
-
+    AssertEqualWithMessage e, a.isErr, "isErr"
     e = 58
-    a = ao.getErr().Item("Number")
-    AssertEqualWithMessage e, a, "getErr().Item('Number')"
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "既に同名のファイルが存在しています。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
-    assertExistsFile p, True, "after", "createfolder", "file"
-    assertExistsFolder p, False, "after", "createfolder", "folder"
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 Sub Test_fs_createFolder_ErrExistsFolder
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000"))
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForCreateFolder(False,True,"Test_fs_createFolder_ErrExistsFolder"))
 
-    Dim c,d
-    'フォルダを作成
-    fso.CreateFolder p
-    assertExistsFolder p, True, "before", "createfolder", "folder"
-    
-    Dim ao,e
+    '実行
+    Dim a : Set a = fs_createFolder(d.Item("target").Item("path"))
+
+    '戻り値の検証
+    Dim e
     e = False
-    Set ao = fs_createFolder(p)
-    AssertEqualWithMessage e, ao, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-
-    Dim a
+    AssertEqualWithMessage e, a, "ret"
     e = False
-    a = ao.isErr()
-    AssertEqualWithMessage e, a, "isErr()"
+    AssertEqualWithMessage e, a.isErr, "isErr"
 
-    assertExistsFolder p, True, "after", "createfolder", "folder"
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 
 '###################################################################################################
@@ -1327,6 +1313,7 @@ Sub getTestItemInfo(i)
         End If
     End With
 End Sub
+'For Test_fs_copyFile_*(),Test_fs_moveFile_*()
 Function createTestItemDefinitionForFile(f,t,n)
     Dim fromFolder : fromFolder = getTempName()
     Dim toFolder : toFolder = getTempName()
@@ -1342,6 +1329,7 @@ Function createTestItemDefinitionForFile(f,t,n)
           Array("to"         , "textfile", toFolder  , getTempName(), True, "For " & n & " as ToFile.")
     createTestItemDefinitionForFile = ret
 End Function
+'For Test_fs_copyFolder_*(),Test_fs_moveFolder_*()
 Function createTestItemDefinitionForFolder(f,t,n)
     Dim fromFolder : fromFolder = getTempName()
     Dim overRideFile : overRideFile = getTempName()
@@ -1391,6 +1379,16 @@ Function createTestItemDefinitionForFolder(f,t,n)
     Next
     
     createTestItemDefinitionForFolder = ret
+End Function
+'For Test_fs_createFolder*()
+Function createTestItemDefinitionForCreateFolder(cfl,cfd,n)
+    Dim tp : tp = "folder"
+    If cfl Then tp = "textfile"
+    Dim flg : flg = False
+    If cfl Or cfd Then flg = True
+    createTestItemDefinitionForCreateFolder = Array( _
+        Array(  "target", tp, getTempName(), vbNullString , flg, n) _
+        )
 End Function
 
 '検証
@@ -1485,6 +1483,25 @@ Sub assertFolder(n,d,p)
     End If
 End Sub
 
+Function createExpectDefinitionUnchange(kd,d)
+    Dim i,k,t,p : i=0
+    Redim a(d.Count-1)
+    For Each k In d.Keys
+        If StrComp(kd,Mid(k,1,Len(kd)),vbBinaryCompare)=0 Then
+            If d.Exists(kd&"-folder") Then p = d.Item(kd&"-folder").Item("path") Else p = d.Item(kd).Item("path")
+            If d.Item(k).Item("isSetup") Then
+                a(i) = Array(k, d.Item(k).Item("type"), d.Item(k), p, d.Item(k).Item("relativePath"))
+            Else
+                If StrComp(d.Item(k).Item("type"),"folder")=0 Then t="NotExistsFolder" Else t="NotExistsFile"
+                a(i) = Array(k, t                     , Empty    , p, d.Item(k).Item("relativePath"))
+            End If
+            i = i + 1
+        End If
+    Next
+    If i>0 Then Redim Preserve a(i-1)
+    createExpectDefinitionUnchange = a
+End Function
+'For Test_fs_copyFile_*(),Test_fs_moveFile_*()
 Function createExpectDefinitionMergeFile(d)
     Dim expToFolder : Set expToFolder = exclusionItem(d.Item("from-folder"), Array("DateLastModified")) : expToFolder.Item("name") = d.Item("to-folder").Item("name")
     Dim expTo : Set expTo = exclusionItem(d.Item("from"), Array()) : expTo.Item("name") = d.Item("to").Item("name")
@@ -1494,6 +1511,20 @@ Function createExpectDefinitionMergeFile(d)
         )
     createExpectDefinitionMergeFile = ret
 End Function
+'For fs_createFolder*()
+Function createExpectDefinitionCreateFolder(d)
+    Dim exp : Set exp = CreateObject("Scripting.Dictionary")
+    With exp
+        .Add "name", d.Item("target").Item("name")
+        .Add "size", 0
+        .Add "Files.Countme", 0
+        .Add "SubFolders.Count", 0
+    End With
+    createExpectDefinitionCreateFolder = Array( _
+        Array(  "target", "folder", exp, d.Item("target").Item("path"), d.Item("target").Item("relativePath")) _
+        )
+End Function
+'For Test_fs_moveFile_*()
 Function createExpectDefinitionDisappearFromFile(d)
     Dim expFromFolder : Set expFromFolder = exclusionItem(d.Item("from-folder"), Array("DateLastModified"))
     With expFromFolder
@@ -1506,34 +1537,19 @@ Function createExpectDefinitionDisappearFromFile(d)
         )
     createExpectDefinitionDisappearFromFile = ret
 End Function
+'For Test_fs_moveFolder_*()
 Function createExpectDefinitionDisappearFromFolder(d)
     createExpectDefinitionDisappearFromFolder = Array( _
         Array(  "from-folder" , "NotExistsFolder", Empty             , d.Item("from-folder").Item("path"), d.Item("from-fl1").Item("relativePath")) _
         )
 End Function
-
-Function createExpectDefinitionUnchange(kd,d)
-    Dim i,k,t : i=0
-    Redim a(d.Count-1)
-    For Each k In d.Keys
-        If StrComp(kd,Mid(k,1,Len(kd)),vbBinaryCompare)=0 Then
-            If d.Item(k).Item("isSetup") Then
-                a(i) = Array(k, d.Item(k).Item("type"), d.Item(k), d.Item(kd&"-folder").Item("path"), d.Item(k).Item("relativePath"))
-            Else
-                If StrComp(d.Item(k).Item("type"),"folder")=0 Then t="NotExistsFolder" Else t="NotExistsFile"
-                a(i) = Array(k, t                     , Empty    , d.Item(kd&"-folder").Item("path"), d.Item(k).Item("relativePath"))
-            End If
-            i = i + 1
-        End If
-    Next
-    If i>0 Then Redim Preserve a(i-1)
-    createExpectDefinitionUnchange = a
-End Function
+'For Test_fs_copyFolder_*(),Test_fs_moveFolder_*()
 Function createExpectDefinitionMergeFolder(d)
     '全てのfromの情報で期待値を上書きする
     Dim f : f = createExpectDefinitionUnchange("from",d)
     createExpectDefinitionMergeFolder = createExpectDefinitionMergeFolderProc(d,f)
 End Function
+'For Test_fs_copyFolder_*()
 Function createExpectDefinitionMergeFolderUntilOverRideFile(d,rp)
     '期待値を上書きするfromの情報は指定したrpまで
     Dim f : f = createExpectDefinitionUnchange("from",d)
@@ -1551,7 +1567,6 @@ Function createExpectDefinitionMergeFolderUntilOverRideFile(d,rp)
     End If
     createExpectDefinitionMergeFolderUntilOverRideFile = f
 End Function
-
 Function createExpectDefinitionMergeFolderProc(d,f)
     'toの期待値をベースにする
     Dim exps : exps = createExpectDefinitionUnchange("to",d)
@@ -1641,7 +1656,6 @@ Function createExpectDefinitionMergeFolderProcAggregate(exps,rp)
     End With
     Set createExpectDefinitionMergeFolderProcAggregate = ret
 End Function
-
 Function exclusionItem(o,e)
     Dim ret : Set ret = CreateObject("Scripting.Dictionary")
     Dim i
