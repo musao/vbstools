@@ -125,7 +125,7 @@ Class clsCmReturnValue
     '----------         ----------------------   -------------------------------------------------------
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Function getErr( _
+    Public Function getErr( _
         )
         Set getErr = PoErr
     End Function
@@ -144,15 +144,15 @@ Class clsCmReturnValue
     '----------         ----------------------   -------------------------------------------------------
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Function isErr( _
+    Public Function isErr( _
         )
         isErr = PboIsErr
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : setValue()
-    'Overview                    : 戻り値の取得とエラーがあればErrオブジェクトの情報を格納する
-    'Detailed Description        : 工事中
+    'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : func_CmReturnValueSetValue()に委譲する
     'Argument
     '     avRet                  : 戻り値
     'Return Value
@@ -163,24 +163,38 @@ Class clsCmReturnValue
     '----------         ----------------------   -------------------------------------------------------
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Function setValue( _
+    Public Function setValue( _
         byRef avRet _
         )
-        cf_bind PvValue, avRet
-        If Err.Number=0 Then
-            PboIsErr = False
-            Set PoErr = Nothing
-        Else
-            PboIsErr = True
-            Set PoErr = fw_storeErr()
-        End If
-        Set setValue = Me
+        Set setValue = func_CmReturnValueSetValue(avRet)
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : setValueByState()
+    'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : func_CmReturnValueSetValueByState()に委譲する
+    'Argument
+    '     avNormal               : 正常の場合の戻り値
+    '     avAbnormal             : 異常の場合の戻り値
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function setValueByState( _
+        byRef avNormal _
+        , byRef avAbnormal _
+        )
+        Set setValueByState = func_CmReturnValueSetValueByState(avNormal,avAbnormal)
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : toString()
     'Overview                    : オブジェクトの内容を文字列で表示する
-    'Detailed Description        : cf_toString()準拠
+    'Detailed Description        : func_CmReturnValueToString()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -193,7 +207,102 @@ Class clsCmReturnValue
     '***************************************************************************************************
     Public Function toString( _
         )
-        toString = _
+        toString = func_CmReturnValueToString()
+    End Function
+
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmReturnValueSetValue()
+    'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : 工事中
+    'Argument
+    '     avRet                  : 戻り値
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmReturnValueSetValue( _
+        byRef avRet _
+        )
+        cf_bind PvValue, avRet
+        sub_CmReturnValueGetErrorStatus()
+        Set func_CmReturnValueSetValue = Me
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmReturnValueSetValueByState()
+    'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : 工事中
+    'Argument
+    '     avNormal               : 正常の場合の戻り値
+    '     avAbnormal             : 異常の場合の戻り値
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmReturnValueSetValueByState( _
+        byRef avNormal _
+        , byRef avAbnormal _
+        )
+        If Err.Number=0 Then
+            cf_bind PvValue, avNormal
+        Else
+            cf_bind PvValue, avAbnormal
+        End If
+        sub_CmReturnValueGetErrorStatus()
+        Set func_CmReturnValueSetValueByState = Me
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : sub_CmReturnValueGetErrorStatus()
+    'Overview                    : エラー状態を取得しエラーがある場合は情報を取得後にクリアする
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub sub_CmReturnValueGetErrorStatus( _
+        )
+        If Err.Number=0 Then
+            PboIsErr = False
+            Set PoErr = Nothing
+        Else
+            PboIsErr = True
+            Set PoErr = fw_storeErr()
+            Err.Clear
+        End If
+    End Sub
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmReturnValueToString()
+    'Overview                    : オブジェクトの内容を文字列で表示する
+    'Detailed Description        : cf_toString()準拠
+    'Argument
+    '     なし
+    'Return Value
+    '     文字列に変換したオブジェクトの内容
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/04         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function func_CmReturnValueToString( _
+        )
+        func_CmReturnValueToString = _
             "<" & TypeName(Me) & ">[" _
             & "returnValue:" & cf_toString(PvValue) _
             & ",isErr:" & cf_toString(PboIsErr) _

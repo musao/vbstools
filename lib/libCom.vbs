@@ -1368,6 +1368,28 @@ Private Function new_Ret( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : new_RetByState()
+'Overview                    : 戻り値クラスオブジェクトの生成関数
+'Detailed Description        : 工事中
+'Argument
+'     avNormal               : 正常の場合の戻り値
+'     avAbnormal             : 異常の場合の戻り値
+'Return Value
+'     生成した戻り値クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/04/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_RetByState( _
+    byRef avNormal _
+    , byRef avAbnormal _
+    )
+    Set new_RetByState = (New clsCmReturnValue).setValueByState(avNormal,avAbnormal)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : new_Shell()
 'Overview                    : Wscript.Shellオブジェクト生成関数
 'Detailed Description        : 工事中
@@ -2267,7 +2289,7 @@ End Function
 Private Function fs_readFile( _
     byVal asPath _
     )
-    fs_readFile = func_FsReadFile(asPath, -1)
+    Set fs_readFile = func_FsReadFile(asPath, -1)
 End Function
 
 '***************************************************************************************************
@@ -2312,7 +2334,7 @@ Private Function fs_writeFile( _
     byVal asPath _
     , byVal asCont _
     )
-    fs_writeFile = func_FsWriteFile(asPath, 2, True, -1, asCont)
+    Set fs_writeFile = func_FsWriteFile(asPath, 2, True, -1, asCont)
 End Function
 
 '***************************************************************************************************
@@ -2337,7 +2359,7 @@ Private Function fs_writeFileDefault( _
     byVal asPath _
     , byVal asCont _
     )
-    fs_writeFileDefault = func_FsWriteFile(asPath, 2, True, -2, asCont)
+    Set fs_writeFileDefault = func_FsWriteFile(asPath, 2, True, -2, asCont)
 End Function
 
 
@@ -2540,10 +2562,7 @@ Private Function func_FsGeneralExecutor( _
             Case Else
                 Err.Raise 9999, "libCom.vbs:func_FsGeneralExecutor()", "不正な実行コマンド："&asCmd
         End Select
-'        Eval("new_Fso()." & asCmd & "(" & Chr(34) & asPath & Chr(34) & ")")
-'        If Err.Number=0 Then func_FsGeneralExecutor=True
-        Dim boRet : If Err.Number=0 Then boRet=True Else boRet=False
-        Set func_FsGeneralExecutor = new_Ret(boRet)
+        Set func_FsGeneralExecutor = new_RetByState(True,False)
         On Error Goto 0
     End With
 End Function
@@ -2568,12 +2587,13 @@ Private Function func_FsReadFile( _
     byVal asPath _
     , byVal alFormat _
     )
-    func_FsReadFile = Empty
+    Dim sRet : sRet = Empty
     On Error Resume Next
     With new_Ts(asPath, 1, False, alFormat)
-        func_FsReadFile = .ReadAll
+        sRet = .ReadAll
         .Close
     End With
+    Set func_FsReadFile = new_Ret(sRet)
     On Error Goto 0
 End Function
 
@@ -2605,13 +2625,12 @@ Private Function func_FsWriteFile( _
     , byVal alFormat _
     , byVal asCont _
     )
-    func_FsWriteFile = True
     On Error Resume Next
     With new_Ts(asPath, alMode, aboCreate, alFormat)
         .Write asCont
         .Close
     End With
-    If Err.Number Then func_FsWriteFile = False
+    Set func_FsWriteFile=new_RetByState(True,False)
     On Error Goto 0
 End Function
 

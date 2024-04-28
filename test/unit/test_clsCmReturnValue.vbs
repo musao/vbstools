@@ -121,6 +121,10 @@ Sub Test_clsCmReturnValue_setValue_Normal
     a = TypeName(o.setValue(d))
     AssertEqualWithMessage e,a,"TypeName"
 
+    e = 0
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Err.Number"
+
     e = d
     a = o.returnValue
     AssertEqualWithMessage e,a,"returnValue"
@@ -143,8 +147,12 @@ Sub Test_clsCmReturnValue_setValue_Err
     Err.Raise ern, ers, erd
     e = TypeName(o)
     a = TypeName(o.setValue(d))
-    On Error Goto 0
     AssertEqualWithMessage e,a,"TypeName"
+
+    e = 0
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Err.Number"
+    On Error Goto 0
 
     Set e = d
     Set a = o.returnValue
@@ -180,10 +188,18 @@ Sub Test_clsCmReturnValue_setValue_ErrToNormal
     Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
     Err.Raise ern, ers, erd
     o.setValue(d)
+
+    e = 0
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Err.Number"
     On Error Goto 0
 
     d = vbNullString
     o.setValue(d)
+
+    e = 0
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Err.Number"
 
     e = d
     a = o.returnValue
@@ -212,6 +228,76 @@ Sub Test_clsCmReturnValue_setValue_Initial
     Set e = Nothing
     Set a = o.getErr()
     AssertSameWithMessage e,a,"getErr()"
+End Sub
+
+'###################################################################################################
+'clsCmReturnValue.setValueByState()
+Sub Test_clsCmReturnValue_setValueByState_Normal_Noerr
+    Dim o : Set o = new clsCmReturnValue
+    Dim normal : normal = "normal"
+    Dim abnormal : abnormal = "abnormal"
+
+    Dim e,a
+    e = TypeName(o)
+    a = TypeName(o.setValueByState(normal,abnormal))
+    AssertEqualWithMessage e,a,"TypeName"
+
+    e = 0
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Err.Number"
+
+    e = normal
+    a = o.returnValue
+    AssertEqualWithMessage e,a,"returnValue"
+
+    e = False
+    a = o.isErr()
+    AssertEqualWithMessage e,a,"isErr()"
+
+    Set e = Nothing
+    Set a = o.getErr()
+    AssertSameWithMessage e,a,"getErr()"
+End Sub
+Sub Test_clsCmReturnValue_setValueByState_Normal_Err
+    Dim o : Set o = new clsCmReturnValue
+    Dim normal : normal = "normal"
+    Dim abnormal : abnormal = "abnormal"
+
+    On Error Resume Next
+    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
+    Err.Raise ern, ers, erd
+    o.setValueByState normal,abnormal
+
+    e = 0
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Err.Number"
+    On Error Goto 0
+
+    Dim e,a
+    e = abnormal
+    a = o.returnValue
+    AssertEqualWithMessage e,a,"returnValue"
+
+    e = True
+    a = o.isErr()
+    AssertEqualWithMessage e,a,"isErr()"
+
+    Dim er : Set er = o.getErr()
+    e = True
+    a = cf_isAvailableObject(er)
+    AssertEqualWithMessage e,a,"cf_isAvailableObject(getErr())"
+
+    e = ern
+    a = er.Item("Number")
+    AssertEqualWithMessage e,a,"isErr().Item('Number')"
+
+    e = erd
+    a = er.Item("Description")
+    AssertEqualWithMessage e,a,"isErr().Item('NuDescriptionmber')"
+
+    e = ers
+    a = er.Item("Source")
+    AssertEqualWithMessage e,a,"isErr().Item('Source')"
 End Sub
 
 '###################################################################################################

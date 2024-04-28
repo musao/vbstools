@@ -770,28 +770,38 @@ End Sub
 '###################################################################################################
 'fs_readFile()
 Sub Test_fs_readFile
-    Dim c,p,d
-    'ファイルを作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "Unicode"
-    d = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
-    writeTestFile c,p,d
+    'データ定義と生成
+    Dim cont
+    cont = "lmn" & vbNewLine & "ⅢⅥⅩ" & vbNewLine & "ｱｲｳ" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", True, cont))
+    
+    '実行
+    Dim a : Set a = fs_readFile(d.Item("target").Item("path"))
 
-    Dim e,a
-    e = d
-    a = fs_readFile(p)
+    '戻り値の検証
+    Dim e
+    e = cont
     AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
 End Sub
 Sub Test_fs_readFile_Err
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "readFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim a : Set a = fs_readFile(d.Item("target").Item("path"))
 
-    Dim e,a
-    e = empty
-    a = fs_readFile(p)
+    '戻り値の検証
+    Dim e
+    e = Empty
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    e = True
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 505
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "不正な参照です。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 End Sub
 
 '###################################################################################################
@@ -816,296 +826,351 @@ End Sub
 '###################################################################################################
 'fs_writeFile()
 Sub Test_fs_writeFile
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "writeFile", "file"
+    'データ定義と生成
+    Dim cont
+    cont = "abc" & vbNewLine & "あいう" & vbNewLine & "123" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim a : Set a = fs_writeFile(p, cont)
 
-    Dim d,e,a
-    d = "abc" & vbNewLine & "あいう" & vbNewLine & "123" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
+    '戻り値の検証
+    Dim e
     e = True
-    a = fs_writeFile(p, d)
     AssertEqualWithMessage e, a, "ret"
-
-    Dim c
-    c = "Unicode"
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    a = readTestFile("Unicode",p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_fs_writeFile_Rewrite
-    Dim p,c,d
-    '上書きするファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "UTF-8"
-    d = "For" & vbNewLine & "Rewrite"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "writeFile", "file"
+    'データ定義と生成
+    Dim cont
+    cont = "For" & vbNewLine & "Test_fs_writeFile_Rewrite"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", True, cont))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    cont = "abc" & vbNewLine & "①②③" & vbNewLine & "!#$" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
+    Dim a : Set a = fs_writeFile(p, cont)
 
-    '上書きすることを確認
-    d = "abc" & vbNewLine & "①②③" & vbNewLine & "!#$" & vbNewLine & ChrW(12316) 'ChrW(12316)='\u301c'（波ダッシュ・波型）Sjisに変換できない文字
-    Dim e,a
+    '戻り値の検証
+    Dim e
     e = True
-    a = fs_writeFile(p, d)
     AssertEqualWithMessage e, a, "ret"
-
-    c = "Unicode"
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    a = readTestFile("Unicode",p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_fs_writeFile_Err
-    Dim p,c,d
-    'ロックするファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "Unicode"
-    d = "For" & vbNewLine & "Write Error"
-    writeTestFile c,p,d
-
-    Dim de
-    'ファイルをロックする
+    'データ定義と生成
+    Dim before : before = "Test_fs_writeFile_Err" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", True, before))
+    
+    '上書きするファイル（target）をロックする
+    Dim p : p = d.Item("target").Item("path")
     With lockFile(p)
-        de = "error" & vbNewLine & "test"
-        Dim e,a
+        '実行
+        Dim cont : cont = "Test_fs_writeFile_Err"
+        Dim a : Set a = fs_writeFile(p, cont)
+    
+        '戻り値の検証
+        Dim e
         e = False
-        a = fs_writeFile(p, de)
-        
-        'fs_writeFile()がエラーになることを確認する
         AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 505
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "不正な参照です。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
-
-    '上書きしていないことを確認
-    e = d
-    a = readTestFile(c, p)
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
+    a = readTestFile("Unicode",p)
+    e = before
     AssertEqualWithMessage e, a, "cont"
 End Sub
 
 '###################################################################################################
 'fs_writeFileDefault()
 Sub Test_fs_writeFileDefault
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "writeFileDefault", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim cont : cont = "Test_fs_writeFileDefault"
+    Dim a : Set a = fs_writeFileDefault(p, cont)
 
-    Dim d,e,a
-    d = "abc" & vbNewLine & "あいう" & vbNewLine & "123"
+    '戻り値の検証
+    Dim e
     e = True
-    a = fs_writeFileDefault(p, d)
     AssertEqualWithMessage e, a, "ret"
-
-    Dim c
-    c = "shift-jis"
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "shift-jis"
+    a = readTestFile(charset,p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 
 '###################################################################################################
 'func_FsWriteFile()
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Normal__Format_SystemDefault
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = True
+    Dim iomode : iomode = 2          'ForWriting
+    Dim format : format = -2         'TristateUseDefault
+    Dim cont : cont = "Test_func_FsWriteFile_Iomode_ForWriting_Normal__Format_SystemDefault"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim d,iomode,create,f,e,a
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForWriting_Normal__Format_SystemDefault"
-    iomode = 2     'ForWriting
-    create = True
-    f = -2         'TristateUseDefault
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    Dim c
-    c = "shift-jis"
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "shift-jis"
+    a = readTestFile(charset,p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode
-    Dim p,c,d
-    '上書きするファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "Unicode"
-    d = "For" & vbNewLine & "Rewrite"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim before : before = "Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", True, before))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = True
+    Dim iomode : iomode = 2          'ForWriting
+    Dim format : format = -1         'TristateTrue(Unicode)
+    Dim cont : cont = "Test_func_FsWriteFile_Iomode_ForWriting_Rewrite__Format_Unicode"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim iomode,create,f,e,a
-    '上書きすることを確認
-    iomode = 2     'ForWriting
-    create = True
-    f = -1    'TristateTrue(Unicode)
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForWriting_Rewrite__Format_Unicode"
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    c = "Unicode"
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "Unicode"
+    a = readTestFile(charset,p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Normal__Format_Ascii
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim before : before = "Test_func_FsWriteFile_Iomode_ForAppending_Normal__Format_Ascii" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile(Ascii)", True, before))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = True
+    Dim iomode : iomode = 8          'ForAppending
+    Dim format : format = 0          'TristateFalse(Ascii)
+    Dim cont : cont = "Test_func_FsWriteFile_Iomode_ForAppending_Normal__Format_Ascii"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim d,iomode,create,f,e,a
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForAppending_Normal__Format_Ascii"
-    iomode = 8     'ForAppending
-    create = True
-    f = 0          'TristateFalse(Ascii)
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    Dim c
-    c = "shift-jis"
-    e = d
-    a = readTestFile(c,p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "shift-jis"
+    a = readTestFile(charset,p)
+    e = before&cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault
-    Dim p,c,d
-    '追記するファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "shift-jis"
-    d = "For" & vbNewLine & "Append"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim before : before = "Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile(Ascii)", True, before))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = True
+    Dim iomode : iomode = 8          'ForAppending
+    Dim format : format = -2         'TristateUseDefault
+    Dim cont : cont = "Test_func_FsWriteFile_Iomode_ForAppending_Append__Format_SystemDefault"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim iomode,create,f,ec,e,a
-    '追記することを確認
-    iomode = 8     'ForAppending
-    create = True
-    f = -2         'TristateUseDefault
-    ec = d
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Iomode_ForAppending_Append__Format_SystemDefault"
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    ec = ec & d
-    a = readTestFile(c, p)
-    AssertEqualWithMessage ec, a, "cont"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "shift-jis"
+    a = readTestFile(charset,p)
+    e = before&cont
+    AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Normal__Format_Unicode
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = True
+    Dim iomode : iomode = 2          'ForWriting
+    Dim format : format = -1         'TristateTrue(Unicode)
+    Dim cont : cont = "Test_func_FsWriteFile_Create_True_Normal__Format_Unicode"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim d,iomode,create,f,e,a
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_True_Normal__Format_Unicode"
-    iomode = 2     'ForWriting
-    create = True
-    f = -1         'TristateTrue(Unicode)
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    Dim c
-    c = "Unicode"
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "Unicode"
+    a = readTestFile(charset,p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii
-    Dim p,c,d
-    '上書きするファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "shift-jis"
-    d = "For" & vbNewLine & "Rewrite"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim before : before = "Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile(Ascii)", True, before))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = True
+    Dim iomode : iomode = 2          'ForWriting
+    Dim format : format = 0          'TristateFalse(Ascii)
+    Dim cont : cont = "Test_func_FsWriteFile_Create_True_Rewrite__Format_Ascii"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim iomode,create,f,e,a
-    '上書きすることを確認
-    iomode = 2     'ForWriting
-    create = True
-    f = 0          'TristateFalse(Ascii)
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_True_Rewrite__Format_Ascii"
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "shift-jis"
+    a = readTestFile(charset,p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Err
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = False
+    Dim iomode : iomode = 2          'ForWriting
+    Dim format : format = -1         'TristateTrue(Unicode)
+    Dim cont : cont = "Test_func_FsWriteFile_Create_False_Err"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim d,iomode,create,f,e,a
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_False_Err"
-    iomode = 2     'ForWriting
-    create = False
-    f = -1         'TristateTrue(Unicode)
+    '戻り値の検証
+    Dim e
     e = False
-    a = func_FsWriteFile(p, iomode, create, f, d)
-
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
-    assertExistsFile p, False, "after", "func_FsWriteFile", "file"
+    e = True
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 505
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "不正な参照です。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 Sub Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode
-    Dim p,c,d
-    '上書きするファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "Unicode"
-    d = "For" & vbNewLine & "Rewrite"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "func_FsWriteFile", "file"
+    'データ定義と生成
+    Dim before : before = "Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", True, before))
+    
+    '実行
+    Dim p : p = d.Item("target").Item("path")
+    Dim create : create = False
+    Dim iomode : iomode = 2          'ForWriting
+    Dim format : format = -1         'TristateTrue(Unicode)
+    Dim cont : cont = "Test_func_FsWriteFile_Create_False_Rewrite__Format_Unicode"
+    Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
 
-    Dim e,a,iomode,create,f
-    '上書きすることを確認
-    iomode = 2     'ForWriting
-    create = False
-    f = -1         'TristateTrue(Unicode)
-    d = "func_FsWriteFile" & vbNewLine & "のテスト" & vbNewLine & "Create_False_Rewrite__Format_Unicode"
+    '戻り値の検証
+    Dim e
     e = True
-    a = func_FsWriteFile(p, iomode, create, f, d)
     AssertEqualWithMessage e, a, "ret"
-
-    e = d
-    a = readTestFile(c, p)
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    
+    'データの検証
+    Dim charset : charset = "Unicode"
+    a = readTestFile(charset,p)
+    e = cont
     AssertEqualWithMessage e, a, "cont"
 End Sub
 Sub Test_func_FsWriteFile_Err_FileLocked
-    Dim p,d,c
-    'ロックするファイルを一旦作成
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    c = "Unicode"
-'    c = "shift-jis"
-    d = "error" & vbNewLine & "FileLocked"
-    writeTestFile c,p,d
-    assertExistsFile p, True, "before", "func_FsWriteFile", "file"
-
-    'ファイルをロックする
+    'データ定義と生成
+    Dim before : before = "Test_func_FsWriteFile_Err_FileLocked" & vbNewLine & "Before"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile(Ascii)", True, before))
+    
+    '上書きするファイル（target）をロックする
+    Dim p : p = d.Item("target").Item("path")
     With lockFile(p)
-
-        Dim iomode,create,f,de,e,a
-        iomode = 2     'ForWriting
-        create = False
-        f = 0          'TristateFalse(Ascii)
-        de = "error" & vbNewLine & "test"
-        e = False
-        a = func_FsWriteFile(p, iomode, create, f, de)
         
-        'func_FsWriteFile()がエラーになることを確認する
+        '実行
+        Dim create : create = False
+        Dim iomode : iomode = 2          'ForWriting
+        Dim format : format = -1         'TristateTrue(Unicode)
+        Dim cont : cont = "Test_func_FsWriteFile_Err_FileLocked"
+        Dim a : Set a = func_FsWriteFile(p, iomode, create, format, cont)
+    
+        '戻り値の検証
+        Dim e
+        e = False
         AssertEqualWithMessage e, a, "ret"
-        AssertEqualWithMessage 0, Err.Number, "Err.Number"
+        e = True
+        AssertEqualWithMessage e, a.isErr, "isErr"
+        e = 505
+        AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+        e = "不正な参照です。"
+        AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
         .Close
     End With
-
-    '上書きしていないことを確認
-    e = d
-    a = readTestFile(c, p)
+    
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
+    Dim charset : charset = "shift-jis"
+    a = readTestFile(charset,p)
+    e = before
     AssertEqualWithMessage e, a, "cont"
 End Sub
 
@@ -1204,8 +1269,14 @@ End Function
 Function getFileName(p)
     getFileName = fso.GetFileName(p)
 End Function
-Sub createTextFile(p,c)
-    With fso.OpenTextFile(p, 2, True, -1)
+Sub createTextFileInUnicode(p,c)
+    createTextFile p,c,-1
+End Sub
+Sub createTextFileInAscii(p,c)
+    createTextFile p,c,0
+End Sub
+Sub createTextFile(p,c,f)
+    With fso.OpenTextFile(p, 2, True, f)
         .Write c
         .Close
     End With
@@ -1257,7 +1328,10 @@ Sub createTestItem(i)
         If .Item("isSetup") Then
             Dim p : p = .Item("path")
             If .Item("type")="textfile" Then
-                createTextFile p, .Item("cont")
+                createTextFileInUnicode p, .Item("cont")
+            End If
+            If .Item("type")="textfile(Ascii)" Then
+                createTextFileInAscii p, .Item("cont")
             End If
             If .Item("type")="folder" Then
                 fso.CreateFolder p
@@ -1269,7 +1343,7 @@ Sub getTestItemInfo(i)
     With i
         If .Item("isSetup") Then
             Dim p : p = .Item("path")
-            If .Item("type")="textfile" Then
+            If .Item("type")="textfile" Or .Item("type")="textfile(Ascii)" Then
                 .Add "size", fso.GetFile(p).Size
                 .Add "DateLastModified", fso.GetFile(p).DateLastModified
             End If
@@ -1375,6 +1449,14 @@ Function createTestItemDefinitionForDeleteFolder(f,n)
         Array(  "target-folder", "folder"  , rootFolder, vbNullString                          , True, Empty) _
         , Array("target"       , "folder"  , rootFolder, targetFolder                          , f   , Empty) _
         , Array("target-file"  , "textfile", rootFolder, buildPath(targetFolder, getTempName()), f   , n) _
+        )
+End Function
+'For Test_fs_readFile*(),Test_fs_writeFile*()
+Function createTestItemDefinitionForReadWriteFile(t,f,n)
+    Dim targetFolder : targetFolder = getTempName()
+    createTestItemDefinitionForReadWriteFile = Array( _
+        Array(  "target-folder", "folder", targetFolder, vbNullString , True, Empty) _
+        , Array("target"       , t       , targetFolder, getTempName(), f   , n) _
         )
 End Function
 

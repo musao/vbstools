@@ -129,7 +129,7 @@ Private Sub sub_GnrtPwGetParameters( _
     Dim vAdd
     oKey = "Add"
     If oArg.Item("Named").Exists(oKey) Then 
-        vAdd = new_ArrSplit(oArg.Item("Named").Item(oKey), ",", vbBinaryCompare).Items
+        vAdd = new_ArrSplit(oArg.Item("Named").Item(oKey), ",", vbBinaryCompare).toArray()
     Else
         vAdd = Empty
     End If

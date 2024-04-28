@@ -479,8 +479,18 @@ Sub Test_new_Ret
     Dim e : Set e = new clsCmReturnValue
     Dim a : Set a = new_Ret(Empty)
     
-    AssertEqual VarType(e), VarType(a)
-    AssertEqual TypeName(e), TypeName(a)
+    AssertEqualWithMessage VarType(e), VarType(a), "VarType"
+    AssertEqualWithMessage TypeName(e), TypeName(a), "TypeName"
+End Sub
+
+'###################################################################################################
+'new_RetByState()
+Sub Test_new_RetByState
+    Dim e : Set e = new clsCmReturnValue
+    Dim a : Set a = new_RetByState(Empty,Nothing)
+
+    AssertEqualWithMessage VarType(e), VarType(a), "VarType"
+    AssertEqualWithMessage TypeName(e), TypeName(a), "TypeName"
 End Sub
 
 '###################################################################################################
