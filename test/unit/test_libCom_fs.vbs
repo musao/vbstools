@@ -17,6 +17,7 @@ Option Explicit
 Const MY_NAME = "test_libCom_fs.vbs"
 Dim PsPathTempFolder
 Dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
+Dim adodb : Set adodb = CreateObject("ADODB.Stream")
 
 '###################################################################################################
 'SetUp()/TearDown()
@@ -1177,76 +1178,89 @@ End Sub
 '###################################################################################################
 'func_FsReadFile()
 Sub Test_func_FsReadFile_Normal__Format_SystemDefault
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    'データ定義と生成
+    Dim cont : cont = "Test_func_FsReadFile_Normal__Format_SystemDefault"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile(Ascii)", True, cont))
+    
+    '実行
+    Dim format : format = -2         'TristateUseDefault
+    Dim a : Set a = func_FsReadFile(d.Item("target").Item("path"), format)
 
-    Dim d,f,c
-    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_SystemDefault"
-    f = -2         'TristateUseDefault
-    c = "shift-jis"
-    writeTestFile c,p,d
-
-    Dim e,a
-    e = d
-    a = func_FsReadFile(p,f)
+    '戻り値の検証
+    Dim e
+    e = cont
     AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 Sub Test_func_FsReadFile_Normal__Format_Unicode
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
+    'データ定義と生成
+    Dim cont : cont = "Test_func_FsReadFile_Normal__Format_Unicode"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", True, cont))
+    
+    '実行
+    Dim format : format = -1         'TristateTrue(Unicode)
+    Dim a : Set a = func_FsReadFile(d.Item("target").Item("path"), format)
 
-    Dim d,f,c
-    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Unicode"
-    f = -1         'TristateTrue(Unicode)
-    c = "Unicode"
-    writeTestFile c,p,d
-
-    Dim e,a
-    e = d
-    a = func_FsReadFile(p,f)
+    '戻り値の検証
+    Dim e
+    e = cont
     AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 Sub Test_func_FsReadFile_Normal__Format_Ascii
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-
-    Dim d,f,c
-    d = "func_FsReadFile" & vbNewLine & "のテスト" & vbNewLine & "Normal__Format_Ascii"
-    f = 0          'TristateFalse(Ascii)
-    c = "shift-jis"
-    writeTestFile c,p,d
+    'データ定義と生成
+    Dim cont : cont = "Test_func_FsReadFile_Normal__Format_Ascii"
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile(Ascii)", True, cont))
     
-    Dim e,a
-    e = d
-    a = func_FsReadFile(p,f)
+    '実行
+    Dim format : format = 0          'TristateFalse(Ascii)
+    Dim a : Set a = func_FsReadFile(d.Item("target").Item("path"), format)
+
+    '戻り値の検証
+    Dim e
+    e = cont
     AssertEqualWithMessage e, a, "ret"
+    e = False
+    AssertEqualWithMessage e, a.isErr, "isErr"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 Sub Test_func_FsReadFile_Err
-    Dim p
-    p = fso.BuildPath(PsPathTempFolder, new_Now().formatAs("YYMMDD_hhmmss.000000.txt"))
-    assertExistsFile p, False, "before", "func_FsReadFile", "file"
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForReadWriteFile("textfile", False, Empty))
+    
+    '実行
+    Dim format : format = -2         'TristateUseDefault
+    Dim a : Set a = func_FsReadFile(d.Item("target").Item("path"), format)
 
-    Dim f,e,a
-    f = -2         'TristateUseDefault
-    e = empty
-    a = func_FsReadFile(p,f)
+    '戻り値の検証
+    Dim e
+    e = Empty
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    e = True
+    AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 505
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "不正な参照です。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
+
+    'データの検証
+    assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 
 '###################################################################################################
 'common
-Sub writeTestFile(c,p,d)
-    With CreateObject("ADODB.Stream")
-        .Charset = c
-        .Open
-        .WriteText d, 0
-        .SaveToFile p, 2
-        .Close
-    End With
-End Sub
 Function readTestFile(c,p)
-    With CreateObject("ADODB.Stream")
+    With adodb
         .Charset = c
         .Open
         .LoadFromFile p
@@ -1256,9 +1270,6 @@ Function readTestFile(c,p)
 End Function
 Function lockFile(p)
     Set lockFile = fso.OpenTextFile(p, 8, True, -1)
-End Function
-Function getTempPath(pf)
-    getTempPath = buildPath(pf, getTempName())
 End Function
 Function getTempName()
     getTempName = fso.GetTempName()
@@ -1280,16 +1291,6 @@ Sub createTextFile(p,c,f)
         .Write c
         .Close
     End With
-End Sub
-Sub assertExistsFile(path, expect, timestr, action, tgt)
-    AssertEqualWithMessage expect, fso.FileExists(path), timestr & " " & action & " " & tgt & " exists"
-End Sub
-Sub assertExistsFolder(path, expect, timestr, action, tgt)
-    AssertEqualWithMessage expect, fso.FolderExists(path), timestr & " " & action & " " & tgt & " exists"
-End Sub
-Sub assertFilesSubfoldersCount(path, expectfilecnt, expectfoldercnt, tgt)
-    AssertEqualWithMessage expectfilecnt, fso.GetFolder(path).Files.Count, tgt & " folderFiles Count"
-    AssertEqualWithMessage expectfoldercnt, fso.GetFolder(path).SubFolders.Count, tgt & " folderSubFolders Count"
 End Sub
 
 'TestItem作成
