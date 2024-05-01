@@ -151,7 +151,7 @@ Private Sub sub_GetFileInfoProc( _
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-        oList.pushMulti fs_getAllFiles(oParam.pop().Path)
+        oList.pushA fs_getAllFiles(oParam.pop().Path)
     Loop
 
     '★ログ出力

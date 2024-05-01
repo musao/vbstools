@@ -191,7 +191,7 @@ End Function
 '***************************************************************************************************
 'Function/Sub Name           : cf_push()
 'Overview                    : 配列に要素を追加する
-'Detailed Description        : 工事中
+'Detailed Description        : sub_CfPush()に委譲する
 'Argument
 '     avArr                  : 配列
 '     avEle                  : 追加する要素
@@ -207,17 +207,13 @@ Private Sub cf_push( _
     byRef avArr _ 
     , byRef avEle _ 
     )
-    On Error Resume Next
-    Redim Preserve avArr(Ubound(avArr)+1)
-    If Err.Number<>0 Then Redim avArr(0)
-    On Error Goto 0
-    cf_bind avArr(Ubound(avArr)), avEle
+    sub_CfPush avArr, avEle
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : cf_pushMulti()
-'Overview                    : 配列に複数の要素を追加する
-'Detailed Description        : 工事中
+'Function/Sub Name           : cf_pushA()
+'Overview                    : 引数の追加する配列の要素を配列に追加する
+'Detailed Description        : sub_CfPushA()に委譲する
 'Argument
 '     avArr                  : 配列
 '     avAdd                  : 追加する要素の配列
@@ -228,34 +224,13 @@ End Sub
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/03         Y.Fujii                  First edition
+'2024/05/01         Y.Fujii                  Rename cf_pushMulti() -> cf_pushA()
 '***************************************************************************************************
-Private Sub cf_pushMulti( _
+Private Sub cf_pushA( _
     byRef avArr _ 
     , byRef avAdd _ 
     )
-    On Error Resume Next
-    Dim lUbAdd,lIdx : lUbAdd = Ubound(avAdd)
-    If Err.Number=0 Then
-    '追加する配列（avAdd）が要素を持つ場合
-        '配列（avArr）を拡張する
-        Dim lUb : lUb = Ubound(avArr)
-        If Err.Number=0 Then
-            Redim Preserve avArr(lUb+lUbAdd+1)
-        Else
-        '配列（avArr）が要素を持たない場合はlUbを-1にする
-            lUb = -1
-            Redim avArr(lUbAdd)
-        End If
-
-        '配列（avArr）に追加する要素の配列（avAdd）を追加する
-        For lIdx=0 To lUbAdd
-            cf_bind avArr(lUb+1+lIdx), avAdd(lIdx)
-        Next
-    Elseif Not IsArray(avAdd) Then
-    '追加する配列（avAdd）が要素を持たず配列でない場合
-        cf_push avArr, avAdd
-    End If
-    On Error Goto 0
+    sub_CfPushA avArr, avAdd
 End Sub
 
 '***************************************************************************************************
@@ -303,6 +278,7 @@ Private Function cf_toString( _
     )
     cf_toString = func_CfToString(avTgt)
 End Function
+
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CfToString()
@@ -438,6 +414,76 @@ Private Function func_CfToStringObjectDictionary( _
         func_CfToStringObjectDictionary = "<" & sLabel & ">{}"
     End If
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CfPush()
+'Overview                    : 配列に要素を追加する
+'Detailed Description        : 工事中
+'Argument
+'     avArr                  : 配列
+'     avEle                  : 追加する要素
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/05/01         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CfPush( _
+    byRef avArr _ 
+    , byRef avEle _ 
+    )
+    On Error Resume Next
+    Redim Preserve avArr(Ubound(avArr)+1)
+    If Err.Number<>0 Then Redim avArr(0)
+    On Error Goto 0
+    cf_bind avArr(Ubound(avArr)), avEle
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : sub_CfPushA()
+'Overview                    : 引数の追加する配列の要素を配列に追加する
+'Detailed Description        : 追加する配列（avAdd）が配列でない場合はsub_CfPush()を実行する
+'Argument
+'     avArr                  : 配列
+'     avAdd                  : 追加する配列
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/05/01         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub sub_CfPushA( _
+    byRef avArr _ 
+    , byRef avAdd _ 
+    )
+    On Error Resume Next
+    Dim lUbAdd,lIdx : lUbAdd = Ubound(avAdd)
+    If Err.Number=0 Then
+    '追加する配列（avAdd）が要素を持つ場合
+        '配列（avArr）を拡張する
+        Dim lUb : lUb = Ubound(avArr)
+        If Err.Number=0 Then
+            Redim Preserve avArr(lUb+lUbAdd+1)
+        Else
+        '配列（avArr）が要素を持たない場合はlUbを-1にする
+            lUb = -1
+            Redim avArr(lUbAdd)
+        End If
+
+        '配列（avArr）に追加する要素の配列（avAdd）を追加する
+        For lIdx=0 To lUbAdd
+            cf_bind avArr(lUb+1+lIdx), avAdd(lIdx)
+        Next
+    Elseif Not IsArray(avAdd) Then
+    '追加する配列（avAdd）が要素を持たず配列でない場合
+        sub_CfPush avArr, avAdd
+    End If
+    On Error Goto 0
+End Sub
 
 
 '###################################################################################################
@@ -886,7 +932,7 @@ Private Function new_ArrWith( _
     byRef avArr _
     )
     Dim oArr : Set oArr = new_Arr()
-    oArr.PushMulti avArr
+    oArr.pushA avArr
     Set new_ArrWith = oArr
     Set oArr = Nothing
 End Function
@@ -2410,7 +2456,7 @@ Private Function func_FsGetAllFilesByFso( _
         For Each oEle In oFolder.Files
             If StrComp(new_Fso().GetExtensionName(oEle.Path), "zip", vbTextCompare)=0 Then
             'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
-                cf_pushMulti vRet, func_FsGetAllFilesByShell(oEle.Path)
+                cf_pushA vRet, func_FsGetAllFilesByShell(oEle.Path)
             Else
             'zipファイル以外の場合、ファイル情報を取得する
                 cf_push vRet, new_AdptFileOf(oEle.Path)
@@ -2418,7 +2464,7 @@ Private Function func_FsGetAllFilesByFso( _
         Next
         'フォルダの取得
         For Each oEle In oFolder.SubFolders
-            cf_pushMulti vRet, func_FsGetAllFilesByFso(oEle)
+            cf_pushA vRet, func_FsGetAllFilesByFso(oEle)
         Next
         func_FsGetAllFilesByFso = vRet
     Else
@@ -2460,7 +2506,7 @@ Private Function func_FsGetAllFilesByShell( _
         'フォルダ内全てのアイテムについて
             If oItem.IsFolder Then
             'フォルダの場合
-                cf_pushMulti vRet, func_FsGetAllFilesByShell(oItem.Path)
+                cf_pushA vRet, func_FsGetAllFilesByShell(oItem.Path)
             Else
             'ファイルの場合
                 cf_push vRet, new_AdptFile(oItem)
@@ -2503,7 +2549,7 @@ Private Function func_FsGetAllFilesByDir( _
     For Each sList In vArrList
         If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompare)=0 Then
         'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
-            cf_pushMulti vRet, func_FsGetAllFilesByShell(sList)
+            cf_pushA vRet, func_FsGetAllFilesByShell(sList)
         Else
         'zipファイル以外の場合、ファイル情報を取得する
             cf_push vRet, new_AdptFileOf(sList)

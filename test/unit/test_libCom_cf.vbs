@@ -282,54 +282,54 @@ Sub Test_cf_push_NotAvailable
 End Sub
 
 '###################################################################################################
-'cf_pushMulti()
-Sub Test_cf_pushMulti_AddIsArray_ArrAvailable
+'cf_pushA()
+Sub Test_cf_pushA_AddIsArray_ArrAvailable
     Dim a,d,e
     Redim a(0)
     d = Array(1,2)
     e = Array(Empty,1,2)
-    cf_pushMulti a, d
+    cf_pushA a, d
     
     assertAllElements e, a
 End Sub
-Sub Test_cf_pushMulti_AddIsArray_ArrNotAvailable
+Sub Test_cf_pushA_AddIsArray_ArrNotAvailable
     Dim a,d,e
     d = Array(1,2)
     e = Array(1,2)
-    cf_pushMulti a, d
+    cf_pushA a, d
     
     assertAllElements e, a
 End Sub
-Sub Test_cf_pushMulti_AddIsArray_ArrNotAvailable2
+Sub Test_cf_pushA_AddIsArray_ArrNotAvailable2
     Dim a(),d,e
     d = Array(1,2)
     e = Array(1,2)
-    cf_pushMulti a, d
+    cf_pushA a, d
     
     assertAllElements e, a
 End Sub
-Sub Test_cf_pushMulti_AddIsZeroArray
+Sub Test_cf_pushA_AddIsZeroArray
     Dim a,d(),e
     Redim a(0)
     e = Array(Empty)
-    cf_pushMulti a, d
+    cf_pushA a, d
     
     assertAllElements e, a
 End Sub
-Sub Test_cf_pushMulti_AddIsNotArray_ArrAvailable
+Sub Test_cf_pushA_AddIsNotArray_ArrAvailable
     Dim a,d,e
     Redim a(0)
     d = "a"
     e = Array(Empty,"a")
-    cf_pushMulti a, d
+    cf_pushA a, d
     
     assertAllElements e, a
 End Sub
-Sub Test_cf_pushMulti_AddIsNotArray_ArrNotAvailable
+Sub Test_cf_pushA_AddIsNotArray_ArrNotAvailable
     Dim a,d,e
     d = "a"
     e = Array("a")
-    cf_pushMulti a, d
+    cf_pushA a, d
     
     assertAllElements e, a
 End Sub

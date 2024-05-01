@@ -124,7 +124,7 @@ Sub Test_clsCmArray_items_AllItems
     Dim e,d,ao,a
     Set ao = new clsCmArray
     d = Array(1,"b",Nothing)
-    ao.pushMulti d
+    ao.pushA d
 
     e = d
     a = ao.items()
@@ -429,13 +429,13 @@ Sub Test_clsCmArray_map_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.pop()/.push()/pushMulti()
+'clsCmArray.pop()/.push()/pushA()
 Sub Test_clsCmArray_pop_push_pushMulti
     Dim a,e
     Set a = new clsCmArray
     
     e = Array("hoge", 2, "参", Nothing)
-    AssertEqual 4, a.pushMulti(e)
+    AssertEqual 4, a.pushA(e)
     
     assertAllElements e, a
     
@@ -584,7 +584,7 @@ Sub Test_clsCmArray_reverse_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.shift()/.unshift()/unshiftMulti()
+'clsCmArray.shift()/.unshift()/unshiftA()
 Sub Test_clsCmArray_shift_unshift_unshiftMulti
     Dim a,e
     Set a = new clsCmArray
@@ -604,7 +604,7 @@ Sub Test_clsCmArray_shift_unshift_unshiftMulti
     AssertEqualWithMessage e(2), a(0), "3-2"
     AssertSameWithMessage e(3), a(1), "3-3"
     
-    AssertEqualWithMessage 4, a.unshiftMulti(Array(Empty, "四")), "4-1"
+    AssertEqualWithMessage 4, a.unshiftA(Array(Empty, "四")), "4-1"
     
     e = Array(Empty, "四", "参", Nothing)
     assertAllElements e, a
@@ -947,7 +947,7 @@ Sub Test_clsCmArray_toArray_AllItems
     Dim e,d,ao,a
     Set ao = new clsCmArray
     d = Array(1,"b",Nothing)
-    ao.pushMulti d
+    ao.pushA d
 
     e = d
     a = ao.toArray()

@@ -269,7 +269,7 @@ Class clsCmCharacterType
                 If Not PoType2Chars.Exists(lDivide) Then
                     sub_CmCharTypeCreateDefinitionsByCharacterType lPowerOf2
                 End If
-                cf_pushMulti vRet, PoType2Chars.Item(lDivide)
+                cf_pushA vRet, PoType2Chars.Item(lDivide)
             End If
             lPowerOf2 = lPowerOf2 - 1
         Loop

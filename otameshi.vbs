@@ -145,7 +145,7 @@ dim pvinfo
 sub getevent(a)
     dim temptemp
     cf_push temptemp, new_Now()
-    cf_pushMulti temptemp, a
+    cf_pushA temptemp, a
     cf_push pvinfo, temptemp
 end sub
 Dim aaa : Set aaa = new_Arr()
@@ -157,7 +157,7 @@ Dim ofncsot : Set ofncsot = new_Func("(c,n)=>c>n")
 
 Dim vArray : vArray = Array(5,2,9,6,4,8,7,3,0,1)
 Dim res2
-aaa.pushMulti vArray
+aaa.pushA vArray
 aaa.sortUsing(ofncsot)
 
 inputbox "","",aaa.toString
@@ -421,7 +421,7 @@ Private Function func_GetFileInfoProcGetFilesRecursionByShell( _
         'フォルダ内全てのアイテムについて
             If oItem.IsFolder Then
             'フォルダの場合
-                cf_pushMulti vRet, func_GetFileInfoProcGetFilesRecursionByShell(oItem.Path)
+                cf_pushA vRet, func_GetFileInfoProcGetFilesRecursionByShell(oItem.Path)
             Else
             'ファイルの場合
                 cf_push vRet, oItem
@@ -444,7 +444,7 @@ on error resume next
     Dim oFile,vArr
     For Each oFile In aoFolder.Items
         If oFile.IsFolder Then 'フォルダであれば再帰処理
-            cf_pushMulti vArr, func_GetFile(oFile.GetFolder)
+            cf_pushA vArr, func_GetFile(oFile.GetFolder)
         Else
             cf_push vArr, Array( _
                 new_FileOf(oFile.Path).Attributes _
@@ -932,7 +932,7 @@ arr.push "あ"
 Call Msgbox(arr.Length)
 Call Msgbox(arr(0))
 
-arr.PushMulti(array(1,"hello", #2023/9/10#))
+arr.pushA(array(1,"hello", #2023/9/10#))
 
 Call Msgbox(arr.Length)
 Call Msgbox(arr(3))
@@ -947,7 +947,7 @@ arr.Unshift "か"
 Call Msgbox(arr.Length)
 Call Msgbox(arr(3))
 
-arr.UnshiftMulti(array(9,"world", #1999/9/10#))
+arr.unshiftA(array(9,"world", #1999/9/10#))
 
 Call Msgbox(arr.Length)
 Call Msgbox(arr(6))

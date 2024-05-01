@@ -225,9 +225,9 @@ Class clsCmArray
         )
         Dim oArr : Set oArr = new_Arr()
         If func_CmArrayLength()>0 Then
-            oArr.pushMulti PvArr
+            oArr.pushA PvArr
         End If
-        oArr.pushMulti avArr
+        oArr.pushA avArr
         Set concat = oArr
 
         Set oArr = Nothing
@@ -440,7 +440,7 @@ Class clsCmArray
     '***************************************************************************************************
     'Function/Sub Name           : push()
     'Overview                    : 配列の末尾に要素を1つ追加する
-    'Detailed Description        : func_CmArrayPushMulti()に委譲する
+    'Detailed Description        : func_CmArrayPushA()に委譲する
     'Argument
     '     aoEle                  : 配列の末尾に追加する要素
     'Return Value
@@ -454,13 +454,13 @@ Class clsCmArray
     Public Function push( _
         byRef aoEle _
         )
-        push = func_CmArrayPushMulti(Array(aoEle))
+        push = func_CmArrayPushA(Array(aoEle))
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : pushMulti()
+    'Function/Sub Name           : pushA()
     'Overview                    : 配列の末尾に要素を複数追加する
-    'Detailed Description        : func_CmArrayPushMulti()に委譲する
+    'Detailed Description        : func_CmArrayPushA()に委譲する
     'Argument
     '     avArr                  : 配列の末尾に追加する要素（配列）
     'Return Value
@@ -471,10 +471,10 @@ Class clsCmArray
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function pushMulti( _
+    Public Function pushA( _
         byRef avArr _
         )
-        pushMulti = func_CmArrayPushMulti(avArr)
+        pushA = func_CmArrayPushA(avArr)
     End Function
 
     '***************************************************************************************************
@@ -739,7 +739,7 @@ Class clsCmArray
     '***************************************************************************************************
     'Function/Sub Name           : unshift()
     'Overview                    : 配列の先頭に要素を1つ追加する
-    'Detailed Description        : func_CmArrayUnshiftMulti()に委譲する
+    'Detailed Description        : func_CmArrayUnshiftA()に委譲する
     'Argument
     '     aoEle                  : 配列の先頭に追加する要素
     'Return Value
@@ -753,13 +753,13 @@ Class clsCmArray
     Public Function unshift( _
         byRef aoEle _
         )
-        unshift = func_CmArrayUnshiftMulti(Array(aoEle))
+        unshift = func_CmArrayUnshiftA(Array(aoEle))
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : unshiftMulti()
+    'Function/Sub Name           : unshiftA()
     'Overview                    : 配列の先頭に要素を1つ追加する
-    'Detailed Description        : func_CmArrayUnshiftMulti()に委譲する
+    'Detailed Description        : func_CmArrayUnshiftA()に委譲する
     'Argument
     '     avArr                  : 配列の先頭に追加する要素（配列）
     'Return Value
@@ -770,10 +770,10 @@ Class clsCmArray
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function unshiftMulti( _
+    Public Function unshiftA( _
         byRef avArr _
         )
-        unshiftMulti = func_CmArrayUnshiftMulti(avArr)
+        unshiftA = func_CmArrayUnshiftA(avArr)
     End Function
 
 
@@ -1184,7 +1184,7 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmArrayPushMulti()
+    'Function/Sub Name           : func_CmArrayPushA()
     'Overview                    : 配列の末尾に要素を複数追加する
     'Detailed Description        : 工事中
     'Argument
@@ -1197,11 +1197,11 @@ Class clsCmArray
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmArrayPushMulti( _
+    Private Function func_CmArrayPushA( _
         byRef avArr _
         )
-        cf_pushMulti PvArr, avArr
-        func_CmArrayPushMulti = func_CmArrayLength()
+        cf_pushA PvArr, avArr
+        func_CmArrayPushA = func_CmArrayLength()
     End Function
 
     '***************************************************************************************************
@@ -1478,7 +1478,7 @@ Class clsCmArray
         
         'Leftにピボット＋Rightを結合する
         cf_push vLeft, oPivot
-        If func_CmArrayHasElement(vRight) Then cf_pushMulti vLeft, vRight
+        If func_CmArrayHasElement(vRight) Then cf_pushA vLeft, vRight
         
         func_CmArraySortQuick = vLeft
         Set oPivot = Nothing
@@ -1834,7 +1834,7 @@ Class clsCmArray
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmArrayUnshiftMulti()
+    'Function/Sub Name           : func_CmArrayUnshiftA()
     'Overview                    : 配列の先頭に要素を複数追加する
     'Detailed Description        : 工事中
     'Argument
@@ -1847,7 +1847,7 @@ Class clsCmArray
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/08         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmArrayUnshiftMulti( _
+    Private Function func_CmArrayUnshiftA( _
         byRef avArr _
         )
         Dim vArr, lUb, lUbAdd
@@ -1869,7 +1869,7 @@ Class clsCmArray
 
         '作成した配列に置換え
         PvArr = vArr
-        func_CmArrayUnshiftMulti = func_CmArrayLength()
+        func_CmArrayUnshiftA = func_CmArrayLength()
 
     End Function
 
