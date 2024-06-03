@@ -338,6 +338,27 @@ Sub Test_fw_storeArguments
 End Sub
 
 '###################################################################################################
+'fw_throwException()
+Sub Test_fw_throwException
+    On Error Resume Next
+    dim d : d = Array(1,"Source","Description")
+    fw_throwException d(0),d(1),d(2)
+
+    dim e,a
+    e = d(0)
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Number"
+
+    e = d(1)
+    a = Err.Source
+    AssertEqualWithMessage e,a,"Source"
+
+    e = d(2)
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
+End Sub
+
+'###################################################################################################
 'fw_tryCatch()
 Sub Test_cf_tryCatch_TryOnly_Normal
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Nothing, Empty)

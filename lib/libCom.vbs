@@ -64,6 +64,64 @@ Private Sub cf_bindAt( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_enum()
+'Overview                    : Enum生成関数
+'Detailed Description        : Enumのインスタンスを生成する
+'Argument
+'     asName                 : Enum名
+'     aoDef                  : Enumの定義
+'                              定義はkeyが定義名、valueが値のDictionary
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/05/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub cf_enum( _
+    byVal asName _
+    , byRef aoDef _
+    )
+    'クラス名（仮名）作成
+    With new_Char()
+        Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
+    End With
+    cf_push vCharList, "_"
+    Dim sClassName : sClassName = "clsEnum_" & util_randStr(vCharList, 10)
+
+    'クラス定義のソースコード作成
+    Dim sValName : sValName = asName
+    Dim vCode,i
+    cf_push vCode, "Class " & sClassName
+    For Each i in aoDef.Keys
+        cf_push vCode, "Public " & i
+    Next
+    cf_push vCode, "Private PoLists"
+    cf_push vCode, "Private Sub Class_Initialize()"
+    cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
+    For Each i in aoDef.Keys
+        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(" & sValName & ", " & i & ", " & aoDef.Item(i) & ")"
+        cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
+    Next
+    cf_push vCode, "End Sub"
+    cf_push vCode, "public Function values()"
+    cf_push vCode, "values = PoLists.Items"
+    cf_push vCode, "End Function"
+    cf_push vCode, "public Function valueOf(n)"
+    cf_push vCode, "Set valueOf = PoLists.Item(n)"
+    cf_push vCode, "End Function"
+    cf_push vCode, "End Class"
+
+    'インスタンス生成のソースコード作成
+    cf_push vCode, "Private " & sValName
+    cf_push vCode, "Set " & sValName & " = new " & sClassName
+
+    '実行
+    ExecuteGlobal Replace(Join(vCode,":"), "'", """")
+End Sub
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_isAvailableObject()
 'Overview                    : オブジェクトが利用可能か判定する
 'Detailed Description        : 工事中
@@ -485,6 +543,81 @@ Private Sub sub_CfPushA( _
     On Error Goto 0
 End Sub
 
+'###################################################################################################
+'検査系の関数
+'###################################################################################################
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argFalse()
+'Overview                    : 引数がFalseか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/05/28         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argFalse( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If Not cf_isSame(False, avArgument) Then fw_throwException 8193, asSource, asDescription
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argNotEmpty()
+'Overview                    : 引数がEmptyでないか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/06/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argNotEmpty( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If IsEmpty(avArgument) Then fw_throwException 8194, asSource, asDescription
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argNotNull()
+'Overview                    : 引数がNullでないか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/06/03         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argNotNull( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If IsNull(avArgument) Then fw_throwException 8195, asSource, asDescription
+End Sub
 
 '###################################################################################################
 'フレームワーク系の関数
@@ -751,6 +884,30 @@ Private Function fw_storeArguments( _
     Set oDic = Nothing
     Set oRet = Nothing
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : fw_throwException()
+'Overview                    : 例外を投げる
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     alNumber               : エラー番号
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/05/28         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub fw_throwException( _
+    byVal alNumber _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    Err.Raise alNumber, asSource, asDescription
+End Sub
 
 '***************************************************************************************************
 'Function/Sub Name           : fw_tryCatch()
@@ -2124,8 +2281,8 @@ End Function
 Private Function fs_copyFile( _
     byVal asFrom _
     , byVal asTo _
-    ) 
-    Set fs_copyFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "CopyFile")
+    )
+    Set fs_copyFile = func_FsGeneralExecutor(Array(asFrom, asTo), "CopyFile")
 End Function
 
 '***************************************************************************************************
@@ -2147,8 +2304,8 @@ End Function
 Private Function fs_copyFolder( _
     byVal asFrom _
     , byVal asTo _
-    ) 
-    Set fs_copyFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "CopyFolder")
+    )
+    Set fs_copyFolder = func_FsGeneralExecutor(Array(asFrom, asTo), "CopyFolder")
 End Function
 
 '***************************************************************************************************
@@ -2226,7 +2383,7 @@ End Function
 Private Function fs_createFolder( _
     byVal asPath _
     )
-    Set fs_createFolder = func_FsGeneralExecutor(True, True, Array(asPath), "CreateFolder")
+    Set fs_createFolder = func_FsGeneralExecutor(Array(asPath), "CreateFolder")
 End Function
 
 '***************************************************************************************************
@@ -2247,7 +2404,7 @@ End Function
 Private Function fs_deleteFile( _
     byVal asPath _
     )
-    Set fs_deleteFile = func_FsGeneralExecutor(False, False, Array(asPath), "DeleteFile")
+    Set fs_deleteFile = func_FsGeneralExecutor(Array(asPath), "DeleteFile")
 End Function
 
 '***************************************************************************************************
@@ -2268,7 +2425,7 @@ End Function
 Private Function fs_deleteFolder( _
     byVal asPath _
     )
-    Set fs_deleteFolder = func_FsGeneralExecutor(True, False, Array(asPath), "DeleteFolder")
+    Set fs_deleteFolder = func_FsGeneralExecutor(Array(asPath), "DeleteFolder")
 End Function
 
 '***************************************************************************************************
@@ -2291,7 +2448,7 @@ Private Function fs_moveFile( _
     byVal asFrom _
     , byVal asTo _
     )
-    Set fs_moveFile = func_FsGeneralExecutor(False, False, Array(asFrom, asTo), "MoveFile")
+    Set fs_moveFile = func_FsGeneralExecutor(Array(asFrom, asTo), "MoveFile")
 End Function
 
 '***************************************************************************************************
@@ -2314,7 +2471,7 @@ Private Function fs_moveFolder( _
     byVal asFrom _
     , byVal asTo _
     )
-    Set fs_moveFolder = func_FsGeneralExecutor(True, False, Array(asFrom, asTo), "MoveFolder")
+    Set fs_moveFolder = func_FsGeneralExecutor(Array(asFrom, asTo), "MoveFolder")
 End Function
 
 '***************************************************************************************************
@@ -2563,8 +2720,6 @@ End Function
 'Overview                    : Fsoコマンド汎用実行関数
 'Detailed Description        : 工事中
 'Argument
-'     aboIsFolder            : True:フォルダ有無の判定 / False:ファイル有無の判定
-'     aboFlg                 : 判定に使用するフラグ
 '     asPath                 : パス
 '     asCmd                  : 実行コマンド
 'Return Value
@@ -2576,19 +2731,10 @@ End Function
 '2023/12/30         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function func_FsGeneralExecutor( _
-    byVal asIsFolder _
-    , byVal aboFlg _
-    , byRef asPath _
+    byRef asPath _
     , byVal asCmd _
     )
-    Set func_FsGeneralExecutor=new_Ret(False)
     With new_Fso()
-        If asIsFolder Then
-            If .FolderExists(asPath(0))=aboFlg Then Exit Function
-        Else
-            If .FileExists(asPath(0))=aboFlg Then Exit Function
-        End If
-    
         On Error Resume Next
         Select Case asCmd
             Case "CopyFile":

@@ -92,9 +92,9 @@ Sub Test_fs_copyFile_Normal_FromFileLocked
     assertFolderItems(createExpectDefinitionUnchange("from",d))
     assertFolderItems(createExpectDefinitionMergeFile(d))
 End Sub
-Sub Test_fs_copyFile_Err_FromFileNoExists
+Sub Test_fs_copyFile_Err_FromFileNotExists
     'データ定義と生成
-    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(False,False,"Test_fs_copyFile_Err_FromFileNoExists"))
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(False,False,"Test_fs_copyFile_Err_FromFileNotExists"))
 
     '実行
     Dim a : Set a = fs_copyFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
@@ -102,8 +102,12 @@ Sub Test_fs_copyFile_Err_FromFileNoExists
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 53
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "ファイルが見つかりません。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -221,9 +225,9 @@ Sub Test_fs_copyFolder_Normal_FromFileLocked
     assertFolderItems(createExpectDefinitionUnchange("from",d))
     assertFolderItems(createExpectDefinitionMergeFolder(d))
 End Sub
-Sub Test_fs_copyFolder_Err_FromFileNoExists
+Sub Test_fs_copyFolder_Err_FromFileNotExists
     'データ定義と生成
-    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(False,False,"Test_fs_copyFolder_Err_FromFileNoExists"))
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(False,False,"Test_fs_copyFolder_Err_FromFileNotExists"))
 
     '実行
     Dim a : Set a = fs_copyFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
@@ -232,8 +236,12 @@ Sub Test_fs_copyFolder_Err_FromFileNoExists
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 76
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "パスが見つかりません。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -378,8 +386,12 @@ Sub Test_fs_createFolder_ErrExistsFolder
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 58
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "既に同名のファイルが存在しています。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("target",d))
@@ -415,8 +427,12 @@ Sub Test_fs_deleteFile_Err_NotExists
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 53
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "ファイルが見つかりません。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("target",d))
@@ -479,8 +495,12 @@ Sub Test_fs_deleteFolder_Err_NotExists
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 76
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "パスが見つかりません。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("target",d))
@@ -581,9 +601,9 @@ Sub Test_fs_moveFile_Err_FromFileLocked
     assertFolderItems(createExpectDefinitionUnchange("from",d))
     assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
-Sub Test_fs_moveFile_Err_FromFileNoExists
+Sub Test_fs_moveFile_Err_FromFileNotExists
     'データ定義と生成
-    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(False,False,"Test_fs_moveFile_Err_FromFileNoExists"))
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(False,False,"Test_fs_moveFile_Err_FromFileNotExists"))
 
     '実行
     Dim a : Set a = fs_moveFile(d.Item("from").Item("path"),d.Item("to").Item("path"))
@@ -591,8 +611,12 @@ Sub Test_fs_moveFile_Err_FromFileNoExists
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 53
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "ファイルが見つかりません。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
 
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
@@ -722,9 +746,9 @@ Sub Test_fs_moveFolder_Err_FromFileLocked
     assertFolderItems(createExpectDefinitionUnchange("from",d))
     assertFolderItems(createExpectDefinitionUnchange("to",d))
 End Sub
-Sub Test_fs_moveFolder_Err_FromFileNoExists
+Sub Test_fs_moveFolder_Err_FromFileNotExists
     'データ定義と生成
-    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(False,False,"Test_fs_moveFolder_Err_FromFileNoExists"))
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFolder(False,False,"Test_fs_moveFolder_Err_FromFileNotExists"))
     
     '実行
     Dim a : Set a = fs_moveFolder(d.Item("from-folder").Item("path"),d.Item("to-folder").Item("path"))
@@ -733,8 +757,12 @@ Sub Test_fs_moveFolder_Err_FromFileNoExists
     Dim e
     e = False
     AssertEqualWithMessage e, a, "ret"
-    e = False
+    e = True
     AssertEqualWithMessage e, a.isErr, "isErr"
+    e = 76
+    AssertEqualWithMessage e, a.getErr.Item("Number"), "getErr.Item('Number')"
+    e = "パスが見つかりません。"
+    AssertEqualWithMessage e, a.getErr.Item("Description"), "getErr.Item('Description')"
     
     'データの検証
     assertFolderItems(createExpectDefinitionUnchange("from",d))
