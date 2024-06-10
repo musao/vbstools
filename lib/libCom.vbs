@@ -1224,14 +1224,14 @@ Private Sub new_Enum( _
     Dim sValName : sValName = asName
     Dim vCode,i
     cf_push vCode, "Class " & sClassName
-    For Each i in aoDef.Keys
-        cf_push vCode, "Public " & i
-    Next
+    cf_push vCode, "Public " & Join(aoDef.Keys,",")
+    
     cf_push vCode, "Private PoLists"
     cf_push vCode, "Private Sub Class_Initialize()"
     cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(" & sValName & ", " & i & ", " & aoDef.Item(i) & ")"
+        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(Me, " & i & ", " & aoDef.Item(i) & ")"
+'        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(" & sValName & ", " & i & ", " & aoDef.Item(i) & ")"
         cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"

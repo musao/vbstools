@@ -23,8 +23,8 @@ Sub Test_clsCmEnumElement
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.code()
-Sub Test_clsCmEnumElement_code
+'clsCmEnumElement.value()
+Sub Test_clsCmEnumElement_value
     Dim d : d = Array("EnumTest", "TEST", 100)
     Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
 
@@ -32,34 +32,34 @@ Sub Test_clsCmEnumElement_code
     Dim a
     a = ao
     AssertEqualWithMessage e, a, "Default"
-    a = ao.code()
-    AssertEqualWithMessage e, a, "code()"
+    a = ao.value()
+    AssertEqualWithMessage e, a, "value()"
 End Sub
-Sub Test_clsCmEnumElement_code_InitialValue
+Sub Test_clsCmEnumElement_value_InitialValue
     Dim ao : Set ao = (new clsCmEnumElement)
     Dim e : e = Empty
     Dim a
     a = ao
     AssertEqualWithMessage e, a, "Default"
-    a = ao.code()
-    AssertEqualWithMessage e, a, "code()"
+    a = ao.value()
+    AssertEqualWithMessage e, a, "value()"
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.kind()
-Sub Test_clsCmEnumElement_kind
-    Dim d : d = Array("EnumTest", "TEST", 100)
+'clsCmEnumElement.parent()
+Sub Test_clsCmEnumElement_parent
+    Dim d : d = Array(CreateObject("Scripting.Dictionary"), "TEST", 100)
     Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
 
-    Dim e : e = d(0)
-    Dim a : a = ao.kind()
-    AssertEqualWithMessage e, a, "kind()"
+    Dim e : Set e = d(0)
+    Dim a : Set a = ao.parent()
+    AssertSameWithMessage e, a, "parent()"
 End Sub
-Sub Test_clsCmEnumElement_kind_InitialValue
+Sub Test_clsCmEnumElement_parent_InitialValue
     Dim ao : Set ao = (new clsCmEnumElement)
-    Dim e : e = Empty
-    Dim a : a = ao.kind()
-    AssertEqualWithMessage e, a, "kind()"
+    Dim e : Set e = Nothing
+    Dim a : Set a = ao.parent()
+    AssertSameWithMessage e, a, "parent()"
 End Sub
 
 '###################################################################################################
@@ -90,7 +90,7 @@ Sub Test_clsCmEnumElement_toString
 End Sub
 Sub Test_clsCmEnumElement_toString_Initial
     Dim ao : Set ao = (new clsCmEnumElement)
-    Dim e : e = "<" & TypeName(ao) & ">(" & cf_toString(Empty) & ":" & cf_toString(Empty) & " of " & cf_toString(Empty) & ")"
+    Dim e : e = "<" & TypeName(ao) & ">(" & cf_toString(Empty) & ":" & cf_toString(Empty) & " of " & cf_toString(Nothing) & ")"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
@@ -98,14 +98,14 @@ End Sub
 '###################################################################################################
 'clsCmEnumElement.compareTo()
 Sub Test_clsCmEnumElement_compareTo_ok
-    Dim kind,name,code
-    kind="kind":name="name":code=10
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(kind,name,code)
+    Dim parent,name,value
+    Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
+    Dim ao : Set ao = (new clsCmEnumElement).thisIs(parent,name,value)
 
     Dim data : data = Array( _
-        Array((new clsCmEnumElement).thisIs(kind,name,9),1) _
-        , Array((new clsCmEnumElement).thisIs(kind,name,code),0) _
-        , Array((new clsCmEnumElement).thisIs(kind,name,11),-1) _
+        Array((new clsCmEnumElement).thisIs(parent,name,9),1) _
+        , Array((new clsCmEnumElement).thisIs(parent,name,value),0) _
+        , Array((new clsCmEnumElement).thisIs(parent,name,11),-1) _
         )
 
     Dim i,d,a,e
@@ -117,15 +117,15 @@ Sub Test_clsCmEnumElement_compareTo_ok
     Next
 End Sub
 Sub Test_clsCmEnumElement_compareTo_ng
-    Dim kind,name,code
-    kind="kind":name="name":code=10
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(kind,name,code)
+    Dim parent,name,value
+    Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
+    Dim ao : Set ao = (new clsCmEnumElement).thisIs(parent,name,value)
 
     Dim sou,dis
     sou="clsCmEnumElement+compareTo()":dis="The type of the argument is different"
     Dim data : data = Array( _
-        Array((new clsCmEnumElement).thisIs("kind2",name,code),Array(sou,dis)) _
-        , Array((new clsCmEnumElement).thisIs(kind,"name2",code),Array(sou,dis)) _
+        Array((new clsCmEnumElement).thisIs(CreateObject("Wscript.Shell"),name,value),Array(sou,dis)) _
+        , Array((new clsCmEnumElement).thisIs(parent,"name2",value),Array(sou,dis)) _
         , Array(CreateObject("Scripting.Dictionary"),Array(sou,dis)) _
         )
 
@@ -149,16 +149,16 @@ End Sub
 '###################################################################################################
 'clsCmEnumElement.equals()
 Sub Test_clsCmEnumElement_equals
-    Dim kind,name,code
-    kind="kind":name="name":code=10
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(kind,name,code)
+    Dim parent,name,value
+    Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
+    Dim ao : Set ao = (new clsCmEnumElement).thisIs(parent,name,value)
 
     Dim data : data = Array( _
-        Array((new clsCmEnumElement).thisIs(kind,name,code),True) _
-        , Array((new clsCmEnumElement).thisIs(kind,name,11),False) _
-        , Array((new clsCmEnumElement).thisIs("kind2",name,code),False) _
-        , Array((new clsCmEnumElement).thisIs(kind,"name2",code),True) _
-        , Array((new clsCmEnumElement).thisIs(kind,name,9),False) _
+        Array((new clsCmEnumElement).thisIs(parent,name,value),True) _
+        , Array((new clsCmEnumElement).thisIs(parent,name,11),False) _
+        , Array((new clsCmEnumElement).thisIs(CreateObject("Wscript.Shell"),name,value),False) _
+        , Array((new clsCmEnumElement).thisIs(parent,"name2",value),True) _
+        , Array((new clsCmEnumElement).thisIs(parent,name,9),False) _
         , Array(CreateObject("Scripting.Dictionary"),False) _
         )
 
@@ -175,25 +175,25 @@ End Sub
 '###################################################################################################
 'clsCmEnumElement.thisIs()
 Sub Test_clsCmEnumElement_thisIs_Err
-    Dim d : d = Array("EnumTest", "TEST", 100)
+    Dim d : d = Array(CreateObject("Scripting.Dictionary"), "TEST", 100)
     Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
 
-    Dim d2 : d2 = Array("EnumTest2", "TEST2", 200)
+    Dim d2 : d2 = Array(CreateObject("Wscript.Shell"), "TEST2", 200)
     On Error Resume Next
     ao.thisIs d2(0),d2(1),d2(2)
 
     dim e,a
-    e = d(0)
-    a = ao.kind
-    AssertEqualWithMessage e,a,"kind"
+    Set e = d(0)
+    Set a = ao.parent
+    AssertSameWithMessage e,a,"parent"
 
     e = d(1)
     a = ao.name
     AssertEqualWithMessage e,a,"name"
 
     e = d(2)
-    a = ao.code
-    AssertEqualWithMessage e,a,"code"
+    a = ao.value
+    AssertEqualWithMessage e,a,"value"
 
     e = "clsCmEnumElement+thisIs()"
     a = Err.Source
