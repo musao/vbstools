@@ -189,8 +189,8 @@ Class clsCmEnumElement
         ast_argFalse PboAlreadySet, TypeName(Me)&"+thisIs()", "Value already set"
 
         sub_CmEnumEleSetKind asKind
-        sub_CmEnumEleSetCode avCode
         sub_CmEnumEleSetName asName
+        sub_CmEnumEleSetCode avCode
         PboAlreadySet = True
         Set thisIs = Me
     End Function
@@ -295,7 +295,7 @@ Class clsCmEnumElement
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub sub_CmEnumEleSetCode( _
-        ByVal avCode _
+        ByRef avCode _
         )
         cf_bind PvCode, avCode
     End Sub

@@ -1,4 +1,4 @@
-' clsCmBroker.vbs: test.
+' libCom.vbs: cf_* procedure test.
 ' @import ../../lib/clsAdptFile.vbs
 ' @import ../../lib/clsCmArray.vbs
 ' @import ../../lib/clsCmBroker.vbs
@@ -43,22 +43,6 @@ Sub Test_cf_bindAt_Object
     cf_bindAt obj, "Object", Nothing
     
     AssertSame Nothing, obj.Item("Object")
-End Sub
-
-'###################################################################################################
-'cf_enum()
-Sub Test_cf_enum
-    Dim def : Set def = CreateObject("Scripting.Dictionary")
-    With def
-        .Add "APPLE", 1
-        .Add "PINEAPPLE", 2
-        .Add "PEN", 3
-    End With
-    cf_enum "GREAT_SATAN_KOSAKA", def
-    
-    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.APPLE, "APPLE"
-    AssertEqualWithMessage 2, GREAT_SATAN_KOSAKA.PINEAPPLE, "PINEAPPLE"
-    AssertEqualWithMessage 3, GREAT_SATAN_KOSAKA.PEN, "PEN"
 End Sub
 
 '###################################################################################################

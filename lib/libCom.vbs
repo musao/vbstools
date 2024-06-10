@@ -64,64 +64,6 @@ Private Sub cf_bindAt( _
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : cf_enum()
-'Overview                    : Enum生成関数
-'Detailed Description        : Enumのインスタンスを生成する
-'Argument
-'     asName                 : Enum名
-'     aoDef                  : Enumの定義
-'                              定義はkeyが定義名、valueが値のDictionary
-'Return Value
-'     なし
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2024/05/04         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Sub cf_enum( _
-    byVal asName _
-    , byRef aoDef _
-    )
-    'クラス名（仮名）作成
-    With new_Char()
-        Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
-    End With
-    cf_push vCharList, "_"
-    Dim sClassName : sClassName = "clsEnum_" & util_randStr(vCharList, 10)
-
-    'クラス定義のソースコード作成
-    Dim sValName : sValName = asName
-    Dim vCode,i
-    cf_push vCode, "Class " & sClassName
-    For Each i in aoDef.Keys
-        cf_push vCode, "Public " & i
-    Next
-    cf_push vCode, "Private PoLists"
-    cf_push vCode, "Private Sub Class_Initialize()"
-    cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
-    For Each i in aoDef.Keys
-        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(" & sValName & ", " & i & ", " & aoDef.Item(i) & ")"
-        cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
-    Next
-    cf_push vCode, "End Sub"
-    cf_push vCode, "public Function values()"
-    cf_push vCode, "values = PoLists.Items"
-    cf_push vCode, "End Function"
-    cf_push vCode, "public Function valueOf(n)"
-    cf_push vCode, "Set valueOf = PoLists.Item(n)"
-    cf_push vCode, "End Function"
-    cf_push vCode, "End Class"
-
-    'インスタンス生成のソースコード作成
-    cf_push vCode, "Private " & sValName
-    cf_push vCode, "Set " & sValName & " = new " & sClassName
-
-    '実行
-    ExecuteGlobal Replace(Join(vCode,":"), "'", """")
-End Sub
-
-'***************************************************************************************************
 'Function/Sub Name           : cf_isAvailableObject()
 'Overview                    : オブジェクトが利用可能か判定する
 'Detailed Description        : 工事中
@@ -1250,6 +1192,64 @@ Private Function new_DriveOf( _
     )
     Set new_DriveOf = new_Fso().GetDrive(asDriveName)
 End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_Enum()
+'Overview                    : Enum生成関数
+'Detailed Description        : Enumのインスタンスを生成する
+'Argument
+'     asName                 : Enum名
+'     aoDef                  : Enumの定義
+'                              定義はkeyが定義名、valueが値のDictionary
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/05/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub new_Enum( _
+    byVal asName _
+    , byRef aoDef _
+    )
+    'クラス名（仮名）作成
+    With new_Char()
+        Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
+    End With
+    cf_push vCharList, "_"
+    Dim sClassName : sClassName = "clsEnum_" & util_randStr(vCharList, 10)
+
+    'クラス定義のソースコード作成
+    Dim sValName : sValName = asName
+    Dim vCode,i
+    cf_push vCode, "Class " & sClassName
+    For Each i in aoDef.Keys
+        cf_push vCode, "Public " & i
+    Next
+    cf_push vCode, "Private PoLists"
+    cf_push vCode, "Private Sub Class_Initialize()"
+    cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
+    For Each i in aoDef.Keys
+        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(" & sValName & ", " & i & ", " & aoDef.Item(i) & ")"
+        cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
+    Next
+    cf_push vCode, "End Sub"
+    cf_push vCode, "public Function values()"
+    cf_push vCode, "values = PoLists.Items"
+    cf_push vCode, "End Function"
+    cf_push vCode, "public Function valueOf(n)"
+    cf_push vCode, "Set valueOf = PoLists.Item(n)"
+    cf_push vCode, "End Function"
+    cf_push vCode, "End Class"
+
+    'インスタンス生成のソースコード作成
+    cf_push vCode, "Private " & sValName
+    cf_push vCode, "Set " & sValName & " = new " & sClassName
+
+    '実行
+    ExecuteGlobal Replace(Join(vCode,":"), "'", """")
+End Sub
 
 '***************************************************************************************************
 'Function/Sub Name           : new_FileOf()

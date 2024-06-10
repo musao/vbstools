@@ -1,4 +1,5 @@
 ' libCom.vbs: new_* procedure test.
+' @import ../../lib/clsAdptFile.vbs
 ' @import ../../lib/clsCmArray.vbs
 ' @import ../../lib/clsCmBroker.vbs
 ' @import ../../lib/clsCmBufferedReader.vbs
@@ -6,11 +7,11 @@
 ' @import ../../lib/clsCmCalendar.vbs
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
+' @import ../../lib/clsCmEnumElement.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
 ' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs
 ' @import ../../lib/libCom.vbs
-
 Option Explicit
 
 '###################################################################################################
@@ -201,6 +202,22 @@ Sub Test_new_DriveOf_Err
     AssertEqual 5, Err.Number
     AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
     AssertEqual Empty, a
+End Sub
+
+'###################################################################################################
+'new_Enum()
+Sub Test_new_Enum
+    Dim def : Set def = CreateObject("Scripting.Dictionary")
+    With def
+        .Add "APPLE", 1
+        .Add "PINEAPPLE", 2
+        .Add "PEN", 3
+    End With
+    new_Enum "GREAT_SATAN_KOSAKA", def
+    
+    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.APPLE, "APPLE"
+    AssertEqualWithMessage 2, GREAT_SATAN_KOSAKA.PINEAPPLE, "PINEAPPLE"
+    AssertEqualWithMessage 3, GREAT_SATAN_KOSAKA.PEN, "PEN"
 End Sub
 
 '###################################################################################################
