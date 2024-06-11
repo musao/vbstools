@@ -14,6 +14,25 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+Class clsEnum_UQIXQKT0OO
+Private APPLE_,PINEAPPLE_,PEN_
+Private PoLists
+Public Sub Class_Initialize()
+Set PoLists = CreateObject("Scripting.Dictionary")
+End Sub
+Public Function values()
+values = PoLists.Items
+End Function
+Public Function valueOf(n)
+Set valueOf = PoLists.Item(n)
+End Function
+End Class
+Private GREAT_SATAN_KOSAKA
+Set GREAT_SATAN_KOSAKA = new clsEnum_UQIXQKT0OO
+msgbox cf_toString(GREAT_SATAN_KOSAKA)
+
+wscript.quit
+
 inputbox "","",new_Shell().ExpandEnvironmentStrings("%UserProfile%")
 wscript.quit
 

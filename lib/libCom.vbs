@@ -1221,34 +1221,36 @@ Private Sub new_Enum( _
     Dim sClassName : sClassName = "clsEnum_" & util_randStr(vCharList, 10)
 
     'クラス定義のソースコード作成
-    Dim sValName : sValName = asName
     Dim vCode,i
     cf_push vCode, "Class " & sClassName
-    cf_push vCode, "Public " & Join(aoDef.Keys,",")
-    
+    cf_push vCode, "Private " & Join(aoDef.Keys,"_,")&"_"
     cf_push vCode, "Private PoLists"
     cf_push vCode, "Private Sub Class_Initialize()"
     cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(Me, " & i & ", " & aoDef.Item(i) & ")"
-'        cf_push vCode, "Set " & i & " = (new clsCmEnumElement).thisIs(" & sValName & ", " & i & ", " & aoDef.Item(i) & ")"
+        cf_push vCode, "Set " & i & "_ = (new clsCmEnumElement).thisIs(Me, " & i & ", " & aoDef.Item(i) & ")"
         cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"
-    cf_push vCode, "public Function values()"
+    For Each i in aoDef.Keys
+        cf_push vCode, "Public Property Get " & i & "()"
+        cf_push vCode, "cf_bind " & i & ", " & i & "_"
+        cf_push vCode, "End Property"
+    Next
+    cf_push vCode, "Public Function values()"
     cf_push vCode, "values = PoLists.Items"
     cf_push vCode, "End Function"
-    cf_push vCode, "public Function valueOf(n)"
+    cf_push vCode, "Public Function valueOf(n)"
     cf_push vCode, "Set valueOf = PoLists.Item(n)"
     cf_push vCode, "End Function"
     cf_push vCode, "End Class"
-
     'インスタンス生成のソースコード作成
-    cf_push vCode, "Private " & sValName
-    cf_push vCode, "Set " & sValName & " = new " & sClassName
-
+    Dim sThisName : sThisName = asName
+    cf_push vCode, "Private " & sThisName
+    cf_push vCode, "Set " & sThisName & " = new " & sClassName
     '実行
     ExecuteGlobal Replace(Join(vCode,":"), "'", """")
+
 End Sub
 
 '***************************************************************************************************

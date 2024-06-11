@@ -218,6 +218,24 @@ Sub Test_new_Enum
     AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.APPLE, "APPLE"
     AssertEqualWithMessage 2, GREAT_SATAN_KOSAKA.PINEAPPLE, "PINEAPPLE"
     AssertEqualWithMessage 3, GREAT_SATAN_KOSAKA.PEN, "PEN"
+    
+    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.valueOf("APPLE"), "valueOf('APPLE')"
+    AssertEqualWithMessage 2, GREAT_SATAN_KOSAKA.valueOf("PINEAPPLE"), "valueOf('PINEAPPLE')"
+    AssertEqualWithMessage 3, GREAT_SATAN_KOSAKA.valueOf("PEN"), "valueOf('PEN')"
+
+    Dim i,ar
+    ar = GREAT_SATAN_KOSAKA.values
+    For i=0 To Ubound(ar)
+        AssertEqualWithMessage def.Item(def.Keys()(i)), ar(i), "values i="&i
+    Next
+
+    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.APPLE), "equals()=False1"
+    AssertEqualWithMessage True, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.PINEAPPLE), "equals()=True"
+    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.PEN), "equals()=False2"
+
+    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.APPLE), "compareTo()=1"
+    AssertEqualWithMessage 0, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.PINEAPPLE), "compareTo()=0"
+    AssertEqualWithMessage -1, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.PEN), "compareTo()=-1"
 End Sub
 
 '###################################################################################################
