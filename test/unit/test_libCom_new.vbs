@@ -7,7 +7,7 @@
 ' @import ../../lib/clsCmCalendar.vbs
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
-' @import ../../lib/clsCmEnumElement.vbs
+' @import ../../lib/clsCmReadOnlyObject.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
 ' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs
@@ -207,35 +207,55 @@ End Sub
 '###################################################################################################
 'new_Enum()
 Sub Test_new_Enum
-    Dim def : Set def = CreateObject("Scripting.Dictionary")
-    With def
-        .Add "APPLE", 1
-        .Add "PINEAPPLE", 2
-        .Add "PEN", 3
-    End With
-    new_Enum "GREAT_SATAN_KOSAKA", def
-    
+    Dim def : Set def = createTestEnum
+
     AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.APPLE, "APPLE"
     AssertEqualWithMessage 2, GREAT_SATAN_KOSAKA.PINEAPPLE, "PINEAPPLE"
     AssertEqualWithMessage 3, GREAT_SATAN_KOSAKA.PEN, "PEN"
+End Sub
+Sub Test_new_Enum_valueOf_Normal
+    Dim def : Set def = createTestEnum
     
-    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.valueOf("APPLE"), "valueOf('APPLE')"
-    AssertEqualWithMessage 2, GREAT_SATAN_KOSAKA.valueOf("PINEAPPLE"), "valueOf('PINEAPPLE')"
-    AssertEqualWithMessage 3, GREAT_SATAN_KOSAKA.valueOf("PEN"), "valueOf('PEN')"
+    Dim i
+    For Each i In def.Keys
+        AssertEqualWithMessage def.Item(i), GREAT_SATAN_KOSAKA.valueOf(i), "valueOf('" & i & "')"
+    Next
+End Sub
+Sub Test_new_Enum_valueOf_Err
+    Dim def : Set def = createTestEnum
+    
+    Dim a : a = GREAT_SATAN_KOSAKA.valueOf("ORANGE")  'todo
+End Sub
+Sub Test_new_Enum_values
+    Dim def : Set def = createTestEnum
 
     Dim i,ar
     ar = GREAT_SATAN_KOSAKA.values
+    AssertEqualWithMessage def.Count-1, Ubound(ar), "count"
     For i=0 To Ubound(ar)
         AssertEqualWithMessage def.Item(def.Keys()(i)), ar(i), "values i="&i
     Next
+End Sub
+Sub Test_new_Enum_equals
+    Dim def : Set def = createTestEnum
 
-    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.APPLE), "equals()=False1"
-    AssertEqualWithMessage True, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.PINEAPPLE), "equals()=True"
-    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.PEN), "equals()=False2"
+    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.APPLE), "PINEAPPLE=APPLE equals()=False"
+    AssertEqualWithMessage True, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.PINEAPPLE), "PINEAPPLE=PINEAPPLE equals()=True"
+    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(GREAT_SATAN_KOSAKA.PEN), "PINEAPPLE=PEN equals()=False"
+    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(Nothing), "Nothing equals()=False"
+    AssertEqualWithMessage False, GREAT_SATAN_KOSAKA.PINEAPPLE.equals(Empty), "Empty equals()=False"
+End Sub
+Sub Test_new_Enum_compareTo_Normal
+    Dim def : Set def = createTestEnum
 
-    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.APPLE), "compareTo()=1"
-    AssertEqualWithMessage 0, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.PINEAPPLE), "compareTo()=0"
-    AssertEqualWithMessage -1, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.PEN), "compareTo()=-1"
+    AssertEqualWithMessage 1, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.APPLE), "PINEAPPLEvsAPPLE compareTo()=1"
+    AssertEqualWithMessage 0, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.PINEAPPLE), "PINEAPPLEvsPINEAPPLE compareTo()=0"
+    AssertEqualWithMessage -1, GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(GREAT_SATAN_KOSAKA.PEN), "PINEAPPLEvsPEN compareTo()=-1"
+End Sub
+Sub Test_new_Enum_compareTo_Err
+    Dim def : Set def = createTestEnum
+
+    Dim a : a = GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(Nothing)  'todo
 End Sub
 
 '###################################################################################################
@@ -729,6 +749,21 @@ Sub Test_func_NewRewriteReturnPhrase_Arrow_nLine_nReturn
     AssertEqual e, a
 End Sub
 
+
+
+'###################################################################################################
+'common
+'For Test_new_Enum*()
+Function createTestEnum
+    Dim def : Set def = CreateObject("Scripting.Dictionary")
+    With def
+        .Add "APPLE", 1
+        .Add "PINEAPPLE", 2
+        .Add "PEN", 3
+    End With
+    new_Enum "GREAT_SATAN_KOSAKA", def
+    Set createTestEnum = def
+End Function
 
 
 ' Local Variables:

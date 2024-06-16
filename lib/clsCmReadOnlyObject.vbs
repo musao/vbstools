@@ -1,6 +1,6 @@
 '***************************************************************************************************
-'FILENAME                    : clsCmEnumElement.vbs
-'Overview                    : Enumの要素クラス
+'FILENAME                    : clsCmReadOnlyObject.vbs
+'Overview                    : 読み取り専用オブジェクトのクラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
 'Histroy
@@ -8,7 +8,7 @@
 '----------         ----------------------   -------------------------------------------------------
 '2024/05/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Class clsCmEnumElement
+Class clsCmReadOnlyObject
     'クラス内変数、定数
     Private PboAlreadySet, PoParent, PvValue, PsName
     
@@ -65,7 +65,7 @@ Class clsCmEnumElement
     '2024/05/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get name()
-        name = func_CmEnumEleGetName()
+        name = func_CmReadOnlyObjectGetName()
     End Property
 
     '***************************************************************************************************
@@ -83,13 +83,13 @@ Class clsCmEnumElement
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get parent()
-        cf_bind parent, func_CmEnumEleGetParent()
+        cf_bind parent, func_CmReadOnlyObjectGetParent()
     End Property
 
     '***************************************************************************************************
     'Function/Sub Name           : Property Get toString()
     'Overview                    : インスタンスの内容を文字出力する
-    'Detailed Description        : func_CmEnumEleToString()に委譲する
+    'Detailed Description        : func_CmReadOnlyObjectToString()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -101,7 +101,7 @@ Class clsCmEnumElement
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get toString()
-        toString = func_CmEnumEleToString()
+        toString = func_CmReadOnlyObjectToString()
     End Property
 
     '***************************************************************************************************
@@ -119,13 +119,13 @@ Class clsCmEnumElement
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Default Property Get value()
-        cf_bind value, func_CmEnumEleGetValue()
+        cf_bind value, func_CmReadOnlyObjectGetValue()
     End Property
 
     '***************************************************************************************************
     'Function/Sub Name           : compareTo()
     'Overview                    : 当クラスのインスタンスのvalueを比較する
-    'Detailed Description        : func_CmEnumEleCompareTo()に委譲する
+    'Detailed Description        : func_CmReadOnlyObjectCompareTo()に委譲する
     'Argument
     '     aoTarget               : 比較対象
     'Return Value
@@ -139,7 +139,7 @@ Class clsCmEnumElement
     Public Function compareTo( _
         ByRef aoTarget _
         )
-        Dim vRet : vRet = func_CmEnumEleCompareTo(aoTarget)
+        Dim vRet : vRet = func_CmReadOnlyObjectCompareTo(aoTarget)
         ast_argNotNull vRet, TypeName(Me)&"+compareTo()", "The type of the argument is different"
         compareTo = vRet
     End Function
@@ -161,7 +161,7 @@ Class clsCmEnumElement
     Public Function equals( _
         ByRef aoTarget _
         )
-        equals = (func_CmEnumEleCompareTo(aoTarget)=0)
+        equals = (func_CmReadOnlyObjectCompareTo(aoTarget)=0)
     End Function
 
     '***************************************************************************************************
@@ -188,16 +188,16 @@ Class clsCmEnumElement
         thisIs = Empty
         ast_argFalse PboAlreadySet, TypeName(Me)&"+thisIs()", "Value already set"
 
-        sub_CmEnumEleSetParent aoParent
-        sub_CmEnumEleSetName asName
-        sub_CmEnumEleSetValue avValue
+        sub_CmReadOnlyObjectSetParent aoParent
+        sub_CmReadOnlyObjectSetName asName
+        sub_CmReadOnlyObjectSetValue avValue
         PboAlreadySet = True
         Set thisIs = Me
     End Function
     
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmEnumEleCompareTo()
+    'Function/Sub Name           : func_CmReadOnlyObjectCompareTo()
     'Overview                    : 当クラスのインスタンスのvalueを比較する
     'Detailed Description        : 下記比較結果を返す
     '                               0  引数と同値
@@ -213,21 +213,21 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmEnumEleCompareTo( _
+    Private Function func_CmReadOnlyObjectCompareTo( _
         ByRef aoTarget _
         )
-        func_CmEnumEleCompareTo = Null
+        func_CmReadOnlyObjectCompareTo = Null
         If Not cf_isSame(TypeName(Me), TypeName(aoTarget)) Then Exit Function
         If Not cf_isSame(PoParent, aoTarget.parent) Then Exit Function
 
         Dim lResult : lResult = 0
         If (PvValue < aoTarget.value) Then lResult = -1
         If (PvValue > aoTarget.value) Then lResult = 1
-        func_CmEnumEleCompareTo = lResult
+        func_CmReadOnlyObjectCompareTo = lResult
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmEnumEleGetValue()
+    'Function/Sub Name           : func_CmReadOnlyObjectGetValue()
     'Overview                    : PvValueのゲッター
     'Detailed Description        : 工事中
     'Argument
@@ -239,13 +239,13 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmEnumEleGetValue( _
+    Private Function func_CmReadOnlyObjectGetValue( _
         )
-        cf_bind func_CmEnumEleGetValue, PvValue
+        cf_bind func_CmReadOnlyObjectGetValue, PvValue
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmEnumEleGetName()
+    'Function/Sub Name           : func_CmReadOnlyObjectGetName()
     'Overview                    : PsNameのゲッター
     'Detailed Description        : 工事中
     'Argument
@@ -257,13 +257,13 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmEnumEleGetName( _
+    Private Function func_CmReadOnlyObjectGetName( _
         )
-        func_CmEnumEleGetName = PsName
+        func_CmReadOnlyObjectGetName = PsName
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmEnumEleGetParent()
+    'Function/Sub Name           : func_CmReadOnlyObjectGetParent()
     'Overview                    : PvParentのゲッター
     'Detailed Description        : 工事中
     'Argument
@@ -275,13 +275,13 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmEnumEleGetParent( _
+    Private Function func_CmReadOnlyObjectGetParent( _
         )
-        cf_bind func_CmEnumEleGetParent, PoParent
+        cf_bind func_CmReadOnlyObjectGetParent, PoParent
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmEnumEleSetName()
+    'Function/Sub Name           : sub_CmReadOnlyObjectSetName()
     'Overview                    : PsNameのセッター
     'Detailed Description        : 工事中
     'Argument
@@ -294,14 +294,14 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmEnumEleSetName( _
+    Private Sub sub_CmReadOnlyObjectSetName( _
         ByVal asName _
         )
         PsName = asName
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmEnumEleSetParent()
+    'Function/Sub Name           : sub_CmReadOnlyObjectSetParent()
     'Overview                    : PvParentのセッター
     'Detailed Description        : 工事中
     'Argument
@@ -314,14 +314,14 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmEnumEleSetParent( _
+    Private Sub sub_CmReadOnlyObjectSetParent( _
         ByVal aoParent _
         )
         cf_bind PoParent, aoParent
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmEnumEleSetValue()
+    'Function/Sub Name           : sub_CmReadOnlyObjectSetValue()
     'Overview                    : PvValueのセッター
     'Detailed Description        : 工事中
     'Argument
@@ -334,14 +334,14 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmEnumEleSetValue( _
+    Private Sub sub_CmReadOnlyObjectSetValue( _
         ByRef avValue _
         )
         cf_bind PvValue, avValue
     End Sub
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmEnumEleToString()
+    'Function/Sub Name           : func_CmReadOnlyObjectToString()
     'Overview                    : インスタンスの内容を文字出力する
     'Detailed Description        : 工事中
     'Argument
@@ -354,9 +354,9 @@ Class clsCmEnumElement
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmEnumEleToString( _
+    Private Function func_CmReadOnlyObjectToString( _
         )
-        func_CmEnumEleToString = "<" & TypeName(Me) & ">(" & cf_toString(PvValue) & ":" & cf_toString(PsName) & " of " & cf_toString(PoParent) & ")"
+        func_CmReadOnlyObjectToString = "<" & TypeName(Me) & ">(" & cf_toString(PvValue) & ":" & cf_toString(PsName) & " of " & cf_toString(PoParent) & ")"
     End Function
     
 End Class

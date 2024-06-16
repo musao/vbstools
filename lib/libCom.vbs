@@ -561,6 +561,30 @@ Private Sub ast_argNotNull( _
     If IsNull(avArgument) Then fw_throwException 8195, asSource, asDescription
 End Sub
 
+'***************************************************************************************************
+'Function/Sub Name           : ast_argTrue()
+'Overview                    : 引数がTrueか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/06/16         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argTrue( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If Not cf_isSame(True, avArgument) Then fw_throwException 8196, asSource, asDescription
+End Sub
+
 '###################################################################################################
 'フレームワーク系の関数
 '###################################################################################################
@@ -1218,9 +1242,10 @@ Private Sub new_Enum( _
         Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
     End With
     cf_push vCharList, "_"
-    Dim sClassName : sClassName = "clsEnum_" & util_randStr(vCharList, 10)
+    Dim sClassName : sClassName = "clsTmp_" & util_randStr(vCharList, 10)
 
     'クラス定義のソースコード作成
+    Dim sThisName : sThisName = asName
     Dim vCode,i
     cf_push vCode, "Class " & sClassName
     cf_push vCode, "Private " & Join(aoDef.Keys,"_,")&"_"
@@ -1228,7 +1253,7 @@ Private Sub new_Enum( _
     cf_push vCode, "Private Sub Class_Initialize()"
     cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "Set " & i & "_ = (new clsCmEnumElement).thisIs(Me, " & i & ", " & aoDef.Item(i) & ")"
+        cf_push vCode, "Set " & i & "_ = (new clsCmReadOnlyObject).thisIs(Me, " & i & ", " & aoDef.Item(i) & ")"
         cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"
@@ -1241,11 +1266,11 @@ Private Sub new_Enum( _
     cf_push vCode, "values = PoLists.Items"
     cf_push vCode, "End Function"
     cf_push vCode, "Public Function valueOf(n)"
+    cf_push vCode, "ast_argTrue PoLists.Exists(n), TypeName(Me)&'(" & sThisName & ")+valueOf()', 'There is no element with the specified name'"
     cf_push vCode, "Set valueOf = PoLists.Item(n)"
     cf_push vCode, "End Function"
     cf_push vCode, "End Class"
     'インスタンス生成のソースコード作成
-    Dim sThisName : sThisName = asName
     cf_push vCode, "Private " & sThisName
     cf_push vCode, "Set " & sThisName & " = new " & sClassName
     '実行

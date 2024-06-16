@@ -7,7 +7,7 @@
 ' @import ../../lib/clsCmCalendar.vbs
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
-' @import ../../lib/clsCmEnumElement.vbs
+' @import ../../lib/clsCmReadOnlyObject.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
 ' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs
@@ -83,6 +83,33 @@ Sub Test_ast_argNotNull_ng
 
     dim e,a
     e = 8195
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Number"
+
+    e = d(1)
+    a = Err.Source
+    AssertEqualWithMessage e,a,"Source"
+
+    e = d(2)
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
+End Sub
+
+'###################################################################################################
+'ast_argTrue()
+Sub Test_ast_argTrue_ok
+    dim d : d = Array(True, "Source_ok", "Description_ok")
+    ast_argTrue d(0),d(1),d(2)
+
+    AssertWithMessage True, "argTrue_ok"
+End Sub
+Sub Test_ast_argTrue_ng
+    On Error Resume Next
+    dim d : d = Array(False, "Source_ng", "Description_ng")
+    ast_argTrue d(0),d(1),d(2)
+
+    dim e,a
+    e = 8196
     a = Err.Number
     AssertEqualWithMessage e,a,"Number"
 

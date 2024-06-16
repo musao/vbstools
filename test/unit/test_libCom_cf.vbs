@@ -7,7 +7,7 @@
 ' @import ../../lib/clsCmCalendar.vbs
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
-' @import ../../lib/clsCmEnumElement.vbs
+' @import ../../lib/clsCmReadOnlyObject.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
 ' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs

@@ -7,7 +7,7 @@
 ' @import ../../lib/clsCmCalendar.vbs
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
-' @import ../../lib/clsCmEnumElement.vbs
+' @import ../../lib/clsCmReadOnlyObject.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
 ' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs
@@ -15,18 +15,18 @@
 Option Explicit
 
 '###################################################################################################
-'clsCmEnumElement
-Sub Test_clsCmEnumElement
-    Dim a : Set a = new clsCmEnumElement
+'clsCmReadOnlyObject
+Sub Test_clsCmReadOnlyObject
+    Dim a : Set a = new clsCmReadOnlyObject
     AssertEqual 0, VarType(a)
-    AssertEqual "clsCmEnumElement", TypeName(a)
+    AssertEqual "clsCmReadOnlyObject", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.value()
-Sub Test_clsCmEnumElement_value
+'clsCmReadOnlyObject.value()
+Sub Test_clsCmReadOnlyObject_value
     Dim d : d = Array("EnumTest", "TEST", 100)
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(d(0),d(1),d(2))
 
     Dim e : e = d(2)
     Dim a
@@ -35,8 +35,8 @@ Sub Test_clsCmEnumElement_value
     a = ao.value()
     AssertEqualWithMessage e, a, "value()"
 End Sub
-Sub Test_clsCmEnumElement_value_InitialValue
-    Dim ao : Set ao = (new clsCmEnumElement)
+Sub Test_clsCmReadOnlyObject_value_InitialValue
+    Dim ao : Set ao = (new clsCmReadOnlyObject)
     Dim e : e = Empty
     Dim a
     a = ao
@@ -46,66 +46,66 @@ Sub Test_clsCmEnumElement_value_InitialValue
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.parent()
-Sub Test_clsCmEnumElement_parent
+'clsCmReadOnlyObject.parent()
+Sub Test_clsCmReadOnlyObject_parent
     Dim d : d = Array(CreateObject("Scripting.Dictionary"), "TEST", 100)
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(d(0),d(1),d(2))
 
     Dim e : Set e = d(0)
     Dim a : Set a = ao.parent()
     AssertSameWithMessage e, a, "parent()"
 End Sub
-Sub Test_clsCmEnumElement_parent_InitialValue
-    Dim ao : Set ao = (new clsCmEnumElement)
+Sub Test_clsCmReadOnlyObject_parent_InitialValue
+    Dim ao : Set ao = (new clsCmReadOnlyObject)
     Dim e : Set e = Nothing
     Dim a : Set a = ao.parent()
     AssertSameWithMessage e, a, "parent()"
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.name()
-Sub Test_clsCmEnumElement_name
+'clsCmReadOnlyObject.name()
+Sub Test_clsCmReadOnlyObject_name
     Dim d : d = Array("EnumTest", "TEST", 100)
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(d(0),d(1),d(2))
 
     Dim e : e = d(1)
     Dim a : a = ao.name()
     AssertEqualWithMessage e, a, "name()"
 End Sub
-Sub Test_clsCmEnumElement_name_InitialValue
-    Dim ao : Set ao = (new clsCmEnumElement)
+Sub Test_clsCmReadOnlyObject_name_InitialValue
+    Dim ao : Set ao = (new clsCmReadOnlyObject)
     Dim e : e = Empty
     Dim a : a = ao.name()
     AssertEqualWithMessage e, a, "name()"
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.toString()
-Sub Test_clsCmEnumElement_toString
+'clsCmReadOnlyObject.toString()
+Sub Test_clsCmReadOnlyObject_toString
     Dim d : d = Array("EnumTest", "TEST", 0)
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(d(0),d(1),d(2))
     Dim e : e = "<" & TypeName(ao) & ">(" & cf_toString(d(2)) & ":" & cf_toString(d(1)) & " of " & cf_toString(d(0)) & ")"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
-Sub Test_clsCmEnumElement_toString_Initial
-    Dim ao : Set ao = (new clsCmEnumElement)
+Sub Test_clsCmReadOnlyObject_toString_Initial
+    Dim ao : Set ao = (new clsCmReadOnlyObject)
     Dim e : e = "<" & TypeName(ao) & ">(" & cf_toString(Empty) & ":" & cf_toString(Empty) & " of " & cf_toString(Nothing) & ")"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.compareTo()
-Sub Test_clsCmEnumElement_compareTo_ok
+'clsCmReadOnlyObject.compareTo()
+Sub Test_clsCmReadOnlyObject_compareTo_ok
     Dim parent,name,value
     Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(parent,name,value)
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(parent,name,value)
 
     Dim data : data = Array( _
-        Array((new clsCmEnumElement).thisIs(parent,name,9),1) _
-        , Array((new clsCmEnumElement).thisIs(parent,name,value),0) _
-        , Array((new clsCmEnumElement).thisIs(parent,name,11),-1) _
+        Array((new clsCmReadOnlyObject).thisIs(parent,name,9),1) _
+        , Array((new clsCmReadOnlyObject).thisIs(parent,name,value),0) _
+        , Array((new clsCmReadOnlyObject).thisIs(parent,name,11),-1) _
         )
 
     Dim i,d,a,e
@@ -116,16 +116,16 @@ Sub Test_clsCmEnumElement_compareTo_ok
         AssertEqualWithMessage e, a, "i=" & i
     Next
 End Sub
-Sub Test_clsCmEnumElement_compareTo_ng
+Sub Test_clsCmReadOnlyObject_compareTo_ng
     Dim parent,name,value
     Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(parent,name,value)
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(parent,name,value)
 
     Dim sou,dis
-    sou="clsCmEnumElement+compareTo()":dis="The type of the argument is different"
+    sou="clsCmReadOnlyObject+compareTo()":dis="The type of the argument is different"
     Dim data : data = Array( _
-        Array((new clsCmEnumElement).thisIs(CreateObject("Wscript.Shell"),name,value),Array(sou,dis)) _
-        , Array((new clsCmEnumElement).thisIs(parent,"name2",value),Array(sou,dis)) _
+        Array((new clsCmReadOnlyObject).thisIs(CreateObject("Wscript.Shell"),name,value),Array(sou,dis)) _
+        , Array((new clsCmReadOnlyObject).thisIs(parent,"name2",value),Array(sou,dis)) _
         , Array(CreateObject("Scripting.Dictionary"),Array(sou,dis)) _
         )
 
@@ -147,18 +147,18 @@ Sub Test_clsCmEnumElement_compareTo_ng
 End Sub
 
 '###################################################################################################
-'clsCmEnumElement.equals()
-Sub Test_clsCmEnumElement_equals
+'clsCmReadOnlyObject.equals()
+Sub Test_clsCmReadOnlyObject_equals
     Dim parent,name,value
     Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(parent,name,value)
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(parent,name,value)
 
     Dim data : data = Array( _
-        Array((new clsCmEnumElement).thisIs(parent,name,value),True) _
-        , Array((new clsCmEnumElement).thisIs(parent,name,11),False) _
-        , Array((new clsCmEnumElement).thisIs(CreateObject("Wscript.Shell"),name,value),False) _
-        , Array((new clsCmEnumElement).thisIs(parent,"name2",value),True) _
-        , Array((new clsCmEnumElement).thisIs(parent,name,9),False) _
+        Array((new clsCmReadOnlyObject).thisIs(parent,name,value),True) _
+        , Array((new clsCmReadOnlyObject).thisIs(parent,name,11),False) _
+        , Array((new clsCmReadOnlyObject).thisIs(CreateObject("Wscript.Shell"),name,value),False) _
+        , Array((new clsCmReadOnlyObject).thisIs(parent,"name2",value),True) _
+        , Array((new clsCmReadOnlyObject).thisIs(parent,name,9),False) _
         , Array(CreateObject("Scripting.Dictionary"),False) _
         )
 
@@ -173,10 +173,10 @@ End Sub
 
 
 '###################################################################################################
-'clsCmEnumElement.thisIs()
-Sub Test_clsCmEnumElement_thisIs_Err
+'clsCmReadOnlyObject.thisIs()
+Sub Test_clsCmReadOnlyObject_thisIs_Err
     Dim d : d = Array(CreateObject("Scripting.Dictionary"), "TEST", 100)
-    Dim ao : Set ao = (new clsCmEnumElement).thisIs(d(0),d(1),d(2))
+    Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(d(0),d(1),d(2))
 
     Dim d2 : d2 = Array(CreateObject("Wscript.Shell"), "TEST2", 200)
     On Error Resume Next
@@ -195,7 +195,7 @@ Sub Test_clsCmEnumElement_thisIs_Err
     a = ao.value
     AssertEqualWithMessage e,a,"value"
 
-    e = "clsCmEnumElement+thisIs()"
+    e = "clsCmReadOnlyObject+thisIs()"
     a = Err.Source
     AssertEqualWithMessage e,a,"Source"
 
