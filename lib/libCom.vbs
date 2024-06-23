@@ -1251,23 +1251,30 @@ Private Sub new_Enum( _
     cf_push vCode, "Private " & Join(aoDef.Keys,"_,")&"_"
     cf_push vCode, "Private PoLists"
     cf_push vCode, "Private Sub Class_Initialize()"
-    cf_push vCode, "Set PoLists = CreateObject('Scripting.Dictionary')"
+    cf_push vCode, "    Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "Set " & i & "_ = (new clsCmReadOnlyObject).thisIs(Me, " & i & ", " & aoDef.Item(i) & ")"
-        cf_push vCode, "cf_bindAt PoLists, '" & i & "', " & i
+        cf_push vCode, "    Set " & i & "_ = (new clsCmReadOnlyObject).thisIs(Me, '" & i & "', " & aoDef.Item(i) & ")"
+        cf_push vCode, "    cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"
     For Each i in aoDef.Keys
         cf_push vCode, "Public Property Get " & i & "()"
-        cf_push vCode, "cf_bind " & i & ", " & i & "_"
+        cf_push vCode, "    cf_bind " & i & ", " & i & "_"
         cf_push vCode, "End Property"
     Next
+    cf_push vCode, "Public Property Get toString()"
+    cf_push vCode, "    Dim i,ar"
+    cf_push vCode, "    For Each i In PoLists.Items"
+    cf_push vCode, "        cf_push ar, i.toString()"
+    cf_push vCode, "    Next"
+    cf_push vCode, "    toString = '<'&TypeName(Me)&'>(" & sThisName & "){'&Join(ar,',')&'}'"
+    cf_push vCode, "End Property"
     cf_push vCode, "Public Function values()"
-    cf_push vCode, "values = PoLists.Items"
+    cf_push vCode, "    values = PoLists.Items"
     cf_push vCode, "End Function"
     cf_push vCode, "Public Function valueOf(n)"
-    cf_push vCode, "ast_argTrue PoLists.Exists(n), TypeName(Me)&'(" & sThisName & ")+valueOf()', 'There is no element with the specified name'"
-    cf_push vCode, "Set valueOf = PoLists.Item(n)"
+    cf_push vCode, "    ast_argTrue PoLists.Exists(n), TypeName(Me)&'(" & sThisName & ")+valueOf()', 'There is no element with the specified name'"
+    cf_push vCode, "    Set valueOf = PoLists.Item(n)"
     cf_push vCode, "End Function"
     cf_push vCode, "End Class"
     'インスタンス生成のソースコード作成

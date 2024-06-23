@@ -356,7 +356,7 @@ Class clsCmReadOnlyObject
     '***************************************************************************************************
     Private Function func_CmReadOnlyObjectToString( _
         )
-        func_CmReadOnlyObjectToString = "<" & TypeName(Me) & ">(" & cf_toString(PvValue) & ":" & cf_toString(PsName) & " of " & cf_toString(PoParent) & ")"
+        func_CmReadOnlyObjectToString = "<" & TypeName(Me) & ">{" & cf_toString(PsName) & ":" & cf_toString(PvValue) & "}"
     End Function
     
 End Class

@@ -84,13 +84,13 @@ End Sub
 Sub Test_clsCmReadOnlyObject_toString
     Dim d : d = Array("EnumTest", "TEST", 0)
     Dim ao : Set ao = (new clsCmReadOnlyObject).thisIs(d(0),d(1),d(2))
-    Dim e : e = "<" & TypeName(ao) & ">(" & cf_toString(d(2)) & ":" & cf_toString(d(1)) & " of " & cf_toString(d(0)) & ")"
+    Dim e : e = "<" & TypeName(ao) & ">{" & cf_toString(d(1)) & ":" & cf_toString(d(2)) & "}"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
 Sub Test_clsCmReadOnlyObject_toString_Initial
     Dim ao : Set ao = (new clsCmReadOnlyObject)
-    Dim e : e = "<" & TypeName(ao) & ">(" & cf_toString(Empty) & ":" & cf_toString(Empty) & " of " & cf_toString(Nothing) & ")"
+    Dim e : e = "<" & TypeName(ao) & ">{" & cf_toString(Empty) & ":" & cf_toString(Empty) & "}"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
@@ -144,6 +144,7 @@ Sub Test_clsCmReadOnlyObject_compareTo_ng
         a = Err.Description
         AssertEqualWithMessage e,a,"i=" & i & " Description"
     Next
+    Err.Clear
 End Sub
 
 '###################################################################################################
@@ -202,6 +203,8 @@ Sub Test_clsCmReadOnlyObject_thisIs_Err
     e = "Value already set"
     a = Err.Description
     AssertEqualWithMessage e,a,"Description"
+
+    Err.Clear
 End Sub
 
 ' Local Variables:

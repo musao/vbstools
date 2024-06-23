@@ -224,7 +224,17 @@ End Sub
 Sub Test_new_Enum_valueOf_Err
     Dim def : Set def = createTestEnum
     
-    Dim a : a = GREAT_SATAN_KOSAKA.valueOf("ORANGE")  'todo
+    On Error Resume Next
+    GREAT_SATAN_KOSAKA.valueOf("ORANGE")
+
+    Dim e,a
+    e = "clsTmp_" & "[A-Z0-9_]{10}" & "\(GREAT_SATAN_KOSAKA\)\+valueOf\(\)"
+    a = Err.Source
+    AssertMatchWithMessage e,a,"Source"
+
+    e = "There is no element with the specified name"
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
 End Sub
 Sub Test_new_Enum_values
     Dim def : Set def = createTestEnum
@@ -235,6 +245,20 @@ Sub Test_new_Enum_values
     For i=0 To Ubound(ar)
         AssertEqualWithMessage def.Item(def.Keys()(i)), ar(i), "values i="&i
     Next
+End Sub
+Sub Test_new_Enum_toString
+    Dim def : Set def = createTestEnum
+
+    Dim ar
+    cf_push ar, "<clsTmp_" & "[A-Z0-9_]{10}" & ">\(GREAT_SATAN_KOSAKA\){"
+    cf_push ar, "<clsCmReadOnlyObject>{<String>'APPLE':<Integer>1}"
+    cf_push ar, ",<clsCmReadOnlyObject>{<String>'PINEAPPLE':<Integer>2}"
+    cf_push ar, ",<clsCmReadOnlyObject>{<String>'PEN':<Integer>3}"
+    cf_push ar, "}"
+    Dim e : e = Replace(Join(ar,""), "'", """")
+    Dim a : a = GREAT_SATAN_KOSAKA.toString()
+
+    AssertMatchWithMessage e, a, "toString()"
 End Sub
 Sub Test_new_Enum_equals
     Dim def : Set def = createTestEnum
@@ -255,7 +279,17 @@ End Sub
 Sub Test_new_Enum_compareTo_Err
     Dim def : Set def = createTestEnum
 
-    Dim a : a = GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(Nothing)  'todo
+    On Error Resume Next
+    GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(Nothing)
+
+    Dim e,a
+    e = "clsCmReadOnlyObject+compareTo()"
+    a = Err.Source
+    AssertEqualWithMessage e,a,"Source"
+
+    e = "The type of the argument is different"
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
 End Sub
 
 '###################################################################################################
