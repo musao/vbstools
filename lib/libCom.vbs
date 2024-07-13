@@ -9,6 +9,28 @@
 '2022/09/27         Y.Fujii                  First edition
 '***************************************************************************************************
 
+'###################################################################################################
+'Enum定数
+'###################################################################################################
+Call new_Enum( _
+    "publishType" _
+    , new_DicWith( _
+        Array( _
+            "LOG", 1 _
+        ) _
+    ) _
+)
+Call new_Enum( _
+    "logType" _
+    , new_DicWith( _
+        Array( _
+            "ERROR", 1 _
+            , "WARNING", 3 _
+            , "INFO", 5 _
+            , "DETAIL_INFO", 9 _
+        ) _
+    ) _
+)
 
 '###################################################################################################
 'カスタム関数
@@ -610,12 +632,11 @@ Private Sub fw_excuteSub( _
     , byRef aoArg _
     , byRef aoBroker _
     )
-    Const Cs_TOPIC = "log"
     
     '実行前の出版（Publish） 処理
     If cf_isAvailableObject(aoBroker) Then
-        aoBroker.publish Cs_TOPIC, Array(5 ,asSubName ,"Start")
-        aoBroker.publish Cs_TOPIC, Array(9 ,asSubName ,cf_toString(aoArg))
+        aoBroker.publish publishType.LOG, Array(logType.INFO ,asSubName ,"Start")
+        aoBroker.publish publishType.LOG, Array(logType.DETAIL_INFO ,asSubName ,cf_toString(aoArg))
     End If
     
     '関数の実行
@@ -625,10 +646,10 @@ Private Sub fw_excuteSub( _
     If cf_isAvailableObject(aoBroker) Then
         If oRet.isErr() Then
         'エラー
-            aoBroker.publish Cs_TOPIC, Array(1, asSubName, cf_toString(oRet.getErr()))
+            aoBroker.publish publishType.LOG, Array(logType.ERROR, asSubName, cf_toString(oRet.getErr()))
         End If
-        aoBroker.publish Cs_TOPIC, Array(5, asSubName, "End")
-        aoBroker.publish Cs_TOPIC, Array(9, asSubName, cf_toString(aoArg))
+        aoBroker.publish publishType.LOG, Array(logType.INFO, asSubName, "End")
+        aoBroker.publish publishType.LOG, Array(logType.DETAIL_INFO, asSubName, cf_toString(aoArg))
     End If
     
     Set oRet = Nothing

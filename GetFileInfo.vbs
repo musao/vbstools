@@ -57,7 +57,7 @@ Sub Main()
     PoWriter.writeBufferSize=100000
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe "log", GetRef("sub_GetFileInfoLogger")
+    oBroker.subscribe publishType.LOG, GetRef("sub_GetFileInfoLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -102,7 +102,7 @@ Private Sub sub_GetFileInfoGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GetFileInfoLogger Array(9, "sub_GetFileInfoGetParameters", cf_toString(oArg))
+    sub_GetFileInfoLogger Array(logType.DETAIL_INFO, "sub_GetFileInfoGetParameters", cf_toString(oArg))
     
     '実在するパスだけパラメータ格納用オブジェクトに設定
     Dim oParam, oRet, oItem
@@ -114,7 +114,7 @@ Private Sub sub_GetFileInfoGetParameters( _
             oParam.push oRet.returnValue
         Else
             '★ログ出力
-            sub_GetFileInfoLogger Array(3, "sub_GetFileInfoGetParameters", oItem & "is an invalid argument.")
+            sub_GetFileInfoLogger Array(logType.WARNING, "sub_GetFileInfoGetParameters", oItem & "is an invalid argument.")
         End If
     Next
     cf_bindAt aoParams, "Param", oParam
@@ -147,7 +147,7 @@ Private Sub sub_GetFileInfoProc( _
     Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before getting list of files.")
+    sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoProc", "Before getting list of files.")
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
@@ -155,7 +155,7 @@ Private Sub sub_GetFileInfoProc( _
     Loop
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoProc", "Before sorting.")
+    sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoProc", "Before sorting.")
     '重複を排除してpath順にソートする
     cf_bindAt aoParams, "List", oList.uniq().sortUsing(getref("func_GetFileInfoSort"))
 
@@ -184,7 +184,7 @@ Private Sub sub_GetFileInfoReport( _
     If aoParams.Item("List").length=0 Then
     'パラメータ格納用汎用オブジェクトが空の場合
         '★ログ出力
-        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "There was no files.")
+        sub_GetFileInfoLogger Array(logType.WARNING, "sub_GetFileInfoReport", "There was no files.")
         '何もせず処理を抜ける
         Exit Sub
     End If
@@ -195,7 +195,7 @@ Private Sub sub_GetFileInfoReport( _
         .addContent func_GetFileInfoReportHtmlBody(aoParams)
     
         '★ログ出力
-        sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before reportfile output.")
+        sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoReport", "Before reportfile output.")
         'レポートをファイルに出力
         Dim sPath
         sPath = fw_getPrivatePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
@@ -203,7 +203,7 @@ Private Sub sub_GetFileInfoReport( _
     End With
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(3, "sub_GetFileInfoReport", "Before open reportfile.")
+    sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoReport", "Before open reportfile.")
     'レポートを開く
     fw_runShellSilently fs_wrapInQuotes(sPath)
     

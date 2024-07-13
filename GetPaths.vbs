@@ -56,7 +56,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe "log", GetRef("sub_GetPathsLogger")
+    oBroker.subscribe publishType.LOG, GetRef("sub_GetPathsLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -98,7 +98,7 @@ Private Sub sub_GetPathsGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GetPathsLogger Array(9, "sub_GetPathsGetParameters", cf_toString(oArg))
+    sub_GetPathsLogger Array(logType.DETAIL_INFO, "sub_GetPathsGetParameters", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", new_ArrWith(oArg.Item("Unnamed")).slice(0,vbNullString)

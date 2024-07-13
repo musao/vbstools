@@ -7,11 +7,11 @@
 ' @import ../../lib/clsCmCalendar.vbs
 ' @import ../../lib/clsCmCharacterType.vbs
 ' @import ../../lib/clsCmCssGenerator.vbs
+' @import ../../lib/clsCmReadOnlyObject.vbs
 ' @import ../../lib/clsCmHtmlGenerator.vbs
 ' @import ../../lib/clsCmReturnValue.vbs
 ' @import ../../lib/clsCompareExcel.vbs
 ' @import ../../lib/libCom.vbs
-
 Option Explicit
 
 Const MY_NAME = "test_libCom_fw.vbs"
@@ -81,7 +81,7 @@ Sub Test_fw_excuteSub_NoArg_NoBroker_Err
 End Sub
 Sub Test_fw_excuteSub_Arg_Broker_Normal
     Dim f,e,d,a,b
-    Set b = new_Broker() : b.subscribe "log", GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
     f = "subArg"
     d = "Arg_Broker_Normal"
     e = d
@@ -93,7 +93,7 @@ Sub Test_fw_excuteSub_Arg_Broker_Normal
 End Sub
 Sub Test_fw_excuteSub_Arg_Broker_Err
     Dim f,d,b
-    Set b = new_Broker() : b.subscribe "log", GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
     f = "subArg"
     d = "Arg_Broker_Err"
     
@@ -103,7 +103,7 @@ Sub Test_fw_excuteSub_Arg_Broker_Err
 End Sub
 Sub Test_fw_excuteSub_NoArg_Broker_Normal
     Dim f,e,d,a,b
-    Set b = new_Broker() : b.subscribe "log", GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
     f = "subNoArg"
     d = Empty
     e = NoArg_CONT
@@ -115,7 +115,7 @@ Sub Test_fw_excuteSub_NoArg_Broker_Normal
 End Sub
 Sub Test_fw_excuteSub_NoArg_Broker_Err
     Dim f,d,b
-    Set b = new_Broker() : b.subscribe "log", GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
     f = "subNoArgErr"
     Set d = Nothing
     
@@ -517,25 +517,25 @@ Function assertLogs(f,d,isErr)
         AssertEqualWithMessage 3, Ubound(PvLog), "Ubound"
     End If
     Dim i : i=0
-    AssertEqualWithMessage 5, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "Start", PvLog(i)(2), i&"-2"
     i=i+1
-    AssertEqualWithMessage 9, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.DETAIL_INFO, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
     If isErr Then
         i=i+1
-        AssertEqualWithMessage 1, PvLog(i)(0), i&"-0"
+        AssertSameWithMessage logType.ERROR, PvLog(i)(0), i&"-0"
         AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
         AssertEqualWithMessage ERR_STR, PvLog(i)(2), i&"-2"
     End If
     i=i+1
-    AssertEqualWithMessage 5, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "End", PvLog(i)(2), i&"-2"
     i=i+1
-    AssertEqualWithMessage 9, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.DETAIL_INFO, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
 End Function

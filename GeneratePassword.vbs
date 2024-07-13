@@ -62,7 +62,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe "log", GetRef("sub_GnrtPwLogger")
+    oBroker.subscribe publishType.LOG, GetRef("sub_GnrtPwLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -116,7 +116,7 @@ Private Sub sub_GnrtPwGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GnrtPwLogger Array(9, "sub_GnrtPwGetParameters", cf_toString(oArg))
+    sub_GnrtPwLogger Array(logType.DETAIL_INFO, "sub_GnrtPwGetParameters", cf_toString(oArg))
     
     '引数の内容を解析
     
@@ -184,7 +184,7 @@ Private Sub sub_GnrtPwGenerate( _
     Dim sPw : sPw = util_randStr(vCharList, lLength)
     
     '★ログ出力
-    sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw)
+    sub_GnrtPwLogger Array(logType.INFO, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw)
     
     'ダイアログのメッセージなどを作成
     Dim sMsg, sTitle
@@ -192,7 +192,7 @@ Private Sub sub_GnrtPwGenerate( _
     sTitle = new_Now() & " に作成"
     
     '★ログ出力
-    sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "Display Inputbox.")
+    sub_GnrtPwLogger Array(logType.INFO, "sub_GnrtPwGenerate", "Display Inputbox.")
     '一時ファイルのパスを作成
     Dim sPath : sPath = fw_getTempPath()
     Do Until Inputbox(sMsg, sTitle, sPw)=False
@@ -203,7 +203,7 @@ Private Sub sub_GnrtPwGenerate( _
         '一時ファイルを削除
         fs_deleteFile sPath
         '★ログ出力
-        sub_GnrtPwLogger Array(3, "sub_GnrtPwGenerate", "Copied to clipboard.")
+        sub_GnrtPwLogger Array(logType.INFO, "sub_GnrtPwGenerate", "Copied to clipboard.")
     Loop
     
     
