@@ -57,7 +57,7 @@ Sub Main()
     PoWriter.writeBufferSize=100000
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe publishType.LOG, GetRef("sub_GetFileInfoLogger")
+    oBroker.subscribe topic.LOG, GetRef("sub_GetFileInfoLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -102,7 +102,7 @@ Private Sub sub_GetFileInfoGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GetFileInfoLogger Array(logType.DETAIL_INFO, "sub_GetFileInfoGetParameters", cf_toString(oArg))
+    sub_GetFileInfoLogger Array(logType.DETAIL, "sub_GetFileInfoGetParameters", cf_toString(oArg))
     
     '実在するパスだけパラメータ格納用オブジェクトに設定
     Dim oParam, oRet, oItem

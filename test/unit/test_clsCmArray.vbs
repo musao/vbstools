@@ -55,9 +55,9 @@ Sub Test_clsCmArray_get_item_OutOfRangeLarge
     a.push CreateObject("Scripting.Dictionary")
     Dim x : x = a(2)
     
-    AssertEqual 9, Err.Number
-    AssertEqual "インデックスが有効範囲にありません。", Err.Description
-    AssertEqual Empty, x
+    AssertEqualWithMessage "clsCmArray+item() Get", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
+    AssertEqualWithMessage Empty, x, "value"
 End Sub
 Sub Test_clsCmArray_get_item_OutOfRangeSmall
     On Error Resume Next
@@ -66,9 +66,9 @@ Sub Test_clsCmArray_get_item_OutOfRangeSmall
     a.push CreateObject("Scripting.Dictionary")
     Dim x : x = a(-1)
     
-    AssertEqual 9, Err.Number
-    AssertEqual "インデックスが有効範囲にありません。", Err.Description
-    AssertEqual Empty, x
+    AssertEqualWithMessage "clsCmArray+item() Get", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
+    AssertEqualWithMessage Empty, x, "value"
 End Sub
 Sub Test_clsCmArray_set_let_item
     Dim ev : ev = "hoge"
@@ -92,20 +92,20 @@ Sub Test_clsCmArray_set_let_item_OutOfRangeLarge
     a.push CreateObject("Scripting.Dictionary")
     a(2) = "fuga"
     
-    AssertEqual 9, Err.Number
-    AssertEqual "インデックスが有効範囲にありません。", Err.Description
-    AssertEqual 2, a.length
+    AssertEqualWithMessage "clsCmArray+item() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
+    AssertEqualWithMessage 2, a.length, "length"
 End Sub
 Sub Test_clsCmArray_set_let_item_OutOfRangeSmall
     On Error Resume Next
     Dim a : Set a = new clsCmArray
     a.push "hoge"
     a.push CreateObject("Scripting.Dictionary")
-    a(-1) = "fuga"
+    Set a(-1) = CreateObject("Scripting.Dictionary")
     
-    AssertEqual 9, Err.Number
-    AssertEqual "インデックスが有効範囲にありません。", Err.Description
-    AssertEqual 2, a.length
+    AssertEqualWithMessage "clsCmArray+item() Set", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
+    AssertEqualWithMessage 2, a.length, "length"
 End Sub
 '###################################################################################################
 'clsCmArray.items()
@@ -506,10 +506,10 @@ Sub Test_clsCmArray_reduce_Err
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), Empty)
     
-    AssertEqual 9, Err.Number
-    AssertEqual "配列の初期値がありません。", Err.Description
-    AssertEqual 0, a1.length
-    AssertEqual Empty, a2
+    AssertEqualWithMessage "clsCmArray+reduce()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Array has no elements.", Err.Description, "Err.Description"
+    AssertEqualWithMessage 0, a1.lentgh, "lentgh"
+    AssertEqualWithMessage Empty, a2, "value"
 End Sub
 
 '###################################################################################################
@@ -559,10 +559,10 @@ Sub Test_clsCmArray_reduceRight_Err
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p*c"), Empty)
     
-    AssertEqual 9, Err.Number
-    AssertEqual "配列の初期値がありません。", Err.Description
-    AssertEqual 0, a1.length
-    AssertEqual Empty, a2
+    AssertEqualWithMessage "clsCmArray+reduceRight()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Array has no elements.", Err.Description, "Err.Description"
+    AssertEqualWithMessage 0, a1.lentgh, "lentgh"
+    AssertEqualWithMessage Empty, a2, "value"
 End Sub
 
 '###################################################################################################

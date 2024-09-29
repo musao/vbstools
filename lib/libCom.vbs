@@ -13,7 +13,7 @@
 'Enum定数
 '###################################################################################################
 Call new_Enum( _
-    "publishType" _
+    "topic" _
     , new_DicWith( _
         Array( _
             "LOG", 1 _
@@ -27,7 +27,7 @@ Call new_Enum( _
             "ERROR", 1 _
             , "WARNING", 3 _
             , "INFO", 5 _
-            , "DETAIL_INFO", 9 _
+            , "DETAIL", 9 _
         ) _
     ) _
 )
@@ -110,11 +110,32 @@ Private Function cf_isAvailableObject( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : cf_isNumeric()
-'Overview                    : 数値か判定する
+'Function/Sub Name           : cf_isInteger()
+'Overview                    : 整数かどうか検査する
 'Detailed Description        : 工事中
 'Argument
-'     avTgt                  : 対象
+'     avValue                : 検査対象
+'Return Value
+'     結果 True:整数 / False:整数でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/09/29         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isInteger( _
+    byRef avValue _
+    )
+    cf_isInteger = False
+    If cf_isNumeric(avValue) Then cf_isInteger = (Fix(avValue) = cdbl(avValue))
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isNumeric()
+'Overview                    : 数値か検査する
+'Detailed Description        : 工事中
+'Argument
+'     avValue                : 検査対象
 'Return Value
 '     結果 True:数値 / False:数値でない
 '---------------------------------------------------------------------------------------------------
@@ -124,23 +145,44 @@ End Function
 '2024/01/03         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function cf_isNumeric( _
-    byRef avTgt _
+    byRef avValue _
     )
-    If IsEmpty(avTgt) Or IsNull(avTgt) Or IsObject(avTgt) Or IsArray(avTgt) Then
+    If IsEmpty(avValue) Or IsNull(avValue) Or IsObject(avValue) Or IsArray(avValue) Then
     'Empty,Null,Object,Arrayの場合はFalse
         cf_isNumeric=False
         Exit Function
     End If
-    If VarType(avTgt)=vbInteger Or VarType(avTgt)=vbLong Or VarType(avTgt)=vbSingle Or VarType(avTgt)=vbDouble Then
+    If VarType(avValue)=vbInteger Or VarType(avValue)=vbLong Or VarType(avValue)=vbSingle Or VarType(avValue)=vbDouble Then
     'Integer,Long,Single,Doubleの場合はTrue
         cf_isNumeric=True
         Exit Function
     End If
     cf_isNumeric=False
-    If VarType(avTgt)=vbString Then
+    If VarType(avValue)=vbString Then
     'Stringの場合はIsNumeric関数の戻り値を返す
-        cf_isNumeric=IsNumeric(avTgt)
+        cf_isNumeric=IsNumeric(avValue)
     End If
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_isPositiveInteger()
+'Overview                    : 正の整数かどうか検査する
+'Detailed Description        : 工事中
+'Argument
+'     avValue                : 検査対象
+'Return Value
+'     結果 True:正の整数 / False:正の整数でない
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/09/29         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isPositiveInteger( _
+    byRef avValue _
+    )
+    cf_isPositiveInteger = False
+    If cf_isInteger(avValue) Then cf_isPositiveInteger = (cdbl(avValue) > 0)
 End Function
 
 '***************************************************************************************************
@@ -635,8 +677,8 @@ Private Sub fw_excuteSub( _
     
     '実行前の出版（Publish） 処理
     If cf_isAvailableObject(aoBroker) Then
-        aoBroker.publish publishType.LOG, Array(logType.INFO ,asSubName ,"Start")
-        aoBroker.publish publishType.LOG, Array(logType.DETAIL_INFO ,asSubName ,cf_toString(aoArg))
+        aoBroker.publish topic.LOG, Array(logType.INFO ,asSubName ,"Start")
+        aoBroker.publish topic.LOG, Array(logType.DETAIL ,asSubName ,cf_toString(aoArg))
     End If
     
     '関数の実行
@@ -646,10 +688,10 @@ Private Sub fw_excuteSub( _
     If cf_isAvailableObject(aoBroker) Then
         If oRet.isErr() Then
         'エラー
-            aoBroker.publish publishType.LOG, Array(logType.ERROR, asSubName, cf_toString(oRet.getErr()))
+            aoBroker.publish topic.LOG, Array(logType.ERROR, asSubName, cf_toString(oRet.getErr()))
         End If
-        aoBroker.publish publishType.LOG, Array(logType.INFO, asSubName, "End")
-        aoBroker.publish publishType.LOG, Array(logType.DETAIL_INFO, asSubName, cf_toString(aoArg))
+        aoBroker.publish topic.LOG, Array(logType.INFO, asSubName, "End")
+        aoBroker.publish topic.LOG, Array(logType.DETAIL, asSubName, cf_toString(aoArg))
     End If
     
     Set oRet = Nothing
@@ -756,10 +798,14 @@ Private Sub fw_logger( _
         cf_push vIps, oEle.Item("Ip").Item("V4")
     Next
 
+    Dim oType : cf_bind oType, avParams(0)
+    If cf_isSame("clsCmReadOnlyObject", TypeName(oType)) Then avParams(0) = oType.name
+
     With aoWriter
         .WriteLine(new_ArrWith(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
     End With
 
+    Set oType = Nothing
     Set oEle = Nothing
 End Sub
 
@@ -1274,7 +1320,7 @@ Private Sub new_Enum( _
     cf_push vCode, "Private Sub Class_Initialize()"
     cf_push vCode, "    Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "    Set " & i & "_ = (new clsCmReadOnlyObject).thisIs(Me, '" & i & "', " & aoDef.Item(i) & ")"
+        cf_push vCode, "    Set " & i & "_ = (new clsCmReadOnlyObject).is(Me, '" & i & "', " & aoDef.Item(i) & ")"
         cf_push vCode, "    cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"

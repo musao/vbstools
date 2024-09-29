@@ -285,11 +285,11 @@ Sub Test_new_Enum_compareTo_Err
     Dim e,a
     e = "clsCmReadOnlyObject+compareTo()"
     a = Err.Source
-    AssertEqualWithMessage e,a,"Source"
+    AssertEqualWithMessage e,a,"Err.Source"
 
-    e = "The type of the argument is different"
+    e = "The type of the argument is different."
     a = Err.Description
-    AssertEqualWithMessage e,a,"Description"
+    AssertEqualWithMessage e,a,"Err.Description"
 End Sub
 
 '###################################################################################################

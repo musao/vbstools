@@ -70,6 +70,49 @@ Sub Test_cf_isAvailableObject_Variable
 End Sub
 
 '###################################################################################################
+'cf_isInteger()
+Sub Test_cf_isInteger
+    Dim data
+    data = Array( _
+        new_DicWith(Array(  "Data", Empty                , "Expect", False)) _
+        , new_DicWith(Array("Data", Null                 , "Expect", False)) _
+        , new_DicWith(Array("Data", new_Dic()            , "Expect", False)) _
+        , new_DicWith(Array("Data", Array()              , "Expect", False)) _
+        , new_DicWith(Array("Data", CInt(1)              , "Expect", True )) _
+        , new_DicWith(Array("Data", CLng(999999)         , "Expect", True )) _
+        , new_DicWith(Array("Data", CInt(-1)             , "Expect", True )) _
+        , new_DicWith(Array("Data", CLng(-999999)        , "Expect", True )) _
+        , new_DicWith(Array("Data", CInt(0)              , "Expect", True )) _
+        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", False)) _
+        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", False)) _
+        , new_DicWith(Array("Data", CSng(-10.1)          , "Expect", False)) _
+        , new_DicWith(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
+        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", False)) _
+        , new_DicWith(Array("Data", True                 , "Expect", False)) _
+        , new_DicWith(Array("Data", CByte(0)             , "Expect", False)) _
+        , new_DicWith(Array("Data", vbNullString         , "Expect", False)) _
+        , new_DicWith(Array("Data", "abc"                , "Expect", False)) _
+        , new_DicWith(Array("Data", "1.2"                , "Expect", False)) _
+        , new_DicWith(Array("Data", "-1.2"               , "Expect", False)) _
+        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", False)) _
+        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", False)) _
+        , new_DicWith(Array("Data", "ÇTÇO"               , "Expect", True )) _
+        , new_DicWith(Array("Data", "Å|ÇTÇO"             , "Expect", True )) _
+        , new_DicWith(Array("Data", "ÇO"                 , "Expect", True )) _
+        , new_DicWith(Array("Data", "äøéö"               , "Expect", False)) _
+        )
+    
+    Dim ub : ub = Ubound(data)
+    Dim i,d,e,a
+    For i=0 To ub
+        cf_bind d, data(i).Item("Data")
+        cf_bind e, data(i).Item("Expect")
+        a = cf_isInteger(d)
+        AssertEqualWithMessage e, a, "No"&i&" Data="&cf_toString(d)&" Expect="&cf_toString(e)
+    Next
+End Sub
+
+'###################################################################################################
 'cf_isNumeric()
 Sub Test_cf_isNumeric
     Dim data
@@ -100,6 +143,49 @@ Sub Test_cf_isNumeric
         cf_bind d, data(i).Item("Data")
         cf_bind e, data(i).Item("Expect")
         a = cf_isNumeric(d)
+        AssertEqualWithMessage e, a, "No"&i&" Data="&cf_toString(d)&" Expect="&cf_toString(e)
+    Next
+End Sub
+
+'###################################################################################################
+'cf_isPositiveInteger()
+Sub Test_cf_isPositiveInteger
+    Dim data
+    data = Array( _
+        new_DicWith(Array(  "Data", Empty                , "Expect", False)) _
+        , new_DicWith(Array("Data", Null                 , "Expect", False)) _
+        , new_DicWith(Array("Data", new_Dic()            , "Expect", False)) _
+        , new_DicWith(Array("Data", Array()              , "Expect", False)) _
+        , new_DicWith(Array("Data", CInt(1)              , "Expect", True )) _
+        , new_DicWith(Array("Data", CLng(999999)         , "Expect", True )) _
+        , new_DicWith(Array("Data", CInt(-1)             , "Expect", False)) _
+        , new_DicWith(Array("Data", CLng(-999999)        , "Expect", False)) _
+        , new_DicWith(Array("Data", CInt(0)              , "Expect", False)) _
+        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", False)) _
+        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", False)) _
+        , new_DicWith(Array("Data", CSng(-10.1)          , "Expect", False)) _
+        , new_DicWith(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
+        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", False)) _
+        , new_DicWith(Array("Data", True                 , "Expect", False)) _
+        , new_DicWith(Array("Data", CByte(0)             , "Expect", False)) _
+        , new_DicWith(Array("Data", vbNullString         , "Expect", False)) _
+        , new_DicWith(Array("Data", "abc"                , "Expect", False)) _
+        , new_DicWith(Array("Data", "1.2"                , "Expect", False)) _
+        , new_DicWith(Array("Data", "-1.2"               , "Expect", False)) _
+        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", False)) _
+        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", False)) _
+        , new_DicWith(Array("Data", "ÇTÇO"               , "Expect", True )) _
+        , new_DicWith(Array("Data", "Å|ÇTÇO"             , "Expect", False)) _
+        , new_DicWith(Array("Data", "ÇO"                 , "Expect", False)) _
+        , new_DicWith(Array("Data", "äøéö"               , "Expect", False)) _
+        )
+    
+    Dim ub : ub = Ubound(data)
+    Dim i,d,e,a
+    For i=0 To ub
+        cf_bind d, data(i).Item("Data")
+        cf_bind e, data(i).Item("Expect")
+        a = cf_isPositiveInteger(d)
         AssertEqualWithMessage e, a, "No"&i&" Data="&cf_toString(d)&" Expect="&cf_toString(e)
     Next
 End Sub

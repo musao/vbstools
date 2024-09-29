@@ -37,7 +37,7 @@ Sub Test_clsCmBufferedReader_readSize
     a.readSize = e
     AssertEqualWithMessage e, a.readSize, "e="&e
     
-    e = 10.5
+    e = "１０"
     a.readSize = e
 '    AssertEqual CLng(e), a.readSize
     AssertEqualWithMessage CDbl(e), a.readSize, "e="&e
@@ -56,9 +56,9 @@ Sub Test_clsCmBufferedReader_readSize_Err_Zero
     d = 0
     a.readSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.readSize
+    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
 Sub Test_clsCmBufferedReader_readSize_Err_OverLower
     On Error Resume Next
@@ -69,9 +69,9 @@ Sub Test_clsCmBufferedReader_readSize_Err_OverLower
     d = -1*2^31 -1
     a.readSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.readSize
+    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
 Sub Test_clsCmBufferedReader_readSize_Err_OverUpper
     On Error Resume Next
@@ -84,11 +84,11 @@ Sub Test_clsCmBufferedReader_readSize_Err_OverUpper
     d = 2^(2^10)
     a.readSize = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
-    AssertEqualWithMessage e, a.readSize, "e="&e
+    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
-Sub Test_clsCmBufferedReader_readSize_Err_NonNumeric
+Sub Test_clsCmBufferedReader_readSize_Err_NotNumeric
     On Error Resume Next
     Dim a,d
     Set a = new clsCmBufferedReader
@@ -98,9 +98,9 @@ Sub Test_clsCmBufferedReader_readSize_Err_NonNumeric
     d = "abc"
     a.readSize = d
     
-    AssertEqual 1031, Err.Number
-    AssertEqual "不正な数字です。", Err.Description
-    AssertEqual e, a.readSize
+    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
+    AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
 
 '###################################################################################################
@@ -120,18 +120,18 @@ Sub Test_clsCmBufferedReader_textStream_setTextStream_Err_Value
     Dim a : Set a = New clsCmBufferedReader
     a.setTextStream(vbNullString)
     
-    AssertEqual 438, Err.Number
-    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-    AssertSame Nothing, a.textStream
+    AssertEqualWithMessage "clsCmBufferedReader+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
+    AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
 Sub Test_clsCmBufferedReader_textStream_setTextStream_Err_Object
     On Error Resume Next
     Dim a : Set a = New clsCmBufferedReader
     a.setTextStream(new_Dic())
     
-    AssertEqual 438, Err.Number
-    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-    AssertSame Nothing, a.textStream
+    AssertEqualWithMessage "clsCmBufferedReader+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
+    AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
 
 

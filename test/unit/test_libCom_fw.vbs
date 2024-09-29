@@ -81,7 +81,7 @@ Sub Test_fw_excuteSub_NoArg_NoBroker_Err
 End Sub
 Sub Test_fw_excuteSub_Arg_Broker_Normal
     Dim f,e,d,a,b
-    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
     f = "subArg"
     d = "Arg_Broker_Normal"
     e = d
@@ -93,7 +93,7 @@ Sub Test_fw_excuteSub_Arg_Broker_Normal
 End Sub
 Sub Test_fw_excuteSub_Arg_Broker_Err
     Dim f,d,b
-    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
     f = "subArg"
     d = "Arg_Broker_Err"
     
@@ -103,7 +103,7 @@ Sub Test_fw_excuteSub_Arg_Broker_Err
 End Sub
 Sub Test_fw_excuteSub_NoArg_Broker_Normal
     Dim f,e,d,a,b
-    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
     f = "subNoArg"
     d = Empty
     e = NoArg_CONT
@@ -115,7 +115,7 @@ Sub Test_fw_excuteSub_NoArg_Broker_Normal
 End Sub
 Sub Test_fw_excuteSub_NoArg_Broker_Err
     Dim f,d,b
-    Set b = new_Broker() : b.subscribe publishType.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
     f = "subNoArgErr"
     Set d = Nothing
     
@@ -521,7 +521,7 @@ Function assertLogs(f,d,isErr)
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "Start", PvLog(i)(2), i&"-2"
     i=i+1
-    AssertSameWithMessage logType.DETAIL_INFO, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.DETAIL, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
     If isErr Then
@@ -535,7 +535,7 @@ Function assertLogs(f,d,isErr)
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "End", PvLog(i)(2), i&"-2"
     i=i+1
-    AssertSameWithMessage logType.DETAIL_INFO, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.DETAIL, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
 End Function

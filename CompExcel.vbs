@@ -58,7 +58,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath(), 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Set PoBroker = new_Broker()
-    PoBroker.subscribe publishType.LOG, GetRef("sub_CmpExcelLogger")
+    PoBroker.subscribe topic.LOG, GetRef("sub_CmpExcelLogger")
     'パラメータ格納用汎用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -108,7 +108,7 @@ Private Sub sub_CmpExcelGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_CmpExcelLogger Array(logType.DETAIL_INFO, "sub_CmpExcelGetParameters", cf_toString(oArg))
+    sub_CmpExcelLogger Array(logType.DETAIL, "sub_CmpExcelGetParameters", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", new_ArrWith(oArg.Item("Unnamed")).slice(0,2)
@@ -201,7 +201,7 @@ Private Sub sub_CmpExcelCompareFiles( _
     oParam.sortUsing new_Func("(c,n)=>new_CalAt(new_FileOf(c).DateLastModified).compareTo(new_CalAt(new_FileOf(n).DateLastModified))>0")
     '★ログ出力
     sub_CmpExcelLogger Array(logType.INFO, "sub_CmpExcelCompareFiles", "aoParams sorted.")
-    sub_CmpExcelLogger Array(logType.DETAIL_INFO, "sub_CmpExcelCompareFiles", "aoParams is " & cf_toString(aoParams))
+    sub_CmpExcelLogger Array(logType.DETAIL, "sub_CmpExcelCompareFiles", "aoParams is " & cf_toString(aoParams))
     
     '比較
     With New clsCompareExcel

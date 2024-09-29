@@ -62,7 +62,7 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe publishType.LOG, GetRef("sub_GnrtPwLogger")
+    oBroker.subscribe topic.LOG, GetRef("sub_GnrtPwLogger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
@@ -116,7 +116,7 @@ Private Sub sub_GnrtPwGetParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GnrtPwLogger Array(logType.DETAIL_INFO, "sub_GnrtPwGetParameters", cf_toString(oArg))
+    sub_GnrtPwLogger Array(logType.DETAIL, "sub_GnrtPwGetParameters", cf_toString(oArg))
     
     '引数の内容を解析
     
