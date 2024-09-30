@@ -24,12 +24,14 @@ Sub SetUp()
     PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedWriter")
     If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
 '    fs_createFolder PsPathTempFolder
-    PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Fso().GetTempName())
+'    PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
     With new_Ts(PsPathForAppending, ForWriting, True, -2)
         .Write("あいうえお" & vbCr)
         .Close
     End With
-    PsPathForWriting = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
+    PsPathForWriting = new_Fso().BuildPath(PsPathTempFolder, new_Fso().GetTempName())
+'    PsPathForWriting = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
 End Sub
 Sub TearDown()
     new_Fso().DeleteFolder PsPathTempFolder
@@ -88,8 +90,8 @@ Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverLower
     d = -1*2^(2^1024)
     a.writeBufferSize = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmBufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverUpper
@@ -103,11 +105,11 @@ Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverUpper
     d = 2^(2^1024)
     a.writeBufferSize = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmBufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeBufferSize_Err_NonNumeric
+Sub Test_clsCmBufferedWriter_writeBufferSize_Err_NotNumeric
     On Error Resume Next
     Dim a,d,e
     Set a = new clsCmBufferedWriter
@@ -117,8 +119,8 @@ Sub Test_clsCmBufferedWriter_writeBufferSize_Err_NonNumeric
     d = "abc"
     a.writeBufferSize = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmBufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 
@@ -163,8 +165,8 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverLower
     d = -1*2^(2^10)
     a.writeIntervalTime = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmBufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverUpper
@@ -178,8 +180,8 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverUpper
     d = 2^(2^10)
     a.writeIntervalTime = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmBufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_NonNumeric
@@ -192,8 +194,8 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_NonNumeric
     d = "abc"
     a.writeIntervalTime = d
     
-    AssertEqualWithMessage 1031, Err.Number, "Err.Number"
-    AssertEqualWithMessage "不正な数字です。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmBufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 
@@ -226,18 +228,18 @@ Sub Test_clsCmBufferedWriter_textStream_setTextStream_Err_Value
     Dim a : Set a = New clsCmBufferedWriter
     a.setTextStream(vbNullString)
     
-    AssertEqual 438, Err.Number
-    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-    AssertSame Nothing, a.textStream
+    AssertEqualWithMessage "clsCmBufferedWriter+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
+    AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
 Sub Test_clsCmBufferedWriter_textStream_setTextStream_Err_Object
     On Error Resume Next
     Dim a : Set a = New clsCmBufferedWriter
     a.setTextStream(new_Dic())
     
-    AssertEqual 438, Err.Number
-    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-    AssertSame Nothing, a.textStream
+    AssertEqualWithMessage "clsCmBufferedWriter+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
+    AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
 
 '###################################################################################################
@@ -383,6 +385,8 @@ Sub Test_clsCmBufferedWriter_newLine
         AssertEqualWithMessage ec, .column, "3-2"
         AssertEqualWithMessage es - sz, .currentBufferSize, "3-3"
         AssertEqualWithMessage nsz, sz, "3-4"
+
+        .close()
     End With
 
     ts.Close

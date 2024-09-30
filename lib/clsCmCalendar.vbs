@@ -94,7 +94,7 @@ Class clsCmCalendar
     '***************************************************************************************************
     'Function/Sub Name           : Property Get toString()
     'Overview                    : デフォルトの形式で表示する
-    'Detailed Description        : func_CmCalendaFormatAs()に委譲する
+    'Detailed Description        : this_formatAs()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -106,7 +106,7 @@ Class clsCmCalendar
     '2023/09/02         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Default Property Get toString()
-        toString = func_CmCalendaFormatAs(PsDefaultFormat)
+        toString = this_formatAs(PsDefaultFormat)
     End Property
     
     '***************************************************************************************************
@@ -171,7 +171,7 @@ Class clsCmCalendar
     '***************************************************************************************************
     'Function/Sub Name           : formatAs()
     'Overview                    : 日付を整形する
-    'Detailed Description        : func_CmCalendaFormatAs()に委譲する
+    'Detailed Description        : this_formatAs()に委譲する
     'Argument
     '     asFormat               : 表示形式
     'Return Value
@@ -185,7 +185,7 @@ Class clsCmCalendar
     Public Function formatAs( _
         ByVal asFormat _
         )
-        formatAs = func_CmCalendaFormatAs(asFormat)
+        formatAs = this_formatAs(asFormat)
     End Function
     
     '***************************************************************************************************
@@ -204,7 +204,7 @@ Class clsCmCalendar
     '***************************************************************************************************
     Public Function getNow( _
         )
-        Set getNow = func_CmCalendarGetNow()
+        Set getNow = this_getNow()
     End Function
     
     '***************************************************************************************************
@@ -224,14 +224,14 @@ Class clsCmCalendar
     Public Function setDateTime( _
         ByVal avDateTime _
         )
-        Set setDateTime = func_CmCalendarSetDate(avDateTime)
+        Set setDateTime = this_setDate(avDateTime)
     End Function
     
     
     
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCalendarGetNow()
+    'Function/Sub Name           : this_getNow()
     'Overview                    : 今の日付時刻を取得する
     'Detailed Description        : 工事中
     'Argument
@@ -244,18 +244,18 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCalendarGetNow( _
+    Private Function this_getNow( _
         )
         PdtDate = Now()
         
         Dim dbTimer : dbTimer = Timer()
         PdbFractionalSec = dbTimer - Fix(dbTimer)
 
-        Set func_CmCalendarGetNow = Me
+        Set this_getNow = Me
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCalendarSetDate()
+    'Function/Sub Name           : this_setDate()
     'Overview                    : 指定した日付時刻を設定する
     'Detailed Description        : 工事中
     'Argument
@@ -268,7 +268,7 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCalendarSetDate( _
+    Private Function this_setDate( _
         ByVal avDateTime _
         )
         Dim sPtn : sPtn = "^([^.]+)\.(\d+)$"
@@ -279,11 +279,11 @@ Class clsCmCalendar
             PdtDate = Cdate(avDateTime)
             PdbFractionalSec = Empty
         End If
-        Set func_CmCalendarSetDate = Me
+        Set this_setDate = Me
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCalendaFormatAs()
+    'Function/Sub Name           : this_formatAs()
     'Overview                    : 日付を整形する
     'Detailed Description        : 下記設定値は日付の数値が入る、下記以外の値はそのまま使用する
     '                              なお、日付が8の場合に"DD"は"08"、"D"は"8"を表示する
@@ -306,7 +306,7 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCalendaFormatAs( _
+    Private Function this_formatAs( _
         byVal asFormat _
         )
         Dim oConversionSettings : Set oConversionSettings = new_Dic()
@@ -375,7 +375,7 @@ Class clsCmCalendar
             Loop
             
         End With
-        func_CmCalendaFormatAs = sResult
+        this_formatAs = sResult
         Set oConversionSettings = Nothing
     End Function
     

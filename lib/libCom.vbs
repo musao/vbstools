@@ -3313,28 +3313,6 @@ Private Function func_CM_UtilSortDefaultFunc( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_UtilIsTextStream()
-'Overview                    : オブジェクトがTextStreamか判定する
-'Detailed Description        : 工事中
-'Argument
-'     aoObj                  : オブジェクト
-'Return Value
-'     結果 True:TextStreamである / False:TextStreamでない
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/10/15         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_UtilIsTextStream( _
-    byRef aoObj _
-    )
-    Dim boFlg : boFlg = False
-    If cf_isSame(Vartype(aoObj),vbObject) And cf_isSame(Typename(aoObj),"TextStream") Then boFlg = True
-    func_CM_UtilIsTextStream = boFlg
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_UtilJoin()
 'Overview                    : Join関数
 'Detailed Description        : vbscriptのJoin関数と同等の機能

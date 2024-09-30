@@ -75,7 +75,7 @@ Class clsCmBufferedReader
         byVal alReadSize _
         )
         ast_argTrue cf_isPositiveInteger(alReadSize), TypeName(Me)&"+readSize() Let", "Not a positive integer."
-        PlReadSize = CDbl(alReadSize)
+        PlReadSize = CLng(alReadSize)
     End Property
     
     '***************************************************************************************************

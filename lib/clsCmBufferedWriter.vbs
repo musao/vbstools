@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class clsCmBufferedWriter
     'クラス内変数、定数
-    Private PoTextStream, PlWriteBufferSize, PlWriteIntervalTime, PoOutbound, PoInbound, PoBuffer
+    Private PoTextStream, PdbWriteBufferSize, PdbWriteIntervalTime, PoOutbound, PoInbound, PoBuffer
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -28,8 +28,8 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Private Sub Class_Initialize()
         Set PoTextStream = Nothing
-        PlWriteBufferSize = 5000                 'デフォルトは5000バイト
-        PlWriteIntervalTime = 0                  'デフォルトは0秒
+        PdbWriteBufferSize = 5000                'デフォルトは5000バイト
+        PdbWriteIntervalTime = 0                 'デフォルトは0秒
         
         Dim vArr : vArr = Array("line", Empty, "column", Empty)
         Set PoOutbound = new_DicWith(vArr)
@@ -52,7 +52,7 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        sub_CmBufferedWriterClose
+        this_close
         Set PoOutbound = Nothing
         Set PoInbound = Nothing
         Set PoBuffer = Nothing
@@ -64,7 +64,7 @@ Class clsCmBufferedWriter
     'Detailed Description        : 出力要求時に出力バッファのサイズがこれを超えた場合
     '                              ファイルに出力する
     'Argument
-    '     alWriteBufferSize      : 出力バッファサイズ
+    '     adbWriteBufferSize     : 出力バッファサイズ
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -74,13 +74,10 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Let writeBufferSize( _
-        byVal alWriteBufferSize _
+        byVal adbWriteBufferSize _
         )
-        If cf_isNumeric(alWriteBufferSize) Then
-            PlWriteBufferSize = CDbl(alWriteBufferSize)
-        Else
-            Err.Raise 1031, "clsCmBufferedWriter.vbs:clsCmBufferedWriter+writeBufferSize()", "不正な数字です。"
-        End If
+        ast_argTrue cf_isNumeric(adbWriteBufferSize), TypeName(Me)&"+writeBufferSize() Let", "Invalid number."
+        PdbWriteBufferSize = CDbl(adbWriteBufferSize)
     End Property
     
     '***************************************************************************************************
@@ -98,7 +95,7 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get writeBufferSize()
-        writeBufferSize = PlWriteBufferSize
+        writeBufferSize = PdbWriteBufferSize
     End Property
     
     '***************************************************************************************************
@@ -107,7 +104,7 @@ Class clsCmBufferedWriter
     'Detailed Description        : 出力要求時に前回出力してから出力間隔時間を超えた場合
     '                              出力バッファの内容がサイズ未満でもファイルに出力する
     'Argument
-    '     alWriteIntervalTime    : 出力間隔時間（秒）
+    '     adbWriteIntervalTime   : 出力間隔時間（秒）
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -117,13 +114,10 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Let writeIntervalTime( _
-        byVal alWriteIntervalTime _
+        byVal adbWriteIntervalTime _
         )
-        If cf_isNumeric(alWriteIntervalTime) Then
-            PlWriteIntervalTime = CDbl(alWriteIntervalTime)
-        Else
-            Err.Raise 1031, "clsCmBufferedWriter.vbs:clsCmBufferedWriter+writeIntervalTime()", "不正な数字です。"
-        End If
+        ast_argTrue cf_isNumeric(adbWriteIntervalTime), TypeName(Me)&"+writeIntervalTime() Let", "Invalid number."
+        PdbWriteIntervalTime = CDbl(adbWriteIntervalTime)
     End Property
     
     '***************************************************************************************************
@@ -141,7 +135,7 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get writeIntervalTime()
-        writeIntervalTime = PlWriteIntervalTime
+        writeIntervalTime = PdbWriteIntervalTime
     End Property
     
     '***************************************************************************************************
@@ -231,11 +225,7 @@ Class clsCmBufferedWriter
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get lastWriteTime()
-        If IsEmpty(PoBuffer.Item("lastWriteTime")) Then
-            lastWriteTime = Empty
-        Else
-            lastWriteTime = PoBuffer.Item("lastWriteTime")
-        End If
+        lastWriteTime = PoBuffer.Item("lastWriteTime")
     End Property
     
     '***************************************************************************************************
@@ -255,15 +245,12 @@ Class clsCmBufferedWriter
     Public Function setTextStream( _
         byRef aoTextStream _
         )
-        If Not func_CM_UtilIsTextStream(aoTextStream) Then
-            Err.Raise 438, "clsCmBufferedWriter.vbs:clsCmBufferedWriter+setTextStream()", "オブジェクトでサポートされていないプロパティまたはメソッドです。"
-            Exit Function
-        End If
+        ast_argTrue this_isTextStream(aoTextStream), TypeName(Me)&"+setTextStream()", "Not a TextStream object."
 
         Set PoTextStream = aoTextStream
         Set setTextStream = Me
         'Inbound、Outboundを最新化する
-        sub_CmBufferedWriterUpdateStatus
+        this_updateStatus
         'バッファの初期化
         Set PoBuffer = new_DicWith(Array("buffer", "", "length", 0, "lastWriteTime", Empty, "firstRequestTime", Empty))
     End Function
@@ -271,7 +258,7 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     'Function/Sub Name           : write()
     'Overview                    : 指定したテキストをファイルに書き込む
-    'Detailed Description        : sub_CmBufferedWriterWrite()に委譲する
+    'Detailed Description        : this_write()に委譲する
     'Argument
     '     asCont                 : 内容
     'Return Value
@@ -285,14 +272,14 @@ Class clsCmBufferedWriter
     Public Sub write( _
         byVal asCont _
         )
-        sub_CmBufferedWriterWriteBuffer asCont
-        sub_CmBufferedWriterWrite
+        this_writeBuffer asCont
+        this_write
     End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : writeBlankLines()
     'Overview                    : 指定した数の改行文字をファイルに書き込む
-    'Detailed Description        : sub_CmBufferedWriterWriteFile()に委譲する
+    'Detailed Description        : this_writeFile()に委譲する
     'Argument
     '     alLines                : ファイルに書き込む改行文字の数
     'Return Value
@@ -306,19 +293,19 @@ Class clsCmBufferedWriter
     Public Sub writeBlankLines( _
         byVal alLines _
         )
-        Dim sTmp, lIdx
-        sTmp = ""
+        Dim sTmp : sTmp = ""
+        Dim lIdx
         For lIdx=1 To alLines 
             sTmp = sTmp & vbNewLine
         Next
-        sub_CmBufferedWriterWriteBuffer sTmp
-        sub_CmBufferedWriterWrite
+        this_writeBuffer sTmp
+        this_write
     End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : writeLine()
     'Overview                    : 指定したテキストと改行をファイルに書き込む
-    'Detailed Description        : sub_CmBufferedWriterWrite()に委譲する
+    'Detailed Description        : this_write()に委譲する
     'Argument
     '     asCont                 : 内容
     'Return Value
@@ -332,14 +319,14 @@ Class clsCmBufferedWriter
     Public Sub writeLine( _
         byVal asCont _
         )
-        sub_CmBufferedWriterWriteBuffer asCont & vbNewLine
-        sub_CmBufferedWriterWrite
+        this_writeBuffer asCont & vbNewLine
+        this_write
     End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : newLine()
     'Overview                    : 改行文字をファイルに書き込む
-    'Detailed Description        : sub_CmBufferedWriterWriteFile()に委譲する
+    'Detailed Description        : this_writeFile()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -352,14 +339,14 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Public Sub newLine( _
         )
-        sub_CmBufferedWriterWriteBuffer vbNewLine
-        sub_CmBufferedWriterWrite
+        this_writeBuffer vbNewLine
+        this_write
     End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : flush()
     'Overview                    : バッファに溜めた内容をファイルに出力する
-    'Detailed Description        : sub_CmBufferedWriterWriteFile()に委譲する
+    'Detailed Description        : this_writeFile()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -372,13 +359,13 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Public Sub flush( _
         )
-        sub_CmBufferedWriterWriteFile
+        this_writeFile
     End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : close()
     'Overview                    : ファイル接続をクローズする
-    'Detailed Description        : sub_CmBufferedWriterClose()に委譲する
+    'Detailed Description        : this_close()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -391,7 +378,7 @@ Class clsCmBufferedWriter
     '***************************************************************************************************
     Public Sub close( _
         )
-        sub_CmBufferedWriterClose
+        this_close
     End Sub
     
     
@@ -399,7 +386,7 @@ Class clsCmBufferedWriter
     
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterWrite()
+    'Function/Sub Name           : this_write()
     'Overview                    : ファイル出力する
     'Detailed Description        : 工事中
     'Argument
@@ -412,14 +399,14 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/09         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterWrite( _
+    Private Sub this_write( _
         )
         'ファイル出力判定＆ファイル出力
-        If func_CmBufferedWriterDecideToWrite() Then Call sub_CmBufferedWriterWriteFile()
+        If this_decideToWrite() Then this_writeFile()
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmBufferedWriterDecideToWrite()
+    'Function/Sub Name           : this_decideToWrite()
     'Overview                    : ファイル出力するか判断する
     'Detailed Description        : 以下の条件で判断する
     '                              ・バッファのサイズが出力バッファサイズを超える
@@ -434,9 +421,9 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmBufferedWriterDecideToWrite( _
+    Private Function this_decideToWrite( _
         )
-        func_CmBufferedWriterDecideToWrite=False
+        this_decideToWrite=False
         If PoTextStream Is Nothing Then Exit Function
         
         '戻り値の初期化
@@ -448,11 +435,11 @@ Class clsCmBufferedWriter
         End If
         
         'バッファサイズの判定
-        If PoBuffer.Item("length")>=PlWriteBufferSize Then boRet=True
+        If PoBuffer.Item("length")>=PdbWriteBufferSize Then boRet=True
         
-        If boRet Or PlWriteIntervalTime<=0 Then
+        If boRet Or PdbWriteIntervalTime<=0 Then
         'バッファのサイズが出力バッファサイズを超えたか出力日時から出力間隔時間（秒）が0以下（＝不要）の場合は関数を抜ける
-            func_CmBufferedWriterDecideToWrite=boRet
+            this_decideToWrite=boRet
             Exit Function
         End If
         
@@ -467,16 +454,16 @@ Class clsCmBufferedWriter
         End If
         
         '出力日時の判定
-        If Abs(oForComparison.differenceFrom(new_Now()))>=PlWriteIntervalTime Then boRet=True
+        If Abs(oForComparison.differenceFrom(new_Now()))>=PdbWriteIntervalTime Then boRet=True
         
         '戻り値を返す
-        func_CmBufferedWriterDecideToWrite=boRet
+        this_decideToWrite=boRet
         
         Set oForComparison = Nothing
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterWriteFile()
+    'Function/Sub Name           : this_writeFile()
     'Overview                    : バッファの内容をファイルに出力する
     'Detailed Description        : 工事中
     'Argument
@@ -489,14 +476,14 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterWriteFile( _
+    Private Sub this_writeFile( _
         )
         If PoTextStream Is Nothing Then Exit Sub
         
         'ファイルに出力
         PoTextStream.Write PoBuffer.Item("buffer")
         'Inbound、Outboundを最新化する
-        sub_CmBufferedWriterUpdateStatus
+        this_updateStatus
         With PoBuffer
             .Item("buffer") = ""                      'バッファのクリア
             .Item("length") = 0                       'バッファ長を0にする
@@ -505,7 +492,7 @@ Class clsCmBufferedWriter
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterClose()
+    'Function/Sub Name           : this_close()
     'Overview                    : ファイル接続をクローズする
     'Detailed Description        : バッファの未出力分を出力後にファイル接続をクローズする
     'Argument
@@ -518,19 +505,19 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/08/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterClose( _
+    Private Sub this_close( _
         )
         If PoTextStream Is Nothing Then Exit Sub
         
         'バッファが残っていたら出力する
-        If PoBuffer.Item("length")<>0 Then Call sub_CmBufferedWriterWriteFile()
+        If PoBuffer.Item("length")<>0 Then Call this_writeFile()
         'テキストストリームをクローズする
         PoTextStream.Close
         Set PoTextStream = Nothing
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterWriteBuffer()
+    'Function/Sub Name           : this_writeBuffer()
     'Overview                    : バッファに書き込む
     'Detailed Description        : 工事中
     'Argument
@@ -543,7 +530,7 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterWriteBuffer( _
+    Private Sub this_writeBuffer( _
         byVal asCont _
         )
         Dim oArr
@@ -568,7 +555,7 @@ Class clsCmBufferedWriter
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterGetInboundStatus()
+    'Function/Sub Name           : this_getInboundStatus()
     'Overview                    : インバウンドの状態を取得する
     'Detailed Description        : 工事中
     'Argument
@@ -581,7 +568,7 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterGetInboundStatus( _
+    Private Sub this_getInboundStatus( _
         )
         With PoTextStream
             'インバウンドの状態を取得する
@@ -590,7 +577,7 @@ Class clsCmBufferedWriter
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterCopyInboundStateToOutbound()
+    'Function/Sub Name           : this_copyInboundStateToOutbound()
     'Overview                    : インバウンドの状態をアウトバウンドにコピーする
     'Detailed Description        : 工事中
     'Argument
@@ -603,7 +590,7 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterCopyInboundStateToOutbound( _
+    Private Sub this_copyInboundStateToOutbound( _
         )
         With PoInbound
             'アウトバウンドの状態にインバウンドの状態をコピーする
@@ -618,7 +605,7 @@ Class clsCmBufferedWriter
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmBufferedWriterUpdateStatus()
+    'Function/Sub Name           : this_updateStatus()
     'Overview                    : Inbound、Outboundを最新化する
     'Detailed Description        : 工事中
     'Argument
@@ -631,12 +618,35 @@ Class clsCmBufferedWriter
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmBufferedWriterUpdateStatus( _
+    Private Sub this_updateStatus( _
         )
         'インバウンドの状態を取得する
-        sub_CmBufferedWriterGetInboundStatus
+        this_getInboundStatus
         'インバウンドの状態をアウトバウンドにコピーする
-        sub_CmBufferedWriterCopyInboundStateToOutbound
+        this_copyInboundStateToOutbound
     End Sub
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_isTextStream()
+    'Overview                    : オブジェクトがTextStreamか検査する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoObj                  : オブジェクト
+    'Return Value
+    '     結果 True:TextStreamである / False:TextStreamでない
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/09/29         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_isTextStream( _
+        byRef aoObj _
+        )
+        this_isTextStream = _
+                cf_isSame(Vartype(aoObj),vbObject) _
+                And _
+                cf_isSame(Typename(aoObj),Typename(new_Ts(WScript.ScriptFullName,1,False,-2)))
+    End Function
     
 End Class
