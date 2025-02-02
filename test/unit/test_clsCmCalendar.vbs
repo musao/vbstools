@@ -162,9 +162,9 @@ Sub Test_clsCmCalendar_compareTo_Err
     e = Empty
     a = a1.compareTo(new_Dic())
 
-    AssertEqual 438, Err.Number
-    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-    AssertEqual e, a
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage "clsCmCalendar+compareTo()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "That object is not a calendar class.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
@@ -224,9 +224,12 @@ Sub Test_clsCmCalendar_differenceFrom_Err
     e = Empty
     a = a1.differenceFrom(new_Dic())
 
-    AssertEqual 438, Err.Number
-    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-    AssertEqual e, a
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage "clsCmCalendar+differenceFrom()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "That object is not a calendar class.", Err.Description, "Err.Description"
+'    AssertEqual 438, Err.Number
+'    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
+'    AssertEqual e, a
 End Sub
 
 '###################################################################################################

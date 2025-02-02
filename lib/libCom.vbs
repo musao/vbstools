@@ -131,6 +131,27 @@ Private Function cf_isInteger( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_isNonNegativeNumber()
+'Overview                    : ïâÇÃêîÇ≈Ç»Ç¢ÅiÅÅ0Ç‹ÇΩÇÕê≥ÇÃêîÅjÇ±Ç∆Çåüç∏Ç∑ÇÈ
+'Detailed Description        : çHéñíÜ
+'Argument
+'     avValue                : åüç∏ëŒè€
+'Return Value
+'     åãâ  True:ïâÇÃêîÇ≈Ç»Ç¢ / False:ïâÇÃêî
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2024/09/30         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_isNonNegativeNumber( _
+    byRef avValue _
+    )
+    cf_isNonNegativeNumber = False
+    If cf_isNumeric(avValue) Then cf_isNonNegativeNumber = Not (0 > avValue)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_isNumeric()
 'Overview                    : êîílÇ©åüç∏Ç∑ÇÈ
 'Detailed Description        : çHéñíÜ
@@ -190,8 +211,8 @@ End Function
 'Overview                    : ìØàÍÇ©îªíËÇ∑ÇÈ
 'Detailed Description        : çHéñíÜ
 'Argument
-'     aoA                    : î‰ärëŒè€
-'     aoB                    : î‰ärëŒè€
+'     avA                    : î‰ärëŒè€
+'     avB                    : î‰ärëŒè€
 'Return Value
 '     åãâ  True:ìØàÍ / False:ìØàÍÇ≈Ç»Ç¢
 '---------------------------------------------------------------------------------------------------
@@ -201,17 +222,17 @@ End Function
 '2023/10/15         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function cf_isSame( _
-    byRef aoA _
-    , byRef aoB _
+    byRef avA _
+    , byRef avB _
     )
     Dim boFlg : boFlg = False
-    If IsObject(aoA) And IsObject(aoB) Then
-        If aoA Is aoB Then boFlg = True
-    ElseIf Not IsObject(aoA) And Not IsObject(aoB) Then
-        If VarType(aoA) = vbString And VarType(aoB) = vbString Then
-            If Strcomp(aoA, aoB, vbBinaryCompare)=0 Then boFlg = True
+    If IsObject(avA) And IsObject(avB) Then
+        If avA Is avB Then boFlg = True
+    ElseIf Not IsObject(avA) And Not IsObject(avB) Then
+        If VarType(avA) = vbString And VarType(avB) = vbString Then
+            If Strcomp(avA, avB, vbBinaryCompare)=0 Then boFlg = True
         Else
-            If aoA = aoB Then boFlg = True
+            If avA = avB Then boFlg = True
         End If
     End If
     cf_isSame = boFlg
@@ -647,6 +668,32 @@ Private Sub ast_argTrue( _
     , byVal asDescription _
     )
     If Not cf_isSame(True, avArgument) Then fw_throwException 8196, asSource, asDescription
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argsIsSame()
+'Overview                    : à¯êîÇ™ìØàÍÇ©åüç∏Ç∑ÇÈ
+'Detailed Description        : åüç∏åãâ Ç™NGÇÃèÍçáÇÕó·äOÇèoÇ∑
+'Argument
+'     avA                    : î‰ärëŒè€
+'     avB                    : î‰ärëŒè€
+'     asSource               : É\Å[ÉX
+'     asDescription          : ê‡ñæ
+'Return Value
+'     Ç»Çµ
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/02/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argsIsSame( _
+    byRef avA _
+    , byRef avB _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If Not cf_isSame(avA, avB) Then fw_throwException 8197, asSource, asDescription
 End Sub
 
 '###################################################################################################

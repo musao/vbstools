@@ -14,6 +14,24 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
+Dim adte,adte2
+adte = #2024/09/30 17:15:02#
+inputbox "","",cdbl(adte)             '45565.7187731481
+adte = #2024/10/01 17:15:02#
+inputbox "","",cdbl(adte)             '45566.7187731481
+
+adte = now():adte2 = timer()
+inputbox "","",adte                   '2024/09/30 17:20:02
+inputbox "","",cdbl(adte)             '45565.7222453704
+inputbox "","",cdbl(adte2)            '62402.703125
+
+
+'0.7222453704 day -> 62402.00000256 s
+
+
+wscript.quit
+
+
 Class clsEnum_UQIXQKT0OO
 Private APPLE_,PINEAPPLE_,PEN_
 Private PoLists

@@ -122,6 +122,33 @@ Sub Test_ast_argTrue_ng
     AssertEqualWithMessage e,a,"Description"
 End Sub
 
+'###################################################################################################
+'ast_argsIsSame()
+Sub Test_ast_argsIsSame_ok
+    dim d : d = Array("A", "A", "Source_ok", "Description_ok")
+    ast_argsIsSame d(0),d(1),d(2),d(3)
+
+    AssertWithMessage True, "argTrue_ok"
+End Sub
+Sub Test_ast_argsIsSame_ng
+    On Error Resume Next
+    dim d : d = Array("A", "B", "Source_ng", "Description_ng")
+    ast_argsIsSame d(0),d(1),d(2),d(3)
+
+    dim e,a
+    e = 8197
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Number"
+
+    e = d(2)
+    a = Err.Source
+    AssertEqualWithMessage e,a,"Source"
+
+    e = d(3)
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
+End Sub
+
 
 ' Local Variables:
 ' mode: Visual-Basic
