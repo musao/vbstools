@@ -111,10 +111,11 @@ End Sub
 Sub Test_new_CalAt_Err
     On Error Resume Next
     Dim a : Set a = new_CalAt(vbNullString)
+    Dim e : e = Empty
     
-    AssertEqual 13, Err.Number
-    AssertEqual "å^Ç™àÍívÇµÇ‹ÇπÇÒÅB", Err.Description
-    AssertEqual Empty, a
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage "clsCmCalendar+of()", Err.Source, "Err.Source"
+    AssertMatchWithMessage "^invalid argument.*", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################

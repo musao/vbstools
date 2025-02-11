@@ -1256,7 +1256,7 @@ End Function
 Private Function new_CalAt( _
     ByVal avDateTime _
     )
-    Set new_CalAt = (New clsCmCalendar).setDateTime(avDateTime)
+    Set new_CalAt = (New clsCmCalendar).of(avDateTime)
 End Function
 
 '***************************************************************************************************
