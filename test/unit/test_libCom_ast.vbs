@@ -123,17 +123,17 @@ Sub Test_ast_argTrue_ng
 End Sub
 
 '###################################################################################################
-'ast_argsIsSame()
-Sub Test_ast_argsIsSame_ok
+'ast_argsAreSame()
+Sub Test_ast_argsAreSame_ok
     dim d : d = Array("A", "A", "Source_ok", "Description_ok")
-    ast_argsIsSame d(0),d(1),d(2),d(3)
+    ast_argsAreSame d(0),d(1),d(2),d(3)
 
     AssertWithMessage True, "argTrue_ok"
 End Sub
-Sub Test_ast_argsIsSame_ng
+Sub Test_ast_argsAreSame_ng
     On Error Resume Next
     dim d : d = Array("A", "B", "Source_ng", "Description_ng")
-    ast_argsIsSame d(0),d(1),d(2),d(3)
+    ast_argsAreSame d(0),d(1),d(2),d(3)
 
     dim e,a
     e = 8197
@@ -145,6 +145,54 @@ Sub Test_ast_argsIsSame_ng
     AssertEqualWithMessage e,a,"Source"
 
     e = d(3)
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
+End Sub
+
+'###################################################################################################
+'ast_argNull()
+Sub Test_ast_argNull_ok
+    dim d : d = Array(Null, "Source_ok", "Description_ok")
+    ast_argNull d(0),d(1),d(2)
+
+    AssertWithMessage True, "argNotNull_ok"
+End Sub
+Sub Test_ast_argNull_ng
+    On Error Resume Next
+    dim d : d = Array("Test", "Source_ng", "Description_ng")
+    ast_argNull d(0),d(1),d(2)
+
+    dim e,a
+    e = 8198
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Number"
+
+    e = d(1)
+    a = Err.Source
+    AssertEqualWithMessage e,a,"Source"
+
+    e = d(2)
+    a = Err.Description
+    AssertEqualWithMessage e,a,"Description"
+End Sub
+
+'###################################################################################################
+'ast_failure()
+Sub Test_ast_failure_ng
+    On Error Resume Next
+    dim d : d = Array("Source_ng", "Description_ng")
+    ast_failure d(0),d(1)
+
+    dim e,a
+    e = 8199
+    a = Err.Number
+    AssertEqualWithMessage e,a,"Number"
+
+    e = d(0)
+    a = Err.Source
+    AssertEqualWithMessage e,a,"Source"
+
+    e = d(1)
     a = Err.Description
     AssertEqualWithMessage e,a,"Description"
 End Sub

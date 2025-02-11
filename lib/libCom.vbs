@@ -671,7 +671,7 @@ Private Sub ast_argTrue( _
 End Sub
 
 '***************************************************************************************************
-'Function/Sub Name           : ast_argsIsSame()
+'Function/Sub Name           : ast_argsAreSame()
 'Overview                    : 引数が同一か検査する
 'Detailed Description        : 検査結果がNGの場合は例外を出す
 'Argument
@@ -687,13 +687,59 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2025/02/02         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub ast_argsIsSame( _
+Private Sub ast_argsAreSame( _
     byRef avA _
     , byRef avB _
     , byVal asSource _
     , byVal asDescription _
     )
     If Not cf_isSame(avA, avB) Then fw_throwException 8197, asSource, asDescription
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argNull()
+'Overview                    : 引数がNullか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/02/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argNull( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If Not(IsNull(avArgument)) Then fw_throwException 8198, asSource, asDescription
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_failure()
+'Overview                    : 例外を出す
+'Detailed Description        : 同上
+'Argument
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/02/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_failure( _
+    byVal asSource _
+    , byVal asDescription _
+    )
+    fw_throwException 8199, asSource, asDescription
 End Sub
 
 '###################################################################################################
@@ -1619,7 +1665,7 @@ End Function
 '***************************************************************************************************
 Private Function new_Now( _
     )
-    Set new_Now = (New clsCmCalendar).getNow()
+    Set new_Now = (New clsCmCalendar).ofNow()
 End Function
 
 '***************************************************************************************************
@@ -2137,9 +2183,53 @@ Private Function math_log2( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : math_tranc()
+'Overview                    : 整数部を返す
+'Detailed Description        : ゼロ方向に丸めた整数部を返す
+'                               10.8  -> 10
+'                               -10.8 -> -10
+'Argument
+'     adbNum                 : 数値
+'Return Value
+'     整数部
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/02/11         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_tranc( _
+    byVal adbNum _ 
+    )
+    math_tranc = func_MathRound(adbNum,0,0,True)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_fractional()
+'Overview                    : 小数部を返す
+'Detailed Description        : ゼロ方向に丸めた小数部を返す
+'                               10.8  -> 0.8
+'                               -10.8 -> -0.8
+'Argument
+'     adbNum                 : 数値
+'Return Value
+'     小数部
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/02/11         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_fractional( _
+    byVal adbNum _ 
+    )
+    math_fractional = adbNum-func_MathRound(adbNum,0,0,True)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : func_MathRound()
 'Overview                    : 数値を丸める
-'Detailed Description        : 符号を無視して絶対値を丸める
+'Detailed Description        : 端数処理の方法に従って数値を丸める
 '                              引数のalPlaceは丸めたい小数の位を指定する、例えば第一位を場合は0を指定する
 '                              小数第二位を四捨五入する場合、alPlaceに1、alThresholdに5を指定する
 '                              一の位、十の位、・・・の場合は-1,-2,…のように負値を指定する

@@ -146,6 +146,25 @@ Class clsCmCalendar
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : clone()
+    'Overview                    : 自身と同じ内容の新しいインスタンスを作る
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     新しいインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/02/11         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function clone( _
+        )
+        Set clone = this_clone()
+    End Function
+    
+    '***************************************************************************************************
     'Function/Sub Name           : compareTo()
     'Overview                    : 日付の大小比較する
     'Detailed Description        : 下記比較結果を返す
@@ -165,7 +184,7 @@ Class clsCmCalendar
     Public Function compareTo( _
         byRef aoTarget _
         )
-        ast_argsIsSame TypeName(Me), TypeName(aoTarget), TypeName(Me)&"+compareTo()", "That object is not a calendar class."
+        ast_argsAreSame TypeName(Me), TypeName(aoTarget), TypeName(Me)&"+compareTo()", "That object is not a calendar class."
         compareTo = this_compareTo(aoTarget)
     End Function
     
@@ -186,7 +205,7 @@ Class clsCmCalendar
     Public Function differenceFrom( _
         byRef aoTarget _
         )
-        ast_argsIsSame TypeName(Me), TypeName(aoTarget), TypeName(Me)&"+differenceFrom()", "That object is not a calendar class."
+        ast_argsAreSame TypeName(Me), TypeName(aoTarget), TypeName(Me)&"+differenceFrom()", "That object is not a calendar class."
         differenceFrom = this_differenceFrom(aoTarget)
     End Function
     
@@ -209,9 +228,29 @@ Class clsCmCalendar
         )
         formatAs = this_formatAs(asFormat)
     End Function
-    
+
     '***************************************************************************************************
-    'Function/Sub Name           : getNow() ->★廃止予定
+    'Function/Sub Name           : of()
+    'Overview                    : 引数に応じたインスタンスを作成する
+    'Detailed Description        : this_of()に委譲する
+    'Argument
+    '     avArgument             : 引数
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/09/30         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function of( _
+        byRef avArgument _
+        )
+        Set of = this_of(avArgument, TypeName(Me)&"+of()")
+    End Function
+     
+    '***************************************************************************************************
+    'Function/Sub Name           : ofNow()
     'Overview                    : 今の日付時刻を取得する
     'Detailed Description        : 工事中
     'Argument
@@ -224,9 +263,9 @@ Class clsCmCalendar
     '----------         ----------------------   -------------------------------------------------------
     '2023/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function getNow( _
+    Public Function ofNow( _
         )
-        Set getNow = this_getNow()
+        Set ofNow = this_newInstance(Now(), Timer(), TypeName(Me)&"+ofNow()")
     End Function
     
     '***************************************************************************************************
@@ -248,56 +287,11 @@ Class clsCmCalendar
         )
         Set setDateTime = this_setDate(avDateTime)
     End Function
+   
 
-    '***************************************************************************************************
-    'Function/Sub Name           : newInstance()
-    'Overview                    : インスタンスを作成する
-    'Detailed Description        : this_newInstance()に委譲する
-    'Argument
-    '     adtDateTime            : 日時
-    '     adbElapsedSeconds      : 経過秒
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/09/30         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function newInstance( _
-        ByVal adtDateTime _
-        , ByVal adbElapsedSeconds _
-        )
-        Set newInstance = this_newInstance(adtDateTime, adbElapsedSeconds, TypeName(Me)&"+newInstance()")
-    End Function
-    
-    
-    
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_getNow() ->★廃止予定
-    'Overview                    : 今の日付時刻を取得する
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/01/04         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_getNow( _
-        )
-        PdtDateTime = Now()
-        
-        Dim dbTimer : dbTimer = Timer()
-        PdbElapsedSeconds = dbTimer - Fix(dbTimer)
 
-        Set this_getNow = Me
-    End Function
-    
+
+
     '***************************************************************************************************
     'Function/Sub Name           : this_setDate() ->★廃止予定
     'Overview                    : 指定した日付時刻を設定する
@@ -392,7 +386,7 @@ Class clsCmCalendar
                     'キーの文字数を取得
                     lKeyLen=Len(sKey)
                     
-                    If StrComp(sKey, Mid(asFormat, lPos, lKeyLen))=0 Then
+                    If cf_isSame(sKey, Mid(asFormat, lPos, lKeyLen)) Then
                     '変換テーブルにある文字と一致した場合
                         vItem = .Item(sKey)
                         If cf_isSame(Cl_USE_DATAPART, vItem(0)) Then
@@ -401,8 +395,10 @@ Class clsCmCalendar
                         Else
                         '秒数の小数部を取り出す場合
                             Dim dbFractionalSec : dbFractionalSec =0
-                            If Not IsNull(PdbElapsedSeconds) Then dbFractionalSec = PdbElapsedSeconds
-                            sItemValue = func_CM_FillInTheCharacters(Fix(dbFractionalSec*10^lKeyLen), lKeyLen, "0", False, True)
+                            If Not IsNull(PdbElapsedSeconds) Then dbFractionalSec = math_fractional(PdbElapsedSeconds)
+                            sItemValue = func_CM_FillInTheCharacters(math_tranc(dbFractionalSec*10^lKeyLen), lKeyLen, "0", False, True)
+'                            If Not IsNull(PdbElapsedSeconds) Then dbFractionalSec = PdbElapsedSeconds - Fix(PdbElapsedSeconds)
+'                            sItemValue = func_CM_FillInTheCharacters(Fix(dbFractionalSec*10^lKeyLen), lKeyLen, "0", False, True)
                         End If
                         boIsMatch = True : Exit For
                     End If
@@ -443,11 +439,111 @@ Class clsCmCalendar
         , byVal adbElapsedSeconds _
         , byVal asSource _
         )
-        ast_argFalse IsNull(PdtDateTime), asSource, "Because it is an immutable variable, its value cannot be changed."
+        ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
         this_setDateTime adtDateTime, asSource
         this_setElapsedSeconds adbElapsedSeconds, asSource
         Set this_newInstance = Me
     End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_of()
+    'Overview                    : 引数に応じたインスタンスを作成する
+    'Detailed Description        : this_newInstance()に委譲する
+    '                              以下の入力検査を行う
+    '                              1.配列でない場合
+    '                                Date型（小数点以下の秒数があってもよい）
+    '                              2.配列の場合は要素数に応じたチェックを行う
+    '                                1-1.要素数が1つ
+    '                                 e(0) -> Date型（小数点以下の秒数があってもよい）
+    '                                1-2.要素数が2つ
+    '                                 e(0) -> Date型
+    '                                 e(1) -> Double型
+    '                                1-3.要素数が6つ
+    '                                 e(0-5) -> "e(0)/e(1)/e(2) e(3):e(4):e(5)"がDate型
+    '                                1-4.要素数が7つ
+    '                                 e(0-5) -> "e(0)/e(1)/e(2) e(3):e(4):e(5)"がDate型
+    '                                 e(6) -> Double型
+    '                                1-5.上記以外の要素数はエラーとする
+    'Argument
+    '     avArgument             : 引数
+    '     asSource               : ソース
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/02/02         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_of( _
+        byRef avArgument _
+        , byVal asSource _
+        )
+        Dim dtDateTime, dbElapsedSeconds
+        dtDateTime = Null
+        dbElapsedSeconds = Null
+        
+        On Error Resume Next
+        If Not(IsArray(avArgument)) Then
+        '配列でない場合
+            Call this_ofForOneArg(avArgument, dtDateTime, dbElapsedSeconds)
+'            dtDateTime = Cdate(avArgument)
+        ElseIf new_Arr().hasElement(avArgument) Then
+        '配列の要素がある場合
+            Dim e : e = avArgument
+            Select Case Ubound(avArgument)
+                Case 0:
+                    Call this_ofForOneArg(e(0), dtDateTime, dbElapsedSeconds)
+'                    dtDateTime = Cdate(e(0))
+                Case 1:
+                    dtDateTime = Cdate(e(0))
+                    dbElapsedSeconds = Cdbl(e(1))
+                Case 5:
+                    dtDateTime = Cdate(e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5))
+                Case 6:
+                    dtDateTime = Cdate(e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5))
+                    dbElapsedSeconds = Cdbl(e(6))
+            End Select
+        End If
+        On Error Goto 0
+        
+        ast_argNotNull dtDateTime, asSource, "invalid argument. " & cf_toString(avArgument)
+
+        Set this_of = this_newInstance(dtDateTime, dbElapsedSeconds, asSource)
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_ofForOneArg()
+    'Overview                    : 日付型に変換する
+    'Detailed Description        : 工事中
+    'Argument
+    '     avDateTime             : 引数の日付時刻
+    '     adtDateTime            : 日時
+    '     dbElapsedSeconds       : 経過秒
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/02/11         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_ofForOneArg( _
+        byVal avDateTime _
+        , byRef adtDateTime _
+        , byRef dbElapsedSeconds _
+        )
+        Dim oRe : Set oRe = new_Re("^([^.]+)\.(\d+)$", "")
+        If oRe.Test(avDateTime) Then
+            adtDateTime = Cdate(oRe.Replace(avDateTime, "$1"))
+            Dim dbElapsedSecondsByDt : dbElapsedSecondsByDt = math_tranc(math_fractional(adtDateTime)*24*60*60)
+'            Dim dbElapsedSecondsByDt : dbElapsedSecondsByDt = Fix((adtDateTime-Fix(adtDateTime))*24*60*60)
+            dbElapsedSeconds = dbElapsedSecondsByDt + Cdbl("0." & oRe.Replace(avDateTime, "$2"))
+        Else
+            adtDateTime = Cdate(avDateTime)
+        End If
+        Set oRe = Nothing
+    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : this_setDateTime()
@@ -468,8 +564,8 @@ Class clsCmCalendar
         byVal adtDateTime _
         , byVal asSource _
         )
-        ast_argTrue IsDate(PdtDateTime), asSource, "DateTime is not a date/time."
-        PadtDateTime = adtDateTime
+        ast_argTrue IsDate(adtDateTime), asSource, "DateTime is not a date/time."
+        PdtDateTime = Cdate(adtDateTime)
     End Sub
 
     '***************************************************************************************************
@@ -492,8 +588,30 @@ Class clsCmCalendar
         , byVal asSource _
         )
         ast_argTrue (IsNull(adbElapsedSeconds) Or cf_isNonNegativeNumber(adbElapsedSeconds)), asSource, "ElapsedSeconds must be null or a non-negative number."
-        PadbElapsedSeconds = adbElapsedSeconds
+        If Not(IsNull(adbElapsedSeconds)) Then PdbElapsedSeconds = Cdbl(adbElapsedSeconds)
     End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_clone()
+    'Overview                    : 自身と同じ内容の新しいインスタンスを作る
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     新しいインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/02/11         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_clone( _
+        )
+        Dim oNewIns : Set oNewIns = new clsCmCalendar
+        If Not IsNull(PdtDateTime) Then Call oNewIns.of(Array(PdtDateTime, PdbElapsedSeconds))
+        Set this_clone = oNewIns
+        Set oNewIns = Nothing
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : this_compareTo()
@@ -517,15 +635,20 @@ Class clsCmCalendar
         )
         Dim lResult : lResult = 0
 
-        If (Me.dateTime < aoTarget.dateTime) Then lResult = -1
-        If (Me.dateTime > aoTarget.dateTime) Then lResult = 1
+        If (PdtDateTime < aoTarget.dateTime) Then lResult = -1
+        If (PdtDateTime > aoTarget.dateTime) Then lResult = 1
         If lResult <> 0 Then
             this_compareTo = lResult
             Exit Function
         End If
         
-        If (Me.elapsedSeconds < aoTarget.elapsedSeconds) Then lResult = -1
-        If (Me.elapsedSeconds > aoTarget.elapsedSeconds) Then lResult = 1
+        If IsNull(PdbElapsedSeconds) And IsNull(aoTarget.elapsedSeconds) Then
+            this_compareTo = lResult
+            Exit Function
+        End If
+
+        If (PdbElapsedSeconds < aoTarget.elapsedSeconds) Or IsNull(PdbElapsedSeconds) Then lResult = -1
+        If (PdbElapsedSeconds > aoTarget.elapsedSeconds) Or IsNull(aoTarget.elapsedSeconds)  Then lResult = 1
 
         this_compareTo = lResult
 
@@ -553,11 +676,26 @@ Class clsCmCalendar
             Exit function
         End If
 
-        Dim dbDiffElapsedSeconds : dbDiffElapsedSeconds = Me.elapsedSeconds - aoTarget.elapsedSeconds
-        If (Me.dateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(Me.dateTime-aoTarget.dateTime)*60*60*24
+        Dim dbDiffElapsedSeconds
+        If IsNull(PdbElapsedSeconds) And IsNull(aoTarget.elapsedSeconds) Then
+            dbDiffElapsedSeconds = 0
+        ElseIf IsNull(PdbElapsedSeconds) Then
+            dbDiffElapsedSeconds = -1*math_fractional(aoTarget.elapsedSeconds)
+'            dbDiffElapsedSeconds = -1*(aoTarget.elapsedSeconds-Fix(aoTarget.elapsedSeconds))
+'            dbDiffElapsedSeconds = -1*aoTarget.elapsedSeconds
+        ElseIf IsNull(aoTarget.elapsedSeconds) Then
+            dbDiffElapsedSeconds = math_fractional(PdbElapsedSeconds)
+'            dbDiffElapsedSeconds = PdbElapsedSeconds-Fix(PdbElapsedSeconds)
+'            dbDiffElapsedSeconds = PdbElapsedSeconds
+        Else
+            dbDiffElapsedSeconds = math_fractional(PdbElapsedSeconds)-math_fractional(aoTarget.elapsedSeconds)
+'            dbDiffElapsedSeconds = (PdbElapsedSeconds-aoTarget.elapsedSeconds)-Fix(PdbElapsedSeconds-aoTarget.elapsedSeconds)
+'            dbDiffElapsedSeconds = PdbElapsedSeconds - aoTarget.elapsedSeconds
+        End If
+
+        If (PdtDateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(PdtDateTime-aoTarget.dateTime)*60*60*24
         this_differenceFrom = math_roundDown(dbDiffElapsedSeconds, 5)
 
-'        this_differenceFrom = math_roundDown(Me.serial()*60*60*24-aoTarget.serial()*60*60*24, 5)
     End Function
     
 End Class

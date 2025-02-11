@@ -24,11 +24,13 @@ End Sub
 
 '###################################################################################################
 'clsCmCalendar.serial()
-Sub Test_clsCmCalendar_serial_getNow
+Sub Test_clsCmCalendar_serial_ofNow
     Dim a,e
-    Set e = (new clsCmCalendar).getNow()
-    Set a = (new clsCmCalendar)
-    a.serial = e.serial
+    Set e = (new clsCmCalendar).ofNow()
+    Set a = e.clone()
+'    Set a = (new clsCmCalendar).of(Array(e.dateTime, e.elapsedSeconds))
+'    Set a = (new clsCmCalendar)
+'    a.serial = e.serial
 
     AssertWithMessage Not e Is a, "Object"
     AssertEqualWithMessage e.serial, a.serial, "serial"
@@ -172,7 +174,8 @@ End Sub
 Sub Test_clsCmCalendar_differenceFrom
     Dim d1,d2,e,a,a1,a2
     d1 = "2024/02/29 00:59:31"
-    Set a1 = (new clsCmCalendar).setDateTime(d1)
+    Set a1 = (new clsCmCalendar).of(d1)
+'    Set a1 = (new clsCmCalendar).setDateTime(d1)
 
     d2 = "2024/02/29 00:59:30"
     Set a2 = (new clsCmCalendar).setDateTime(d2)
@@ -195,22 +198,26 @@ End Sub
 Sub Test_clsCmCalendar_differenceFrom_WithDecimal
     Dim d1,d2,e,a,a1,a2
     d1 = "2024/02/29 00:59:31.123456"
-    Set a1 = (new clsCmCalendar).setDateTime(d1)
+    Set a1 = (new clsCmCalendar).of(d1)
+'    Set a1 = (new clsCmCalendar).setDateTime(d1)
 
     d2 = "2024/02/29 00:59:30.123455"
-    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    Set a2 = (new clsCmCalendar).of(d2)
+'    Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = 1
     a = a1.differenceFrom(a2)
     AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 
     d2 = "2024/02/29 00:59:31.123456"
-    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    Set a2 = (new clsCmCalendar).of(d2)
+'    Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = 0
     a = a1.differenceFrom(a2)
     AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
 
     d2 = "2024/02/29 00:59:32.123457"
-    Set a2 = (new clsCmCalendar).setDateTime(d2)
+    Set a2 = (new clsCmCalendar).of(d2)
+'    Set a2 = (new clsCmCalendar).setDateTime(d2)
     e = -1
     a = a1.differenceFrom(a2)
     AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
@@ -219,7 +226,8 @@ Sub Test_clsCmCalendar_differenceFrom_Err
     On Error Resume Next
     Dim d1,e,a,a1
     d1 = "2024/02/29 00:59:31"
-    Set a1 = (new clsCmCalendar).setDateTime(d1)
+    Set a1 = (new clsCmCalendar).of(d1)
+'    Set a1 = (new clsCmCalendar).setDateTime(d1)
 
     e = Empty
     a = a1.differenceFrom(new_Dic())
@@ -227,9 +235,6 @@ Sub Test_clsCmCalendar_differenceFrom_Err
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage "clsCmCalendar+differenceFrom()", Err.Source, "Err.Source"
     AssertEqualWithMessage "That object is not a calendar class.", Err.Description, "Err.Description"
-'    AssertEqual 438, Err.Number
-'    AssertEqual "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description
-'    AssertEqual e, a
 End Sub
 
 '###################################################################################################
@@ -239,7 +244,8 @@ Sub Test_clsCmCalendar_formatAs_Normal1
     f = "YY/M/d hh:mm:ss.000"
     d = "2024/02/29 00:59:30.456789"
     e = "24/2/29 00:59:30.456"
-    Set a = (new clsCmCalendar).setDateTime(d)
+    Set a = (new clsCmCalendar).of(d)
+'    Set a = (new clsCmCalendar).setDateTime(d)
 
     AssertEqual e, a.formatAs(f)
 End Sub
@@ -248,7 +254,8 @@ Sub Test_clsCmCalendar_formatAs_Normal2
     f = "fujii.txt"
     d = "2024/02/29 00:59:30.456789"
     e = f
-    Set a = (new clsCmCalendar).setDateTime(d)
+    Set a = (new clsCmCalendar).of(d)
+'    Set a = (new clsCmCalendar).setDateTime(d)
 
     AssertEqual e, a.formatAs(f)
 End Sub
@@ -257,7 +264,8 @@ Sub Test_clsCmCalendar_formatAs_YYYY
     f = "YYYY"
     d = "2024/02/29 00:59:30"
     e = Right("000" & Year(Left(d,19)), 4)
-    Set a = (new clsCmCalendar).setDateTime(d)
+    Set a = (new clsCmCalendar).of(d)
+'    Set a = (new clsCmCalendar).setDateTime(d)
 
     AssertEqualWithMessage e, a.formatAs(f), "uppercase"
 
@@ -365,7 +373,8 @@ Sub Test_clsCmCalendar_formatAs_HH_1
     f = "HH"
     d = "2024/02/29 00:59:30"
     e = Right("0" & Hour(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).setDateTime(d)
+    Set a = (new clsCmCalendar).of(d)
+'    Set a = (new clsCmCalendar).setDateTime(d)
 
     AssertEqualWithMessage e, a.formatAs(f), "uppercase"
 
@@ -567,8 +576,8 @@ Sub Test_clsCmCalendar_formatAs_000
 End Sub
 
 '###################################################################################################
-'clsCmCalendar.getNow()/toString()
-Sub Test_clsCmCalendar_getNow_toString
+'clsCmCalendar.ofNow()/toString()
+Sub Test_clsCmCalendar_ofNow_toString
     Dim n,y,m,d,h,mm,s
     n = now()
     y = Right("000" & Year(n), 4)
@@ -578,10 +587,10 @@ Sub Test_clsCmCalendar_getNow_toString
     mm = Right("0" & Minute(n), 2)
     s = Right("0" & Second(n), 2)
     Dim ptn : ptn = "^"&y&"/"&m&"/"&d&" "&h&":"&mm&":"&s&"\.\d{3}$"
-    Dim a : Set a = (new clsCmCalendar).getNow()
+    Dim a : Set a = (new clsCmCalendar).ofNow()
 
-    AssertMatch ptn, a.toString()
-    AssertMatch ptn, a
+    AssertMatchWithMessage ptn, a.toString(), "toString()"
+    AssertMatchWithMessage ptn, a, "default"
 End Sub
 
 '###################################################################################################

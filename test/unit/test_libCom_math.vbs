@@ -266,6 +266,48 @@ Sub Test_func_MathLog
     Next
 End Sub
 
+'###################################################################################################
+'math_tranc()
+Sub Test_math_tranc
+    dim a,e,d,i,num
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"Num",1    ,"Expected",1  )) _
+            , new_DicWith(Array("No",2 ,"Num",2.0  ,"Expected",2  )) _
+            , new_DicWith(Array("No",3 ,"Num",-3.0 ,"Expected",-3 )) _
+            , new_DicWith(Array("No",4 ,"Num",1.1  ,"Expected",1  )) _
+            , new_DicWith(Array("No",5 ,"Num",2.5  ,"Expected",2  )) _
+            , new_DicWith(Array("No",6 ,"Num",-3.9 ,"Expected",-3 )) _
+            , new_DicWith(Array("No",7 ,"Num",-0.1 ,"Expected",0  )) _
+            )
+    For Each i In d
+        num = i.Item("Num")
+        e = i.Item("Expected")
+        a = math_tranc(num)
+        AssertEqualWithMessage a, e, "No="&i.Item("No")&", Num="&num
+    Next
+End Sub
+
+'###################################################################################################
+'math_fractional()
+Sub Test_math_fractional
+    dim a,e,d,i,num
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"Num",1    ,"Expected",0    )) _
+            , new_DicWith(Array("No",2 ,"Num",2.0  ,"Expected",0    )) _
+            , new_DicWith(Array("No",3 ,"Num",-3.0 ,"Expected",0    )) _
+            , new_DicWith(Array("No",4 ,"Num",1.1  ,"Expected",0.1  )) _
+            , new_DicWith(Array("No",5 ,"Num",2.5  ,"Expected",0.5  )) _
+            , new_DicWith(Array("No",6 ,"Num",-3.9 ,"Expected",-0.9 )) _
+            , new_DicWith(Array("No",7 ,"Num",-0.1 ,"Expected",-0.1 )) _
+            )
+    For Each i In d
+        num = i.Item("Num")
+        e = CStr(i.Item("Expected"))
+        a = CStr(math_fractional(num))
+        AssertEqualWithMessage a, e, "No="&i.Item("No")&", Num="&num
+    Next
+End Sub
+
 ' Local Variables:
 ' mode: Visual-Basic
 ' indent-tabs-mode: nil
