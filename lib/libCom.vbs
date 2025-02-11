@@ -2223,7 +2223,7 @@ End Function
 Private Function math_fractional( _
     byVal adbNum _ 
     )
-    math_fractional = adbNum-func_MathRound(adbNum,0,0,True)
+    math_fractional = math_round(adbNum-func_MathRound(adbNum,0,0,True),11)
 End Function
 
 '***************************************************************************************************

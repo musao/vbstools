@@ -682,7 +682,7 @@ Sub Test_clsCmCalendar_setDateTime_toString_TimeOnly_WithDecimal
     Dim e : e = "1900/01/01 " & Left(d, 12)
     Dim a : Set a = (new clsCmCalendar).of(e)
 
-    AssertEqual e, a.toString()
+    AssertEqualWithMessage e, a.toString(), "toString()"
 End Sub
 Sub Test_clsCmCalendar_setDateTime_toString_TimeOnly_WithDecimal_ErrAtTime
     On Error Resume Next
