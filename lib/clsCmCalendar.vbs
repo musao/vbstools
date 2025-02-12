@@ -68,6 +68,24 @@ Class clsCmCalendar
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get fractionalPartOfelapsedSeconds()
+    'Overview                    : 経過秒の小数部を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     経過秒の小数部
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/02/12         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get fractionalPartOfelapsedSeconds()
+       fractionalPartOfelapsedSeconds = this_getFractionalPartOfElapsedSeconds()
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get elapsedSeconds()
     'Overview                    : 経過秒を返す
     'Detailed Description        : 工事中
@@ -100,9 +118,7 @@ Class clsCmCalendar
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get serial()
-       Dim dbFractionalSec : dbFractionalSec = 0
-       If Not IsNull(PdbElapsedSeconds) Then dbFractionalSec = PdbElapsedSeconds/(60*60*24)
-       serial = Cdbl(PdtDateTime) + dbFractionalSec
+       serial = Cdbl(PdtDateTime) + this_getFractionalPartOfElapsedSeconds()
     End Property
     
     '***************************************************************************************************
@@ -230,7 +246,7 @@ Class clsCmCalendar
     '***************************************************************************************************
     'Function/Sub Name           : ofNow()
     'Overview                    : 今の日付時刻を取得する
-    'Detailed Description        : 工事中
+    'Detailed Description        : this_setData()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -243,7 +259,7 @@ Class clsCmCalendar
     '***************************************************************************************************
     Public Function ofNow( _
         )
-        Set ofNow = this_newInstance(Now(), Timer(), TypeName(Me)&"+ofNow()")
+        Set ofNow = this_setData(Now(), Timer(), TypeName(Me)&"+ofNow()")
     End Function
        
 
@@ -301,14 +317,8 @@ Class clsCmCalendar
             Exit Function
         End If
         
-        If IsNull(PdbElapsedSeconds) And IsNull(aoTarget.elapsedSeconds) Then
-            this_compareTo = lResult
-            Exit Function
-        End If
-
-        If (PdbElapsedSeconds < aoTarget.elapsedSeconds) Or IsNull(PdbElapsedSeconds) Then lResult = -1
-        If (PdbElapsedSeconds > aoTarget.elapsedSeconds) Or IsNull(aoTarget.elapsedSeconds)  Then lResult = 1
-
+        If (this_getFractionalPartOfElapsedSeconds < aoTarget.fractionalPartOfelapsedSeconds) Then lResult = -1
+        If (this_getFractionalPartOfElapsedSeconds > aoTarget.fractionalPartOfelapsedSeconds) Then lResult = 1
         this_compareTo = lResult
 
     End Function
@@ -336,15 +346,7 @@ Class clsCmCalendar
         End If
 
         Dim dbDiffElapsedSeconds
-        If IsNull(PdbElapsedSeconds) And IsNull(aoTarget.elapsedSeconds) Then
-            dbDiffElapsedSeconds = 0
-        ElseIf IsNull(PdbElapsedSeconds) Then
-            dbDiffElapsedSeconds = -1*math_fractional(aoTarget.elapsedSeconds)
-        ElseIf IsNull(aoTarget.elapsedSeconds) Then
-            dbDiffElapsedSeconds = math_fractional(PdbElapsedSeconds)
-        Else
-            dbDiffElapsedSeconds = math_fractional(PdbElapsedSeconds)-math_fractional(aoTarget.elapsedSeconds)
-        End If
+        dbDiffElapsedSeconds = this_getFractionalPartOfElapsedSeconds-aoTarget.fractionalPartOfelapsedSeconds
 
         If (PdtDateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(PdtDateTime-aoTarget.dateTime)*60*60*24
         this_differenceFrom = math_roundDown(dbDiffElapsedSeconds, 5)
@@ -425,9 +427,7 @@ Class clsCmCalendar
                             sItemValue = func_CM_FillInTheCharacters(DatePart(vItem(1), PdtDateTime), lKeyLen, "0", vItem(2), True)
                         Else
                         '秒数の小数部を取り出す場合
-                            Dim dbFractionalSec : dbFractionalSec =0
-                            If Not IsNull(PdbElapsedSeconds) Then dbFractionalSec = math_fractional(PdbElapsedSeconds)
-                            sItemValue = func_CM_FillInTheCharacters(math_tranc(dbFractionalSec*10^lKeyLen), lKeyLen, "0", False, True)
+                            sItemValue = func_CM_FillInTheCharacters(math_tranc(this_getFractionalPartOfElapsedSeconds*10^lKeyLen), lKeyLen, "0", False, True)
                         End If
                         boIsMatch = True : Exit For
                     End If
@@ -446,38 +446,32 @@ Class clsCmCalendar
         End With
         this_formatAs = sResult
     End Function
-
+    
     '***************************************************************************************************
-    'Function/Sub Name           : this_newInstance()
-    'Overview                    : インスタンスを作成する
+    'Function/Sub Name           : this_getFractionalPartOfElapsedSeconds()
+    'Overview                    : 経過秒の小数部を返す
     'Detailed Description        : 工事中
     'Argument
-    '     adtDateTime            : 日時
-    '     adbElapsedSeconds      : 経過秒
-    '     asSource               : ソース
+    '     なし
     'Return Value
-    '     自身のインスタンス
+    '     経過秒の小数部
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2024/09/30         Y.Fujii                  First edition
+    '2025/02/12         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_newInstance( _
-        byVal adtDateTime _
-        , byVal adbElapsedSeconds _
-        , byVal asSource _
+    Private Function this_getFractionalPartOfElapsedSeconds( _
         )
-        ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
-        this_setDateTime adtDateTime, asSource
-        this_setElapsedSeconds adbElapsedSeconds, asSource
-        Set this_newInstance = Me
+        Dim dbFract : dbFract = 0
+        If Not IsNull(PdbElapsedSeconds) Then dbFract = math_round(math_fractional(PdbElapsedSeconds),7)
+        this_getFractionalPartOfElapsedSeconds = dbFract
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : this_of()
     'Overview                    : 引数に応じたインスタンスを作成する
-    'Detailed Description        : this_newInstance()に委譲する
+    'Detailed Description        : this_setData()に委譲する
     '                              以下の入力検査を行う
     '                              1.配列でない場合
     '                                Date型（小数点以下の秒数があってもよい）
@@ -536,7 +530,7 @@ Class clsCmCalendar
         
         ast_argNotNull dtDateTime, asSource, "invalid argument. " & cf_toString(avArgument)
 
-        Set this_of = this_newInstance(dtDateTime, dbElapsedSeconds, asSource)
+        Set this_of = this_setData(dtDateTime, dbElapsedSeconds, asSource)
     End Function
 
     '***************************************************************************************************
@@ -548,7 +542,7 @@ Class clsCmCalendar
     '     adtDateTime            : 日時
     '     dbElapsedSeconds       : 経過秒
     'Return Value
-    '     自身のインスタンス
+    '     なし
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -570,6 +564,33 @@ Class clsCmCalendar
         End If
         Set oRe = Nothing
     End Sub
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setData()
+    'Overview                    : データを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     adtDateTime            : 日時
+    '     adbElapsedSeconds      : 経過秒
+    '     asSource               : ソース
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/09/30         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_setData( _
+        byVal adtDateTime _
+        , byVal adbElapsedSeconds _
+        , byVal asSource _
+        )
+        ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
+        this_setDateTime adtDateTime, asSource
+        this_setElapsedSeconds adbElapsedSeconds, asSource
+        Set this_setData = Me
+    End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : this_setDateTime()

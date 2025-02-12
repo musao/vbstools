@@ -23,6 +23,26 @@ Sub Test_clsCmCalendar
 End Sub
 
 '###################################################################################################
+'clsCmCalendar.dateTime
+Sub Test_clsCmCalendar_dateTime
+    dim a,e,d,i,data
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"data", Now()                      , "memo", "Now()" )) _
+            , new_DicWith(Array("No",2 ,"data", Date()                     , "memo", "Date()")) _
+            , new_DicWith(Array("No",3 ,"data", Time()                     , "memo", "Time()")) _
+            , new_DicWith(Array("No",4 ,"data", Cdate("2025/2/12 11:22:33"), "memo", "2025/2/12 11:22:33")) _
+            , new_DicWith(Array("No",5 ,"data", Cdate("2025/12/31")        , "memo", "2025/12/31")) _
+            , new_DicWith(Array("No",6 ,"data", Cdate("12:34:56")          , "memo", "12:34:56")) _
+            )
+    For Each i In d
+        data = i.Item("data")
+        e = data
+        a = (new clsCmCalendar).of(data).dateTime
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&", data="&i.Item("memo")
+    Next
+End Sub
+
+'###################################################################################################
 'clsCmCalendar.serial()
 Sub Test_clsCmCalendar_serial_ofNow
     Dim a,e
