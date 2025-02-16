@@ -152,7 +152,7 @@ Sub Test_clsCmCalendar_toString
 End Sub
 
 '###################################################################################################
-'clsCmCalendar.clone
+'clsCmCalendar.clone()
 Sub Test_clsCmCalendar_clone_initial
     dim a,ao,e,bo
     set ao = (new clsCmCalendar)
@@ -181,6 +181,41 @@ Sub Test_clsCmCalendar_clone
         a = ao.compareTo(bo)
         AssertEqualWithMessage e, a, "No="&i.Item("No")&", data="&cf_toString(data)
     Next
+End Sub
+
+'###################################################################################################
+'clsCmCalendar.compareTo()
+Sub Test_clsCmCalendar_compareTo_initial
+    dim a,ao,e,bo
+    set ao = (new clsCmCalendar)
+
+    set bo = (new clsCmCalendar)
+    e = 0
+    a = ao.compareTo(bo)
+    AssertEqualWithMessage e, a, "compareTo()=0 ao="&ao.toString()&" bo="&bo.toString()
+
+    set bo = (new clsCmCalendar).ofNow()
+    e = -1
+    a = ao.compareTo(bo)
+    AssertEqualWithMessage e, a, "compareTo()<0 ao="&ao.toString()&" bo="&bo.toString()
+
+    ao.ofNow()
+    set bo = (new clsCmCalendar)
+    e = 1
+    a = ao.compareTo(bo)
+    AssertEqualWithMessage e, a, "compareTo()>0 ao="&ao.toString()&" bo="&bo.toString()
+End Sub
+Sub Test_clsCmCalendar_compareTo_Err
+    On Error Resume Next
+    Dim d,e,a
+    d = "2024/02/29 00:59:31"
+
+    e = Empty
+    a = (new clsCmCalendar).of(d).compareTo(new_Dic())
+
+    AssertEqualWithMessage e, a, "ret"
+    AssertEqualWithMessage "clsCmCalendar+compareTo()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "That object is not a calendar class.", Err.Description, "Err.Description"
 End Sub
 
 
@@ -312,19 +347,6 @@ Sub Test_clsCmCalendar_compareTo_TimeOnly
     e = -1
     a = a1.compareTo(a2)
     AssertEqualWithMessage e, a, a1&" vs "&a2
-End Sub
-Sub Test_clsCmCalendar_compareTo_Err
-    On Error Resume Next
-    Dim d1,e,a,a1
-    d1 = "2024/02/29 00:59:31"
-    Set a1 = (new clsCmCalendar).of(d1)
-
-    e = Empty
-    a = a1.compareTo(new_Dic())
-
-    AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage "clsCmCalendar+compareTo()", Err.Source, "Err.Source"
-    AssertEqualWithMessage "That object is not a calendar class.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################

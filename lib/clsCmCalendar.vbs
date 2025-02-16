@@ -310,10 +310,12 @@ Class clsCmCalendar
     Private Function this_compareTo( _
         byRef aoTarget _
         )
+        this_compareTo = 0
+        If IsNull(PdtDateTime) And IsNull(aoTarget.dateTime) Then Exit Function
+        
         Dim lResult : lResult = 0
-
-        If (PdtDateTime < aoTarget.dateTime) Then lResult = -1
-        If (PdtDateTime > aoTarget.dateTime) Then lResult = 1
+        If IsNull(PdtDateTime) Or (PdtDateTime < aoTarget.dateTime) Then lResult = -1
+        If IsNull(aoTarget.dateTime) Or (PdtDateTime > aoTarget.dateTime) Then lResult = 1
         If lResult <> 0 Then
             this_compareTo = lResult
             Exit Function
