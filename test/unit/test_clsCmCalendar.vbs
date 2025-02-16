@@ -23,25 +23,169 @@ Sub Test_clsCmCalendar
 End Sub
 
 '###################################################################################################
-'clsCmCalendar.dateTime
-Sub Test_clsCmCalendar_dateTime
-    dim a,e,d,i,data
+'clsCmCalendar.dateTime,fractionalPartOfelapsedSeconds,elapsedSeconds,serial
+Sub Test_clsCmCalendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_initial
+    dim tg,a,ao,e
+    set ao = (new clsCmCalendar)
+
+    tg = "A.dateTime"
+    e = Null
+    a = ao.dateTime
+    AssertEqualWithMessage e, a, tg
+
+    tg = "B.fractionalPartOfelapsedSeconds"
+    e = Null
+    a = ao.fractionalPartOfelapsedSeconds
+    AssertEqualWithMessage e, a, tg
+
+    tg = "C.elapsedSeconds"
+    e = Null
+    a = ao.elapsedSeconds
+    AssertEqualWithMessage e, a, tg
+
+    tg = "D.serial"
+    e = Null
+    a = ao.serial
+    AssertEqualWithMessage e, a, tg
+End Sub
+Sub Test_clsCmCalendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_elapsedSeconds_Null
+    dim tg,a,ao,e,d,i,data
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"data", Now()                      , "memo", "Now()" )) _
-            , new_DicWith(Array("No",2 ,"data", Date()                     , "memo", "Date()")) _
-            , new_DicWith(Array("No",3 ,"data", Time()                     , "memo", "Time()")) _
-            , new_DicWith(Array("No",4 ,"data", Cdate("2025/2/12 11:22:33"), "memo", "2025/2/12 11:22:33")) _
-            , new_DicWith(Array("No",5 ,"data", Cdate("2025/12/31")        , "memo", "2025/12/31")) _
-            , new_DicWith(Array("No",6 ,"data", Cdate("12:34:56")          , "memo", "12:34:56")) _
+            new_DicWith(Array(  "No",1 ,"date", Now()               )) _
+            , new_DicWith(Array("No",2 ,"date", Date()              )) _
+            , new_DicWith(Array("No",3 ,"date", Time()              )) _
+            , new_DicWith(Array("No",4 ,"date", "2025/2/12 11:22:33")) _
+            , new_DicWith(Array("No",5 ,"date", "2025/12/31"        )) _
+            , new_DicWith(Array("No",6 ,"date", "12:34:56"          )) _
             )
+
     For Each i In d
-        data = i.Item("data")
-        e = data
-        a = (new clsCmCalendar).of(data).dateTime
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&", data="&i.Item("memo")
+        data = i.Item("date")
+        set ao = (new clsCmCalendar).of(data)
+        
+        tg = "A.dateTime"
+        e = CDate(data)
+        a = ao.dateTime
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
+        
+        tg = "B.fractionalPartOfelapsedSeconds"
+        e = 0
+        a = ao.fractionalPartOfelapsedSeconds
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
+        
+        tg = "C.elapsedSeconds"
+        e = Null
+        a = ao.elapsedSeconds
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
+        
+        tg = "D.serial"
+        e = Cdbl(CDate(data))
+        a = ao.serial
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
+    Next
+End Sub
+Sub Test_clsCmCalendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_elapsedSeconds_NotNull
+    dim tg,a,ao,e,d,i,data
+    d = Array ( _
+            new_DicWith(Array(  "No",1 ,"date", Now()               , "elapsed", Timer()                 )) _
+            , new_DicWith(Array("No",2 ,"date", Date()              , "elapsed", "Cal"                   )) _
+            , new_DicWith(Array("No",3 ,"date", Time()              , "elapsed", "Cal"                   )) _
+            , new_DicWith(Array("No",4 ,"date", "2025/2/12 11:22:33", "elapsed", 11*60*60+22*60+33+0.2345)) _
+            , new_DicWith(Array("No",5 ,"date", "2025/12/31"        , "elapsed", 0.8901234               )) _
+            , new_DicWith(Array("No",6 ,"date", "12:34:56"          , "elapsed", 0                       )) _
+            )
+
+    For Each i In d
+        data = Array(i.Item("date"), i.Item("elapsed"))
+        If data(1)="Cal" Then data(1)=(Cdbl(Cdate(data(0)))-Fix(Cdbl(Cdate(data(0)))))*24*60*60
+        set ao = (new clsCmCalendar).of(data)
+        
+        tg = "A.dateTime"
+        e = CDate(data(0))
+        a = ao.dateTime
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&cf_toString(data)
+        
+        tg = "B.fractionalPartOfelapsedSeconds"
+        e = data(1)-Fix(data(1))
+        a = ao.fractionalPartOfelapsedSeconds
+        AssertWithMessage Abs(e-a)<0.0000001 Or (1-Abs(e-a))<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
+        
+        tg = "C.elapsedSeconds"
+        e = data(1)
+        a = ao.elapsedSeconds
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&cf_toString(data)
+        
+        tg = "D.serial"
+        e = Cdbl(CDate(data(0)))
+        a = ao.serial
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&cf_toString(data)
     Next
 End Sub
 
+'###################################################################################################
+'clsCmCalendar.toString
+Sub Test_clsCmCalendar_toString_initial
+    dim a,ao,e
+    set ao = (new clsCmCalendar)
+
+    e = "<clsCmCalendar><Null>"
+    a = ao.toString()
+    AssertEqualWithMessage e, a, "toString()"
+End Sub
+Sub Test_clsCmCalendar_toString
+    dim a,e,d,i,data
+    d = Array ( _
+            new_DicWith(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        , "expected", "2025/02/12 11:22:33.000"))_
+            , new_DicWith(Array("No", 2,"data", Array("2025/12/1")                 , "expected", "2025/12/01 00:00:00.000"))_
+            , new_DicWith(Array("No", 3,"data", Array("12:34:56")                  , "expected", "1899/12/30 12:34:56.000"))_
+            , new_DicWith(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234), "expected", "2025/02/12 11:22:33.123"))_
+            , new_DicWith(Array("No", 5,"data", Array("2025/12/1"         , 0.9876), "expected", "2025/12/01 00:00:00.987"))_
+            , new_DicWith(Array("No", 6,"data", Array("12:34:56"          , 0)     , "expected", "1899/12/30 12:34:56.000"))_
+            )
+
+    For Each i In d
+        data = i.Item("data")
+        e = i.Item("expected")
+        a = (new clsCmCalendar).of(data).toString()
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&", data="&cf_toString(data)
+    Next
+End Sub
+
+'###################################################################################################
+'clsCmCalendar.clone
+Sub Test_clsCmCalendar_clone_initial
+    dim a,ao,e,bo
+    set ao = (new clsCmCalendar)
+    set bo = ao.clone()
+
+    e = 0
+    a = ao.compareTo(bo)
+    AssertEqualWithMessage e, a, "clone()"
+End Sub
+Sub Test_clsCmCalendar_clone
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicWith(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        ))_
+            , new_DicWith(Array("No", 2,"data", Array("2025/12/1")                 ))_
+            , new_DicWith(Array("No", 3,"data", Array("12:34:56")                  ))_
+            , new_DicWith(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234)))_
+            , new_DicWith(Array("No", 5,"data", Array("2025/12/1"         , 0.9876)))_
+            , new_DicWith(Array("No", 6,"data", Array("12:34:56"          , 0)     ))_
+            )
+
+    For Each i In d
+        data = i.Item("data")
+        Set ao = (new clsCmCalendar).of(data)
+        Set bo = ao.clone()
+        e = 0
+        a = ao.compareTo(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&", data="&cf_toString(data)
+    Next
+End Sub
+
+
+
+    
 '###################################################################################################
 'clsCmCalendar.serial()
 Sub Test_clsCmCalendar_serial_ofNow

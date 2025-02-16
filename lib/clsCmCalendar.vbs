@@ -82,7 +82,8 @@ Class clsCmCalendar
     '2025/02/12         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get fractionalPartOfelapsedSeconds()
-       fractionalPartOfelapsedSeconds = this_getFractionalPartOfElapsedSeconds()
+       fractionalPartOfelapsedSeconds = Null
+       If Not IsNull(PdtDateTime) Then fractionalPartOfelapsedSeconds = this_getFractionalPartOfElapsedSeconds()
     End Property
     
     '***************************************************************************************************
@@ -118,7 +119,8 @@ Class clsCmCalendar
     '2023/10/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get serial()
-       serial = Cdbl(PdtDateTime) + this_getFractionalPartOfElapsedSeconds()
+       serial = Null
+       If Not IsNull(PdtDateTime) Then serial = Cdbl(PdtDateTime)
     End Property
     
     '***************************************************************************************************
@@ -380,6 +382,9 @@ Class clsCmCalendar
     Private Function this_formatAs( _
         byVal asFormat _
         )
+        this_formatAs = "<"&TypeName(Me)&">"&cf_toString(Null)
+        If IsNull(PdtDateTime) Then Exit Function
+
         Const Cl_USE_DATAPART = 0
         Const Cl_USE_FRACTIONAL_SECONDS = 1
         With new_Dic()
