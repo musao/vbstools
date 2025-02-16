@@ -136,7 +136,7 @@ Private Sub sub_GnrtPwGetParameters( _
     
     '文字の種類
     Dim oSetting, lSum, lType
-    Set oSetting = new_DicWith(Array("U", 1, "L", 2, "N", 4, "S", 8))
+    Set oSetting = new_DicOf(Array("U", 1, "L", 2, "N", 4, "S", 8))
     lSum = 0
     For Each oKey In oSetting.Keys
         If oArg.Item("Named").Exists(oKey) Then lSum = lSum + oSetting.Item(oKey)
@@ -144,7 +144,7 @@ Private Sub sub_GnrtPwGetParameters( _
     lType = lSum
     If lType = 0 And IsEmpty(vAdd) Then lType = 15
     
-    Dim oParam : Set oParam = new_DicWith(Array("Length", lLength, "Type", lType, "Additional", vAdd))
+    Dim oParam : Set oParam = new_DicOf(Array("Length", lLength, "Type", lType, "Additional", vAdd))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", oParam

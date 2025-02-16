@@ -27,7 +27,7 @@ Class clsCmCssGenerator
     '2023/10/25         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        Set PoTagInfo = new_DicWith(Array("selector", Empty, "property", Empty))
+        Set PoTagInfo = new_DicOf(Array("selector", Empty, "property", Empty))
     End Sub
     
     '***************************************************************************************************
@@ -128,7 +128,7 @@ Class clsCmCssGenerator
         byVal asKey _
         , byVal asValue _
         )
-        Dim oNewAttr : Set oNewAttr = new_DicWith(Array("key", asKey, "value", asValue))
+        Dim oNewAttr : Set oNewAttr = new_DicOf(Array("key", asKey, "value", asValue))
         Dim vArr : cf_bind vArr, PoTagInfo.Item("property")
         cf_push vArr, oNewAttr
         cf_bindAt PoTagInfo, "property", vArr

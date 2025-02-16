@@ -892,7 +892,7 @@ Class clsCmArray
         Next
         
         '作成した配列で当クラスのインスタンスを生成して返却
-        If this_hasElement(vRet) Then Set this_filter = new_ArrWith(vRet)
+        If this_hasElement(vRet) Then Set this_filter = new_ArrOf(vRet)
     End Function
 
     '***************************************************************************************************
@@ -1106,7 +1106,7 @@ Class clsCmArray
         Next
         
         '生成した配列で作成した新しいインスタンスを返す
-        If this_hasElement(vRet) Then Set this_map = new_ArrWith(vRet)
+        If this_hasElement(vRet) Then Set this_map = new_ArrOf(vRet)
     End Function
 
     '***************************************************************************************************
@@ -1303,7 +1303,7 @@ Class clsCmArray
         Next
         
         '配列の一部を切り出した配列で作成した新しいインスタンスを返す
-        If this_hasElement(vRet) Then Set this_slice = new_ArrWith(vRet)
+        If this_hasElement(vRet) Then Set this_slice = new_ArrOf(vRet)
     End Function
 
     '***************************************************************************************************
@@ -1747,7 +1747,7 @@ Class clsCmArray
             Next
 
             '配列から取り除いた要素で作成した新しいインスタンスを返す
-            If this_hasElement(vRet) Then Set this_splice = new_ArrWith(vRet)
+            If this_hasElement(vRet) Then Set this_splice = new_ArrOf(vRet)
         End If
         
         If this_hasElement(avArr) Then

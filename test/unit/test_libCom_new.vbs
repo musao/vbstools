@@ -57,11 +57,11 @@ Sub Test_new_ArrSplit
 End Sub
 
 '###################################################################################################
-'new_ArrWith()
-Sub Test_new_ArrWith_Array
+'new_ArrOf()
+Sub Test_new_ArrOf_Array
     Dim e : Set e = New clsCmArray
     Dim ev : ev = Array(1,Nothing,"ŽO")
-    Dim a : Set a = new_ArrWith(ev)
+    Dim a : Set a = new_ArrOf(ev)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
@@ -70,16 +70,16 @@ Sub Test_new_ArrWith_Array
     AssertSame ev(1), a(1)
     AssertEqual ev(2), a(2)
 End Sub
-Sub Test_new_ArrWith_Array_0
+Sub Test_new_ArrOf_Array_0
     Dim e : Set e = New clsCmArray
     Dim ev : ev = Array()
-    Dim a : Set a = new_ArrWith(ev)
+    Dim a : Set a = new_ArrOf(ev)
     
     AssertEqual 0, a.Length
 End Sub
-Sub Test_new_ArrWith_Variable
+Sub Test_new_ArrOf_Variable
     Dim ev : ev = "abc"
-    Dim a : Set a = new_ArrWith(ev)
+    Dim a : Set a = new_ArrOf(ev)
     
     AssertEqual 1, a.Length
     AssertEqual "abc", a(0)
@@ -158,26 +158,26 @@ Sub Test_new_Dic
 End Sub
 
 '###################################################################################################
-'new_DicWith()
-Sub Test_new_DicWith_Normal
+'new_DicOf()
+Sub Test_new_DicOf_Normal
     Dim e : Set e = CreateObject("Scripting.Dictionary")
-    Dim a : Set a = new_DicWith(Array(1,2,3))
+    Dim a : Set a = new_DicOf(Array(1,2,3))
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-Sub Test_new_DicWith_EvenNumber
+Sub Test_new_DicOf_EvenNumber
     Dim ev : ev = Array("first", "ˆê", "Second", Nothing, "3rd", 3)
-    Dim a : Set a = new_DicWith(ev)
+    Dim a : Set a = new_DicOf(ev)
     
     AssertEqual (Ubound(ev)+1)/2, a.Count
     AssertEqual ev(1), a.Item(ev(0))
     AssertSame ev(3), a.Item(ev(2))
     AssertEqual ev(5), a.Item(ev(4))
 End Sub
-Sub Test_new_DicWith_OddNumber
+Sub Test_new_DicOf_OddNumber
     Dim ev : ev = Array("first", "ˆê", "Second", Nothing, "3rd")
-    Dim a : Set a = new_DicWith(ev)
+    Dim a : Set a = new_DicOf(ev)
     
     AssertEqual Ubound(ev)/2+1, a.Count
     AssertEqual ev(1), a.Item(ev(0))

@@ -14,7 +14,7 @@
 '###################################################################################################
 Call new_Enum( _
     "topic" _
-    , new_DicWith( _
+    , new_DicOf( _
         Array( _
             "LOG", 1 _
         ) _
@@ -22,7 +22,7 @@ Call new_Enum( _
 )
 Call new_Enum( _
     "logType" _
-    , new_DicWith( _
+    , new_DicOf( _
         Array( _
             "ERROR", 1 _
             , "WARNING", 3 _
@@ -895,7 +895,7 @@ Private Sub fw_logger( _
     If cf_isSame("clsCmReadOnlyObject", TypeName(oType)) Then avParams(0) = oType.name
 
     With aoWriter
-        .WriteLine(new_ArrWith(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
+        .WriteLine(new_ArrOf(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
     End With
 
     Set oType = Nothing
@@ -1194,11 +1194,11 @@ Private Function new_ArrSplit( _
     byVal asTarget _
     , byVal asDelimiter _
     )
-    Set new_ArrSplit = new_ArrWith(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
+    Set new_ArrSplit = new_ArrOf(Split(asTarget, asDelimiter, -1, vbBinaryCompare))
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_ArrWith()
+'Function/Sub Name           : new_ArrOf()
 'Overview                    : インスタンス生成関数
 'Detailed Description        : 引数で指定した要素を含んだ同クラスのインスタンスを返す
 'Argument
@@ -1211,12 +1211,12 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/08         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_ArrWith( _
+Private Function new_ArrOf( _
     byRef avArr _
     )
     Dim oArr : Set oArr = new_Arr()
     oArr.pushA avArr
-    Set new_ArrWith = oArr
+    Set new_ArrOf = oArr
     Set oArr = Nothing
 End Function
 
@@ -1321,7 +1321,7 @@ Private Function new_Dic( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_DicWith()
+'Function/Sub Name           : new_DicOf()
 'Overview                    : Dictionaryオブジェクトを生成し初期値を設定する
 'Detailed Description        : 工事中
 'Argument
@@ -1335,7 +1335,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_DicWith( _
+Private Function new_DicOf( _
     byVal avParams _
     )
     Dim oDict, vItem, vKey, boIsKey
@@ -1353,7 +1353,7 @@ Private Function new_DicWith( _
         boIsKey = Not boIsKey
     Next
     
-    Set new_DicWith = oDict
+    Set new_DicOf = oDict
     Set oDict = Nothing
 End Function
 
@@ -2368,7 +2368,7 @@ Private Function util_getIpAddress( _
                  cf_bind oIpv6, oAddress
              End If
          Next
-         cf_push oRet, new_DicWith(Array("Caption", oAdapter.Caption, "Ip", new_DicWith(Array("V4", oIpv4, "V6", oIpv6))))
+         cf_push oRet, new_DicOf(Array("Caption", oAdapter.Caption, "Ip", new_DicOf(Array("V4", oIpv4, "V6", oIpv6))))
     Next
     util_getIpAddress = oRet
     
@@ -2484,7 +2484,7 @@ Private Function util_zip( _
     If new_Fso().FileExists(asDestination) Then Exit Function
 
     '圧縮するファイルのパスを連結
-    Dim sPath : sPath = new_ArrWith(asPath).map(new_Func("(e,i,a)=>fs_wrapInQuotes(util_escapeForPs(e))")).join(",")
+    Dim sPath : sPath = new_ArrOf(asPath).map(new_Func("(e,i,a)=>fs_wrapInQuotes(util_escapeForPs(e))")).join(",")
 
     'PowerShellのコマンドを作成
     Dim sCmd : sCmd = _

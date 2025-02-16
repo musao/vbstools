@@ -27,7 +27,7 @@ Class clsCmHtmlGenerator
     '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        Set PoTagInfo = new_DicWith(Array("element", Empty, "attribute", Empty, "content", Empty))
+        Set PoTagInfo = new_DicOf(Array("element", Empty, "attribute", Empty, "content", Empty))
     End Sub
     
     '***************************************************************************************************
@@ -170,7 +170,7 @@ Class clsCmHtmlGenerator
         byVal asKey _
         , byVal asValue _
         )
-        Dim oNewAttr : Set oNewAttr = new_DicWith(Array("key", asKey, "value", asValue))
+        Dim oNewAttr : Set oNewAttr = new_DicOf(Array("key", asKey, "value", asValue))
         Dim vArr : cf_bind vArr, PoTagInfo.Item("attribute")
         cf_push vArr, oNewAttr
         cf_bindAt PoTagInfo, "attribute", vArr

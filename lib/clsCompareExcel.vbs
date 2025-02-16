@@ -199,7 +199,7 @@ Class clsCompareExcel
         '★ログ出力
         sub_CmpExcelPublishLog logType.WARNING, sMyName, "Create a new workbook for comparison."
         
-        Dim oParams : Set oParams = new_DicWith(Array("WorkbookForResults", oWorkbookForResults))
+        Dim oParams : Set oParams = new_DicOf(Array("WorkbookForResults", oWorkbookForResults))
         
         '比較対象ファイルの全シートを比較結果用ワークブックにコピーする
         Call sub_CmpExcelCopyAllSheetsToWorkbookForResults(oParams)
@@ -331,7 +331,7 @@ Class clsCompareExcel
             'ワークシートのリネーム情報格納用配列（clsCmArray型）
             Dim oWorkSheetRenameInfo : Set oWorkSheetRenameInfo = new_Arr()
             'タブの色変換用ハッシュマップ定義
-            Dim oStringToThemeColor : Set oStringToThemeColor = new_DicWith(Array("From", 2, "To", 8))
+            Dim oStringToThemeColor : Set oStringToThemeColor = new_DicOf(Array("From", 2, "To", 8))
             
             Dim oWorksheet, sNewSheetName
             For Each oWorksheet In .Worksheets
@@ -350,7 +350,7 @@ Class clsCompareExcel
                     
                     'ワークシート名取得および変更する名称を決める
                     sNewSheetName = func_CmpExcelMakeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
-                    oWorkSheetRenameInfo.Push new_DicWith( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
+                    oWorkSheetRenameInfo.Push new_DicOf( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
                     '★ログ出力
                     sub_CmpExcelPublishLog logType.DETAIL, sMyName, "oWorkSheetRenameInfo = " & cf_toString(oWorkSheetRenameInfo)
                     
@@ -389,7 +389,7 @@ Class clsCompareExcel
         End If
 
         'サマリーシートのカラム位置変換用ハッシュマップ定義
-        Dim oStringToColumn : Set oStringToColumn = new_DicWith(Array("From", 1, "To", 2))
+        Dim oStringToColumn : Set oStringToColumn = new_DicOf(Array("From", 1, "To", 2))
         'サマリーシートに比較対象ファイルの情報を出力
         Dim lRow : Dim lColumn : Dim oItem
         lColumn = oStringToColumn.Item(asFromToString)

@@ -101,7 +101,7 @@ Private Sub sub_GetPathsGetParameters( _
     sub_GetPathsLogger Array(logType.DETAIL, "sub_GetPathsGetParameters", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
-    cf_bindAt aoParams, "Param", new_ArrWith(oArg.Item("Unnamed")).slice(0,vbNullString)
+    cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,vbNullString)
     
     Set oArg = Nothing
 End Sub

@@ -30,9 +30,9 @@ Class clsCmBufferedReader
         PlReadSize = 5000                 'デフォルトは5000バイト
         Set PoTextStream = Nothing
         Dim vArr : vArr = Array("line", Empty, "column", Empty, "atEndOfLine", Empty, "atEndOfStream", Empty)
-        Set PoOutbound = new_DicWith(vArr)
-        Set PoInbound = new_DicWith(vArr)
-        Set PoBuffer = new_DicWith(Array("buffer", Empty, "pointer", Empty, "length", Empty))
+        Set PoOutbound = new_DicOf(vArr)
+        Set PoInbound = new_DicOf(vArr)
+        Set PoBuffer = new_DicOf(Array("buffer", Empty, "pointer", Empty, "length", Empty))
     End Sub
     
     '***************************************************************************************************
@@ -562,7 +562,7 @@ Class clsCmBufferedReader
         )
         With PoTextStream
             'インバウンドの状態を取得する
-            Set PoInbound = new_DicWith(Array("line", .Line, "column", .Column, "atEndOfLine", .AtEndOfLine, "atEndOfStream", .AtEndOfStream))
+            Set PoInbound = new_DicOf(Array("line", .Line, "column", .Column, "atEndOfLine", .AtEndOfLine, "atEndOfStream", .AtEndOfStream))
         End With
     End Sub
     
@@ -615,7 +615,7 @@ Class clsCmBufferedReader
         'インバウンドの状態をアウトバウンドにコピーする
         this_copyInboundStateToOutbound
         'ポインタの初期化
-        Set PoBuffer = new_DicWith(Array("pointer", 1, "buffer", "", "length", 0))
+        Set PoBuffer = new_DicOf(Array("pointer", 1, "buffer", "", "length", 0))
     End Sub
 
     '***************************************************************************************************

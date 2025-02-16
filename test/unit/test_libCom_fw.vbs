@@ -304,7 +304,7 @@ Sub Test_fw_storeErr_NoErr
     AssertEqualWithMessage v, a.Item(k), k
 End Sub
 Sub Test_fw_storeErr_Err
-    Dim e : Set e = new_DicWith(Array("Number", 1234, "Description", "Val_Description", "Source", "Val_Source"))
+    Dim e : Set e = new_DicOf(Array("Number", 1234, "Description", "Val_Description", "Source", "Val_Source"))
     On Error Resume Next
     Err.Raise e.Item("Number"), e.Item("Source"), e.Item("Description")
     dim a : Set a = fw_storeErr()

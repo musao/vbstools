@@ -32,9 +32,9 @@ Class clsCmBufferedWriter
         PdbWriteIntervalTime = 0                 'デフォルトは0秒
         
         Dim vArr : vArr = Array("line", Empty, "column", Empty)
-        Set PoOutbound = new_DicWith(vArr)
-        Set PoInbound = new_DicWith(vArr)
-        Set PoBuffer = new_DicWith(Array("buffer", Empty, "length", Empty, "lastWriteTime", Empty, "firstRequestTime", Empty))
+        Set PoOutbound = new_DicOf(vArr)
+        Set PoInbound = new_DicOf(vArr)
+        Set PoBuffer = new_DicOf(Array("buffer", Empty, "length", Empty, "lastWriteTime", Empty, "firstRequestTime", Empty))
     End Sub
     
     '***************************************************************************************************
@@ -252,7 +252,7 @@ Class clsCmBufferedWriter
         'Inbound、Outboundを最新化する
         this_updateStatus
         'バッファの初期化
-        Set PoBuffer = new_DicWith(Array("buffer", "", "length", 0, "lastWriteTime", Empty, "firstRequestTime", Empty))
+        Set PoBuffer = new_DicOf(Array("buffer", "", "length", 0, "lastWriteTime", Empty, "firstRequestTime", Empty))
     End Function
     
     '***************************************************************************************************
@@ -572,7 +572,7 @@ Class clsCmBufferedWriter
         )
         With PoTextStream
             'インバウンドの状態を取得する
-            Set PoInbound = new_DicWith(Array("line", .Line, "column", .Column))
+            Set PoInbound = new_DicOf(Array("line", .Line, "column", .Column))
         End With
     End Sub
     

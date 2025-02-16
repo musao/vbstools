@@ -74,32 +74,32 @@ End Sub
 Sub Test_cf_isInteger
     Dim data
     data = Array( _
-        new_DicWith(Array(  "Data", Empty                , "Expect", False)) _
-        , new_DicWith(Array("Data", Null                 , "Expect", False)) _
-        , new_DicWith(Array("Data", new_Dic()            , "Expect", False)) _
-        , new_DicWith(Array("Data", Array()              , "Expect", False)) _
-        , new_DicWith(Array("Data", CInt(1)              , "Expect", True )) _
-        , new_DicWith(Array("Data", CLng(999999)         , "Expect", True )) _
-        , new_DicWith(Array("Data", CInt(-1)             , "Expect", True )) _
-        , new_DicWith(Array("Data", CLng(-999999)        , "Expect", True )) _
-        , new_DicWith(Array("Data", CInt(0)              , "Expect", True )) _
-        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", False)) _
-        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", False)) _
-        , new_DicWith(Array("Data", CSng(-10.1)          , "Expect", False)) _
-        , new_DicWith(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
-        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", False)) _
-        , new_DicWith(Array("Data", True                 , "Expect", False)) _
-        , new_DicWith(Array("Data", CByte(0)             , "Expect", False)) _
-        , new_DicWith(Array("Data", vbNullString         , "Expect", False)) _
-        , new_DicWith(Array("Data", "abc"                , "Expect", False)) _
-        , new_DicWith(Array("Data", "1.2"                , "Expect", False)) _
-        , new_DicWith(Array("Data", "-1.2"               , "Expect", False)) _
-        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", False)) _
-        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", False)) _
-        , new_DicWith(Array("Data", "ÇTÇO"               , "Expect", True )) _
-        , new_DicWith(Array("Data", "Å|ÇTÇO"             , "Expect", True )) _
-        , new_DicWith(Array("Data", "ÇO"                 , "Expect", True )) _
-        , new_DicWith(Array("Data", "äøéö"               , "Expect", False)) _
+        new_DicOf(Array(  "Data", Empty                , "Expect", False)) _
+        , new_DicOf(Array("Data", Null                 , "Expect", False)) _
+        , new_DicOf(Array("Data", new_Dic()            , "Expect", False)) _
+        , new_DicOf(Array("Data", Array()              , "Expect", False)) _
+        , new_DicOf(Array("Data", CInt(1)              , "Expect", True )) _
+        , new_DicOf(Array("Data", CLng(999999)         , "Expect", True )) _
+        , new_DicOf(Array("Data", CInt(-1)             , "Expect", True )) _
+        , new_DicOf(Array("Data", CLng(-999999)        , "Expect", True )) _
+        , new_DicOf(Array("Data", CInt(0)              , "Expect", True )) _
+        , new_DicOf(Array("Data", CSng(10.1)           , "Expect", False)) _
+        , new_DicOf(Array("Data", CDbl(1234.567890123) , "Expect", False)) _
+        , new_DicOf(Array("Data", CSng(-10.1)          , "Expect", False)) _
+        , new_DicOf(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
+        , new_DicOf(Array("Data", CCur("\1,000")       , "Expect", False)) _
+        , new_DicOf(Array("Data", True                 , "Expect", False)) _
+        , new_DicOf(Array("Data", CByte(0)             , "Expect", False)) _
+        , new_DicOf(Array("Data", vbNullString         , "Expect", False)) _
+        , new_DicOf(Array("Data", "abc"                , "Expect", False)) _
+        , new_DicOf(Array("Data", "1.2"                , "Expect", False)) _
+        , new_DicOf(Array("Data", "-1.2"               , "Expect", False)) _
+        , new_DicOf(Array("Data", "192.168.11.52"      , "Expect", False)) _
+        , new_DicOf(Array("Data", "2024/01/03"         , "Expect", False)) _
+        , new_DicOf(Array("Data", "ÇTÇO"               , "Expect", True )) _
+        , new_DicOf(Array("Data", "Å|ÇTÇO"             , "Expect", True )) _
+        , new_DicOf(Array("Data", "ÇO"                 , "Expect", True )) _
+        , new_DicOf(Array("Data", "äøéö"               , "Expect", False)) _
         )
     
     Dim ub : ub = Ubound(data)
@@ -117,32 +117,32 @@ End Sub
 Sub Test_cf_isNonNegativeNumber
     Dim data
     data = Array( _
-        new_DicWith(Array(  "Data", Empty                , "Expect", False)) _
-        , new_DicWith(Array("Data", Null                 , "Expect", False)) _
-        , new_DicWith(Array("Data", new_Dic()            , "Expect", False)) _
-        , new_DicWith(Array("Data", Array()              , "Expect", False)) _
-        , new_DicWith(Array("Data", CInt(1)              , "Expect", True )) _
-        , new_DicWith(Array("Data", CLng(999999)         , "Expect", True )) _
-        , new_DicWith(Array("Data", CInt(-1)             , "Expect", False)) _
-        , new_DicWith(Array("Data", CLng(-999999)        , "Expect", False)) _
-        , new_DicWith(Array("Data", CInt(0)              , "Expect", True )) _
-        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", True )) _
-        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", True )) _
-        , new_DicWith(Array("Data", CSng(-10.1)          , "Expect", False)) _
-        , new_DicWith(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
-        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", False)) _
-        , new_DicWith(Array("Data", True                 , "Expect", False)) _
-        , new_DicWith(Array("Data", CByte(0)             , "Expect", False)) _
-        , new_DicWith(Array("Data", vbNullString         , "Expect", False)) _
-        , new_DicWith(Array("Data", "abc"                , "Expect", False)) _
-        , new_DicWith(Array("Data", "1.2"                , "Expect", True )) _
-        , new_DicWith(Array("Data", "-1.2"               , "Expect", False)) _
-        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", False)) _
-        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", False)) _
-        , new_DicWith(Array("Data", "ÇTÇO"               , "Expect", True )) _
-        , new_DicWith(Array("Data", "Å|ÇTÇO"             , "Expect", False)) _
-        , new_DicWith(Array("Data", "ÇO"                 , "Expect", True )) _
-        , new_DicWith(Array("Data", "äøéö"               , "Expect", False)) _
+        new_DicOf(Array(  "Data", Empty                , "Expect", False)) _
+        , new_DicOf(Array("Data", Null                 , "Expect", False)) _
+        , new_DicOf(Array("Data", new_Dic()            , "Expect", False)) _
+        , new_DicOf(Array("Data", Array()              , "Expect", False)) _
+        , new_DicOf(Array("Data", CInt(1)              , "Expect", True )) _
+        , new_DicOf(Array("Data", CLng(999999)         , "Expect", True )) _
+        , new_DicOf(Array("Data", CInt(-1)             , "Expect", False)) _
+        , new_DicOf(Array("Data", CLng(-999999)        , "Expect", False)) _
+        , new_DicOf(Array("Data", CInt(0)              , "Expect", True )) _
+        , new_DicOf(Array("Data", CSng(10.1)           , "Expect", True )) _
+        , new_DicOf(Array("Data", CDbl(1234.567890123) , "Expect", True )) _
+        , new_DicOf(Array("Data", CSng(-10.1)          , "Expect", False)) _
+        , new_DicOf(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
+        , new_DicOf(Array("Data", CCur("\1,000")       , "Expect", False)) _
+        , new_DicOf(Array("Data", True                 , "Expect", False)) _
+        , new_DicOf(Array("Data", CByte(0)             , "Expect", False)) _
+        , new_DicOf(Array("Data", vbNullString         , "Expect", False)) _
+        , new_DicOf(Array("Data", "abc"                , "Expect", False)) _
+        , new_DicOf(Array("Data", "1.2"                , "Expect", True )) _
+        , new_DicOf(Array("Data", "-1.2"               , "Expect", False)) _
+        , new_DicOf(Array("Data", "192.168.11.52"      , "Expect", False)) _
+        , new_DicOf(Array("Data", "2024/01/03"         , "Expect", False)) _
+        , new_DicOf(Array("Data", "ÇTÇO"               , "Expect", True )) _
+        , new_DicOf(Array("Data", "Å|ÇTÇO"             , "Expect", False)) _
+        , new_DicOf(Array("Data", "ÇO"                 , "Expect", True )) _
+        , new_DicOf(Array("Data", "äøéö"               , "Expect", False)) _
         )
     
     Dim ub : ub = Ubound(data)
@@ -160,24 +160,24 @@ End Sub
 Sub Test_cf_isNumeric
     Dim data
     data = Array( _
-        new_DicWith(Array(  "Data", Empty                , "Expect", False)) _
-        , new_DicWith(Array("Data", Null                 , "Expect", False)) _
-        , new_DicWith(Array("Data", new_Dic()            , "Expect", False)) _
-        , new_DicWith(Array("Data", Array()              , "Expect", False)) _
-        , new_DicWith(Array("Data", CInt(1)              , "Expect", True )) _
-        , new_DicWith(Array("Data", CLng(999999)         , "Expect", True )) _
-        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", True )) _
-        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", True )) _
-        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", False)) _
-        , new_DicWith(Array("Data", True                 , "Expect", False)) _
-        , new_DicWith(Array("Data", CByte(0)             , "Expect", False)) _
-        , new_DicWith(Array("Data", vbNullString         , "Expect", False)) _
-        , new_DicWith(Array("Data", "abc"                , "Expect", False)) _
-        , new_DicWith(Array("Data", "1.2"                , "Expect", True)) _
-        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", False)) _
-        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", False)) _
-        , new_DicWith(Array("Data", "ÇTÇO"               , "Expect", True)) _
-        , new_DicWith(Array("Data", "äøéö"               , "Expect", False)) _
+        new_DicOf(Array(  "Data", Empty                , "Expect", False)) _
+        , new_DicOf(Array("Data", Null                 , "Expect", False)) _
+        , new_DicOf(Array("Data", new_Dic()            , "Expect", False)) _
+        , new_DicOf(Array("Data", Array()              , "Expect", False)) _
+        , new_DicOf(Array("Data", CInt(1)              , "Expect", True )) _
+        , new_DicOf(Array("Data", CLng(999999)         , "Expect", True )) _
+        , new_DicOf(Array("Data", CSng(10.1)           , "Expect", True )) _
+        , new_DicOf(Array("Data", CDbl(1234.567890123) , "Expect", True )) _
+        , new_DicOf(Array("Data", CCur("\1,000")       , "Expect", False)) _
+        , new_DicOf(Array("Data", True                 , "Expect", False)) _
+        , new_DicOf(Array("Data", CByte(0)             , "Expect", False)) _
+        , new_DicOf(Array("Data", vbNullString         , "Expect", False)) _
+        , new_DicOf(Array("Data", "abc"                , "Expect", False)) _
+        , new_DicOf(Array("Data", "1.2"                , "Expect", True)) _
+        , new_DicOf(Array("Data", "192.168.11.52"      , "Expect", False)) _
+        , new_DicOf(Array("Data", "2024/01/03"         , "Expect", False)) _
+        , new_DicOf(Array("Data", "ÇTÇO"               , "Expect", True)) _
+        , new_DicOf(Array("Data", "äøéö"               , "Expect", False)) _
         )
     
     Dim ub : ub = Ubound(data)
@@ -195,32 +195,32 @@ End Sub
 Sub Test_cf_isPositiveInteger
     Dim data
     data = Array( _
-        new_DicWith(Array(  "Data", Empty                , "Expect", False)) _
-        , new_DicWith(Array("Data", Null                 , "Expect", False)) _
-        , new_DicWith(Array("Data", new_Dic()            , "Expect", False)) _
-        , new_DicWith(Array("Data", Array()              , "Expect", False)) _
-        , new_DicWith(Array("Data", CInt(1)              , "Expect", True )) _
-        , new_DicWith(Array("Data", CLng(999999)         , "Expect", True )) _
-        , new_DicWith(Array("Data", CInt(-1)             , "Expect", False)) _
-        , new_DicWith(Array("Data", CLng(-999999)        , "Expect", False)) _
-        , new_DicWith(Array("Data", CInt(0)              , "Expect", False)) _
-        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", False)) _
-        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", False)) _
-        , new_DicWith(Array("Data", CSng(-10.1)          , "Expect", False)) _
-        , new_DicWith(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
-        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", False)) _
-        , new_DicWith(Array("Data", True                 , "Expect", False)) _
-        , new_DicWith(Array("Data", CByte(0)             , "Expect", False)) _
-        , new_DicWith(Array("Data", vbNullString         , "Expect", False)) _
-        , new_DicWith(Array("Data", "abc"                , "Expect", False)) _
-        , new_DicWith(Array("Data", "1.2"                , "Expect", False)) _
-        , new_DicWith(Array("Data", "-1.2"               , "Expect", False)) _
-        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", False)) _
-        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", False)) _
-        , new_DicWith(Array("Data", "ÇTÇO"               , "Expect", True )) _
-        , new_DicWith(Array("Data", "Å|ÇTÇO"             , "Expect", False)) _
-        , new_DicWith(Array("Data", "ÇO"                 , "Expect", False)) _
-        , new_DicWith(Array("Data", "äøéö"               , "Expect", False)) _
+        new_DicOf(Array(  "Data", Empty                , "Expect", False)) _
+        , new_DicOf(Array("Data", Null                 , "Expect", False)) _
+        , new_DicOf(Array("Data", new_Dic()            , "Expect", False)) _
+        , new_DicOf(Array("Data", Array()              , "Expect", False)) _
+        , new_DicOf(Array("Data", CInt(1)              , "Expect", True )) _
+        , new_DicOf(Array("Data", CLng(999999)         , "Expect", True )) _
+        , new_DicOf(Array("Data", CInt(-1)             , "Expect", False)) _
+        , new_DicOf(Array("Data", CLng(-999999)        , "Expect", False)) _
+        , new_DicOf(Array("Data", CInt(0)              , "Expect", False)) _
+        , new_DicOf(Array("Data", CSng(10.1)           , "Expect", False)) _
+        , new_DicOf(Array("Data", CDbl(1234.567890123) , "Expect", False)) _
+        , new_DicOf(Array("Data", CSng(-10.1)          , "Expect", False)) _
+        , new_DicOf(Array("Data", CDbl(-1234.567890123), "Expect", False)) _
+        , new_DicOf(Array("Data", CCur("\1,000")       , "Expect", False)) _
+        , new_DicOf(Array("Data", True                 , "Expect", False)) _
+        , new_DicOf(Array("Data", CByte(0)             , "Expect", False)) _
+        , new_DicOf(Array("Data", vbNullString         , "Expect", False)) _
+        , new_DicOf(Array("Data", "abc"                , "Expect", False)) _
+        , new_DicOf(Array("Data", "1.2"                , "Expect", False)) _
+        , new_DicOf(Array("Data", "-1.2"               , "Expect", False)) _
+        , new_DicOf(Array("Data", "192.168.11.52"      , "Expect", False)) _
+        , new_DicOf(Array("Data", "2024/01/03"         , "Expect", False)) _
+        , new_DicOf(Array("Data", "ÇTÇO"               , "Expect", True )) _
+        , new_DicOf(Array("Data", "Å|ÇTÇO"             , "Expect", False)) _
+        , new_DicOf(Array("Data", "ÇO"                 , "Expect", False)) _
+        , new_DicOf(Array("Data", "äøéö"               , "Expect", False)) _
         )
     
     Dim ub : ub = Ubound(data)
@@ -564,7 +564,7 @@ Sub Test_cf_toString_String_ContainsDoubleQuotes
 End Sub
 Sub Test_cf_toString_Object_Dictionary
     Dim a,d,e
-    Set d = new_DicWith(Array("foo","apple","bar",5))
+    Set d = new_DicOf(Array("foo","apple","bar",5))
     e = "<Dictionary>{<String>" & Chr(34) & "foo" & Chr(34) & "=><String>" & Chr(34) & "apple" & Chr(34) & ",<String>" & Chr(34) & "bar" & Chr(34) & "=><Integer>5}"
     a = cf_toString(d)
     AssertEqual e,a
@@ -599,7 +599,7 @@ Sub Test_cf_toString_Object_Other_UserDef
 End Sub
 Sub Test_cf_toString_Object_Other_UserDef_Special
     Dim a,d,e
-    Set d = new_DicWith(Array("__Special__", "Test", "Key", "Value"))
+    Set d = new_DicOf(Array("__Special__", "Test", "Key", "Value"))
     e = "<Test>{<String>" & Chr(34) & "Key" & Chr(34) & "=><String>" & Chr(34) & "Value" & Chr(34) & "}"
     a = cf_toString(d)
     AssertEqual e,a
@@ -620,7 +620,7 @@ Sub Test_cf_toString_Byte
 End Sub
 Sub Test_cf_toString_Array
     Dim a,d,e
-    d = Array(1,"a",Array("éQ",4),new_DicWith(Array("áX",6,7,"ÇW")))
+    d = Array(1,"a",Array("éQ",4),new_DicOf(Array("áX",6,7,"ÇW")))
     e = "<Array>[<Integer>1,<String>" & Chr(34) & "a" & Chr(34) & ",<Array>[<String>" & Chr(34) & "éQ" & Chr(34) & ",<Integer>4],<Dictionary>{<String>" & Chr(34) & "áX" & Chr(34) & "=><Integer>6,<Integer>7=><String>" & Chr(34) & "ÇW" & Chr(34) & "}]"
     a = cf_toString(d)
     AssertEqual e,a

@@ -27,24 +27,24 @@ End Sub
 Sub Test_clsCmReturnValue_returnValue
     Dim data
     data = Array( _
-        new_DicWith(Array(  "Data", Empty                , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", Null                 , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", new_Dic()            , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", Array("a",2)         , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", CInt(1)              , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", CLng(999999)         , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", CSng(10.1)           , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", CDbl(1234.567890123) , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", CCur("\1,000")       , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", True                 , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", CByte(0)             , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", vbNullString         , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", "abc"                , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", "1.2"                , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", "192.168.11.52"      , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", "2024/01/03"         , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", "‚T‚O"               , "Expect", "EqualData")) _
-        , new_DicWith(Array("Data", "Š¿Žš"               , "Expect", "EqualData")) _
+        new_DicOf(Array(  "Data", Empty                , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", Null                 , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", new_Dic()            , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", Array("a",2)         , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", CInt(1)              , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", CLng(999999)         , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", CSng(10.1)           , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", CDbl(1234.567890123) , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", CCur("\1,000")       , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", True                 , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", CByte(0)             , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", vbNullString         , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", "abc"                , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", "1.2"                , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", "192.168.11.52"      , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", "2024/01/03"         , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", "‚T‚O"               , "Expect", "EqualData")) _
+        , new_DicOf(Array("Data", "Š¿Žš"               , "Expect", "EqualData")) _
         )
     Dim o : Set o = new clsCmReturnValue
     

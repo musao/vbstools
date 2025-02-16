@@ -273,7 +273,7 @@ msgbox"ok"
 wscript.quit
 
 
-dim sdg : Set sdg=new_ArrWith(Array(1,2,3))
+dim sdg : Set sdg=new_ArrOf(Array(1,2,3))
 
 inputbox "","",vbNullString
 
@@ -443,7 +443,7 @@ wscript.quit
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2\jis_ins.vbs"
 'Dim stPath : stPath = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f2"
 DIm ret : ret = func_GetFileInfoProcGetFilesRecursionByShell(stPath)
-inputbox "","",cf_toString(new_ArrWith(ret).map(new_Func("(e,i,a)=>e.Parent.Self.Path")))
+inputbox "","",cf_toString(new_ArrOf(ret).map(new_Func("(e,i,a)=>e.Parent.Self.Path")))
 
 
 Private Function func_GetFileInfoProcGetFilesRecursionByShell( _
@@ -724,7 +724,7 @@ wscript.quit
 dim arr5
 
 ''Test Concat()
-'Set arr5 = new_ArrWith(Array(1,2,3,4,5,6))
+'Set arr5 = new_ArrOf(Array(1,2,3,4,5,6))
 'Call msgbox(cf_toString(arr5))
 'Call msgbox(cf_toString(arr5.Concat(Array("a",9))))
 
@@ -738,7 +738,7 @@ dim arr5
 'private function EveryTestNg2(arg, i, a)
 '    EveryTestNg2 = (arg < 0)
 'end function
-'Set arr5 = new_ArrWith(Array(1,2,3))
+'Set arr5 = new_ArrOf(Array(1,2,3))
 'Call msgbox(cf_toString(arr5))
 'Call msgbox( arr5.Every(getref("EveryTestOk")) )     'True
 'Call msgbox( arr5.Every(getref("EveryTestNg")) )     'False
@@ -759,7 +759,7 @@ dim arr5
 
 
 ''Test Filter()
-'Set arr5 = new_ArrWith(Array(1,2,3))
+'Set arr5 = new_ArrOf(Array(1,2,3))
 'Call msgbox(cf_toString(arr5))                                       '[1,2,3]
 'Call msgbox( cf_toString(arr5.Filter(new_Func("(e,i,a)=>(e>1)"))) )  '[2,3]
 
@@ -769,16 +769,16 @@ dim arr5
 '    Call msgbox(cf_toString(i))
 '    Call msgbox(cf_toString(a))
 'end function
-'Set arr5 = new_ArrWith(Array(8, "Z"))
+'Set arr5 = new_ArrOf(Array(8, "Z"))
 'Call msgbox(cf_toString(arr5))
 'arr5.ForEach getref("ForEachTest")
 
 ''Test IndexOf()
-'Dim IndexOfTest : Set IndexOfTest = new_DicWith(Array(4, "five"))
+'Dim IndexOfTest : Set IndexOfTest = new_DicOf(Array(4, "five"))
 'Set arr5 = new_Arr()
 'Call msgbox( arr5.IndexOf("a") )          '-1
 'Set arr5 = Nothing
-'Set arr5 = new_ArrWith(Array("a", 2, 3.14, IndexOfTest, "End"))
+'Set arr5 = new_ArrOf(Array("a", 2, 3.14, IndexOfTest, "End"))
 'Call msgbox(cf_toString(arr5))
 'Call msgbox( arr5.IndexOf("a") )          '0
 'Call msgbox( arr5.IndexOf(IndexOfTest) )  '3
@@ -787,7 +787,7 @@ dim arr5
 'Call msgbox( arr5.IndexOf("2") )          '-1
 
 ''Test joinvbs()
-'Set arr5 = new_ArrWith(Array(1, 2, 3.14, "Testing"))
+'Set arr5 = new_ArrOf(Array(1, 2, 3.14, "Testing"))
 'Call msgbox(cf_toString(arr5))         '[1,2,3.14,"Testing"]
 'Call msgbox( arr5.joinvbs("") )             '"123.14Testing"
 'Call msgbox( arr5.joinvbs("+") )            '"1+2+3.14+Testing"
@@ -795,11 +795,11 @@ dim arr5
 'Call msgbox( arr5.Joinvbs("+") )            '"1+2+3.14+Testing"
 
 ''Test LastIndexOf()
-'Dim LastIndexOfTest : Set LastIndexOfTest = new_DicWith(Array(4, "five"))
+'Dim LastIndexOfTest : Set LastIndexOfTest = new_DicOf(Array(4, "five"))
 'Set arr5 = new_Arr()
 'Call msgbox( arr5.LastIndexOf(LastIndexOfTest) )  '-1
 'Set arr5 = Nothing
-'Set arr5 = new_ArrWith(Array("a", 2, 3.14, LastIndexOfTest, "End"))
+'Set arr5 = new_ArrOf(Array("a", 2, 3.14, LastIndexOfTest, "End"))
 'Call msgbox(cf_toString(arr5))
 'Call msgbox( arr5.LastIndexOf("a") )          '0
 'Call msgbox( arr5.LastIndexOf(LastIndexOfTest) )  '3
@@ -811,13 +811,13 @@ dim arr5
 'Set arr5 = new_Arr()
 'Call msgbox( cf_toString(arr5) & vbNewLine & arr5.Length )  '<clsCmArray> 0
 'Set arr5 = Nothing
-'Set arr5 = new_ArrWith(Array("1", 2))
+'Set arr5 = new_ArrOf(Array("1", 2))
 'Call msgbox( cf_toString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 'arr5.Concat Array(3, "Four")
 'Call msgbox( cf_toString(arr5) & vbNewLine & arr5.Length )  '["1",2] 2
 'arr5.Push Array("th", "ree")
 'Call msgbox( cf_toString(arr5) & vbNewLine & arr5.Length )  '["1",2,["th","ree"]] 3
-'arr5.Unshift new_DicWith(Array(4, "四"))
+'arr5.Unshift new_DicOf(Array(4, "四"))
 'Call msgbox( cf_toString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2,["th","ree"]] 4
 'Call msgbox( cf_toString(arr5.Pop) )                        '["th","ree"]
 'Call msgbox( cf_toString(arr5) & vbNewLine & arr5.Length )  '[{4=>"四"},"1",2] 3
@@ -828,7 +828,7 @@ dim arr5
 'private function MapTest(arg, i, a)
 '    MapTest = arg*arg
 'end function
-'Set arr5 = new_ArrWith(Array(1,2,3))
+'Set arr5 = new_ArrOf(Array(1,2,3))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( cf_toString(arr5.Map(getref("MapTest"))) )
 
@@ -836,7 +836,7 @@ dim arr5
 'private function ReduceTest(prev, current, i, a)
 '    ReduceTest = prev*current
 'end function
-'Set arr5 = new_ArrWith(Array(1,2,3,4))
+'Set arr5 = new_ArrOf(Array(1,2,3,4))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( arr5.Reduce(getref("ReduceTest")) )
 
@@ -844,31 +844,31 @@ dim arr5
 'private function ReduceRightTest(prev, current, i, a)
 '    ReduceRightTest = prev/current
 'end function
-'Set arr5 = new_ArrWith(Array(2,10,60))
+'Set arr5 = new_ArrOf(Array(2,10,60))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( arr5.ReduceRight(getref("ReduceRightTest")) )
 
 ''Test Reverse()
-'Set arr5 = new_ArrWith(Array(1,2,3))
+'Set arr5 = new_ArrOf(Array(1,2,3))
 'Call msgbox( cf_toString(arr5) )                  '[1.2.3]
 'arr5.Reverse
 'Call msgbox( cf_toString(arr5) )                  '[3,2,1]
 
 ''Test Slice()
-'Set arr5 = new_ArrWith(Array(1,2,3,4,5))
+'Set arr5 = new_ArrOf(Array(1,2,3,4,5))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( cf_toString(arr5.Slice(0,3)) )               '[1.2.3]
 'Call msgbox( cf_toString(arr5.Slice(3, vbNullString)) )   '[4,5]
 'Call msgbox( cf_toString(arr5.Slice(1, -1)) )             '[2,3,4]
 'Call msgbox( cf_toString(arr5.Slice(-3, -2)) )            '[3]
 'Call msgbox( cf_toString(arr5.Slice(-3, -3)) )            '<clsCmArray>
-'Set arr5 = new_ArrWith(Array(1))
+'Set arr5 = new_ArrOf(Array(1))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( cf_toString(arr5.Slice(0,2)) )               '[1]
 
 
 ''Test sort()
-'Set arr5 = new_ArrWith(Array(5,2,9,6,4,8,7,3,0,1))
+'Set arr5 = new_ArrOf(Array(5,2,9,6,4,8,7,3,0,1))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( cf_toString(arr5.sort(True)) )
 'Call msgbox( cf_toString(arr5.sort(False)) )
@@ -877,13 +877,13 @@ dim arr5
 'private function ArraySortTest(x,y)
 '    ArraySortTest = (x > y)
 'end function
-'Set arr5 = new_ArrWith(Array(5,2,9,6,4,8,7,3,0,1))
+'Set arr5 = new_ArrOf(Array(5,2,9,6,4,8,7,3,0,1))
 'Call msgbox( cf_toString(arr5) )
 'Call msgbox( cf_toString(arr5.sortUsing(getref("ArraySortTest"))) )
 'Call msgbox( cf_toString(arr5.sortUsing(new_Func("(x,y) => (x>y)"))) )
 
 ''Test Splice()
-'Set arr5 = new_ArrWith(Array(1,2,3,4,5,6,7,8))
+'Set arr5 = new_ArrOf(Array(1,2,3,4,5,6,7,8))
 'Call msgbox( cf_toString(arr5) )                          '[1,2,3,4,5,6,7,8]
 'Call msgbox( cf_toString(arr5.splice(1,2,Nothing)) )      '[2,3]
 'Call msgbox( cf_toString(arr5) )                          '[1,4,5,6,7,8]
@@ -924,7 +924,7 @@ end function
 
 
 'dim arr2 : Set arr2 = new_Arr()
-dim arr2 : Set arr2 = new_ArrWith(Array(1,2,3,4,5,6))
+dim arr2 : Set arr2 = new_ArrOf(Array(1,2,3,4,5,6))
 Call msgbox(cf_toString(arr2.items))
 
 'Call Msgbox(arr2.Length)

@@ -212,12 +212,12 @@ Sub Test_clsCmHtmlGenerator_generate_EntityReference
     Dim ao,a,d,dc,e,i
     
     d = Array( _
-        new_DicWith(Array(  "No",1 ,"Cont","'fuga"   ,"Expected","&#39;fuga")) _
-        , new_DicWith(Array("No",2 ,"Cont","fu""ga"   ,"Expected","fu&quot;ga")) _
-        , new_DicWith(Array("No",3 ,"Cont","fuga&"   ,"Expected","fuga&amp;")) _
-        , new_DicWith(Array("No",4 ,"Cont","<fuga"   ,"Expected","&lt;fuga")) _
-        , new_DicWith(Array("No",5 ,"Cont","fuga>"   ,"Expected","fuga&gt;")) _
-        , new_DicWith(Array("No",6 ,"Cont","<'fu""ga&>"   ,"Expected","&lt;&#39;fu&quot;ga&amp;&gt;")) _
+        new_DicOf(Array(  "No",1 ,"Cont","'fuga"   ,"Expected","&#39;fuga")) _
+        , new_DicOf(Array("No",2 ,"Cont","fu""ga"   ,"Expected","fu&quot;ga")) _
+        , new_DicOf(Array("No",3 ,"Cont","fuga&"   ,"Expected","fuga&amp;")) _
+        , new_DicOf(Array("No",4 ,"Cont","<fuga"   ,"Expected","&lt;fuga")) _
+        , new_DicOf(Array("No",5 ,"Cont","fuga>"   ,"Expected","fuga&gt;")) _
+        , new_DicOf(Array("No",6 ,"Cont","<'fu""ga&>"   ,"Expected","&lt;&#39;fu&quot;ga&amp;&gt;")) _
         )
     
     For Each i In d

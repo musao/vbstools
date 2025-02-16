@@ -51,12 +51,12 @@ End Sub
 Sub Test_clsCmCalendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_elapsedSeconds_Null
     dim tg,a,ao,e,d,i,data
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"date", Now()               )) _
-            , new_DicWith(Array("No",2 ,"date", Date()              )) _
-            , new_DicWith(Array("No",3 ,"date", Time()              )) _
-            , new_DicWith(Array("No",4 ,"date", "2025/2/12 11:22:33")) _
-            , new_DicWith(Array("No",5 ,"date", "2025/12/31"        )) _
-            , new_DicWith(Array("No",6 ,"date", "12:34:56"          )) _
+            new_DicOf(Array(  "No",1 ,"date", Now()               )) _
+            , new_DicOf(Array("No",2 ,"date", Date()              )) _
+            , new_DicOf(Array("No",3 ,"date", Time()              )) _
+            , new_DicOf(Array("No",4 ,"date", "2025/2/12 11:22:33")) _
+            , new_DicOf(Array("No",5 ,"date", "2025/12/31"        )) _
+            , new_DicOf(Array("No",6 ,"date", "12:34:56"          )) _
             )
 
     For Each i In d
@@ -87,12 +87,12 @@ End Sub
 Sub Test_clsCmCalendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_elapsedSeconds_NotNull
     dim tg,a,ao,e,d,i,data
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"date", Now()               , "elapsed", Timer()                 )) _
-            , new_DicWith(Array("No",2 ,"date", Date()              , "elapsed", "Cal"                   )) _
-            , new_DicWith(Array("No",3 ,"date", Time()              , "elapsed", "Cal"                   )) _
-            , new_DicWith(Array("No",4 ,"date", "2025/2/12 11:22:33", "elapsed", 11*60*60+22*60+33+0.2345)) _
-            , new_DicWith(Array("No",5 ,"date", "2025/12/31"        , "elapsed", 0.8901234               )) _
-            , new_DicWith(Array("No",6 ,"date", "12:34:56"          , "elapsed", 0                       )) _
+            new_DicOf(Array(  "No",1 ,"date", Now()               , "elapsed", Timer()                 )) _
+            , new_DicOf(Array("No",2 ,"date", Date()              , "elapsed", "Cal"                   )) _
+            , new_DicOf(Array("No",3 ,"date", Time()              , "elapsed", "Cal"                   )) _
+            , new_DicOf(Array("No",4 ,"date", "2025/2/12 11:22:33", "elapsed", 11*60*60+22*60+33+0.2345)) _
+            , new_DicOf(Array("No",5 ,"date", "2025/12/31"        , "elapsed", 0.8901234               )) _
+            , new_DicOf(Array("No",6 ,"date", "12:34:56"          , "elapsed", 0                       )) _
             )
 
     For Each i In d
@@ -135,12 +135,12 @@ End Sub
 Sub Test_clsCmCalendar_toString
     dim a,e,d,i,data
     d = Array ( _
-            new_DicWith(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        , "expected", "2025/02/12 11:22:33.000"))_
-            , new_DicWith(Array("No", 2,"data", Array("2025/12/1")                 , "expected", "2025/12/01 00:00:00.000"))_
-            , new_DicWith(Array("No", 3,"data", Array("12:34:56")                  , "expected", "1899/12/30 12:34:56.000"))_
-            , new_DicWith(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234), "expected", "2025/02/12 11:22:33.123"))_
-            , new_DicWith(Array("No", 5,"data", Array("2025/12/1"         , 0.9876), "expected", "2025/12/01 00:00:00.987"))_
-            , new_DicWith(Array("No", 6,"data", Array("12:34:56"          , 0)     , "expected", "1899/12/30 12:34:56.000"))_
+            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        , "expected", "2025/02/12 11:22:33.000"))_
+            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                 , "expected", "2025/12/01 00:00:00.000"))_
+            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                  , "expected", "1899/12/30 12:34:56.000"))_
+            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234), "expected", "2025/02/12 11:22:33.123"))_
+            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876), "expected", "2025/12/01 00:00:00.987"))_
+            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 0)     , "expected", "1899/12/30 12:34:56.000"))_
             )
 
     For Each i In d
@@ -165,12 +165,12 @@ End Sub
 Sub Test_clsCmCalendar_clone
     dim a,e,d,i,data,ao,bo
     d = Array ( _
-            new_DicWith(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        ))_
-            , new_DicWith(Array("No", 2,"data", Array("2025/12/1")                 ))_
-            , new_DicWith(Array("No", 3,"data", Array("12:34:56")                  ))_
-            , new_DicWith(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234)))_
-            , new_DicWith(Array("No", 5,"data", Array("2025/12/1"         , 0.9876)))_
-            , new_DicWith(Array("No", 6,"data", Array("12:34:56"          , 0)     ))_
+            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        ))_
+            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                 ))_
+            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                  ))_
+            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234)))_
+            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876)))_
+            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 0)     ))_
             )
 
     For Each i In d

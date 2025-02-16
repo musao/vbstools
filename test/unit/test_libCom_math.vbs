@@ -19,13 +19,13 @@ Option Explicit
 Sub Test_math_min
     dim a,e,d,i,num1,num2
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expected","Num1")) _
-            , new_DicWith(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expected","Num2")) _
-            , new_DicWith(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expected","Num1")) _
-            , new_DicWith(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expected","Num2")) _
-            , new_DicWith(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expected","Num1")) _
-            , new_DicWith(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expected","Num2")) _
-            , new_DicWith(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expected","Num1")) _
+            new_DicOf(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expected","Num1")) _
+            , new_DicOf(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expected","Num2")) _
+            , new_DicOf(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expected","Num1")) _
+            , new_DicOf(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expected","Num2")) _
+            , new_DicOf(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expected","Num1")) _
+            , new_DicOf(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expected","Num2")) _
+            , new_DicOf(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expected","Num1")) _
             )
     For Each i In d
         num1 = i.Item("Num1")
@@ -41,13 +41,13 @@ End Sub
 Sub Test_math_max
     dim a,e,d,i,num1,num2
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expected","Num2")) _
-            , new_DicWith(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expected","Num1")) _
-            , new_DicWith(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expected","Num2")) _
-            , new_DicWith(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expected","Num1")) _
-            , new_DicWith(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expected","Num2")) _
-            , new_DicWith(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expected","Num1")) _
-            , new_DicWith(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expected","Num2")) _
+            new_DicOf(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expected","Num2")) _
+            , new_DicOf(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expected","Num1")) _
+            , new_DicOf(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expected","Num2")) _
+            , new_DicOf(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expected","Num1")) _
+            , new_DicOf(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expected","Num2")) _
+            , new_DicOf(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expected","Num1")) _
+            , new_DicOf(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expected","Num2")) _
             )
     For Each i In d
         num1 = i.Item("Num1")
@@ -63,9 +63,9 @@ End Sub
 Sub Test_math_roundUp
     dim a,e,d,i,n,p
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num",-12345.6789 ,"Place",-6 ,"Expected",0)) _
-            , new_DicWith(Array("No",2 ,"Num",54545.4545 ,"Place",0   ,"Expected",54546)) _
-            , new_DicWith(Array("No",3 ,"Num",10101.0101 ,"Place",4   ,"Expected",10101.0101)) _
+            new_DicOf(Array(  "No",1 ,"Num",-12345.6789 ,"Place",-6 ,"Expected",0)) _
+            , new_DicOf(Array("No",2 ,"Num",54545.4545 ,"Place",0   ,"Expected",54546)) _
+            , new_DicOf(Array("No",3 ,"Num",10101.0101 ,"Place",4   ,"Expected",10101.0101)) _
             )
     For Each i In d
         n = i.Item("Num")
@@ -81,9 +81,9 @@ End Sub
 Sub Test_math_round
     dim a,e,d,i,n,p
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num",-12345.6789 ,"Place",-6 ,"Expected",0)) _
-            , new_DicWith(Array("No",2 ,"Num",54545.4545 ,"Place",0   ,"Expected",54545)) _
-            , new_DicWith(Array("No",3 ,"Num",10101.0101 ,"Place",4   ,"Expected",10101.0101)) _
+            new_DicOf(Array(  "No",1 ,"Num",-12345.6789 ,"Place",-6 ,"Expected",0)) _
+            , new_DicOf(Array("No",2 ,"Num",54545.4545 ,"Place",0   ,"Expected",54545)) _
+            , new_DicOf(Array("No",3 ,"Num",10101.0101 ,"Place",4   ,"Expected",10101.0101)) _
             )
     For Each i In d
         n = i.Item("Num")
@@ -100,9 +100,9 @@ End Sub
 Sub Test_math_roundDwon
     dim a,e,d,i,n,p
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num",-12345.6789 ,"Place",-6 ,"Expected",0)) _
-            , new_DicWith(Array("No",2 ,"Num",54545.4545 ,"Place",0   ,"Expected",54545)) _
-            , new_DicWith(Array("No",3 ,"Num",10101.0101 ,"Place",4   ,"Expected",10101.0101)) _
+            new_DicOf(Array(  "No",1 ,"Num",-12345.6789 ,"Place",-6 ,"Expected",0)) _
+            , new_DicOf(Array("No",2 ,"Num",54545.4545 ,"Place",0   ,"Expected",54545)) _
+            , new_DicOf(Array("No",3 ,"Num",10101.0101 ,"Place",4   ,"Expected",10101.0101)) _
             )
     For Each i In d
         n = i.Item("Num")
@@ -118,12 +118,12 @@ End Sub
 Sub Test_math_rand
     dim d,m,n,p,a,i,j
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"min",5 ,"max",10 ,"place",0 )) _
-            , new_DicWith(Array(  "No",2 ,"min",-10 ,"max",-5 ,"place",0 )) _
-            , new_DicWith(Array(  "No",3 ,"min",-5 ,"max",5 ,"place",0 )) _
-            , new_DicWith(Array(  "No",4 ,"min",3.14 ,"max",12.345 ,"place",5 )) _
-            , new_DicWith(Array(  "No",5 ,"min",-100.12345 ,"max",-1.23456 ,"place",5 )) _
-            , new_DicWith(Array(  "No",6 ,"min",-10.246 ,"max",100.357 ,"place",3 )) _
+            new_DicOf(Array(  "No",1 ,"min",5 ,"max",10 ,"place",0 )) _
+            , new_DicOf(Array(  "No",2 ,"min",-10 ,"max",-5 ,"place",0 )) _
+            , new_DicOf(Array(  "No",3 ,"min",-5 ,"max",5 ,"place",0 )) _
+            , new_DicOf(Array(  "No",4 ,"min",3.14 ,"max",12.345 ,"place",5 )) _
+            , new_DicOf(Array(  "No",5 ,"min",-100.12345 ,"max",-1.23456 ,"place",5 )) _
+            , new_DicOf(Array(  "No",6 ,"min",-10.246 ,"max",100.357 ,"place",3 )) _
             )
     For Each i In d
         n = i.Item("min")
@@ -148,14 +148,14 @@ Sub Test_func_MathRound_d0
     dt = 0
     dn = 12345.6789
     d = Array( _
-                   new_DicWith( Array("No", 1, "Place", -6, "Expected", 0) ) _
-                   , new_DicWith( Array("No", 2, "Place", -5, "Expected", 0) ) _
-                   , new_DicWith( Array("No", 3, "Place", -4, "Expected", 10000) ) _
-                   , new_DicWith( Array("No", 4, "Place", -1, "Expected", 12340) ) _
-                   , new_DicWith( Array("No", 5, "Place", 0, "Expected", 12345) ) _
-                   , new_DicWith( Array("No", 6, "Place", 1, "Expected", 12345.6) ) _
-                   , new_DicWith( Array("No", 7, "Place", 4, "Expected", 12345.6789) ) _
-                   , new_DicWith( Array("No", 8, "Place", 5, "Expected", 12345.6789) ) _
+                   new_DicOf( Array("No", 1, "Place", -6, "Expected", 0) ) _
+                   , new_DicOf( Array("No", 2, "Place", -5, "Expected", 0) ) _
+                   , new_DicOf( Array("No", 3, "Place", -4, "Expected", 10000) ) _
+                   , new_DicOf( Array("No", 4, "Place", -1, "Expected", 12340) ) _
+                   , new_DicOf( Array("No", 5, "Place", 0, "Expected", 12345) ) _
+                   , new_DicOf( Array("No", 6, "Place", 1, "Expected", 12345.6) ) _
+                   , new_DicOf( Array("No", 7, "Place", 4, "Expected", 12345.6789) ) _
+                   , new_DicOf( Array("No", 8, "Place", 5, "Expected", 12345.6789) ) _
                 )
     For Each i In d
         dp = i.Item("Place")
@@ -177,14 +177,14 @@ Sub Test_func_MathRound_d5
     dt = 5
     dn = 54545.4545
     d = Array( _
-                   new_DicWith( Array("No", 1, "Place", -6, "Expected", 0) ) _
-                   , new_DicWith( Array("No", 2, "Place", -5, "Expected", 100000) ) _
-                   , new_DicWith( Array("No", 3, "Place", -4, "Expected", 50000) ) _
-                   , new_DicWith( Array("No", 4, "Place", -1, "Expected", 54550) ) _
-                   , new_DicWith( Array("No", 5, "Place", 0, "Expected", 54545) ) _
-                   , new_DicWith( Array("No", 6, "Place", 1, "Expected", 54545.5) ) _
-                   , new_DicWith( Array("No", 7, "Place", 4, "Expected", 54545.4545) ) _
-                   , new_DicWith( Array("No", 8, "Place", 5, "Expected", 54545.4545) ) _
+                   new_DicOf( Array("No", 1, "Place", -6, "Expected", 0) ) _
+                   , new_DicOf( Array("No", 2, "Place", -5, "Expected", 100000) ) _
+                   , new_DicOf( Array("No", 3, "Place", -4, "Expected", 50000) ) _
+                   , new_DicOf( Array("No", 4, "Place", -1, "Expected", 54550) ) _
+                   , new_DicOf( Array("No", 5, "Place", 0, "Expected", 54545) ) _
+                   , new_DicOf( Array("No", 6, "Place", 1, "Expected", 54545.5) ) _
+                   , new_DicOf( Array("No", 7, "Place", 4, "Expected", 54545.4545) ) _
+                   , new_DicOf( Array("No", 8, "Place", 5, "Expected", 54545.4545) ) _
                 )
     For Each i In d
         dp = i.Item("Place")
@@ -208,14 +208,14 @@ Sub Test_func_MathRound_d9
     dt = 9
     dn = 10101.0101
     d = Array( _
-                   new_DicWith( Array("No", 1, "Place", -6, "Expected", 0) ) _
-                   , new_DicWith( Array("No", 2, "Place", -5, "Expected", 100000) ) _
-                   , new_DicWith( Array("No", 3, "Place", -4, "Expected", 10000) ) _
-                   , new_DicWith( Array("No", 4, "Place", -1, "Expected", 10110) ) _
-                   , new_DicWith( Array("No", 5, "Place", 0, "Expected", 10101) ) _
-                   , new_DicWith( Array("No", 6, "Place", 1, "Expected", 10101.1) ) _
-                   , new_DicWith( Array("No", 7, "Place", 4, "Expected", 10101.0101) ) _
-                   , new_DicWith( Array("No", 8, "Place", 5, "Expected", 10101.0101) ) _
+                   new_DicOf( Array("No", 1, "Place", -6, "Expected", 0) ) _
+                   , new_DicOf( Array("No", 2, "Place", -5, "Expected", 100000) ) _
+                   , new_DicOf( Array("No", 3, "Place", -4, "Expected", 10000) ) _
+                   , new_DicOf( Array("No", 4, "Place", -1, "Expected", 10110) ) _
+                   , new_DicOf( Array("No", 5, "Place", 0, "Expected", 10101) ) _
+                   , new_DicOf( Array("No", 6, "Place", 1, "Expected", 10101.1) ) _
+                   , new_DicOf( Array("No", 7, "Place", 4, "Expected", 10101.0101) ) _
+                   , new_DicOf( Array("No", 8, "Place", 5, "Expected", 10101.0101) ) _
                 )
     For Each i In d
         dp = i.Item("Place")
@@ -238,8 +238,8 @@ End Sub
 Sub Test_math_log2
     dim d,i,al,e,a
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"antilogarithm",1024 ,"expected",10 )) _
-            , new_DicWith(Array(  "No",2 ,"antilogarithm",0.125 ,"expected",-3 )) _
+            new_DicOf(Array(  "No",1 ,"antilogarithm",1024 ,"expected",10 )) _
+            , new_DicOf(Array(  "No",2 ,"antilogarithm",0.125 ,"expected",-3 )) _
             )
     For Each i In d
         al = i.Item("antilogarithm")
@@ -254,8 +254,8 @@ End Sub
 Sub Test_func_MathLog
     dim d,i,b,al,e,a
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"base",2 ,"antilogarithm",4 ,"expected",2 )) _
-            , new_DicWith(Array(  "No",2 ,"base",10 ,"antilogarithm",0.01 ,"expected",-2 )) _
+            new_DicOf(Array(  "No",1 ,"base",2 ,"antilogarithm",4 ,"expected",2 )) _
+            , new_DicOf(Array(  "No",2 ,"base",10 ,"antilogarithm",0.01 ,"expected",-2 )) _
             )
     For Each i In d
         b = i.Item("base")
@@ -271,13 +271,13 @@ End Sub
 Sub Test_math_tranc
     dim a,e,d,i,num
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num",1    ,"Expected",1  )) _
-            , new_DicWith(Array("No",2 ,"Num",2.0  ,"Expected",2  )) _
-            , new_DicWith(Array("No",3 ,"Num",-3.0 ,"Expected",-3 )) _
-            , new_DicWith(Array("No",4 ,"Num",1.1  ,"Expected",1  )) _
-            , new_DicWith(Array("No",5 ,"Num",2.5  ,"Expected",2  )) _
-            , new_DicWith(Array("No",6 ,"Num",-3.9 ,"Expected",-3 )) _
-            , new_DicWith(Array("No",7 ,"Num",-0.1 ,"Expected",0  )) _
+            new_DicOf(Array(  "No",1 ,"Num",1    ,"Expected",1  )) _
+            , new_DicOf(Array("No",2 ,"Num",2.0  ,"Expected",2  )) _
+            , new_DicOf(Array("No",3 ,"Num",-3.0 ,"Expected",-3 )) _
+            , new_DicOf(Array("No",4 ,"Num",1.1  ,"Expected",1  )) _
+            , new_DicOf(Array("No",5 ,"Num",2.5  ,"Expected",2  )) _
+            , new_DicOf(Array("No",6 ,"Num",-3.9 ,"Expected",-3 )) _
+            , new_DicOf(Array("No",7 ,"Num",-0.1 ,"Expected",0  )) _
             )
     For Each i In d
         num = i.Item("Num")
@@ -292,13 +292,13 @@ End Sub
 Sub Test_math_fractional
     dim a,e,d,i,num
     d = Array ( _
-            new_DicWith(Array(  "No",1 ,"Num",1    ,"Expected",0    )) _
-            , new_DicWith(Array("No",2 ,"Num",2.0  ,"Expected",0    )) _
-            , new_DicWith(Array("No",3 ,"Num",-3.0 ,"Expected",0    )) _
-            , new_DicWith(Array("No",4 ,"Num",1.1  ,"Expected",0.1  )) _
-            , new_DicWith(Array("No",5 ,"Num",2.5  ,"Expected",0.5  )) _
-            , new_DicWith(Array("No",6 ,"Num",-3.9 ,"Expected",-0.9 )) _
-            , new_DicWith(Array("No",7 ,"Num",-0.1 ,"Expected",-0.1 )) _
+            new_DicOf(Array(  "No",1 ,"Num",1    ,"Expected",0    )) _
+            , new_DicOf(Array("No",2 ,"Num",2.0  ,"Expected",0    )) _
+            , new_DicOf(Array("No",3 ,"Num",-3.0 ,"Expected",0    )) _
+            , new_DicOf(Array("No",4 ,"Num",1.1  ,"Expected",0.1  )) _
+            , new_DicOf(Array("No",5 ,"Num",2.5  ,"Expected",0.5  )) _
+            , new_DicOf(Array("No",6 ,"Num",-3.9 ,"Expected",-0.9 )) _
+            , new_DicOf(Array("No",7 ,"Num",-0.1 ,"Expected",-0.1 )) _
             )
     For Each i In d
         num = i.Item("Num")
