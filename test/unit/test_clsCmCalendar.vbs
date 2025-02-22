@@ -135,17 +135,17 @@ End Sub
 Sub Test_clsCmCalendar_toString
     dim a,e,d,i,data
     d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        , "expected", "2025/02/12 11:22:33.000"))_
-            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                 , "expected", "2025/12/01 00:00:00.000"))_
-            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                  , "expected", "1899/12/30 12:34:56.000"))_
-            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234), "expected", "2025/02/12 11:22:33.123"))_
-            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876), "expected", "2025/12/01 00:00:00.987"))_
-            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 0)     , "expected", "1899/12/30 12:34:56.000"))_
+            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        , "expect", "2025/02/12 11:22:33.000"))_
+            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                 , "expect", "2025/12/01 00:00:00.000"))_
+            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                  , "expect", "1899/12/30 12:34:56.000"))_
+            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234), "expect", "2025/02/12 11:22:33.123"))_
+            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876), "expect", "2025/12/01 00:00:00.987"))_
+            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 0)     , "expect", "1899/12/30 12:34:56.000"))_
             )
 
     For Each i In d
         data = i.Item("data")
-        e = i.Item("expected")
+        e = i.Item("expect")
         a = (new clsCmCalendar).of(data).toString()
         AssertEqualWithMessage e, a, "No="&i.Item("No")&", data="&cf_toString(data)
     Next
@@ -205,6 +205,74 @@ Sub Test_clsCmCalendar_compareTo_initial
     a = ao.compareTo(bo)
     AssertEqualWithMessage e, a, "compareTo()>0 ao="&ao.toString()&" bo="&bo.toString()
 End Sub
+Sub Test_clsCmCalendar_compareTo
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:30", "expect", 1 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31", "expect", 0 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:32", "expect", -1))_
+            )
+    Set ao = (new clsCmCalendar).of("2024/02/29 00:59:31")
+
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.compareTo(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
+End Sub
+Sub Test_clsCmCalendar_compareTo_WithDecimal
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:31.123455", "expect", 1 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31.123456", "expect", 0 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31.123457", "expect", -1))_
+            )
+    Set ao = (new clsCmCalendar).of("2024/02/29 00:59:31.123456")
+
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.compareTo(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
+End Sub
+Sub Test_clsCmCalendar_compareTo_DateOnly
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/28", "expect", 1 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29", "expect", 0 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/03/01", "expect", -1))_
+            )
+    Set ao = (new clsCmCalendar).of("2024/02/29")
+
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.compareTo(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
+End Sub
+Sub Test_clsCmCalendar_compareTo_TimeOnly
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "00:59:30", "expect", 1 ))_
+            , new_DicOf(Array("No", 2,"data", "00:59:31", "expect", 0 ))_
+            , new_DicOf(Array("No", 2,"data", "00:59:32", "expect", -1))_
+            )
+    Set ao = (new clsCmCalendar).of("00:59:31")
+
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.compareTo(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
+End Sub
 Sub Test_clsCmCalendar_compareTo_Err
     On Error Resume Next
     Dim d,e,a
@@ -218,184 +286,92 @@ Sub Test_clsCmCalendar_compareTo_Err
     AssertEqualWithMessage "That object is not a calendar class.", Err.Description, "Err.Description"
 End Sub
 
-
-
-    
-'###################################################################################################
-'clsCmCalendar.serial()
-Sub Test_clsCmCalendar_serial_ofNow
-    Dim a,e
-    Set e = (new clsCmCalendar).ofNow()
-    Set a = e.clone()
-
-    AssertWithMessage Not e Is a, "Object"
-    AssertEqualWithMessage e.serial, a.serial, "serial"
-    AssertEqualWithMessage e.toString, a.toString, "toString"
-    AssertEqualWithMessage Left(e.formatAs("000000"),4), Left(a.formatAs("000000"),4), "microsecond"
-End Sub
-Sub Test_clsCmCalendar_serial_setDateTime_1
-    Dim a,e
-    Set e = (new clsCmCalendar).of("2023/12/31 23:30:10.4567890")
-    Set a = e.clone()
-
-    AssertWithMessage Not e Is a, "Object"
-    AssertEqualWithMessage e.serial, a.serial, "serial"
-    AssertEqualWithMessage e.toString, a.toString, "toString"
-    AssertEqualWithMessage Left(e.formatAs("000000"),4), Left(a.formatAs("000000"),4), "microsecond"
-End Sub
-Sub Test_clsCmCalendar_serial_setDateTime_2
-    Dim a,e
-    Set e = (new clsCmCalendar).of("2023/12/31 23:30:10.5678901")
-    Set a = e.clone()
-
-    AssertWithMessage Not e Is a, "Object"
-    AssertEqualWithMessage e.serial, a.serial, "serial"
-    AssertEqualWithMessage e.toString, a.toString, "toString"
-    AssertEqualWithMessage Left(e.formatAs("000000"),4), Left(a.formatAs("000000"),4), "microsecond"
-End Sub
-
-'###################################################################################################
-'clsCmCalendar.compareTo()
-Sub Test_clsCmCalendar_compareTo
-    Dim d1,d2,e,a,a1,a2
-    d1 = "2024/02/29 00:59:31"
-    Set a1 = (new clsCmCalendar).of(d1)
-
-    d2 = "2024/02/29 00:59:30"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "2024/02/29 00:59:31"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 0
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "2024/02/29 00:59:32"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = -1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-End Sub
-Sub Test_clsCmCalendar_compareTo_WithDecimal
-    Dim d1,d2,e,a,a1,a2
-    d1 = "2024/02/29 00:59:31.123456"
-    Set a1 = (new clsCmCalendar).of(d1)
-
-    d2 = "2024/02/29 00:59:31.123455"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
-
-    d2 = "2024/02/29 00:59:31.123456"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 0
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
-
-    d2 = "2024/02/29 00:59:31.123457"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = -1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
-End Sub
-Sub Test_clsCmCalendar_compareTo_DateOnly
-    Dim d1,d2,e,a,a1,a2
-    d1 = "2024/02/29"
-    Set a1 = (new clsCmCalendar).of(d1)
-
-    d2 = "2024/02/28"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "2024/02/29"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 0
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "2024/03/01"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = -1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-End Sub
-Sub Test_clsCmCalendar_compareTo_TimeOnly
-    Dim d1,d2,e,a,a1,a2
-    d1 = "00:59:31"
-    Set a1 = (new clsCmCalendar).of(d1)
-
-    d2 = "00:59:30"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "00:59:31"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 0
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "00:59:32"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = -1
-    a = a1.compareTo(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-End Sub
-
 '###################################################################################################
 'clsCmCalendar.differenceFrom()
+Sub Test_clsCmCalendar_differenceFrom_initial
+    dim a,ao,bo
+    set ao = (new clsCmCalendar)
+
+    set bo = (new clsCmCalendar)
+    a = ao.differenceFrom(bo)
+    AssertWithMessage a=0, "differenceFrom()=0 a="&a&" ao="&ao.toString()&" bo="&bo.toString()
+
+    set bo = (new clsCmCalendar).ofNow()
+    a = ao.differenceFrom(bo)
+    AssertWithMessage a<0, "differenceFrom()<0 a="&a&" ao="&ao.toString()&" bo="&bo.toString()
+
+    ao.ofNow()
+    set bo = (new clsCmCalendar)
+    a = ao.differenceFrom(bo)
+    AssertWithMessage a>0, "differenceFrom()>0 a="&a&" ao="&ao.toString()&" bo="&bo.toString()
+End Sub
 Sub Test_clsCmCalendar_differenceFrom
-    Dim d1,d2,e,a,a1,a2
-    d1 = "2024/02/29 00:59:31"
-    Set a1 = (new clsCmCalendar).of(d1)
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:30", "expect", 1 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31", "expect", 0 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:32", "expect", -1))_
+            )
+    Set ao = (new clsCmCalendar).of("2024/02/29 00:59:31")
 
-    d2 = "2024/02/29 00:59:30"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 1
-    a = a1.differenceFrom(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "2024/02/29 00:59:31"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 0
-    a = a1.differenceFrom(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
-
-    d2 = "2024/02/29 00:59:32"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = -1
-    a = a1.differenceFrom(a2)
-    AssertEqualWithMessage e, a, a1&" vs "&a2
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.differenceFrom(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
 End Sub
 Sub Test_clsCmCalendar_differenceFrom_WithDecimal
-    Dim d1,d2,e,a,a1,a2
-    d1 = "2024/02/29 00:59:31.123456"
-    Set a1 = (new clsCmCalendar).of(d1)
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:31.123455", "expect", 0.000001 ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31.123456", "expect", 0        ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31.123457", "expect", -0.000001))_
+            )
+    Set ao = (new clsCmCalendar).of("2024/02/29 00:59:31.123456")
 
-    d2 = "2024/02/29 00:59:30.123455"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 1
-    a = a1.differenceFrom(a2)
-    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.differenceFrom(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
+End Sub
+Sub Test_clsCmCalendar_differenceFrom_DateOnly
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/28", "expect", 24*60*60   ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29", "expect", 0          ))_
+            , new_DicOf(Array("No", 2,"data", "2024/03/01", "expect", -1*24*60*60))_
+            )
+    Set ao = (new clsCmCalendar).of("2024/02/29")
 
-    d2 = "2024/02/29 00:59:31.123456"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = 0
-    a = a1.differenceFrom(a2)
-    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.differenceFrom(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
+End Sub
+Sub Test_clsCmCalendar_differenceFrom_TimeOnly
+    dim a,e,d,i,data,ao,bo
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "00:59:30", "expect", 1 ))_
+            , new_DicOf(Array("No", 2,"data", "00:59:31", "expect", 0 ))_
+            , new_DicOf(Array("No", 2,"data", "00:59:32", "expect", -1))_
+            )
+    Set ao = (new clsCmCalendar).of("00:59:31")
 
-    d2 = "2024/02/29 00:59:32.123457"
-    Set a2 = (new clsCmCalendar).of(d2)
-    e = -1
-    a = a1.differenceFrom(a2)
-    AssertEqualWithMessage e, a, a1.formatAs("ss.000000")&" vs "&a2.formatAs("ss.000000")
+    For Each i In d
+        data = i.Item("data")
+        Set bo = (new clsCmCalendar).of(data)
+        e = i.Item("expect")
+        a = ao.differenceFrom(bo)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" ao="&ao.formatAs("YYYY/MM/DD hh:mm:ss.000000")&" data="&cf_toString(i)
+    Next
 End Sub
 Sub Test_clsCmCalendar_differenceFrom_Err
     On Error Resume Next
@@ -413,337 +389,82 @@ End Sub
 
 '###################################################################################################
 'clsCmCalendar.formatAs()
-Sub Test_clsCmCalendar_formatAs_Normal1
-    Dim d,f,e,a
-    f = "YY/M/d hh:mm:ss.000"
-    d = "2024/02/29 00:59:30.456789"
-    e = "24/2/29 00:59:30.456"
-    Set a = (new clsCmCalendar).of(d)
+Sub Test_clsCmCalendar_formatAs
+    dim a,e,d,i,data,format
+    d = Array ( _
+            new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:30.456789" , "expect", "24/2/29 00:59:30.456","format", "YY/M/d hh:mm:ss.000"         ))_
+            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:30.456789" , "expect", "fujii.txt"           ,"format", "fujii.txt"                   ))_
+            , new_DicOf(Array("No", 3,"data", "2024/02/29 00:59:30"        , "expect", "2024"                ,"format", "YYYY"               , "lcace"))_
+            , new_DicOf(Array("No", 4,"data", "2024/02/29 00:59:30.123456" , "expect", "24"                  ,"format", "YY"                 , "lcace"))_
+            , new_DicOf(Array("No", 5,"data", "2024/02/29 00:59:30"        , "expect", "02"                  ,"format", "MM"                          ))_
+            , new_DicOf(Array("No", 6,"data", "2024/10/29 00:59:30.123456" , "expect", "10"                  ,"format", "MM"                          ))_
+            , new_DicOf(Array("No", 7,"data", "2024/02/29 00:59:30.123456" , "expect", "2"                   ,"format", "M"                           ))_
+            , new_DicOf(Array("No", 8,"data", "2024/11/29 00:59:30"        , "expect", "11"                  ,"format", "M"                           ))_
+            , new_DicOf(Array("No", 9,"data", "2024/02/09 00:59:30"        , "expect", "09"                  ,"format", "DD"                 , "lcace"))_
+            , new_DicOf(Array("No",10,"data", "2024/02/29 00:59:30.123456" , "expect", "29"                  ,"format", "DD"                 , "lcace"))_
+            , new_DicOf(Array("No",11,"data", "2024/02/01 00:59:30.123456" , "expect", "1"                   ,"format", "D"                  , "lcace"))_
+            , new_DicOf(Array("No",12,"data", "2024/02/29 00:59:30"        , "expect", "29"                  ,"format", "D"                  , "lcace"))_
+            , new_DicOf(Array("No",13,"data", "2024/02/29 00:59:30"        , "expect", "00"                  ,"format", "HH"                 , "lcace"))_
+            , new_DicOf(Array("No",14,"data", "2024/02/29 23:59:30.123456" , "expect", "23"                  ,"format", "HH"                 , "lcace"))_
+            , new_DicOf(Array("No",13,"data", "2024/02/29 09:59:30.123456" , "expect", "9"                   ,"format", "H"                  , "lcace"))_
+            , new_DicOf(Array("No",14,"data", "2024/02/29 10:59:30"        , "expect", "10"                  ,"format", "H"                  , "lcace"))_
+            , new_DicOf(Array("No",15,"data", "2024/02/29 00:00:30"        , "expect", "00"                  ,"format", "mm"                          ))_
+            , new_DicOf(Array("No",16,"data", "2024/02/29 00:59:30.123456" , "expect", "59"                  ,"format", "mm"                          ))_
+            , new_DicOf(Array("No",17,"data", "2024/02/29 00:09:30.123456" , "expect", "9"                   ,"format", "m"                           ))_
+            , new_DicOf(Array("No",18,"data", "2024/02/29 00:10:30"        , "expect", "10"                  ,"format", "m"                           ))_
+            , new_DicOf(Array("No",19,"data", "2024/02/29 00:59:30"        , "expect", "30"                  ,"format", "SS"                 , "lcace"))_
+            , new_DicOf(Array("No",20,"data", "2024/02/29 00:59:09.123456" , "expect", "09"                  ,"format", "SS"                 , "lcace"))_
+            , new_DicOf(Array("No",21,"data", "2024/02/29 00:59:00.123456" , "expect", "0"                   ,"format", "S"                  , "lcace"))_
+            , new_DicOf(Array("No",22,"data", "2024/02/29 00:59:10"        , "expect", "10"                  ,"format", "S"                  , "lcace"))_
+            , new_DicOf(Array("No",23,"data", "2024/02/29 00:59:10.1234567", "expect", "123456"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",24,"data", "2024/02/29 00:59:10.987654" , "expect", "987654"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",25,"data", "2024/02/29 00:59:10.12345"  , "expect", "123450"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",26,"data", "2024/02/29 00:59:10.9876"   , "expect", "987600"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",27,"data", "2024/02/29 00:59:10.123"    , "expect", "123000"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",28,"data", "2024/02/29 00:59:10.98"     , "expect", "980000"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",29,"data", "2024/02/29 00:59:10.1"      , "expect", "100000"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",30,"data", "2024/02/29 00:59:10"        , "expect", "000000"              ,"format", "000000"                      ))_
+            , new_DicOf(Array("No",31,"data", "2024/02/29 00:59:10.9876"   , "expect", "987"                 ,"format", "000"                         ))_
+            , new_DicOf(Array("No",32,"data", "2024/02/29 00:59:10.123"    , "expect", "123"                 ,"format", "000"                         ))_
+            , new_DicOf(Array("No",33,"data", "2024/02/29 00:59:10.98"     , "expect", "980"                 ,"format", "000"                         ))_
+            , new_DicOf(Array("No",34,"data", "2024/02/29 00:59:10.1"      , "expect", "100"                 ,"format", "000"                         ))_
+            , new_DicOf(Array("No",35,"data", "2024/02/29 00:59:10"        , "expect", "000"                 ,"format", "000"                         ))_
+            )
 
-    AssertEqual e, a.formatAs(f)
+    For Each i In d
+        format = i.Item("format")
+        data = i.Item("data")
+        e = i.Item("expect")
+        a = (new clsCmCalendar).of(data).formatAs(format)
+        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
+        If i.Exists("lcace") Then
+            a = (new clsCmCalendar).of(data).formatAs(LCase(format))
+            AssertEqualWithMessage e, a, "No="&i.Item("No")&"(lcase) data="&cf_toString(i)
+        End If
+    Next
 End Sub
-Sub Test_clsCmCalendar_formatAs_Normal2
-    Dim d,f,e,a
-    f = "fujii.txt"
-    d = "2024/02/29 00:59:30.456789"
-    e = f
-    Set a = (new clsCmCalendar).of(d)
 
-    AssertEqual e, a.formatAs(f)
+'###################################################################################################
+'clsCmCalendar.of()
+Sub Test_clsCmCalendar_of_Err
+    On Error Resume Next
+    Dim d
+    d = "xyz"
+    Call (new clsCmCalendar).of(d)
+
+    AssertEqualWithMessage "clsCmCalendar+of()", Err.Source, "Err.Source"
+    AssertMatchWithMessage "^invalid argument.*"&d, Err.Description, "Err.Description"
 End Sub
-Sub Test_clsCmCalendar_formatAs_YYYY
-    Dim d,f,e,a
-    f = "YYYY"
-    d = "2024/02/29 00:59:30"
-    e = Right("000" & Year(Left(d,19)), 4)
-    Set a = (new clsCmCalendar).of(d)
+Sub Test_clsCmCalendar_of_ErrImmutable
+    On Error Resume Next
+    Dim ao
+    Set ao = (new clsCmCalendar).ofNow()
+    Call ao.of("2025/2/22 22:22:22")
 
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
+    AssertEqualWithMessage "clsCmCalendar+of()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Because it is an immutable variable, its value cannot be changed.", Err.Description, "Err.Description"
 End Sub
-Sub Test_clsCmCalendar_formatAs_YY
-    Dim d,f,e,a
-    f = "YY"
-    d = "2024/02/29 00:59:30.123456"
-    e = Right("0" & Year(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
 
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_Month_MM_1
-    Dim d,f,e,a
-    f = "MM"
-    d = "2024/02/29 00:59:30"
-    e = Right("0" & Month(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_Month_MM_2
-    Dim d,f,e,a
-    f = "MM"
-    d = "2024/10/29 00:59:30.123456"
-    e = Right("0" & Month(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_Month_M_1
-    Dim d,f,e,a
-    f = "M"
-    d = "2024/02/29 00:59:30"
-    e = Cstr(Month(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_Month_M_2
-    Dim d,f,e,a
-    f = "M"
-    d = "2024/11/29 00:59:30.123456"
-    e = Cstr(Month(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_DD_1
-    Dim d,f,e,a
-    f = "DD"
-    d = "2024/02/09 00:59:30"
-    e = Right("0" & Day(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_DD_2
-    Dim d,f,e,a
-    f = "DD"
-    d = "2024/02/29 00:59:30.123456"
-    e = Right("0" & Day(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_D_1
-    Dim d,f,e,a
-    f = "D"
-    d = "2024/02/01 00:59:30"
-    e = Cstr(Day(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_D_2
-    Dim d,f,e,a
-    f = "D"
-    d = "2024/02/29 00:59:30.123456"
-    e = Cstr(Day(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_HH_1
-    Dim d,f,e,a
-    f = "HH"
-    d = "2024/02/29 00:59:30"
-    e = Right("0" & Hour(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_HH_2
-    Dim d,f,e,a
-    f = "HH"
-    d = "2024/02/29 23:59:30.123456"
-    e = Right("0" & Hour(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_H_1
-    Dim d,f,e,a
-    f = "H"
-    d = "2024/02/29 09:59:30"
-    e = CStr(Hour(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_H_2
-    Dim d,f,e,a
-    f = "H"
-    d = "2024/02/29 10:59:30.123456"
-    e = CStr(Hour(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_Minute_mm_1
-    Dim d,f,e,a
-    f = "mm"
-    d = "2024/02/29 00:00:30"
-    e = Right("0" & Minute(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_Minute_mm_2
-    Dim d,f,e,a
-    f = "mm"
-    d = "2024/02/29 00:59:30.123456"
-    e = Right("0" & Minute(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_Minute_m_1
-    Dim d,f,e,a
-    f = "m"
-    d = "2024/02/29 00:09:30"
-    e = Cstr(Minute(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_Minute_m_2
-    Dim d,f,e,a
-    f = "m"
-    d = "2024/02/29 00:10:30.123456"
-    e = Cstr(Minute(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqual e, a.formatAs(f)
-End Sub
-Sub Test_clsCmCalendar_formatAs_SS_1
-    Dim d,f,e,a
-    f = "SS"
-    d = "2024/02/29 00:59:30"
-    e = Right("0" & Second(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_SS_1
-    Dim d,f,e,a
-    f = "SS"
-    d = "2024/02/29 00:59:09.123456"
-    e = Right("0" & Second(Left(d,19)), 2)
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_S_1
-    Dim d,f,e,a
-    f = "S"
-    d = "2024/02/29 00:59:00"
-    e = Cstr(Second(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_S_2
-    Dim d,f,e,a
-    f = "S"
-    d = "2024/02/29 00:59:10.123456"
-    e = Cstr(Second(Left(d,19)))
-    Set a = (new clsCmCalendar).of(d)
-
-    AssertEqualWithMessage e, a.formatAs(f), "uppercase"
-
-    f = LCase(f)
-    AssertEqualWithMessage e, a.formatAs(f), "lowercase"
-End Sub
-Sub Test_clsCmCalendar_formatAs_000000
-    Dim d,f,e,a
-    f = "000000"
-
-    d = "2024/02/29 00:59:10.1234567"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.123456"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.12345"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.1234"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.123"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.12"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.1"
-    e = Left(Mid(d,21) & "000000", 6)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10"
-    e = "000000"
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-End Sub
-Sub Test_clsCmCalendar_formatAs_000
-    Dim d,f,e,a
-    f = "000"
-
-    d = "2024/02/29 00:59:10.1234"
-    e = Left(Mid(d,21) & "000", 3)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.123"
-    e = Left(Mid(d,21) & "000", 3)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.12"
-    e = Left(Mid(d,21) & "000", 3)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10.1"
-    e = Left(Mid(d,21) & "000", 3)
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-
-    d = "2024/02/29 00:59:10"
-    e = "000"
-    Set a = (new clsCmCalendar).of(d)
-    AssertEqualWithMessage e, a.formatAs(f), "Input = " & d
-End Sub
 
 '###################################################################################################
 'clsCmCalendar.ofNow()/toString()

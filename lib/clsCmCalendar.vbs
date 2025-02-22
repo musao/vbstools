@@ -349,11 +349,19 @@ Class clsCmCalendar
             Exit function
         End If
 
+        Dim dbResult : dbResult = 0
+        If IsNull(PdtDateTime) Then dbResult = -1 * ((aoTarget.dateTime)*60*60*24 + aoTarget.fractionalPartOfelapsedSeconds)
+        If IsNull(aoTarget.dateTime) Then dbResult = PdtDateTime*60*60*24 + this_getFractionalPartOfElapsedSeconds
+        If dbResult <> 0 Then
+            this_differenceFrom = dbResult
+            Exit Function
+        End If
+
         Dim dbDiffElapsedSeconds
         dbDiffElapsedSeconds = this_getFractionalPartOfElapsedSeconds-aoTarget.fractionalPartOfelapsedSeconds
 
         If (PdtDateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(PdtDateTime-aoTarget.dateTime)*60*60*24
-        this_differenceFrom = math_roundDown(dbDiffElapsedSeconds, 5)
+        this_differenceFrom = math_round(dbDiffElapsedSeconds, 6)
 
     End Function
 
