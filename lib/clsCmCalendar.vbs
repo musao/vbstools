@@ -285,7 +285,14 @@ Class clsCmCalendar
     Private Function this_clone( _
         )
         Dim oNewIns : Set oNewIns = new clsCmCalendar
-        If Not IsNull(PdtDateTime) Then Call oNewIns.of(Array(PdtDateTime, PdbElapsedSeconds))
+        If IsNull(PdtDateTime) Then
+        Else
+            If IsNull(PdbElapsedSeconds) Then
+                Call oNewIns.of(Array(PdtDateTime))
+            Else
+                Call oNewIns.of(Array(PdtDateTime, PdbElapsedSeconds))
+            End If
+        End If
         Set this_clone = oNewIns
         Set oNewIns = Nothing
     End Function
@@ -517,9 +524,10 @@ Class clsCmCalendar
         byRef avArgument _
         , byVal asSource _
         )
-        Dim dtDateTime, dbElapsedSeconds
+        Dim dtDateTime, dbElapsedSeconds, boIsError
         dtDateTime = Null
         dbElapsedSeconds = Null
+        boIsError = False
         
         On Error Resume Next
         If Not(IsArray(avArgument)) Then
@@ -528,7 +536,7 @@ Class clsCmCalendar
         ElseIf new_Arr().hasElement(avArgument) Then
         'îzóÒÇÃóvëfÇ™Ç†ÇÈèÍçá
             Dim e : e = avArgument
-            Select Case Ubound(avArgument)
+            Select Case Ubound(e)
                 Case 0:
                     Call this_ofForOneArg(e(0), dtDateTime, dbElapsedSeconds)
                 Case 1:
@@ -541,9 +549,10 @@ Class clsCmCalendar
                     dbElapsedSeconds = Cdbl(e(6))
             End Select
         End If
+        If Err.Number<>0 Then boIsError=True
         On Error Goto 0
-        
-        ast_argNotNull dtDateTime, asSource, "invalid argument. " & cf_toString(avArgument)
+
+        ast_argFalse boIsError, asSource, "invalid argument. " & cf_toString(avArgument)
 
         Set this_of = this_setData(dtDateTime, dbElapsedSeconds, asSource)
     End Function
@@ -565,15 +574,15 @@ Class clsCmCalendar
     '2025/02/11         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub this_ofForOneArg( _
-        byVal avDateTime _
+        byRef avDateTime _
         , byRef adtDateTime _
-        , byRef dbElapsedSeconds _
+        , byRef adbElapsedSeconds _
         )
         Dim oRe : Set oRe = new_Re("^([^.]+)\.(\d+)$", "")
         If oRe.Test(avDateTime) Then
             adtDateTime = Cdate(oRe.Replace(avDateTime, "$1"))
             Dim dbElapsedSecondsByDt : dbElapsedSecondsByDt = math_tranc(math_fractional(adtDateTime)*24*60*60)
-            dbElapsedSeconds = dbElapsedSecondsByDt + Cdbl("0." & oRe.Replace(avDateTime, "$2"))
+            adbElapsedSeconds = dbElapsedSecondsByDt + Cdbl("0." & oRe.Replace(avDateTime, "$2"))
         Else
             adtDateTime = Cdate(avDateTime)
         End If
