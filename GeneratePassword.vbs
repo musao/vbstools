@@ -178,7 +178,7 @@ Private Sub sub_GnrtPwGenerate( _
         cf_bind lType, .Item("Type")
         cf_bind vAdd, .Item("Additional")
     End With
-    Dim vCharList : vCharList = new_Char().getCharList(lType)
+    Dim vCharList : vCharList = new_Char().charList(lType)
     vCharList = Filter(vCharList, " ", False, vbBinaryCompare)
     If Not IsEmpty(vAdd) Then cf_pushA vCharList, vAdd
     Dim sPw : sPw = util_randStr(vCharList, lLength)

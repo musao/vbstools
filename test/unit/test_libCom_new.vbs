@@ -229,7 +229,7 @@ Sub Test_new_Enum_valueOf_Err
     GREAT_SATAN_KOSAKA.valueOf("ORANGE")
 
     Dim e,a
-    e = "clsTmp_" & "[A-Z0-9_]{10}" & "\(GREAT_SATAN_KOSAKA\)\+valueOf\(\)"
+    e = "clsTmp_" & "[A-Za-z0-9_]{8}" & "\(GREAT_SATAN_KOSAKA\)\+valueOf\(\)"
     a = Err.Source
     AssertMatchWithMessage e,a,"Source"
 
@@ -251,7 +251,7 @@ Sub Test_new_Enum_toString
     Dim def : Set def = createTestEnum
 
     Dim ar
-    cf_push ar, "<clsTmp_" & "[A-Z0-9_]{10}" & ">\(GREAT_SATAN_KOSAKA\){"
+    cf_push ar, "<clsTmp_" & "[A-Za-z0-9_]{8}" & ">\(GREAT_SATAN_KOSAKA\){"
     cf_push ar, "<clsCmReadOnlyObject>{<String>'APPLE':<Integer>1}"
     cf_push ar, ",<clsCmReadOnlyObject>{<String>'PINEAPPLE':<Integer>2}"
     cf_push ar, ",<clsCmReadOnlyObject>{<String>'PEN':<Integer>3}"

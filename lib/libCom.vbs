@@ -31,6 +31,30 @@ Call new_Enum( _
         ) _
     ) _
 )
+Call new_Enum( _
+    "charType" _
+    , new_DicOf( _
+        Array( _
+            "HALF_WIDTH_ALPHABET_UPPERCASE", 2^0 _
+            , "HALF_WIDTH_ALPHABET_LOWERCASE", 2^1 _
+            , "HALF_WIDTH_NUMBERS", 2^2 _
+            , "HALF_WIDTH_SYMBOL", 2^3 _
+            , "HALF_WIDTH_KATAKANA", 2^4 _
+            , "HALF_WIDTH_KATAKANA_SYMBOL", 2^5 _
+            , "FULL_WIDTH_ALPHABET_UPPERCASE", 2^6 _
+            , "FULL_WIDTH_ALPHABET_LOWERCASE", 2^7 _
+            , "FULL_WIDTH_NUMBERS", 2^8 _
+            , "FULL_WIDTH_SYMBOL", 2^9 _
+            , "FULL_WIDTH_HIRAGANA", 2^10 _
+            , "FULL_WIDTH_KATAKANA", 2^11 _
+            , "FULL_WIDTH_GREEK_CYRILLIC_UPPERCASE", 2^12 _
+            , "FULL_WIDTH_GREEK_CYRILLIC_LOWERCASE", 2^13 _
+            , "FULL_WIDTH_LINEFRAME", 2^14 _
+            , "FULL_WIDTH_KANJI_LEVEL1", 2^15 _
+            , "FULL_WIDTH_KANJI_LEVEL2", 2^16 _
+        ) _
+    ) _
+)
 
 '###################################################################################################
 'カスタム関数
@@ -767,11 +791,12 @@ Private Sub fw_excuteSub( _
     , byRef aoArg _
     , byRef aoBroker _
     )
-    
+    Dim sSubNameForPublish : sSubNameForPublish=asSubName&"()"
+
     '実行前の出版（Publish） 処理
     If cf_isAvailableObject(aoBroker) Then
-        aoBroker.publish topic.LOG, Array(logType.INFO ,asSubName ,"Start")
-        aoBroker.publish topic.LOG, Array(logType.DETAIL ,asSubName ,cf_toString(aoArg))
+        aoBroker.publish topic.LOG, Array(logType.INFO ,sSubNameForPublish ,"Start")
+        aoBroker.publish topic.LOG, Array(logType.DETAIL ,sSubNameForPublish ,cf_toString(aoArg))
     End If
     
     '関数の実行
@@ -781,10 +806,10 @@ Private Sub fw_excuteSub( _
     If cf_isAvailableObject(aoBroker) Then
         If oRet.isErr() Then
         'エラー
-            aoBroker.publish topic.LOG, Array(logType.ERROR, asSubName, cf_toString(oRet.getErr()))
+            aoBroker.publish topic.LOG, Array(logType.ERROR, sSubNameForPublish, cf_toString(oRet.getErr()))
         End If
-        aoBroker.publish topic.LOG, Array(logType.INFO, asSubName, "End")
-        aoBroker.publish topic.LOG, Array(logType.DETAIL, asSubName, cf_toString(aoArg))
+        aoBroker.publish topic.LOG, Array(logType.INFO, sSubNameForPublish, "End")
+        aoBroker.publish topic.LOG, Array(logType.DETAIL, sSubNameForPublish, cf_toString(aoArg))
     End If
     
     Set oRet = Nothing
@@ -1398,11 +1423,12 @@ Private Sub new_Enum( _
     , byRef aoDef _
     )
     'クラス名（仮名）作成
-    With new_Char()
-        Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
-    End With
-    cf_push vCharList, "_"
-    Dim sClassName : sClassName = "clsTmp_" & util_randStr(vCharList, 10)
+    Dim sClassName : sClassName = "clsTmp_" & new_Fso().GetBaseName(new_Fso().GetTempName())
+'    With new_Char()
+'        Dim vCharList : vCharList = .charList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
+'    End With
+'    cf_push vCharList, "_"
+'    Dim sClassName : sClassName = "clsTmp_" & util_randStr(vCharList, 10)
 
     'クラス定義のソースコード作成
     Dim sThisName : sThisName = asName
@@ -1413,7 +1439,7 @@ Private Sub new_Enum( _
     cf_push vCode, "Private Sub Class_Initialize()"
     cf_push vCode, "    Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "    Set " & i & "_ = (new clsCmReadOnlyObject).is(Me, '" & i & "', " & aoDef.Item(i) & ")"
+        cf_push vCode, "    Set " & i & "_ = (new clsCmReadOnlyObject).of(Me, '" & i & "', " & aoDef.Item(i) & ")"
         cf_push vCode, "    cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"
@@ -1562,11 +1588,12 @@ Private Function new_Func( _
     sSoruceCode = Replace(sSoruceCode, "'", """")
     
     '関数名（仮名）を作る
-    With new_Char()
-        Dim vCharList : vCharList = .getCharList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
-    End With
-    cf_push vCharList, "_"
-    Dim sFuncName : sFuncName = "anonymous_" & util_randStr(vCharList, 10)
+    Dim sFuncName : sFuncName = "anonymous_" & new_Fso().GetBaseName(new_Fso().GetTempName())
+'    With new_Char()
+'        Dim vCharList : vCharList = .charList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
+'    End With
+'    cf_push vCharList, "_"
+'    Dim sFuncName : sFuncName = "anonymous_" & util_randStr(vCharList, 10)
     
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
@@ -2042,9 +2069,31 @@ Private Function math_min( _
     byVal al1 _ 
     , byVal al2 _
     )
-    Dim lRet
-    If al1 < al2 Then lRet = al1 Else lRet = al2
-    math_min = lRet
+    cf_bind math_min, math_minA(Array(al1, al2))
+'    Dim lRet
+'    If al1 < al2 Then lRet = al1 Else lRet = al2
+'    math_min = lRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_minA()
+'Overview                    : 最小値を求める
+'Detailed Description        : 工事中
+'Argument
+'     avNums                 : 数値
+'Return Value
+'     avNumsの最小値
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/01         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_minA( _
+    byRef avNums _
+    )
+    cf_bind math_minA, avNums
+    If new_Arr().hasElement(avNums) Then cf_bind math_minA, new_ArrOf(avNums).sort(True)(0)
 End Function
 
 '***************************************************************************************************
@@ -2066,9 +2115,31 @@ Private Function math_max( _
     byVal al1 _ 
     , byVal al2 _
     )
-    Dim lRet
-    If al1 > al2 Then lRet = al1 Else lRet = al2
-    math_max = lRet
+    cf_bind math_max, math_maxA(Array(al1, al2))
+'    Dim lRet
+'    If al1 > al2 Then lRet = al1 Else lRet = al2
+'    math_max = lRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : math_maxA()
+'Overview                    : 最大値を求める
+'Detailed Description        : 工事中
+'Argument
+'     avNums                 : 数値
+'Return Value
+'     avNumsの最大値
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/01         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function math_maxA( _
+    byRef avNums _
+    )
+    cf_bind math_maxA, avNums
+    If new_Arr().hasElement(avNums) Then cf_bind math_maxA, new_ArrOf(avNums).sort(False)(0)
 End Function
 
 '***************************************************************************************************

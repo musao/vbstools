@@ -166,7 +166,7 @@ Class clsCmReadOnlyObject
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : is()
+    'Function/Sub Name           : of()
     'Overview                    : ílÇê›íËÇ∑ÇÈ
     'Detailed Description        : ä˘Ç…ê›íËçœÇ›ÇÃèÍçáÇÕó·äO
     'Argument
@@ -181,19 +181,19 @@ Class clsCmReadOnlyObject
     '----------         ----------------------   -------------------------------------------------------
     '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function [is]( _
+    Public Function of( _
         ByRef aoParent _
         , ByVal asName _
         , ByRef avValue _
         )
-        [is] = Empty
-        ast_argFalse PboAlreadySet, TypeName(Me)&"+is()", "Value already set."
+        of = Empty
+        ast_argFalse PboAlreadySet, TypeName(Me)&"+of()", "Value already set."
 
         this_setParent aoParent
         this_setName asName
         this_setValue avValue
         PboAlreadySet = True
-        Set [is] = Me
+        Set of = Me
     End Function
     
 

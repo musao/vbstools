@@ -152,7 +152,7 @@ Class clsCmReturnValue
     '***************************************************************************************************
     'Function/Sub Name           : setValue()
     'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
-    'Detailed Description        : func_CmReturnValueSetValue()に委譲する
+    'Detailed Description        : this_setValue()に委譲する
     'Argument
     '     avRet                  : 戻り値
     'Return Value
@@ -166,13 +166,13 @@ Class clsCmReturnValue
     Public Function setValue( _
         byRef avRet _
         )
-        Set setValue = func_CmReturnValueSetValue(avRet)
+        Set setValue = this_setValue(avRet)
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : setValueByState()
     'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
-    'Detailed Description        : func_CmReturnValueSetValueByState()に委譲する
+    'Detailed Description        : this_setValueByState()に委譲する
     'Argument
     '     avNormal               : 正常の場合の戻り値
     '     avAbnormal             : 異常の場合の戻り値
@@ -188,7 +188,7 @@ Class clsCmReturnValue
         byRef avNormal _
         , byRef avAbnormal _
         )
-        Set setValueByState = func_CmReturnValueSetValueByState(avNormal,avAbnormal)
+        Set setValueByState = this_setValueByState(avNormal,avAbnormal)
     End Function
 
     '***************************************************************************************************
@@ -212,7 +212,7 @@ Class clsCmReturnValue
 
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmReturnValueSetValue()
+    'Function/Sub Name           : this_setValue()
     'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
     'Detailed Description        : 工事中
     'Argument
@@ -225,16 +225,16 @@ Class clsCmReturnValue
     '----------         ----------------------   -------------------------------------------------------
     '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmReturnValueSetValue( _
+    Private Function this_setValue( _
         byRef avRet _
         )
         cf_bind PvValue, avRet
-        sub_CmReturnValueGetErrorStatus()
-        Set func_CmReturnValueSetValue = Me
+        this_getErrorStatus()
+        Set this_setValue = Me
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmReturnValueSetValueByState()
+    'Function/Sub Name           : this_setValueByState()
     'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
     'Detailed Description        : 工事中
     'Argument
@@ -248,7 +248,7 @@ Class clsCmReturnValue
     '----------         ----------------------   -------------------------------------------------------
     '2024/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmReturnValueSetValueByState( _
+    Private Function this_setValueByState( _
         byRef avNormal _
         , byRef avAbnormal _
         )
@@ -257,12 +257,12 @@ Class clsCmReturnValue
         Else
             cf_bind PvValue, avAbnormal
         End If
-        sub_CmReturnValueGetErrorStatus()
-        Set func_CmReturnValueSetValueByState = Me
+        this_getErrorStatus()
+        Set this_setValueByState = Me
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmReturnValueGetErrorStatus()
+    'Function/Sub Name           : this_getErrorStatus()
     'Overview                    : エラー状態を取得しエラーがある場合は情報を取得後にクリアする
     'Detailed Description        : 工事中
     'Argument
@@ -275,7 +275,7 @@ Class clsCmReturnValue
     '----------         ----------------------   -------------------------------------------------------
     '2024/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmReturnValueGetErrorStatus( _
+    Private Sub this_getErrorStatus( _
         )
         If Err.Number=0 Then
             PboIsErr = False

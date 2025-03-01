@@ -58,18 +58,18 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath(), 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Set PoBroker = new_Broker()
-    PoBroker.subscribe topic.LOG, GetRef("sub_CmpExcelLogger")
+    PoBroker.subscribe topic.LOG, GetRef("this_logger")
     'パラメータ格納用汎用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数取得
-    fw_excuteSub "sub_CmpExcelGetParameters", oParams, PoBroker
+    fw_excuteSub "this_getParameters", oParams, PoBroker
     
     '比較対象ファイル入力画面の表示と取得
-    fw_excuteSub "sub_CmpExcelDispInputFiles", oParams, PoBroker
+    fw_excuteSub "this_dispInputFiles", oParams, PoBroker
     
     'エクセルファイルを比較する
-    fw_excuteSub "sub_CmpExcelCompareFiles", oParams, PoBroker
+    fw_excuteSub "this_compareFiles", oParams, PoBroker
     
     'ログ出力をクローズ
     PoWriter.close
@@ -82,7 +82,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_CmpExcelGetParameters()
+'Function/Sub Name           : this_getParameters()
 'Overview                    : 当スクリプトの引数取得
 'Detailed Description        : パラメータ格納用汎用オブジェクトにKey="Param"で格納する
 '                              配列（clsCmArray型）に名前なし引数（/Key:Value 形式でない）があるれば
@@ -102,13 +102,13 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2017/04/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CmpExcelGetParameters( _
+Private Sub this_getParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_CmpExcelLogger Array(logType.DETAIL, "sub_CmpExcelGetParameters", cf_toString(oArg))
+    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,2)
@@ -118,7 +118,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2
-'Function/Sub Name           : sub_CmpExcelDispInputFiles()
+'Function/Sub Name           : this_dispInputFiles()
 'Overview                    : 比較対象ファイル入力画面の表示と取得
 'Detailed Description        : 引数で比較するエクセルファイルの指定がない場合、Excel.Applicationの
 '                              ダイアログを表示してユーザにファイルを選択させる
@@ -136,14 +136,14 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2017/04/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CmpExcelDispInputFiles( _
+Private Sub this_dispInputFiles( _
     byRef aoParams _
     )
     Dim oParam : Set oParam = aoParams.Item("Param")
     If oParam.length > 1 Then
     'パラメータが2個以上だったら関数を抜ける
         '★ログ出力
-        sub_CmpExcelLogger Array(logType.INFO, "sub_CmpExcelDispInputFiles", "No dialog required.")
+        this_logger Array(logType.INFO, "this_dispInputFiles()", "No dialog required.")
         Exit Sub
     End If
     
@@ -159,7 +159,7 @@ Private Sub sub_CmpExcelDispInputFiles( _
                 .Quit
 
                 '★ログ出力
-                sub_CmpExcelLogger Array(logType.WARNING, "sub_CmpExcelDispInputFiles", "Dialog input canceled.")
+                this_logger Array(logType.WARNING, "this_dispInputFiles()", "Dialog input canceled.")
                 PoWriter.close
                 
                 Set oParam = Nothing
@@ -178,7 +178,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 3
-'Function/Sub Name           : sub_CmpExcelCompareFiles()
+'Function/Sub Name           : this_compareFiles()
 'Overview                    : エクセルファイルを比較する
 'Detailed Description        : エラーは無視する
 'Argument
@@ -191,7 +191,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2017/04/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CmpExcelCompareFiles( _
+Private Sub this_compareFiles( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
@@ -200,8 +200,8 @@ Private Sub sub_CmpExcelCompareFiles( _
     'ファイルの最終更新日昇順に並べ替える
     oParam.sortUsing new_Func("(c,n)=>new_CalAt(new_FileOf(c).DateLastModified).compareTo(new_CalAt(new_FileOf(n).DateLastModified))>0")
     '★ログ出力
-    sub_CmpExcelLogger Array(logType.INFO, "sub_CmpExcelCompareFiles", "aoParams sorted.")
-    sub_CmpExcelLogger Array(logType.DETAIL, "sub_CmpExcelCompareFiles", "aoParams is " & cf_toString(aoParams))
+    this_logger Array(logType.INFO, "this_compareFiles()", "aoParams sorted.")
+    this_logger Array(logType.DETAIL, "this_compareFiles()", "aoParams is " & cf_toString(aoParams))
     
     '比較
     With New clsCompareExcel
@@ -217,7 +217,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : -
-'Function/Sub Name           : sub_CmpExcelLogger()
+'Function/Sub Name           : this_logger()
 'Overview                    : ログ出力する
 'Detailed Description        : fw_logger()に委譲する
 'Argument
@@ -230,7 +230,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_CmpExcelLogger( _
+Private Sub this_logger( _
     byRef avParams _
     )
     fw_logger avParams, PoWriter

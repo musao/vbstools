@@ -140,7 +140,7 @@ Class clsCmCssGenerator
     '***************************************************************************************************
     'Function/Sub Name           : generate()
     'Overview                    : CSSを生成する
-    'Detailed Description        : func_CmCssGenGenerate()に委譲する
+    'Detailed Description        : this_generate()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -153,7 +153,7 @@ Class clsCmCssGenerator
     '***************************************************************************************************
     Public Function generate( _
         )
-        generate = func_CmCssGenGenerate()
+        generate = this_generate(TypeName(Me)&"+generate()")
     End Function
 
     '***************************************************************************************************
@@ -172,18 +172,18 @@ Class clsCmCssGenerator
     '***************************************************************************************************
     Public Function toString( _
         )
-        toString = func_CmCssGenGenerate()
+        toString = this_generate(TypeName(Me)&"+toString()")
     End Function
 
 
 
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCssGenGenerate()
+    'Function/Sub Name           : this_generate()
     'Overview                    : CSSを生成する
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     asSource               : ソース
     'Return Value
     '     生成したCSS
     '---------------------------------------------------------------------------------------------------
@@ -192,12 +192,10 @@ Class clsCmCssGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/25         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCssGenGenerate( _
+    Private Function this_generate( _
+        byVal asSource _
         )
-        If IsEmpty(PoTagInfo.Item("selector")) Then
-            Err.Raise 17, "clsCmCssGenerator.vbs:clsCmCssGenerator-func_CmCssGenGenerate()", "セレクタがないCSSは生成できません。"
-            Exit Function
-        End If
+        ast_argNotEmpty PoTagInfo.Item("selector"), asSource, "CSS without selectors cannot be generated."
 
         Dim sRet : sRet = PoTagInfo.Item("selector") & " {" & vbNewLine
 
@@ -206,7 +204,7 @@ Class clsCmCssGenerator
         If Not IsEmpty(PoTagInfo.Item("property")) Then
         'propertyが空でない場合
             For Each vEle In PoTagInfo.Item("property")
-                cf_push vArr, "  " & func_CmCssGenEditProperty(vEle)
+                cf_push vArr, "  " & this_editProperty(vEle)
             Next
             sRet = sRet & Join(vArr, vbNewLine) & vbNewLine
         End If
@@ -214,11 +212,11 @@ Class clsCmCssGenerator
         sRet = sRet & "}"
 
         '生成したCSSを返却
-        func_CmCssGenGenerate = sRet
+        this_generate = sRet
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmCssGenEditProperty()
+    'Function/Sub Name           : this_editProperty()
     'Overview                    : プロパティ（property）の編集処理
     'Detailed Description        : 工事中
     'Argument
@@ -231,10 +229,10 @@ Class clsCmCssGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/25         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmCssGenEditProperty( _
+    Private Function this_editProperty( _
         byRef aoAttr _
         )
-        func_CmCssGenEditProperty = aoAttr.Item("key") & " : " & aoAttr.Item("value") & " ;"
+        this_editProperty = aoAttr.Item("key") & " : " & aoAttr.Item("value") & " ;"
     End Function
 
 End Class

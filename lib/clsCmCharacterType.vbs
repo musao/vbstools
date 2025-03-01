@@ -105,11 +105,11 @@ Class clsCmCharacterType
     Public Property Get typeHalfWidthKatakanaSymbol()
         typeHalfWidthKatakanaSymbol = 2^5
     End Property
-    Public Property Get typeFullWidthAlphabeticUppercase()
-        typeFullWidthAlphabeticUppercase = 2^6
+    Public Property Get typeFullWidthAlphabetUppercase()
+        typeFullWidthAlphabetUppercase = 2^6
     End Property
-    Public Property Get typeFullWidthAlphabeticLowercase()
-        typeFullWidthAlphabeticLowercase = 2^7
+    Public Property Get typeFullWidthAlphabetLowercase()
+        typeFullWidthAlphabetLowercase = 2^7
     End Property
     Public Property Get typeFullWidthNumbers()
         typeFullWidthNumbers = 2^8
@@ -179,7 +179,7 @@ Class clsCmCharacterType
     '全角のグループ
     Public Property Get typeFullWidthAll()
         Dim i,lStt,lEnd,lRet : lRet = 0
-        lStt = math_log2(typeFullWidthAlphabeticUppercase)
+        lStt = math_log2(typeFullWidthAlphabetUppercase)
         lEnd = math_log2(typeFullWidthKanjiLevel2)
         For i=lStt To lEnd
             lRet = lRet + 2^i
@@ -212,19 +212,17 @@ Class clsCmCharacterType
 
         Dim lPowerOf2 : lPowerOf2 = 0
         Do While lPowerOf2 <= Cl_MAX_POWER_OF_2
-            If Not PoType2Chars.Exists(2^lPowerOf2) Then
-                sub_CmCharTypeCreateDefinitionsByCharacterType lPowerOf2
-                If PoChar2Type.Exists(bCode) Then
-                    whatType = PoChar2Type.Item(bCode)
-                    Exit Function
-                End If
+            this_createDefinitionsByCharacterType lPowerOf2
+            If PoChar2Type.Exists(bCode) Then
+                whatType = PoChar2Type.Item(bCode)
+                Exit Function
             End If
             lPowerOf2 = lPowerOf2+1
         Loop
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : getCharList()
+    'Function/Sub Name           : charList()
     'Overview                    : 指定した文字の種類の配列を返す
     'Detailed Description        : http://charset.7jp.net/sjis.html
     'Argument
@@ -254,31 +252,27 @@ Class clsCmCharacterType
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/28         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function getCharList( _
+    Public Function charList( _
         byVal alType _
         )
         Dim lType : lType = alType
         Dim lPowerOf2 : lPowerOf2 = Cl_MAX_POWER_OF_2
-        Dim vRet
-        Dim lQuotient,lDivide
+        Dim vRet,lTargetType
         Do Until lPowerOf2<0
-            lDivide = 2^lPowerOf2
-            lQuotient = lType \ lDivide
-            lType = lType Mod lDivide
-            If lQuotient>0 Then
-                If Not PoType2Chars.Exists(lDivide) Then
-                    sub_CmCharTypeCreateDefinitionsByCharacterType lPowerOf2
-                End If
-                cf_pushA vRet, PoType2Chars.Item(lDivide)
+            lTargetType = 2^lPowerOf2
+            If (lType-lTargetType)>=0 Then
+                lType = lType-lTargetType
+                this_createDefinitionsByCharacterType lPowerOf2
+                cf_pushA vRet, PoType2Chars.Item(lTargetType)
             End If
             lPowerOf2 = lPowerOf2 - 1
         Loop
-        getCharList = vRet
+        charList = vRet
     End Function
     
 
     '***************************************************************************************************
-    'Function/Sub Name           : sub_CmCharTypeCreateDefinitionsByCharacterType
+    'Function/Sub Name           : this_createDefinitionsByCharacterType
     'Overview                    : 指定した文字種類の定義を作成する
     'Detailed Description        : 工事中
     'Argument
@@ -291,7 +285,7 @@ Class clsCmCharacterType
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/30         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub sub_CmCharTypeCreateDefinitionsByCharacterType( _
+    Private Sub this_createDefinitionsByCharacterType( _
         byVal alPowerOf2 _
         )
         Dim lType : lType = 2^alPowerOf2

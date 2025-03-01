@@ -518,25 +518,25 @@ Function assertLogs(f,d,isErr)
     End If
     Dim i : i=0
     AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
-    AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
+    AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "Start", PvLog(i)(2), i&"-2"
     i=i+1
     AssertSameWithMessage logType.DETAIL, PvLog(i)(0), i&"-0"
-    AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
+    AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
     If isErr Then
         i=i+1
         AssertSameWithMessage logType.ERROR, PvLog(i)(0), i&"-0"
-        AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
+        AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
         AssertEqualWithMessage ERR_STR, PvLog(i)(2), i&"-2"
     End If
     i=i+1
     AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
-    AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
+    AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "End", PvLog(i)(2), i&"-2"
     i=i+1
     AssertSameWithMessage logType.DETAIL, PvLog(i)(0), i&"-0"
-    AssertEqualWithMessage f, PvLog(i)(1), i&"-1"
+    AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
 End Function
 

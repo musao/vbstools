@@ -53,12 +53,12 @@ Sub Test_clsCmCharacterType_type_
     AssertEqualWithMessage e, a, "typeHalfWidthKatakanaSymbol"
 
     e = e*2
-    a = ao.typeFullWidthAlphabeticUppercase
-    AssertEqualWithMessage e, a, "typeFullWidthAlphabeticUppercase"
+    a = ao.typeFullWidthAlphabetUppercase
+    AssertEqualWithMessage e, a, "typeFullWidthAlphabetUppercase"
 
     e = e*2
-    a = ao.typeFullWidthAlphabeticLowercase
-    AssertEqualWithMessage e, a, "typeFullWidthAlphabeticLowercase"
+    a = ao.typeFullWidthAlphabetLowercase
+    AssertEqualWithMessage e, a, "typeFullWidthAlphabetLowercase"
 
     e = e*2
     a = ao.typeFullWidthNumbers
@@ -136,7 +136,7 @@ Sub Test_clsCmCharacterType_typeSum_
     a = ao.typeHalfWidthAll
     AssertEqualWithMessage e, a, "typeHalfWidthAll"
 
-    stt = math_log2(ao.typeFullWidthAlphabeticUppercase)
+    stt = math_log2(ao.typeFullWidthAlphabetUppercase)
     ed = math_log2(ao.typeFullWidthKanjiLevel2)
     e = 0
     For i=stt To ed
@@ -197,14 +197,14 @@ Sub Test_clsCmCharacterType_whatType
 End Sub
 
 '###################################################################################################
-'clsCmCharacterType.getCharList()
+'clsCmCharacterType.charList()
 Sub Test_clsCmCharacterType_getCharList
     Dim ao,a,d,e,i,j
     Set ao = new clsCmCharacterType
     
     For i=0 To 16
         d = 2^i
-        For Each j In ao.getCharList(d)
+        For Each j In ao.charList(d)
             e = d
             a = ao.whatType(j)
             AssertEqualWithMessage e, a, "No="&i&", Type="&(2^i)&", Char="&j

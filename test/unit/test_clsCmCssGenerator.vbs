@@ -127,10 +127,10 @@ Sub Test_clsCmCssGenerator_generate_Err
     Set ao = new clsCmCssGenerator
 
     On Error Resume Next
-    ao.generate
+    ao.generate()
 
-    AssertEqualWithMessage 17, Err.Number, "Err.Number"
-    AssertEqualWithMessage "セレクタがないCSSは生成できません。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmCssGenerator+generate()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "CSS without selectors cannot be generated.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
@@ -145,6 +145,16 @@ Sub Test_clsCmCssGenerator_toString
     a = ao.toString()
 
     AssertEqualWithMessage e, a, "1"
+End Sub
+Sub Test_clsCmCssGenerator_toString_Err
+    Dim ao
+    Set ao = new clsCmCssGenerator
+
+    On Error Resume Next
+    ao.toString()
+
+    AssertEqualWithMessage "clsCmCssGenerator+toString()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "CSS without selectors cannot be generated.", Err.Description, "Err.Description"
 End Sub
 
 ' Local Variables:

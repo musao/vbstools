@@ -200,10 +200,10 @@ Sub Test_clsCmHtmlGenerator_generate_Err
     Set ao = new clsCmHtmlGenerator
 
     On Error Resume Next
-    ao.generate
+    ao.generate()
 
-    AssertEqualWithMessage 17, Err.Number, "Err.Number"
-    AssertEqualWithMessage "要素がないHTMLタグは生成できません。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "clsCmHtmlGenerator+generate()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "HTML tags without elements cannot be generated.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
@@ -248,6 +248,16 @@ Sub Test_clsCmHtmlGenerator_toString
     a = ao.toString()
 
     AssertEqualWithMessage e, a, "1"
+End Sub
+Sub Test_clsCmHtmlGenerator_toString_Err
+    Dim ao
+    Set ao = new clsCmHtmlGenerator
+
+    On Error Resume Next
+    ao.toString()
+
+    AssertEqualWithMessage "clsCmHtmlGenerator+toString()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "HTML tags without elements cannot be generated.", Err.Description, "Err.Description"
 End Sub
 
 ' Local Variables:

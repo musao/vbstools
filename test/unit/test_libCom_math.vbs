@@ -19,20 +19,39 @@ Option Explicit
 Sub Test_math_min
     dim a,e,d,i,num1,num2
     d = Array ( _
-            new_DicOf(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expected","Num1")) _
-            , new_DicOf(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expected","Num2")) _
-            , new_DicOf(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expected","Num1")) _
-            , new_DicOf(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expected","Num2")) _
-            , new_DicOf(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expected","Num1")) _
-            , new_DicOf(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expected","Num2")) _
-            , new_DicOf(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expected","Num1")) _
+            new_DicOf(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expect","Num1")) _
+            , new_DicOf(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expect","Num2")) _
+            , new_DicOf(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expect","Num1")) _
+            , new_DicOf(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expect","Num2")) _
+            , new_DicOf(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expect","Num1")) _
+            , new_DicOf(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expect","Num2")) _
+            , new_DicOf(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expect","Num1")) _
             )
     For Each i In d
         num1 = i.Item("Num1")
         num2 = i.Item("Num2")
-        e = i.Item(i.Item("Expected"))
+        e = i.Item(i.Item("Expect"))
         a = math_min(num1,num2)
         AssertEqualWithMessage a, e, "No="&i.Item("No")&", Num1="&num1&", Num2="&num2
+    Next
+End Sub
+
+'###################################################################################################
+'math_minA()
+Sub Test_math_minA
+    dim a,e,d,i,nums
+    d = Array ( _
+            new_DicOf(Array(  "No",1 ,"Nums",Array(1,2,3) ,"Expect",1)) _
+            , new_DicOf(Array("No",2 ,"Nums",Array(3,2)   ,"Expect",2)) _
+            , new_DicOf(Array("No",3 ,"Nums",Array(3)     ,"Expect",3)) _
+            , new_DicOf(Array("No",4 ,"Nums","fujii"      ,"Expect","fujii")) _
+            , new_DicOf(Array("No",5 ,"Nums",null         ,"Expect",null)) _
+            )
+    For Each i In d
+        nums = i.Item("Nums")
+        e = i.Item("Expect")
+        a = math_minA(nums)
+        AssertEqualWithMessage a, e, cf_toString(i)
     Next
 End Sub
 
@@ -41,20 +60,39 @@ End Sub
 Sub Test_math_max
     dim a,e,d,i,num1,num2
     d = Array ( _
-            new_DicOf(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expected","Num2")) _
-            , new_DicOf(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expected","Num1")) _
-            , new_DicOf(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expected","Num2")) _
-            , new_DicOf(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expected","Num1")) _
-            , new_DicOf(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expected","Num2")) _
-            , new_DicOf(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expected","Num1")) _
-            , new_DicOf(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expected","Num2")) _
+            new_DicOf(Array(  "No",1 ,"Num1",1     ,"Num2",1     ,"Expect","Num2")) _
+            , new_DicOf(Array("No",2 ,"Num1",2     ,"Num2",1     ,"Expect","Num1")) _
+            , new_DicOf(Array("No",3 ,"Num1",-3    ,"Num2",-2    ,"Expect","Num2")) _
+            , new_DicOf(Array("No",4 ,"Num1",1     ,"Num2",-2    ,"Expect","Num1")) _
+            , new_DicOf(Array("No",5 ,"Num1",0.2   ,"Num2",0.3   ,"Expect","Num2")) _
+            , new_DicOf(Array("No",6 ,"Num1",0.1   ,"Num2",-0.04 ,"Expect","Num1")) _
+            , new_DicOf(Array("No",7 ,"Num1",-0.015,"Num2",-0.009,"Expect","Num2")) _
             )
     For Each i In d
         num1 = i.Item("Num1")
         num2 = i.Item("Num2")
-        e = i.Item(i.Item("Expected"))
+        e = i.Item(i.Item("Expect"))
         a = math_max(num1,num2)
         AssertEqualWithMessage a, e, "No="&i.Item("No")&", Num1="&num1&", Num2="&num2
+    Next
+End Sub
+
+'###################################################################################################
+'math_maxA()
+Sub Test_math_maxA
+    dim a,e,d,i,nums
+    d = Array ( _
+            new_DicOf(Array(  "No",1 ,"Nums",Array(1,2,3) ,"Expect",3)) _
+            , new_DicOf(Array("No",2 ,"Nums",Array(1,2)   ,"Expect",2)) _
+            , new_DicOf(Array("No",3 ,"Nums",Array(1)     ,"Expect",1)) _
+            , new_DicOf(Array("No",4 ,"Nums","fujii"      ,"Expect","fujii")) _
+            , new_DicOf(Array("No",5 ,"Nums",Empty        ,"Expect",Empty)) _
+            )
+    For Each i In d
+        nums = i.Item("Nums")
+        e = i.Item("Expect")
+        a = math_maxA(nums)
+        AssertEqualWithMessage a, e, cf_toString(i)
     Next
 End Sub
 

@@ -54,7 +54,7 @@ Sub Test_util_randStr
     dim d,a,s
     s = 1000
     With new_Char()
-        d = .getCharList(.typeHalfWidthNumbers)
+        d = .charList(.typeHalfWidthNumbers)
     End With
     
     a = util_randStr(d,s)

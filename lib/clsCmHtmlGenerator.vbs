@@ -182,7 +182,7 @@ Class clsCmHtmlGenerator
     '***************************************************************************************************
     'Function/Sub Name           : generate()
     'Overview                    : HTMLを生成する
-    'Detailed Description        : func_CmHtmlGenGenerate()に委譲する
+    'Detailed Description        : this_generate()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -195,7 +195,7 @@ Class clsCmHtmlGenerator
     '***************************************************************************************************
     Public Function generate( _
         )
-        generate = func_CmHtmlGenGenerate()
+        generate = this_generate(TypeName(Me)&"+generate()")
     End Function
 
     '***************************************************************************************************
@@ -214,16 +214,16 @@ Class clsCmHtmlGenerator
     '***************************************************************************************************
     Public Function toString( _
         )
-        toString = func_CmHtmlGenGenerate()
+        toString = this_generate(TypeName(Me)&"+toString()")
     End Function
 
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlGenGenerate()
+    'Function/Sub Name           : this_generate()
     'Overview                    : HTMLを生成する
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     asSource               : ソース
     'Return Value
     '     生成したHTML
     '---------------------------------------------------------------------------------------------------
@@ -232,12 +232,14 @@ Class clsCmHtmlGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlGenGenerate( _
+    Private Function this_generate( _
+        byVal asSource _
         )
-        If IsEmpty(PoTagInfo.Item("element")) Then
-            Err.Raise 17, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator-func_CmHtmlGenGenerate()", "要素がないHTMLタグは生成できません。"
-            Exit Function
-        End If
+        ast_argNotEmpty PoTagInfo.Item("element"), asSource, "HTML tags without elements cannot be generated."
+'        If IsEmpty(PoTagInfo.Item("element")) Then
+'            Err.Raise 17, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator-this_generate()", "要素がないHTMLタグは生成できません。"
+'            Exit Function
+'        End If
 
         '開始タグの編集
         Dim sStt : sStt =  "<" & PoTagInfo.Item("element")
@@ -246,7 +248,7 @@ Class clsCmHtmlGenerator
         If Not IsEmpty(PoTagInfo.Item("attribute")) Then
         'attributeが空でない場合
             For Each vEle In PoTagInfo.Item("attribute")
-                cf_push vArr, func_CmHtmlGenEditAttribute(vEle)
+                cf_push vArr, this_editAttribute(vEle)
             Next
             sStt = sStt & " " & Join(vArr, " ")
         End If
@@ -264,7 +266,7 @@ Class clsCmHtmlGenerator
         'contentが空でない場合
             vArr = Array()
             For Each vEle In PoTagInfo.Item("content")
-                cf_push vArr, func_CmHtmlGenEditContent(vEle)
+                cf_push vArr, this_editContent(vEle)
             Next
             sCont = new_Re("^([^\n])", "igm").Replace(Join(vArr, vbNewLine),"  $1")
         End If
@@ -279,12 +281,12 @@ Class clsCmHtmlGenerator
         '生成したHTMLを返却
         sRet = sStt
         If Not IsEmpty(PoTagInfo.Item("content")) Then sRet = sRet & vbNewLine & sCont & vbNewLine & sEnd
-        func_CmHtmlGenGenerate = sRet
+        this_generate = sRet
 
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlGenEditAttribute()
+    'Function/Sub Name           : this_editAttribute()
     'Overview                    : 属性（attribute）の編集処理
     'Detailed Description        : 工事中
     'Argument
@@ -297,7 +299,7 @@ Class clsCmHtmlGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlGenEditAttribute( _
+    Private Function this_editAttribute( _
         byRef aoAttr _
         )
         Dim sRet
@@ -306,11 +308,11 @@ Class clsCmHtmlGenerator
         Else
             sRet = aoAttr.Item("key") & "=" & Chr(34) & aoAttr.Item("value") & Chr(34)
         End If
-        func_CmHtmlGenEditAttribute = sRet
+        this_editAttribute = sRet
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlGenEditContent()
+    'Function/Sub Name           : this_editContent()
     'Overview                    : 内容（content）の編集処理
     'Detailed Description        : 工事中
     'Argument
@@ -323,21 +325,21 @@ Class clsCmHtmlGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/10/22         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlGenEditContent( _
+    Private Function this_editContent( _
         byRef aoCont _
         )
         Dim sRet
         On Error Resume Next
         sRet = aoCont.generate()
         If Err.Number<>0 Then
-            sRet = func_CmHtmlGenHtmlEntityReference(aoCont)
+            sRet = this_htmlEntityReference(aoCont)
         End If
         On Error GoTo 0
-        func_CmHtmlGenEditContent = sRet
+        this_editContent = sRet
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmHtmlGenHtmlEntityReference()
+    'Function/Sub Name           : this_htmlEntityReference()
     'Overview                    : HTMLの特殊文字を実体参照（entity reference）処理する
     'Detailed Description        : HTMLとして特殊な意味を持つ文字（特殊文字またはメタ文字）を意味を持たない
     '                              別の文字列に置換する
@@ -351,7 +353,7 @@ Class clsCmHtmlGenerator
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmHtmlGenHtmlEntityReference( _
+    Private Function this_htmlEntityReference( _
         byRef asTarget _
         )
         Dim vSettings : vSettings = Array( _
@@ -366,7 +368,7 @@ Class clsCmHtmlGenerator
         For Each i In vSettings
             sTarget = Replace(sTarget, i(0), i(1))
         Next
-        func_CmHtmlGenHtmlEntityReference = sTarget
+        this_htmlEntityReference = sTarget
     End Function
 
 End Class
