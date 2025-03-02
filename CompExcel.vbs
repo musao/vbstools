@@ -19,11 +19,11 @@ Option Explicit
 'ïœêî
 Private PoWriter, PoBroker
 
-'lib import
-Private Const Cs_FOLDER_LIB = "lib"
+'lib\com import
+Dim sRelativeFolderName : sRelativeFolderName = "lib\com"
 With CreateObject("Scripting.FileSystemObject")
     Dim sParentFolderPath : sParentFolderPath = .GetParentFolderName(WScript.ScriptFullName)
-    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, Cs_FOLDER_LIB)
+    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, sRelativeFolderName)
     Dim oLibFile
     For Each oLibFile In CreateObject("Shell.Application").Namespace(sLibFolderPath).Items
         If Not oLibFile.IsFolder Then
@@ -32,6 +32,13 @@ With CreateObject("Scripting.FileSystemObject")
     Next
 End With
 Set oLibFile = Nothing
+
+'lib import
+sRelativeFolderName = "lib"
+With new_FSO()
+    sLibFolderPath = .BuildPath(sParentFolderPath, sRelativeFolderName)
+    ExecuteGlobal .OpenTextfile(.BuildPath(sLibFolderPath,"clsCompareExcel.vbs")).ReadAll
+End With
 
 'ÉÅÉCÉìä÷êîé¿çs
 Call Main()

@@ -1,16 +1,16 @@
 ' clsCmHtmlGenerator.vbs: test.
-' @import ../../lib/clsAdptFile.vbs
-' @import ../../lib/clsCmArray.vbs
-' @import ../../lib/clsCmBroker.vbs
-' @import ../../lib/clsCmBufferedReader.vbs
-' @import ../../lib/clsCmBufferedWriter.vbs
-' @import ../../lib/clsCmCalendar.vbs
-' @import ../../lib/clsCmCharacterType.vbs
-' @import ../../lib/clsCmCssGenerator.vbs
-' @import ../../lib/clsCmHtmlGenerator.vbs
-' @import ../../lib/clsCmReturnValue.vbs
-' @import ../../lib/clsCompareExcel.vbs
-' @import ../../lib/libCom.vbs
+' @import ../../lib/com/clsAdptFile.vbs
+' @import ../../lib/com/clsCmArray.vbs
+' @import ../../lib/com/clsCmBroker.vbs
+' @import ../../lib/com/clsCmBufferedReader.vbs
+' @import ../../lib/com/clsCmBufferedWriter.vbs
+' @import ../../lib/com/clsCmCalendar.vbs
+' @import ../../lib/com/clsCmCharacterType.vbs
+' @import ../../lib/com/clsCmCssGenerator.vbs
+' @import ../../lib/com/clsCmHtmlGenerator.vbs
+' @import ../../lib/com/clsCmReadOnlyObject.vbs
+' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/libCom.vbs
 
 Option Explicit
 

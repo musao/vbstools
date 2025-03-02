@@ -23,11 +23,11 @@ Option Explicit
 'ïœêî
 Private PoWriter
 
-'lib import
-Private Const Cs_FOLDER_LIB = "lib"
+'lib\com import
+Dim sRelativeFolderName : sRelativeFolderName = "lib\com"
 With CreateObject("Scripting.FileSystemObject")
     Dim sParentFolderPath : sParentFolderPath = .GetParentFolderName(WScript.ScriptFullName)
-    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, Cs_FOLDER_LIB)
+    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, sRelativeFolderName)
     Dim oLibFile
     For Each oLibFile In CreateObject("Shell.Application").Namespace(sLibFolderPath).Items
         If Not oLibFile.IsFolder Then
@@ -126,12 +126,10 @@ Private Sub this_getParameters( _
     If oArg.Item("Named").Exists(oKey) Then lLength = oArg.Item("Named").Item(oKey) Else lLength = 16
     
     'í«â¡éwíËÇ∑ÇÈï∂éöéÌ
-    Dim vAdd
+    Dim vAdd : vAdd = Empty
     oKey = "Add"
     If oArg.Item("Named").Exists(oKey) Then 
         vAdd = new_ArrSplit(oArg.Item("Named").Item(oKey), ",", vbBinaryCompare).toArray()
-    Else
-        vAdd = Empty
     End If
     
     'ï∂éöÇÃéÌóﬁ
