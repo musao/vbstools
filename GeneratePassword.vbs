@@ -62,15 +62,15 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe topic.LOG, GetRef("sub_GnrtPwLogger")
+    oBroker.subscribe topic.LOG, GetRef("this_logger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    fw_excuteSub "sub_GnrtPwGetParameters", oParams, oBroker
+    fw_excuteSub "this_getParameters", oParams, oBroker
     
     'パスワードを生成する
-    fw_excuteSub "sub_GnrtPwGenerate", oParams, oBroker
+    fw_excuteSub "this_generate", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -83,7 +83,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_GnrtPwGetParameters()
+'Function/Sub Name           : this_getParameters()
 'Overview                    : 当スクリプトの引数をパラメータ格納用オブジェクトに取得する
 'Detailed Description        : 名前付き引数（/Key:Value 形式）だけを取得する
 '                              Key           Value                                     Default
@@ -110,13 +110,13 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/24         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GnrtPwGetParameters( _
+Private Sub this_getParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GnrtPwLogger Array(logType.DETAIL, "sub_GnrtPwGetParameters", cf_toString(oArg))
+    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
     
     '引数の内容を解析
     
@@ -155,7 +155,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2
-'Function/Sub Name           : sub_GnrtPwGenerate()
+'Function/Sub Name           : this_generate()
 'Overview                    : パスワードを生成する
 'Detailed Description        : 生成したパスワードはクリップボードにコピーし、InputBoxに表示する
 'Argument
@@ -168,7 +168,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/24         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GnrtPwGenerate( _
+Private Sub this_generate( _
     byRef aoParams _
     )
     'パスワード生成
@@ -184,7 +184,7 @@ Private Sub sub_GnrtPwGenerate( _
     Dim sPw : sPw = util_randStr(vCharList, lLength)
     
     '★ログ出力
-    sub_GnrtPwLogger Array(logType.INFO, "sub_GnrtPwGenerate", "GeneratedPassword is " & sPw)
+    this_logger Array(logType.INFO, "this_generate()", "Generated password is " & sPw)
     
     'ダイアログのメッセージなどを作成
     Dim sMsg, sTitle
@@ -192,7 +192,7 @@ Private Sub sub_GnrtPwGenerate( _
     sTitle = new_Now() & " に作成"
     
     '★ログ出力
-    sub_GnrtPwLogger Array(logType.INFO, "sub_GnrtPwGenerate", "Display Inputbox.")
+    this_logger Array(logType.INFO, "this_generate()", "Display Inputbox.")
     '一時ファイルのパスを作成
     Dim sPath : sPath = fw_getTempPath()
     Do Until Inputbox(sMsg, sTitle, sPw)=False
@@ -203,15 +203,14 @@ Private Sub sub_GnrtPwGenerate( _
         '一時ファイルを削除
         fs_deleteFile sPath
         '★ログ出力
-        sub_GnrtPwLogger Array(logType.INFO, "sub_GnrtPwGenerate", "Copied to clipboard.")
+        this_logger Array(logType.INFO, "this_generate()", "Copied to clipboard.")
     Loop
-    
     
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : -
-'Function/Sub Name           : sub_GnrtPwLogger()
+'Function/Sub Name           : this_logger()
 'Overview                    : ログ出力する
 'Detailed Description        : fw_logger()に委譲する
 'Argument
@@ -224,7 +223,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GnrtPwLogger( _
+Private Sub this_logger( _
     byRef avParams _
     )
     fw_logger avParams, PoWriter

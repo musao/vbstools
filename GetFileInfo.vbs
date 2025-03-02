@@ -57,18 +57,18 @@ Sub Main()
     PoWriter.writeBufferSize=100000
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe topic.LOG, GetRef("sub_GetFileInfoLogger")
+    oBroker.subscribe topic.LOG, GetRef("this_logger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    fw_excuteSub "sub_GetFileInfoGetParameters", oParams, oBroker
+    fw_excuteSub "this_getParameters", oParams, oBroker
     
     'ファイル情報の取得
-    fw_excuteSub "sub_GetFileInfoProc", oParams, oBroker
+    fw_excuteSub "this_getFileInfomations", oParams, oBroker
     
     '結果出力
-    fw_excuteSub "sub_GetFileInfoReport", oParams, oBroker
+    fw_excuteSub "this_makeReport", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -81,7 +81,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_GetFileInfoGetParameters()
+'Function/Sub Name           : this_getParameters()
 'Overview                    : 当スクリプトの引数をパラメータ格納用オブジェクトに取得する
 'Detailed Description        : パラメータ格納用汎用オブジェクトにKey="Param"で格納する
 '                              配列（clsCmArray型）に名前なし引数（/Key:Value 形式でない）を全て
@@ -96,13 +96,13 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/05         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetFileInfoGetParameters( _
+Private Sub this_getParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GetFileInfoLogger Array(logType.DETAIL, "sub_GetFileInfoGetParameters", cf_toString(oArg))
+    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
     
     '実在するパスだけパラメータ格納用オブジェクトに設定
     Dim oParam, oRet, oItem
@@ -114,7 +114,7 @@ Private Sub sub_GetFileInfoGetParameters( _
             oParam.push oRet.returnValue
         Else
             '★ログ出力
-            sub_GetFileInfoLogger Array(logType.WARNING, "sub_GetFileInfoGetParameters", oItem & "is an invalid argument.")
+            this_logger Array(logType.WARNING, "this_getParameters()", oItem & "is an invalid argument.")
         End If
     Next
     cf_bindAt aoParams, "Param", oParam
@@ -127,7 +127,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2
-'Function/Sub Name           : sub_GetFileInfoProc()
+'Function/Sub Name           : this_getFileInfomations()
 'Overview                    : ファイル情報の取得
 'Detailed Description        : 工事中
 'Argument
@@ -140,14 +140,14 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/05         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetFileInfoProc( _
+Private Sub this_getFileInfomations( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
     Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoProc", "Before getting list of files.")
+    this_logger Array(logType.INFO, "this_getFileInfomations()", "Before getting list of files.")
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
@@ -155,9 +155,9 @@ Private Sub sub_GetFileInfoProc( _
     Loop
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoProc", "Before sorting.")
+    this_logger Array(logType.INFO, "this_getFileInfomations()", "Before sorting.")
     '重複を排除してpath順にソートする
-    cf_bindAt aoParams, "List", oList.uniq().sortUsing(getref("func_GetFileInfoSort"))
+    cf_bindAt aoParams, "List", oList.uniq().sortUsing(getref("this_sort"))
 
     Set oList = Nothing
     Set oParam = Nothing
@@ -165,7 +165,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 3
-'Function/Sub Name           : sub_GetFileInfoReport()
+'Function/Sub Name           : this_makeReport()
 'Overview                    : 結果出力
 'Detailed Description        : 工事中
 'Argument
@@ -178,24 +178,24 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetFileInfoReport( _
+Private Sub this_makeReport( _
     byRef aoParams _
     )
     If aoParams.Item("List").length=0 Then
     'パラメータ格納用汎用オブジェクトが空の場合
         '★ログ出力
-        sub_GetFileInfoLogger Array(logType.WARNING, "sub_GetFileInfoReport", "There was no files.")
+        this_logger Array(logType.WARNING, "this_makeReport()", "There was no files.")
         '何もせず処理を抜ける
         Exit Sub
     End If
 
     'レポートの作成
     With new_HtmlOf("html")
-        .addContent func_GetFileInfoReportHtmlHead(aoParams)
-        .addContent func_GetFileInfoReportHtmlBody(aoParams)
+        .addContent this_makeReportHtmlHeader(aoParams)
+        .addContent this_makeReportHtmlBody(aoParams)
     
         '★ログ出力
-        sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoReport", "Before reportfile output.")
+        this_logger Array(logType.INFO, "this_makeReport()", "Before reportfile output.")
         'レポートをファイルに出力
         Dim sPath
         sPath = fw_getPrivatePath("report", new_Fso().GetBaseName(WScript.ScriptName) & new_Now().formatAs("_YYMMDD_HHmmSS_000") & ".html")
@@ -203,7 +203,7 @@ Private Sub sub_GetFileInfoReport( _
     End With
 
     '★ログ出力
-    sub_GetFileInfoLogger Array(logType.INFO, "sub_GetFileInfoReport", "Before open reportfile.")
+    this_logger Array(logType.INFO, "this_makeReport()", "Before open reportfile.")
     'レポートを開く
     fw_runShellSilently fs_wrapInQuotes(sPath)
     
@@ -211,7 +211,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 3-1
-'Function/Sub Name           : func_GetFileInfoReportHtmlHead()
+'Function/Sub Name           : this_makeReportHtmlHeader()
 'Overview                    : 結果HTMLのheadタグ内の編集
 'Detailed Description        : 工事中
 'Argument
@@ -224,7 +224,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_GetFileInfoReportHtmlHead( _
+Private Function this_makeReportHtmlHeader( _
     byRef aoParams _
     )
     
@@ -274,14 +274,14 @@ Private Function func_GetFileInfoReportHtmlHead( _
     Dim oHead : Set oHead = new_HtmlOf("head")
     oHead.addContent oStyle
 
-    Set func_GetFileInfoReportHtmlHead = oHead
+    Set this_makeReportHtmlHeader = oHead
     Set oStyle = Nothing
     Set oHead = Nothing
 End Function
 
 '***************************************************************************************************
 'Processing Order            : 3-2
-'Function/Sub Name           : func_GetFileInfoReportHtmlBody()
+'Function/Sub Name           : this_makeReportHtmlBody()
 'Overview                    : 結果HTMLのbodyタグ内の編集
 'Detailed Description        : 工事中
 'Argument
@@ -294,7 +294,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_GetFileInfoReportHtmlBody( _
+Private Function this_makeReportHtmlBody( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
@@ -339,7 +339,7 @@ Private Function func_GetFileInfoReportHtmlBody( _
     Dim oBody : Set oBody = new_HtmlOf("body")
     oBody.addContent oDiv
 
-    Set func_GetFileInfoReportHtmlBody = oBody
+    Set this_makeReportHtmlBody = oBody
     Set oTr = Nothing
     Set oThead = Nothing
     Set oTbody = Nothing
@@ -350,7 +350,7 @@ End Function
 
 '***************************************************************************************************
 'Processing Order            : -
-'Function/Sub Name           : sub_GetFileInfoLogger()
+'Function/Sub Name           : this_logger()
 'Overview                    : ログ出力する
 'Detailed Description        : fw_logger()に委譲する
 'Argument
@@ -363,14 +363,14 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/05         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetFileInfoLogger( _
+Private Sub this_logger( _
     byRef avParams _
     )
     fw_logger avParams, PoWriter
 End Sub
 '***************************************************************************************************
 'Processing Order            : -
-'Function/Sub Name           : func_GetFileInfoSort()
+'Function/Sub Name           : this_sort()
 'Overview                    : 要素の比較結果を返す
 'Detailed Description        : ファイル情報リストのソートで使用する
 'Argument
@@ -384,9 +384,9 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/12/21         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_GetFileInfoSort( _
+Private Function this_sort( _
     byRef aoCurrentValue _
     , byRef aoNextValue _
     )
-    func_GetFileInfoSort = aoCurrentValue.ParentFolder&aoCurrentValue.Path > aoNextValue.ParentFolder&aoNextValue.Path
+    this_sort = aoCurrentValue.ParentFolder&aoCurrentValue.Path > aoNextValue.ParentFolder&aoNextValue.Path
 End Function

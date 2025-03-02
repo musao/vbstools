@@ -56,15 +56,15 @@ Sub Main()
     Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
     'ブローカークラスのインスタンスの設定
     Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe topic.LOG, GetRef("sub_GetPathsLogger")
+    oBroker.subscribe topic.LOG, GetRef("this_logger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    fw_excuteSub "sub_GetPathsGetParameters", oParams, oBroker
+    fw_excuteSub "this_getParameters", oParams, oBroker
     
     '引数のファイルパスをクリップボードに出力する
-    fw_excuteSub "sub_GetPathsProc", oParams, oBroker
+    fw_excuteSub "this_toClipbord", oParams, oBroker
     
     'ログ出力をクローズ
     PoWriter.close()
@@ -77,7 +77,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_GetPathsGetParameters()
+'Function/Sub Name           : this_getParameters()
 'Overview                    : 当スクリプトの引数をパラメータ格納用オブジェクトに取得する
 'Detailed Description        : パラメータ格納用汎用オブジェクトにKey="Param"で格納する
 '                              配列（clsCmArray型）に名前なし引数（/Key:Value 形式でない）を全て
@@ -92,13 +92,13 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/30         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetPathsGetParameters( _
+Private Sub this_getParameters( _
     byRef aoParams _
     )
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    sub_GetPathsLogger Array(logType.DETAIL, "sub_GetPathsGetParameters", cf_toString(oArg))
+    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,vbNullString)
@@ -108,7 +108,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2
-'Function/Sub Name           : sub_GetPathsProc()
+'Function/Sub Name           : this_toClipbord()
 'Overview                    : 引数のファイルパスをクリップボードに出力する
 'Detailed Description        : 工事中
 'Argument
@@ -121,7 +121,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/30         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetPathsProc( _
+Private Sub this_toClipbord( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
@@ -129,7 +129,7 @@ Private Sub sub_GetPathsProc( _
     
     '一時ファイルに連結した引数を出力
     Dim sTempFilePaths : sTempFilePaths = fw_getTempPath()
-    fs_writeFileDefault sTempFilePaths, func_GetPathsReplaceEnvironmentStrings(oParam.join(vbNewLine))
+    fs_writeFileDefault sTempFilePaths, this_replaceEnvironmentStrings(oParam.join(vbNewLine))
     fw_runShellSilently "cmd /c clip <" & fs_wrapInQuotes(sTempFilePaths)
     
     '一時ファイルを削除
@@ -140,7 +140,7 @@ End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2-1
-'Function/Sub Name           : func_GetPathsReplaceEnvironmentStrings()
+'Function/Sub Name           : this_replaceEnvironmentStrings()
 'Overview                    : 環境変数に置き換える
 'Detailed Description        : 工事中
 'Argument
@@ -153,7 +153,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2024/04/06         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function func_GetPathsReplaceEnvironmentStrings( _
+Private Function this_replaceEnvironmentStrings( _
     byVal asStr _
     )
     Dim sSettings
@@ -165,12 +165,12 @@ Private Function func_GetPathsReplaceEnvironmentStrings( _
         sRet = Replace(sRet, new_Shell().ExpandEnvironmentStrings(i), i)
     Next
 
-    func_GetPathsReplaceEnvironmentStrings = sRet
+    this_replaceEnvironmentStrings = sRet
 End Function
 
 '***************************************************************************************************
 'Processing Order            : -
-'Function/Sub Name           : sub_GetPathsLogger()
+'Function/Sub Name           : this_logger()
 'Overview                    : ログ出力する
 'Detailed Description        : fw_logger()に委譲する
 'Argument
@@ -183,7 +183,7 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/30         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_GetPathsLogger( _
+Private Sub this_logger( _
     byRef avParams _
     )
     fw_logger avParams, PoWriter
