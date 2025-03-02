@@ -1,32 +1,32 @@
-' clsCmCharacterType.vbs: test.
+' CharacterType.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
 
 '###################################################################################################
-'clsCmCharacterType
-Sub Test_clsCmCharacterType
-    Dim a : Set a = new clsCmCharacterType
+'CharacterType
+Sub Test_CharacterType
+    Dim a : Set a = new CharacterType
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmCharacterType", TypeName(a)
+    AssertEqual "CharacterType", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmCharacterType.type*()
-Sub Test_clsCmCharacterType_type_
+'CharacterType.type*()
+Sub Test_CharacterType_type_
     Dim ao,a,e
-    Set ao = new clsCmCharacterType
+    Set ao = new CharacterType
 
     e = 2^0
     a = ao.typeHalfWidthAlphabetUppercase
@@ -96,9 +96,9 @@ Sub Test_clsCmCharacterType_type_
     a = ao.typeFullWidthKanjiLevel2
     AssertEqualWithMessage e, a, "typeFullWidthKanjiLevel2"
 End Sub
-Sub Test_clsCmCharacterType_typeSum_
+Sub Test_CharacterType_typeSum_
     Dim ao,a,e,i,stt,ed
-    Set ao = new clsCmCharacterType
+    Set ao = new CharacterType
 
     stt = math_log2(ao.typeHalfWidthAlphabetUppercase)
     ed = math_log2(ao.typeFullWidthKanjiLevel2)
@@ -147,10 +147,10 @@ Sub Test_clsCmCharacterType_typeSum_
 End Sub
 
 '###################################################################################################
-'clsCmCharacterType.whatType()
-Sub Test_clsCmCharacterType_whatType
+'CharacterType.whatType()
+Sub Test_CharacterType_whatType
     Dim ao,a,d,dc,e,i
-    Set ao = new clsCmCharacterType
+    Set ao = new CharacterType
     d = Array( _
         new_DicOf(Array("No", "1-1", "Char", "A", "Expected", 2^0)) _
         , new_DicOf(Array("No", "1-2", "Char", "Q", "Expected", 2^0)) _
@@ -197,10 +197,10 @@ Sub Test_clsCmCharacterType_whatType
 End Sub
 
 '###################################################################################################
-'clsCmCharacterType.charList()
-Sub Test_clsCmCharacterType_getCharList
+'CharacterType.charList()
+Sub Test_CharacterType_getCharList
     Dim ao,a,d,e,i,j
-    Set ao = new clsCmCharacterType
+    Set ao = new CharacterType
     
     For i=0 To 16
         d = 2^i

@@ -1,15 +1,15 @@
 ' libCom.vbs: new_* procedure test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
@@ -32,7 +32,7 @@ End Sub
 '###################################################################################################
 'new_Arr()
 Sub Test_new_Arr
-    Dim e : Set e = New clsCmArray
+    Dim e : Set e = New ArrayList
     Dim a : Set a = new_Arr()
     
     AssertEqual VarType(e), VarType(a)
@@ -43,7 +43,7 @@ End Sub
 '###################################################################################################
 'new_ArrSplit()
 Sub Test_new_ArrSplit
-    Dim e : Set e = New clsCmArray
+    Dim e : Set e = New ArrayList
     Dim es : es = "one,“ó,3"
     Dim ev : ev = Split(es, ",")
     Dim a : Set a = new_ArrSplit(es, ",")
@@ -59,7 +59,7 @@ End Sub
 '###################################################################################################
 'new_ArrOf()
 Sub Test_new_ArrOf_Array
-    Dim e : Set e = New clsCmArray
+    Dim e : Set e = New ArrayList
     Dim ev : ev = Array(1,Nothing,"ŽO")
     Dim a : Set a = new_ArrOf(ev)
     
@@ -71,7 +71,7 @@ Sub Test_new_ArrOf_Array
     AssertEqual ev(2), a(2)
 End Sub
 Sub Test_new_ArrOf_Array_0
-    Dim e : Set e = New clsCmArray
+    Dim e : Set e = New ArrayList
     Dim ev : ev = Array()
     Dim a : Set a = new_ArrOf(ev)
     
@@ -88,7 +88,7 @@ End Sub
 '###################################################################################################
 'new_Broker()
 Sub Test_new_Broker
-    Dim e : Set e = New clsCmBroker
+    Dim e : Set e = New Broker
     Dim a : Set a = new_Broker()
     
     AssertEqual VarType(e), VarType(a)
@@ -98,7 +98,7 @@ End Sub
 '###################################################################################################
 'new_CalAt()
 Sub Test_new_CalAt
-    Dim e : Set e = New clsCmCalendar
+    Dim e : Set e = New Calendar
     Dim ed : ed = CDate("2024/2/29")
     Dim a : Set a = new_CalAt(ed)
     
@@ -114,14 +114,14 @@ Sub Test_new_CalAt_Err
     Dim e : e = Empty
     
     AssertEqualWithMessage e, a, "ret"
-    AssertEqualWithMessage "clsCmCalendar+of()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Calendar+of()", Err.Source, "Err.Source"
     AssertMatchWithMessage "^invalid argument.*", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
 'new_Char()
 Sub Test_new_Char
-    Dim e : Set e = New clsCmCharacterType
+    Dim e : Set e = New CharacterType
     Dim a : Set a = new_Char()
     
     AssertEqual VarType(e), VarType(a)
@@ -131,7 +131,7 @@ End Sub
 '###################################################################################################
 'new_CssOf()
 Sub Test_new_CssOf
-    Dim e : Set e = New clsCmCssGenerator
+    Dim e : Set e = New CssGenerator
     Dim a : Set a = new_CssOf(".hoge")
     
     AssertEqual VarType(e), VarType(a)
@@ -252,9 +252,9 @@ Sub Test_new_Enum_toString
 
     Dim ar
     cf_push ar, "<clsTmp_" & "[A-Za-z0-9_]{8}" & ">\(GREAT_SATAN_KOSAKA\){"
-    cf_push ar, "<clsCmReadOnlyObject>{<String>'APPLE':<Integer>1}"
-    cf_push ar, ",<clsCmReadOnlyObject>{<String>'PINEAPPLE':<Integer>2}"
-    cf_push ar, ",<clsCmReadOnlyObject>{<String>'PEN':<Integer>3}"
+    cf_push ar, "<ReadOnlyObject>{<String>'APPLE':<Integer>1}"
+    cf_push ar, ",<ReadOnlyObject>{<String>'PINEAPPLE':<Integer>2}"
+    cf_push ar, ",<ReadOnlyObject>{<String>'PEN':<Integer>3}"
     cf_push ar, "}"
     Dim e : e = Replace(Join(ar,""), "'", """")
     Dim a : a = GREAT_SATAN_KOSAKA.toString()
@@ -284,7 +284,7 @@ Sub Test_new_Enum_compareTo_Err
     GREAT_SATAN_KOSAKA.PINEAPPLE.compareTo(Nothing)
 
     Dim e,a
-    e = "clsCmReadOnlyObject+compareTo()"
+    e = "ReadOnlyObject+compareTo()"
     a = Err.Source
     AssertEqualWithMessage e,a,"Err.Source"
 
@@ -442,7 +442,7 @@ End Sub
 '###################################################################################################
 'new_HtmlOf()
 Sub Test_new_HtmlOf
-    Dim e : Set e = New clsCmHtmlGenerator
+    Dim e : Set e = New HtmlGenerator
     Dim a : Set a = new_HtmlOf("hoge")
     
     AssertEqual VarType(e), VarType(a)
@@ -470,7 +470,7 @@ End Sub
 '###################################################################################################
 'new_Now()
 Sub Test_new_Now
-    Dim e : Set e = New clsCmCalendar
+    Dim e : Set e = New Calendar
     Dim ed : ed = Now()
     Dim a : Set a = new_Now()
     
@@ -536,7 +536,7 @@ End Sub
 '###################################################################################################
 'new_Reader()
 Sub Test_new_Reader
-    Dim e : Set e = New clsCmBufferedReader
+    Dim e : Set e = New BufferedReader
     Dim ts : Set ts =  new_Fso().OpenTextFile(WScript.ScriptFullName)
     Dim a : Set a = new_Reader(ts)
     
@@ -548,7 +548,7 @@ End Sub
 '###################################################################################################
 'new_ReaderFrom()
 Sub Test_new_ReaderFrom
-    Dim e : Set e = New clsCmBufferedReader
+    Dim e : Set e = New BufferedReader
     Dim a : Set a = new_ReaderFrom(WScript.ScriptFullName)
     
     AssertEqual VarType(e), VarType(a)
@@ -566,7 +566,7 @@ End Sub
 '###################################################################################################
 'new_Ret()
 Sub Test_new_Ret
-    Dim e : Set e = new clsCmReturnValue
+    Dim e : Set e = new ReturnValue
     Dim a : Set a = new_Ret(Empty)
     
     AssertEqualWithMessage VarType(e), VarType(a), "VarType"
@@ -576,7 +576,7 @@ End Sub
 '###################################################################################################
 'new_RetByState()
 Sub Test_new_RetByState
-    Dim e : Set e = new clsCmReturnValue
+    Dim e : Set e = new ReturnValue
     Dim a : Set a = new_RetByState(Empty,Nothing)
 
     AssertEqualWithMessage VarType(e), VarType(a), "VarType"
@@ -624,7 +624,7 @@ End Sub
 '###################################################################################################
 'new_Writer()
 Sub Test_new_Writer
-    Dim e : Set e = New clsCmBufferedWriter
+    Dim e : Set e = New BufferedWriter
     Dim ts : Set ts =  new_Fso().OpenTextFile(WScript.ScriptFullName)
     Dim a : Set a = new_Writer(ts)
     
@@ -636,7 +636,7 @@ End Sub
 '###################################################################################################
 'new_WriterTo()
 Sub Test_new_WriterTo
-    Dim e : Set e = New clsCmBufferedWriter
+    Dim e : Set e = New BufferedWriter
     Dim a : Set a = new_WriterTo(WScript.ScriptFullName, 8, False, -2)
     
     AssertEqual VarType(e), VarType(a)

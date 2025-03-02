@@ -1,15 +1,15 @@
 ' libCom.vbs: ast_* procedure test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit

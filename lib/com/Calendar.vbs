@@ -1,5 +1,5 @@
 '***************************************************************************************************
-'FILENAME                    : clsCmCalendar.vbs
+'FILENAME                    : Calendar.vbs
 'Overview                    : 日付クラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@
 '----------         ----------------------   -------------------------------------------------------
 '2023/01/04         Y.Fujii                  First edition
 '***************************************************************************************************
-Class clsCmCalendar
+Class Calendar
     'クラス内変数、定数
     Private PdtDateTime, PdbElapsedSeconds, PsDefaultFormat
     
@@ -284,7 +284,7 @@ Class clsCmCalendar
     '***************************************************************************************************
     Private Function this_clone( _
         )
-        Dim oNewIns : Set oNewIns = new clsCmCalendar
+        Dim oNewIns : Set oNewIns = new Calendar
         If IsNull(PdtDateTime) Then
         Else
             If IsNull(PdbElapsedSeconds) Then

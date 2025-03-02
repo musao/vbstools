@@ -1,18 +1,16 @@
 '***************************************************************************************************
-'FILENAME                    : clsCmReturnValue.vbs
-'Overview                    : 戻り値クラス
+'FILENAME                    : ReadOnlyObject.vbs
+'Overview                    : 読み取り専用オブジェクトのクラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2024/01/03         Y.Fujii                  First edition
+'2024/05/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Class clsCmReturnValue
+Class ReadOnlyObject
     'クラス内変数、定数
-    Private PvValue
-    Private PoErr
-    Private PboIsErr
+    Private PboAlreadySet, PoParent, PvValue, PsName
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -26,12 +24,13 @@ Class clsCmReturnValue
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
+    '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
+        PboAlreadySet = False
+        Set PoParent = Nothing
         PvValue = Empty
-        Set PoErr = Nothing
-        PboIsErr = Empty
+        PsName = Empty
     End Sub
     
     '***************************************************************************************************
@@ -46,268 +45,319 @@ Class clsCmReturnValue
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
+    '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        Set PvValue = Nothing
-        Set PoErr = Nothing
+        Set PoParent = Nothing
+    End Sub
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get name()
+    'Overview                    : 名前
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     名前
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get name()
+        name = this_getName()
+    End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get parent()
+    'Overview                    : 親
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     親
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get parent()
+        cf_bind parent, this_getParent()
+    End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get toString()
+    'Overview                    : インスタンスの内容を文字出力する
+    'Detailed Description        : this_toString()に委譲する
+    'Argument
+    '     なし
+    'Return Value
+    '     インスタンスの内容
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get toString()
+        toString = this_toString()
+    End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get value()
+    'Overview                    : 値
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     値
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Default Property Get value()
+        cf_bind value, this_getValue()
+    End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : compareTo()
+    'Overview                    : 当クラスのインスタンスのvalueを比較する
+    'Detailed Description        : this_compareTo()に委譲する
+    'Argument
+    '     aoTarget               : 比較対象
+    'Return Value
+    '     比較結果
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function compareTo( _
+        ByRef aoTarget _
+        )
+        Dim vRet : vRet = this_compareTo(aoTarget)
+        ast_argNotNull vRet, TypeName(Me)&"+compareTo()", "The type of the argument is different."
+        compareTo = vRet
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : equals()
+    'Overview                    : 指定されたオブジェクトがこのenum定数と同じ場合にtrueを返す。
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoTarget               : 当クラスのインスタンス
+    'Return Value
+    '     結果 True:一致 / False:不一致
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function equals( _
+        ByRef aoTarget _
+        )
+        equals = (this_compareTo(aoTarget)=0)
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : of()
+    'Overview                    : 値を設定する
+    'Detailed Description        : 既に設定済みの場合は例外
+    'Argument
+    '     aoParent               : 親のオブジェクト
+    '     asName                 : 名前
+    '     avValue                : 値
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function of( _
+        ByRef aoParent _
+        , ByVal asName _
+        , ByRef avValue _
+        )
+        of = Empty
+        ast_argFalse PboAlreadySet, TypeName(Me)&"+of()", "Value already set."
+
+        this_setParent aoParent
+        this_setName asName
+        this_setValue avValue
+        PboAlreadySet = True
+        Set of = Me
+    End Function
+    
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_compareTo()
+    'Overview                    : 当クラスのインスタンスのvalueを比較する
+    'Detailed Description        : 下記比較結果を返す
+    '                               0  引数と同値
+    '                               -1 引数より小さい
+    '                               1  引数より大きい
+    'Argument
+    '     aoTarget              : 比較対象
+    'Return Value
+    '     比較結果
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_compareTo( _
+        ByRef aoTarget _
+        )
+        this_compareTo = Null
+        If Not cf_isSame(TypeName(Me), TypeName(aoTarget)) Then Exit Function
+        If Not cf_isSame(PoParent, aoTarget.parent) Then Exit Function
+
+        Dim lResult : lResult = 0
+        If (PvValue < aoTarget.value) Then lResult = -1
+        If (PvValue > aoTarget.value) Then lResult = 1
+        this_compareTo = lResult
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_getValue()
+    'Overview                    : PvValueのゲッター
+    'Detailed Description        : 工事中
+    'Argument
+    'Return Value
+    '     値
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_getValue( _
+        )
+        cf_bind this_getValue, PvValue
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_getName()
+    'Overview                    : PsNameのゲッター
+    'Detailed Description        : 工事中
+    'Argument
+    'Return Value
+    '     名前
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_getName( _
+        )
+        this_getName = PsName
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_getParent()
+    'Overview                    : PvParentのゲッター
+    'Detailed Description        : 工事中
+    'Argument
+    'Return Value
+    '     種類
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_getParent( _
+        )
+        cf_bind this_getParent, PoParent
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setName()
+    'Overview                    : PsNameのセッター
+    'Detailed Description        : 工事中
+    'Argument
+    '     asName                 : 名前
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/05/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_setName( _
+        ByVal asName _
+        )
+        PsName = asName
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get returnValue()
-    'Overview                    : 戻り値を返す
+    'Function/Sub Name           : this_setParent()
+    'Overview                    : PvParentのセッター
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     aoParent               : 親
     'Return Value
-    '     戻り値
+    '     なし
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
+    '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Default Property Get returnValue()
-        cf_bind returnValue, PvValue
-    End Property
+    Private Sub this_setParent( _
+        ByVal aoParent _
+        )
+        cf_bind PoParent, aoParent
+    End Sub
     
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Let returnValue()
-    'Overview                    : 戻り値を設定する
-    'Detailed Description        : 工事中
-    'Argument
-    '     avRet                  : 戻り値
-    'Return Value
-    '     なし
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Let returnValue( _
-        byRef avRet _
-        )
-        cf_bind PvValue, avRet
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Set returnValue()
-    'Overview                    : 戻り値を設定する
-    'Detailed Description        : 工事中
-    'Argument
-    '     avRet                  : 戻り値
-    'Return Value
-    '     なし
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Set returnValue( _
-        byRef avRet _
-        )
-        cf_bind PvValue, avRet
-    End Property
-
-    '***************************************************************************************************
-    'Function/Sub Name           : getErr()
-    'Overview                    : エラー情報を返却する
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     エラー情報
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function getErr( _
-        )
-        Set getErr = PoErr
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : isErr()
-    'Overview                    : エラー情報の有無を返却する
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     結果 True:エラーあり / False:エラーなし
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function isErr( _
-        )
-        isErr = PboIsErr
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : setValue()
-    'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
-    'Detailed Description        : this_setValue()に委譲する
-    'Argument
-    '     avRet                  : 戻り値
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function setValue( _
-        byRef avRet _
-        )
-        Set setValue = this_setValue(avRet)
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : setValueByState()
-    'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
-    'Detailed Description        : this_setValueByState()に委譲する
-    'Argument
-    '     avNormal               : 正常の場合の戻り値
-    '     avAbnormal             : 異常の場合の戻り値
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/04/27         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function setValueByState( _
-        byRef avNormal _
-        , byRef avAbnormal _
-        )
-        Set setValueByState = this_setValueByState(avNormal,avAbnormal)
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : toString()
-    'Overview                    : オブジェクトの内容を文字列で表示する
-    'Detailed Description        : func_CmReturnValueToString()に委譲する
-    'Argument
-    '     なし
-    'Return Value
-    '     文字列に変換したオブジェクトの内容
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/04         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function toString( _
-        )
-        toString = func_CmReturnValueToString()
-    End Function
-
-
     '***************************************************************************************************
     'Function/Sub Name           : this_setValue()
-    'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Overview                    : PvValueのセッター
     'Detailed Description        : 工事中
     'Argument
-    '     avRet                  : 戻り値
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/01/03         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_setValue( _
-        byRef avRet _
-        )
-        cf_bind PvValue, avRet
-        this_getErrorStatus()
-        Set this_setValue = Me
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_setValueByState()
-    'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
-    'Detailed Description        : 工事中
-    'Argument
-    '     avNormal               : 正常の場合の戻り値
-    '     avAbnormal             : 異常の場合の戻り値
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2024/04/27         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_setValueByState( _
-        byRef avNormal _
-        , byRef avAbnormal _
-        )
-        If Err.Number=0 Then
-            cf_bind PvValue, avNormal
-        Else
-            cf_bind PvValue, avAbnormal
-        End If
-        this_getErrorStatus()
-        Set this_setValueByState = Me
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_getErrorStatus()
-    'Overview                    : エラー状態を取得しエラーがある場合は情報を取得後にクリアする
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
+    '     avValue                : 値
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2024/04/27         Y.Fujii                  First edition
+    '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub this_getErrorStatus( _
+    Private Sub this_setValue( _
+        ByRef avValue _
         )
-        If Err.Number=0 Then
-            PboIsErr = False
-            Set PoErr = Nothing
-        Else
-            PboIsErr = True
-            Set PoErr = fw_storeErr()
-            Err.Clear
-        End If
+        cf_bind PvValue, avValue
     End Sub
+
     '***************************************************************************************************
-    'Function/Sub Name           : func_CmReturnValueToString()
-    'Overview                    : オブジェクトの内容を文字列で表示する
-    'Detailed Description        : cf_toString()準拠
+    'Function/Sub Name           : this_toString()
+    'Overview                    : インスタンスの内容を文字出力する
+    'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     文字列に変換したオブジェクトの内容
+    '     インスタンスの内容
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2024/01/04         Y.Fujii                  First edition
+    '2024/05/26         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function func_CmReturnValueToString( _
+    Private Function this_toString( _
         )
-        func_CmReturnValueToString = _
-            "<" & TypeName(Me) & ">[" _
-            & "returnValue:" & cf_toString(PvValue) _
-            & ",isErr:" & cf_toString(PboIsErr) _
-            & ",getErr:" & cf_toString(PoErr) _
-            & "]"
+        this_toString = "<" & TypeName(Me) & ">{" & cf_toString(PsName) & ":" & cf_toString(PvValue) & "}"
     End Function
-
+    
 End Class

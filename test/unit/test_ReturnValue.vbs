@@ -1,30 +1,30 @@
-' clsCmReturnValue.vbs: test.
+' ReturnValue.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
 
 '###################################################################################################
-'clsCmReturnValue
-Sub Test_clsCmReturnValue
-    Dim a : Set a = new clsCmReturnValue
+'ReturnValue
+Sub Test_ReturnValue
+    Dim a : Set a = new ReturnValue
     AssertEqual 0, VarType(a)
-    AssertEqual "clsCmReturnValue", TypeName(a)
+    AssertEqual "ReturnValue", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmReturnValue.returnValue()
-Sub Test_clsCmReturnValue_returnValue
+'ReturnValue.returnValue()
+Sub Test_ReturnValue_returnValue
     Dim data
     data = Array( _
         new_DicOf(Array(  "Data", Empty                , "Expect", "EqualData")) _
@@ -46,7 +46,7 @@ Sub Test_clsCmReturnValue_returnValue
         , new_DicOf(Array("Data", "５０"               , "Expect", "EqualData")) _
         , new_DicOf(Array("Data", "漢字"               , "Expect", "EqualData")) _
         )
-    Dim o : Set o = new clsCmReturnValue
+    Dim o : Set o = new ReturnValue
     
     Dim ub : ub = Ubound(data)
     Dim i,j,d,e,a
@@ -78,9 +78,9 @@ Sub Test_clsCmReturnValue_returnValue
 End Sub
 
 '###################################################################################################
-'clsCmReturnValue.isErr()
-Sub Test_clsCmReturnValue_isErr_Normal
-    Dim o : Set o = new clsCmReturnValue
+'ReturnValue.isErr()
+Sub Test_ReturnValue_isErr_Normal
+    Dim o : Set o = new ReturnValue
     o.setValue "abc"
 
     Dim e,a
@@ -88,10 +88,10 @@ Sub Test_clsCmReturnValue_isErr_Normal
     a = o.isErr()
     AssertEqual e,a
 End Sub
-Sub Test_clsCmReturnValue_isErr_Err
-    Dim o : Set o = new clsCmReturnValue
+Sub Test_ReturnValue_isErr_Err
+    Dim o : Set o = new ReturnValue
     On Error Resume Next
-    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
+    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_ReturnValue.vbsのエラー"
     Err.Raise ern, ers, erd
     o.setValue "あいう"
     On Error Goto 0
@@ -101,8 +101,8 @@ Sub Test_clsCmReturnValue_isErr_Err
     a = o.isErr()
     AssertEqual e,a
 End Sub
-Sub Test_clsCmReturnValue_isErr_Initial
-    Dim o : Set o = new clsCmReturnValue
+Sub Test_ReturnValue_isErr_Initial
+    Dim o : Set o = new ReturnValue
 
     Dim e,a
     e = Empty
@@ -111,9 +111,9 @@ Sub Test_clsCmReturnValue_isErr_Initial
 End Sub
 
 '###################################################################################################
-'clsCmReturnValue.setValue()
-Sub Test_clsCmReturnValue_setValue_Normal
-    Dim o : Set o = new clsCmReturnValue
+'ReturnValue.setValue()
+Sub Test_ReturnValue_setValue_Normal
+    Dim o : Set o = new ReturnValue
     Dim d : d = "abc"
 
     Dim e,a
@@ -137,13 +137,13 @@ Sub Test_clsCmReturnValue_setValue_Normal
     Set a = o.getErr()
     AssertSameWithMessage e,a,"getErr()"
 End Sub
-Sub Test_clsCmReturnValue_setValue_Err
-    Dim o : Set o = new clsCmReturnValue
+Sub Test_ReturnValue_setValue_Err
+    Dim o : Set o = new ReturnValue
     Dim d : Set d = new_Dic()
 
     Dim e,a
     On Error Resume Next
-    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
+    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_ReturnValue.vbsのエラー"
     Err.Raise ern, ers, erd
     e = TypeName(o)
     a = TypeName(o.setValue(d))
@@ -179,13 +179,13 @@ Sub Test_clsCmReturnValue_setValue_Err
     a = er.Item("Source")
     AssertEqualWithMessage e,a,"isErr().Item('Source')"
 End Sub
-Sub Test_clsCmReturnValue_setValue_ErrToNormal
-    Dim o : Set o = new clsCmReturnValue
+Sub Test_ReturnValue_setValue_ErrToNormal
+    Dim o : Set o = new ReturnValue
     Dim d : Set d = new_Dic()
 
     Dim e,a
     On Error Resume Next
-    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
+    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_ReturnValue.vbsのエラー"
     Err.Raise ern, ers, erd
     o.setValue(d)
 
@@ -213,8 +213,8 @@ Sub Test_clsCmReturnValue_setValue_ErrToNormal
     Set a = o.getErr()
     AssertSameWithMessage e,a,"getErr()"
 End Sub
-Sub Test_clsCmReturnValue_setValue_Initial
-    Dim o : Set o = new clsCmReturnValue
+Sub Test_ReturnValue_setValue_Initial
+    Dim o : Set o = new ReturnValue
 
     Dim e,a
     e = Empty
@@ -231,9 +231,9 @@ Sub Test_clsCmReturnValue_setValue_Initial
 End Sub
 
 '###################################################################################################
-'clsCmReturnValue.setValueByState()
-Sub Test_clsCmReturnValue_setValueByState_Normal_Noerr
-    Dim o : Set o = new clsCmReturnValue
+'ReturnValue.setValueByState()
+Sub Test_ReturnValue_setValueByState_Normal_Noerr
+    Dim o : Set o = new ReturnValue
     Dim normal : normal = "normal"
     Dim abnormal : abnormal = "abnormal"
 
@@ -258,13 +258,13 @@ Sub Test_clsCmReturnValue_setValueByState_Normal_Noerr
     Set a = o.getErr()
     AssertSameWithMessage e,a,"getErr()"
 End Sub
-Sub Test_clsCmReturnValue_setValueByState_Normal_Err
-    Dim o : Set o = new clsCmReturnValue
+Sub Test_ReturnValue_setValueByState_Normal_Err
+    Dim o : Set o = new ReturnValue
     Dim normal : normal = "normal"
     Dim abnormal : abnormal = "abnormal"
 
     On Error Resume Next
-    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
+    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_ReturnValue.vbsのエラー"
     Err.Raise ern, ers, erd
     o.setValueByState normal,abnormal
 
@@ -301,27 +301,27 @@ Sub Test_clsCmReturnValue_setValueByState_Normal_Err
 End Sub
 
 '###################################################################################################
-'clsCmReturnValue.toString()
-Sub Test_clsCmReturnValue_toString
-    Dim o : Set o = new clsCmReturnValue
+'ReturnValue.toString()
+Sub Test_ReturnValue_toString
+    Dim o : Set o = new ReturnValue
 
     Dim e,a
-    e = "<clsCmReturnValue>[returnValue:<Empty>,isErr:<Empty>,getErr:<Nothing>]"
+    e = "<ReturnValue>[returnValue:<Empty>,isErr:<Empty>,getErr:<Nothing>]"
     a = o.toString()
     AssertEqualWithMessage e,a,"Initial"
 
     Dim d : d = "abc"
     o.setValue(d)
-    e = "<clsCmReturnValue>[returnValue:<String>"""&d&""",isErr:<Boolean>False,getErr:<Nothing>]"
+    e = "<ReturnValue>[returnValue:<String>"""&d&""",isErr:<Boolean>False,getErr:<Nothing>]"
     a = o.toString()
     AssertEqualWithMessage e,a,"Normal"
 
     On Error Resume Next
-    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_clsCmReturnValue.vbsのエラー"
+    Dim ern,ers,erd : ern=9999:ers="エラー":erd="test_ReturnValue.vbsのエラー"
     Err.Raise ern, ers, erd
     o.setValue(d)
     On Error Goto 0
-    e = "<clsCmReturnValue>[returnValue:<String>""abc"",isErr:<Boolean>True,getErr:<Err>{<String>""Number""=><Long>"&ern&",<String>""Description""=><String>"""&erd&""",<String>""Source""=><String>"""&ers&"""}]"
+    e = "<ReturnValue>[returnValue:<String>""abc"",isErr:<Boolean>True,getErr:<Err>{<String>""Number""=><Long>"&ern&",<String>""Description""=><String>"""&erd&""",<String>""Source""=><String>"""&ers&"""}]"
     a = o.toString()
     AssertEqualWithMessage e,a,"Err"
 

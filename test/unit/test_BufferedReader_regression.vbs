@@ -1,15 +1,15 @@
-' clsCmBufferedReader.vbs: test.
+' BufferedReader.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
@@ -21,7 +21,7 @@ Dim PsPathTempFolder,PsPathData1,PsPathData2
 '###################################################################################################
 'SetUp()/TearDown()
 Sub SetUp()
-    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedReader_regression")
+    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_BufferedReader_regression")
     If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
 '    fs_createFolder PsPathTempFolder
     PsPathData1 = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
@@ -44,8 +44,8 @@ End Sub
 
 
 '###################################################################################################
-'clsCmBufferedReader.readAll()
-Sub Test_clsCmBufferedReader_readAll
+'BufferedReader.readAll()
+Sub Test_BufferedReader_readAll
     reader_testCommon getref("operations_readAll"), PsPathData1
 End Sub
 Sub operations_readAll(v,o,r)
@@ -55,8 +55,8 @@ Sub operations_readAll(v,o,r)
 End Sub
 
 '###################################################################################################
-'clsCmBufferedReader.read/readLine/skip/skipLine()
-Sub Test_clsCmBufferedReader_read_readLine_skip_skipLine_1
+'BufferedReader.read/readLine/skip/skipLine()
+Sub Test_BufferedReader_read_readLine_skip_skipLine_1
     reader_testCommon getref("operations_read_readLine_skip_skipLine_1"), PsPathData1
 End Sub
 Sub operations_read_readLine_skip_skipLine_1(v,o,r)
@@ -77,7 +77,7 @@ Sub operations_read_readLine_skip_skipLine_1(v,o,r)
 
     o.Close
 End Sub
-Sub Test_clsCmBufferedReader_read_readLine_skip_skipLine_2
+Sub Test_BufferedReader_read_readLine_skip_skipLine_2
     reader_testCommon getref("operations_read_readLine_skip_skipLine_2"), PsPathData1
 End Sub
 Sub operations_read_readLine_skip_skipLine_2(v,o,r)
@@ -98,7 +98,7 @@ Sub operations_read_readLine_skip_skipLine_2(v,o,r)
 
     o.Close
 End Sub
-Sub Test_clsCmBufferedReader_read_readLine_skip_skipLine_3
+Sub Test_BufferedReader_read_readLine_skip_skipLine_3
     reader_testCommon getref("operations_read_readLine_skip_skipLine_3"), PsPathData1
 End Sub
 Sub operations_read_readLine_skip_skipLine_3(v,o,r)
@@ -119,7 +119,7 @@ Sub operations_read_readLine_skip_skipLine_3(v,o,r)
 
     o.Close
 End Sub
-Sub Test_clsCmBufferedReader_read_readLine_skip_skipLine_4
+Sub Test_BufferedReader_read_readLine_skip_skipLine_4
     reader_testCommon getref("operations_read_readLine_skip_skipLine_4"), PsPathData1
 End Sub
 Sub operations_read_readLine_skip_skipLine_4(v,o,r)
@@ -134,7 +134,7 @@ Sub operations_read_readLine_skip_skipLine_4(v,o,r)
 
     o.Close
 End Sub
-Sub Test_clsCmBufferedReader_read_readLine_skip_skipLine_5
+Sub Test_BufferedReader_read_readLine_skip_skipLine_5
     reader_testCommon getref("operations_read_readLine_skip_skipLine_5"), PsPathData2
 End Sub
 Sub operations_read_readLine_skip_skipLine_5(v,o,r)
@@ -164,7 +164,7 @@ Sub reader_testCommon(f,p)
             If flg Then
                 f ev,eo,er
             Else
-                Set ao = New clsCmBufferedReader
+                Set ao = New BufferedReader
                 ao.readSize = rs(j)
                 ao.setTextStream(eo)
                 f av,ao,ar

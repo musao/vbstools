@@ -1,30 +1,30 @@
-' clsCmArray.vbs: test.
+' ArrayList.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 Option Explicit
 
 '###################################################################################################
-'clsCmArray
-Sub Test_clsCmArray
-    Dim a : Set a = new clsCmArray
+'ArrayList
+Sub Test_Array
+    Dim a : Set a = new ArrayList
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmArray", TypeName(a)
+    AssertEqual "ArrayList", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmArray.count()
-Sub Test_clsCmArray_count
-    Dim a : Set a = new clsCmArray
+'ArrayList.count()
+Sub Test_Array_count
+    Dim a : Set a = new ArrayList
     
     AssertEqual 0, a.count
     
@@ -34,11 +34,11 @@ Sub Test_clsCmArray_count
 End Sub
 
 '###################################################################################################
-'clsCmArray.item()
-Sub Test_clsCmArray_get_item
+'ArrayList.item()
+Sub Test_Array_get_item
     Dim ev : ev = "hoge"
     Dim eo : Set eo = CreateObject("Scripting.Dictionary")
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     
     a.push ev
     a.push eo
@@ -48,32 +48,32 @@ Sub Test_clsCmArray_get_item
     AssertSame eo, a.item(1)
     AssertSame eo, a(1)
 End Sub
-Sub Test_clsCmArray_get_item_OutOfRangeLarge
+Sub Test_Array_get_item_OutOfRangeLarge
     On Error Resume Next
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     a.push "hoge"
     a.push CreateObject("Scripting.Dictionary")
     Dim x : x = a(2)
     
-    AssertEqualWithMessage "clsCmArray+item() Get", Err.Source, "Err.Source"
+    AssertEqualWithMessage "ArrayList+item() Get", Err.Source, "Err.Source"
     AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
     AssertEqualWithMessage Empty, x, "value"
 End Sub
-Sub Test_clsCmArray_get_item_OutOfRangeSmall
+Sub Test_Array_get_item_OutOfRangeSmall
     On Error Resume Next
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     a.push "hoge"
     a.push CreateObject("Scripting.Dictionary")
     Dim x : x = a(-1)
     
-    AssertEqualWithMessage "clsCmArray+item() Get", Err.Source, "Err.Source"
+    AssertEqualWithMessage "ArrayList+item() Get", Err.Source, "Err.Source"
     AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
     AssertEqualWithMessage Empty, x, "value"
 End Sub
-Sub Test_clsCmArray_set_let_item
+Sub Test_Array_set_let_item
     Dim ev : ev = "hoge"
     Dim eo : Set eo = CreateObject("Scripting.Dictionary")
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     
     a.push "fuga"
     a.push "foo"
@@ -85,33 +85,33 @@ Sub Test_clsCmArray_set_let_item
     AssertEqual ev, a.item(1)
     AssertEqual ev, a(1)
 End Sub
-Sub Test_clsCmArray_set_let_item_OutOfRangeLarge
+Sub Test_Array_set_let_item_OutOfRangeLarge
     On Error Resume Next
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     a.push "hoge"
     a.push CreateObject("Scripting.Dictionary")
     a(2) = "fuga"
     
-    AssertEqualWithMessage "clsCmArray+item() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "ArrayList+item() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
     AssertEqualWithMessage 2, a.length, "length"
 End Sub
-Sub Test_clsCmArray_set_let_item_OutOfRangeSmall
+Sub Test_Array_set_let_item_OutOfRangeSmall
     On Error Resume Next
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     a.push "hoge"
     a.push CreateObject("Scripting.Dictionary")
     Set a(-1) = CreateObject("Scripting.Dictionary")
     
-    AssertEqualWithMessage "clsCmArray+item() Set", Err.Source, "Err.Source"
+    AssertEqualWithMessage "ArrayList+item() Set", Err.Source, "Err.Source"
     AssertEqualWithMessage "Index is out of range.", Err.Description, "Err.Description"
     AssertEqualWithMessage 2, a.length, "length"
 End Sub
 '###################################################################################################
-'clsCmArray.items()
-Sub Test_clsCmArray_items
+'ArrayList.items()
+Sub Test_Array_items
     Dim e()
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     
     a.push CreateObject("Scripting.Dictionary")
     a.push "hoge"
@@ -120,9 +120,9 @@ Sub Test_clsCmArray_items
     AssertEqual TypeName(e), TypeName(a.items)
     AssertEqual a.length-1, Ubound(a.items)
 End Sub
-Sub Test_clsCmArray_items_AllItems
+Sub Test_Array_items_AllItems
     Dim e,d,ao,a
-    Set ao = new clsCmArray
+    Set ao = new ArrayList
     d = Array(1,"b",Nothing)
     ao.pushA d
 
@@ -136,9 +136,9 @@ Sub Test_clsCmArray_items_AllItems
     e = d2
     assertAllElementsArray e, a
 End Sub
-Sub Test_clsCmArray_items_NoData
+Sub Test_Array_items_NoData
     Dim e,ao,a
-    Set ao = new clsCmArray
+    Set ao = new ArrayList
 
     e = Array()
     a = ao.items()
@@ -146,9 +146,9 @@ Sub Test_clsCmArray_items_NoData
 End Sub
 
 '###################################################################################################
-'clsCmArray.length()
-Sub Test_clsCmArray_length
-    Dim a : Set a = new clsCmArray
+'ArrayList.length()
+Sub Test_Array_length
+    Dim a : Set a = new ArrayList
     
     AssertEqual a.count, a.length
     
@@ -158,15 +158,15 @@ Sub Test_clsCmArray_length
 End Sub
 
 '###################################################################################################
-'clsCmArray.concat()
-Sub Test_clsCmArray_concat_Array_New
+'ArrayList.concat()
+Sub Test_Array_concat_Array_New
     Dim e : e = Array(1,2,3,4,5)
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : Set a2 = a1.concat(e)
     
     assertAllElements e, a2
 End Sub
-Sub Test_clsCmArray_concat_Array_Add
+Sub Test_Array_concat_Array_Add
     Dim e : e = Array(1,2,3,4,5)
     Dim d1 : d1 = Array(1,2,3)
     Dim d2 : d2 = Array(4,5)
@@ -177,7 +177,7 @@ Sub Test_clsCmArray_concat_Array_Add
     
     assertAllElements d1, a1
 End Sub
-Sub Test_clsCmArray_concat_Variable_New
+Sub Test_Array_concat_Variable_New
     Dim e : e = Array(5)
     Dim d : d = 5
     Dim a1 : Set a1 = new_Arr()
@@ -185,7 +185,7 @@ Sub Test_clsCmArray_concat_Variable_New
     
     assertAllElements e, a2
 End Sub
-Sub Test_clsCmArray_concat_Variable_Add
+Sub Test_Array_concat_Variable_Add
     Dim e : e = Array(1,2,3,5)
     Dim d1 : d1 = Array(1,2,3)
     Dim d2 : d2 = 5
@@ -198,8 +198,8 @@ Sub Test_clsCmArray_concat_Variable_Add
 End Sub
 
 '###################################################################################################
-'clsCmArray.every()
-Sub Test_clsCmArray_every_True
+'ArrayList.every()
+Sub Test_Array_every_True
     Dim d : d = Array(1,2,3)
     Dim a : Set a = new_ArrOf(d)
     
@@ -207,7 +207,7 @@ Sub Test_clsCmArray_every_True
     
     assertAllElements d, a
 End Sub
-Sub Test_clsCmArray_every_False
+Sub Test_Array_every_False
     Dim d : d = Array(1,2,3)
     Dim a : Set a = new_ArrOf(d)
     
@@ -215,7 +215,7 @@ Sub Test_clsCmArray_every_False
     
     assertAllElements d, a
 End Sub
-Sub Test_clsCmArray_every_Empty
+Sub Test_Array_every_Empty
     Dim a : Set a = new_Arr()
     AssertEqual 0, a.length
     
@@ -225,8 +225,8 @@ Sub Test_clsCmArray_every_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.filter()
-Sub Test_clsCmArray_filter
+'ArrayList.filter()
+Sub Test_Array_filter
     Dim e : e = Array(2,3)
     Dim d : d = Array(1,2,3)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -236,7 +236,7 @@ Sub Test_clsCmArray_filter
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_filter_Empty
+Sub Test_Array_filter_Empty
     Dim d : d = Array(1,2,3)
     Dim a1 : Set a1 = new_ArrOf(d)
     Dim a2 : Set a2 = a1.filter(new_Func("(e,i,a)=>e>3"))
@@ -247,8 +247,8 @@ Sub Test_clsCmArray_filter_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.find()
-Sub Test_clsCmArray_Variable_find
+'ArrayList.find()
+Sub Test_Array_Variable_find
     Dim e : e = 12
     Dim d : d = Array(5,12,8,130,44)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -258,7 +258,7 @@ Sub Test_clsCmArray_Variable_find
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_Object_find
+Sub Test_Array_Object_find
     Dim e : Set e = Nothing
     Dim d : d = Array(0,"",vbNullString,Nothing,Empty)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -268,7 +268,7 @@ Sub Test_clsCmArray_Object_find
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_find_NoHit
+Sub Test_Array_find_NoHit
     Dim e : e = Empty
     Dim d : d = Array(5,12,8,130,44)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -280,15 +280,15 @@ Sub Test_clsCmArray_find_NoHit
 End Sub
 
 '###################################################################################################
-'clsCmArray.forEach()
-Sub Test_clsCmArray_forEach
+'ArrayList.forEach()
+Sub Test_Array_forEach
     Dim e : e = Array(2,3,4)
     Dim a : Set a = new_ArrOf(Array(1,2,3))
     a.forEach(new_Func("function(e,i,a) {a(i)=a(i)+1}"))
     
     assertAllElements e, a
 End Sub
-Sub Test_clsCmArray_forEach_Empty
+Sub Test_Array_forEach_Empty
     Dim a : Set a = new_Arr()
     a.forEach(new_Func("function(e,i,a) {a(i)=a(i)+1}"))
     
@@ -296,8 +296,8 @@ Sub Test_clsCmArray_forEach_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.hasElement()
-Sub Test_clsCmArray_hasElement_Ok
+'ArrayList.hasElement()
+Sub Test_Array_hasElement_Ok
     Dim a
     Set a = new_Arr()
     
@@ -323,7 +323,7 @@ Sub Test_clsCmArray_hasElement_Ok
     Redim d4(0)
     AssertEqualWithMessage True, a.hasElement(d4), "7"
 End Sub
-Sub Test_clsCmArray_hasElement_Ng_Variable
+Sub Test_Array_hasElement_Ng_Variable
     Dim a
     Set a = new_Arr()
     
@@ -343,7 +343,7 @@ Sub Test_clsCmArray_hasElement_Ng_Variable
     d = 123
     AssertEqualWithMessage False, a.hasElement(d), "5"
 End Sub
-Sub Test_clsCmArray_hasElement_Ng_Array
+Sub Test_Array_hasElement_Ng_Array
     Dim a
     Set a = new_Arr()
     
@@ -355,15 +355,15 @@ Sub Test_clsCmArray_hasElement_Ng_Array
 End Sub
 
 '###################################################################################################
-'clsCmArray.indexOf()
-Sub Test_clsCmArray_indexOf
+'ArrayList.indexOf()
+Sub Test_Array_indexOf
     Dim d : d = Array("a","b","c","b")
     Dim a : Set a = new_ArrOf(d)
     
     AssertEqual 1, a.indexOf("b")
     AssertEqual -1, a.indexOf("z")
 End Sub
-Sub Test_clsCmArray_indexOf_Empty
+Sub Test_Array_indexOf_Empty
     Dim a : Set a = new_Arr()
     
     AssertEqual -1, a.indexOf("b")
@@ -371,15 +371,15 @@ Sub Test_clsCmArray_indexOf_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.join()
-Sub Test_clsCmArray_join
+'ArrayList.join()
+Sub Test_Array_join
     Dim d : d = Array(1,2,3,"testing")
     Dim e : e = Join(d, "+")
     Dim a : a = new_ArrOf(d).join("+")
     
     AssertEqual e, a
 End Sub
-Sub Test_clsCmArray_join_Empty
+Sub Test_Array_join_Empty
     Dim e : e = ""
     Dim a : a = new_Arr().join("+")
     
@@ -387,8 +387,8 @@ Sub Test_clsCmArray_join_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.lastIndexOf()
-Sub Test_clsCmArray_lastIndexOf
+'ArrayList.lastIndexOf()
+Sub Test_Array_lastIndexOf
     Dim d : Set d = new_DicOf(Array(4, "five"))
     Dim a : Set a = new_ArrOf(Array("a", 2, 3.14, d, d, "End"))
     
@@ -398,7 +398,7 @@ Sub Test_clsCmArray_lastIndexOf
     AssertEqual 1, a.lastIndexOf(2)
     AssertEqual -1, a.lastIndexOf("2")
 End Sub
-Sub Test_clsCmArray_lastIndexOf_Empty
+Sub Test_Array_lastIndexOf_Empty
     Dim a : Set a = new_Arr()
     
     AssertEqual -1, a.lastIndexOf("a")
@@ -408,8 +408,8 @@ Sub Test_clsCmArray_lastIndexOf_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.map()
-Sub Test_clsCmArray_map
+'ArrayList.map()
+Sub Test_Array_map
     Dim e : e = Array(1,4,9)
     Dim d : d = Array(1,2,3)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -419,7 +419,7 @@ Sub Test_clsCmArray_map
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_map_Empty
+Sub Test_Array_map_Empty
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : Set a2 = a1.map(new_Func("(e,i,a)=>e*e"))
     
@@ -429,10 +429,10 @@ Sub Test_clsCmArray_map_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.pop()/.push()/pushA()
-Sub Test_clsCmArray_pop_push_pushMulti
+'ArrayList.pop()/.push()/pushA()
+Sub Test_Array_pop_push_pushMulti
     Dim a,e
-    Set a = new clsCmArray
+    Set a = new ArrayList
     
     e = Array("hoge", 2, "ŽQ", Nothing)
     AssertEqual 4, a.pushA(e)
@@ -460,8 +460,8 @@ Sub Test_clsCmArray_pop_push_pushMulti
 End Sub
 
 '###################################################################################################
-'clsCmArray.reduce()
-Sub Test_clsCmArray_reduce_InitEmpty
+'ArrayList.reduce()
+Sub Test_Array_reduce_InitEmpty
     Dim e : e = 24
     Dim d : d = Array(1,2,3,4)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -471,7 +471,7 @@ Sub Test_clsCmArray_reduce_InitEmpty
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduce_InitNoEmpty
+Sub Test_Array_reduce_InitNoEmpty
     Dim e : e = 120
     Dim d : d = Array(1,2,3,4)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -481,7 +481,7 @@ Sub Test_clsCmArray_reduce_InitNoEmpty
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduce_InitEmpty_Len1
+Sub Test_Array_reduce_InitEmpty_Len1
     Dim e : e = 1
     Dim d : d = Array(1)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -491,7 +491,7 @@ Sub Test_clsCmArray_reduce_InitEmpty_Len1
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduce_InitNoEmpty_Len1
+Sub Test_Array_reduce_InitNoEmpty_Len1
     Dim e : e = 10
     Dim d : d = Array(1)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -501,20 +501,20 @@ Sub Test_clsCmArray_reduce_InitNoEmpty_Len1
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduce_Err
+Sub Test_Array_reduce_Err
     On Error Resume Next
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : a2 = a1.reduce(new_Func("(p,c,i,a)=>p*c"), Empty)
     
-    AssertEqualWithMessage "clsCmArray+reduce()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "ArrayList+reduce()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Array has no elements.", Err.Description, "Err.Description"
     AssertEqualWithMessage 0, a1.lentgh, "lentgh"
     AssertEqualWithMessage Empty, a2, "value"
 End Sub
 
 '###################################################################################################
-'clsCmArray.reduceRight()
-Sub Test_clsCmArray_reduceRight_InitEmpty
+'ArrayList.reduceRight()
+Sub Test_Array_reduceRight_InitEmpty
     Dim e : e = 3
     Dim d : d = Array(2,10,60)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -524,7 +524,7 @@ Sub Test_clsCmArray_reduceRight_InitEmpty
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduceRight_InitNoEmpty
+Sub Test_Array_reduceRight_InitNoEmpty
     Dim e : e = 5
     Dim d : d = Array(2,10,60)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -534,7 +534,7 @@ Sub Test_clsCmArray_reduceRight_InitNoEmpty
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduceRight_InitEmpty_Len1
+Sub Test_Array_reduceRight_InitEmpty_Len1
     Dim e : e = 2
     Dim d : d = Array(2)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -544,7 +544,7 @@ Sub Test_clsCmArray_reduceRight_InitEmpty_Len1
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduceRight_InitNoEmpty_Len1
+Sub Test_Array_reduceRight_InitNoEmpty_Len1
     Dim e : e = 1
     Dim d : d = Array(2)
     Dim a1 : Set a1 = new_ArrOf(d)
@@ -554,20 +554,20 @@ Sub Test_clsCmArray_reduceRight_InitNoEmpty_Len1
     
     assertAllElements d, a1
 End Sub
-Sub Test_clsCmArray_reduceRight_Err
+Sub Test_Array_reduceRight_Err
     On Error Resume Next
     Dim a1 : Set a1 = new_Arr()
     Dim a2 : a2 = a1.reduceRight(new_Func("(p,c,i,a)=>p*c"), Empty)
     
-    AssertEqualWithMessage "clsCmArray+reduceRight()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "ArrayList+reduceRight()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Array has no elements.", Err.Description, "Err.Description"
     AssertEqualWithMessage 0, a1.lentgh, "lentgh"
     AssertEqualWithMessage Empty, a2, "value"
 End Sub
 
 '###################################################################################################
-'clsCmArray.reverse()
-Sub Test_clsCmArray_reverse
+'ArrayList.reverse()
+Sub Test_Array_reverse
     Dim e : e = Array(3,Nothing,1)
     Dim d : d = Array(1,Nothing,3)
     Dim a : Set a = new_ArrOf(d)
@@ -575,7 +575,7 @@ Sub Test_clsCmArray_reverse
     
     assertAllElements e, a
 End Sub
-Sub Test_clsCmArray_reverse_Empty
+Sub Test_Array_reverse_Empty
     Dim a : Set a = new_Arr()
     AssertEqual 0, a.length
     
@@ -584,10 +584,10 @@ Sub Test_clsCmArray_reverse_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.shift()/.unshift()/unshiftA()
-Sub Test_clsCmArray_shift_unshift_unshiftMulti
+'ArrayList.shift()/.unshift()/unshiftA()
+Sub Test_Array_shift_unshift_unshiftMulti
     Dim a,e
-    Set a = new clsCmArray
+    Set a = new ArrayList
     
     e = Array("hoge", 2, "ŽQ", Nothing)
     AssertEqualWithMessage 1, a.unshift(e(3)), "1-1"
@@ -617,8 +617,8 @@ Sub Test_clsCmArray_shift_unshift_unshiftMulti
 End Sub
 
 '###################################################################################################
-'clsCmArray.slice
-Sub Test_clsCmArray_slice_Normal
+'ArrayList.slice
+Sub Test_Array_slice_Normal
     Dim e,a,a1,d
     d = Array(1,2,3,4,5)
     Set a = new_ArrOf(d)
@@ -639,7 +639,7 @@ Sub Test_clsCmArray_slice_Normal
     Set a1 = a.slice(-3,-2)
     assertAllElements e, a1
 End Sub
-Sub Test_clsCmArray_slice_Limit_Upper
+Sub Test_Array_slice_Limit_Upper
     Dim e,a,a1,d
     d = Array(1,2,3,4,5)
     Set a = new_ArrOf(d)
@@ -664,7 +664,7 @@ Sub Test_clsCmArray_slice_Limit_Upper
     Set a1 = a.slice(-1,-1)
     AssertEqual 0, a1.length
 End Sub
-Sub Test_clsCmArray_slice_Limit_Lower
+Sub Test_Array_slice_Limit_Lower
     Dim e,a,a1,d
     d = Array(1,2,3,4,5)
     Set a = new_ArrOf(d)
@@ -696,7 +696,7 @@ Sub Test_clsCmArray_slice_Limit_Lower
     Set a1 = a.slice(-5,-5)
     AssertEqual 0, a1.length
 End Sub
-Sub Test_clsCmArray_slice_Empty
+Sub Test_Array_slice_Empty
     Dim a,a1
     Set a = new_Arr()
     AssertEqual 0, a.length
@@ -715,8 +715,8 @@ Sub Test_clsCmArray_slice_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.some()
-Sub Test_clsCmArray_some_True
+'ArrayList.some()
+Sub Test_Array_some_True
     Dim d : d = Array(1,2,3)
     Dim a : Set a = new_ArrOf(d)
     
@@ -724,7 +724,7 @@ Sub Test_clsCmArray_some_True
     
     assertAllElements d, a
 End Sub
-Sub Test_clsCmArray_some_False
+Sub Test_Array_some_False
     Dim d : d = Array(1,2,3)
     Dim a : Set a = new_ArrOf(d)
     
@@ -732,7 +732,7 @@ Sub Test_clsCmArray_some_False
     
     assertAllElements d, a
 End Sub
-Sub Test_clsCmArray_some_Empty
+Sub Test_Array_some_Empty
     Dim a : Set a = new_Arr()
     AssertEqual 0, a.length
     
@@ -742,8 +742,8 @@ Sub Test_clsCmArray_some_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.sort()
-Sub Test_clsCmArray_sort_Num
+'ArrayList.sort()
+Sub Test_Array_sort_Num
     Dim e,d,a
     d = Array(5,2,9,6,4,8,7,3,0,1)
     Set a = new_ArrOf(d)
@@ -754,7 +754,7 @@ Sub Test_clsCmArray_sort_Num
     e = Array(9,8,7,6,5,4,3,2,1,0)
     assertAllElements e, a.sort(False)
 End Sub
-Sub Test_clsCmArray_sort_Various
+Sub Test_Array_sort_Various
     Dim e,d,a
     d = Array("C","$","b","Š¿","a","B","‚ ","A","c","0")
     Set a = new_ArrOf(d)
@@ -765,7 +765,7 @@ Sub Test_clsCmArray_sort_Various
     e = Array("Š¿","‚ ","c","b","a","C","B","A","0","$")
     assertAllElements e, a.sort(False)
 End Sub
-Sub Test_clsCmArray_sort_Empty
+Sub Test_Array_sort_Empty
     Dim a
     Set a = new_Arr()
     AssertEqual 0, a.length
@@ -778,8 +778,8 @@ Sub Test_clsCmArray_sort_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.sortUsing()
-Sub Test_clsCmArray_sortUsing_Num
+'ArrayList.sortUsing()
+Sub Test_Array_sortUsing_Num
     Dim e,d,a
     d = Array(5,2,9,6,4,8,7,3,0,1)
     Set a = new_ArrOf(d)
@@ -790,7 +790,7 @@ Sub Test_clsCmArray_sortUsing_Num
     e = Array(9,8,7,6,5,4,3,2,1,0)
     assertAllElements e, a.sortUsing(new_Func("(c,n)=>c<n"))
 End Sub
-Sub Test_clsCmArray_sortUsing_Various
+Sub Test_Array_sortUsing_Various
     Dim e,d,a
     d = Array("C","$","b","Š¿","a","B","‚ ","A","c","0")
     Set a = new_ArrOf(d)
@@ -801,7 +801,7 @@ Sub Test_clsCmArray_sortUsing_Various
     e = Array("Š¿","‚ ","c","b","a","C","B","A","0","$")
     assertAllElements e, a.sortUsing(new_Func("(c,n)=>c<n"))
 End Sub
-Sub Test_clsCmArray_sortUsing_Empty
+Sub Test_Array_sortUsing_Empty
     Dim a
     Set a = new_Arr()
     AssertEqual 0, a.length
@@ -814,8 +814,8 @@ Sub Test_clsCmArray_sortUsing_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.splice
-Sub Test_clsCmArray_splice_Normal
+'ArrayList.splice
+Sub Test_Array_splice_Normal
     Dim e,e1,a,a1,d
     d = Array(1,2,3,4,5,6,7,8)
     Set a = new_ArrOf(d)
@@ -837,7 +837,7 @@ Sub Test_clsCmArray_splice_Normal
     assertAllElements e, a
     AssertEqual 0, a1.length
 End Sub
-Sub Test_clsCmArray_splice_Limit_Upper
+Sub Test_Array_splice_Limit_Upper
     Dim e,e1,a,a1,d
     d = Array(1,2,3,4,5,6,7,8)
     
@@ -873,7 +873,7 @@ Sub Test_clsCmArray_splice_Limit_Upper
     assertAllElements e, a
     AssertEqual 0, a1.length
 End Sub
-Sub Test_clsCmArray_splice_Limit_Lower
+Sub Test_Array_splice_Limit_Lower
     Dim e,e1,a,a1,d
     d = Array(1,2,3,4,5,6,7,8)
     
@@ -910,7 +910,7 @@ Sub Test_clsCmArray_splice_Limit_Lower
     assertAllElements e, a
     assertAllElements e1, a1
 End Sub
-Sub Test_clsCmArray_splice_Empty
+Sub Test_Array_splice_Empty
     Dim a,a1,e
     Set a = new_Arr()
     AssertEqual 0, a.length
@@ -931,10 +931,10 @@ Sub Test_clsCmArray_splice_Empty
 End Sub
 
 '###################################################################################################
-'clsCmArray.toArray()
-Sub Test_clsCmArray_toArray
+'ArrayList.toArray()
+Sub Test_Array_toArray
     Dim e()
-    Dim a : Set a = new clsCmArray
+    Dim a : Set a = new ArrayList
     
     a.push CreateObject("Scripting.Dictionary")
     a.push "hoge"
@@ -943,9 +943,9 @@ Sub Test_clsCmArray_toArray
     AssertEqual TypeName(e), TypeName(a.toArray())
     AssertEqual a.length-1, Ubound(a.toArray())
 End Sub
-Sub Test_clsCmArray_toArray_AllItems
+Sub Test_Array_toArray_AllItems
     Dim e,d,ao,a
-    Set ao = new clsCmArray
+    Set ao = new ArrayList
     d = Array(1,"b",Nothing)
     ao.pushA d
 
@@ -959,9 +959,9 @@ Sub Test_clsCmArray_toArray_AllItems
     e = d2
     assertAllElementsArray e, a
 End Sub
-Sub Test_clsCmArray_toArray_NoData
+Sub Test_Array_toArray_NoData
     Dim e,ao,a
-    Set ao = new clsCmArray
+    Set ao = new ArrayList
 
     e = Array()
     a = ao.toArray()
@@ -969,32 +969,32 @@ Sub Test_clsCmArray_toArray_NoData
 End Sub
 
 '###################################################################################################
-'clsCmArray.toString()
-Sub Test_clsCmArray_toString
+'ArrayList.toString()
+Sub Test_Array_toString
     Dim e,d,a
     d = Array(1,2,3)
-    e = "<clsCmArray>[<Integer>1,<Integer>2,<Integer>3]"
+    e = "<ArrayList>[<Integer>1,<Integer>2,<Integer>3]"
     a = new_ArrOf(d).toString
     AssertEqual e, a
 End Sub
 
 '###################################################################################################
-'clsCmArray.uniq()
-Sub Test_clsCmArray_uniq_ari
+'ArrayList.uniq()
+Sub Test_Array_uniq_ari
     Dim e,d,a
     d = Array(1,2,3,2,3)
     e = Array(1,2,3)
     Set a = new_ArrOf(d).uniq()
     assertAllElements e, a
 End Sub
-Sub Test_clsCmArray_uniq_nasi
+Sub Test_Array_uniq_nasi
     Dim e,d,a
     d = Array(1,2,3)
     e = Array(1,2,3)
     Set a = new_ArrOf(d).uniq()
     assertAllElements e, a
 End Sub
-Sub Test_clsCmArray_uniq_Empty
+Sub Test_Array_uniq_Empty
     Dim e,d,a
     d = Array()
     e = Array()

@@ -1,16 +1,18 @@
 '***************************************************************************************************
-'FILENAME                    : clsCmHtmlGenerator.vbs
-'Overview                    : HTML生成クラス
+'FILENAME                    : ReturnValue.vbs
+'Overview                    : 戻り値クラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
-'2023/10/22         Y.Fujii                  First edition
+'2024/01/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Class clsCmHtmlGenerator
+Class ReturnValue
     'クラス内変数、定数
-    Private PoTagInfo
+    Private PvValue
+    Private PoErr
+    Private PboIsErr
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -24,10 +26,12 @@ Class clsCmHtmlGenerator
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/22         Y.Fujii                  First edition
+    '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        Set PoTagInfo = new_DicOf(Array("element", Empty, "attribute", Empty, "content", Empty))
+        PvValue = Empty
+        Set PoErr = Nothing
+        PboIsErr = Empty
     End Sub
     
     '***************************************************************************************************
@@ -42,164 +46,248 @@ Class clsCmHtmlGenerator
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/22         Y.Fujii                  First edition
+    '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Terminate()
-        Set PoTagInfo = Nothing
+        Set PvValue = Nothing
+        Set PoErr = Nothing
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get attribute()
-    'Overview                    : 属性（オブジェクトの配列）を返す
+    'Function/Sub Name           : Property Get returnValue()
+    'Overview                    : 戻り値を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     属性（オブジェクトの配列）を返す
+    '     戻り値
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
+    '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get attribute()
-        attribute = PoTagInfo.Item("attribute")
+    Public Default Property Get returnValue()
+        cf_bind returnValue, PvValue
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get content()
-    'Overview                    : 内容（オブジェクトの配列）を返す
+    'Function/Sub Name           : Property Let returnValue()
+    'Overview                    : 戻り値を設定する
     'Detailed Description        : 工事中
     'Argument
-    '     なし
-    'Return Value
-    '     内容（オブジェクトの配列）を返す
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get content()
-        content = PoTagInfo.Item("content")
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Let element()
-    'Overview                    : 要素を設定する
-    'Detailed Description        : 工事中
-    'Argument
-    '     asElement              : 要素
+    '     avRet                  : 戻り値
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
+    '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Let element( _
-        byVal asElement _
+    Public Property Let returnValue( _
+        byRef avRet _
         )
-        PoTagInfo.Item("element") = asElement
-'        If new_Re("^[!-~][ -~]*$", "i").Test(asElement) Then
-'            PoTagInfo.Item("element") = asElement
-'        Else
-'            Err.Raise 1032, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator+element()", "要素（element）には半角以外の文字を指定できません。"
-'        End If
+        cf_bind PvValue, avRet
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get element()
-    'Overview                    : 要素を返す
+    'Function/Sub Name           : Property Set returnValue()
+    'Overview                    : 戻り値を設定する
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     avRet                  : 戻り値
     'Return Value
-    '     要素
+    '     なし
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
+    '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get element()
-        element = PoTagInfo.Item("element")
+    Public Property Set returnValue( _
+        byRef avRet _
+        )
+        cf_bind PvValue, avRet
     End Property
-        
+
     '***************************************************************************************************
-    'Function/Sub Name           : addContent()
-    'Overview                    : 内容を追加する
+    'Function/Sub Name           : getErr()
+    'Overview                    : エラー情報を返却する
     'Detailed Description        : 工事中
     'Argument
-    '     avCont                 : 追加する内容
+    '     なし
+    'Return Value
+    '     エラー情報
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function getErr( _
+        )
+        Set getErr = PoErr
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : isErr()
+    'Overview                    : エラー情報の有無を返却する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     結果 True:エラーあり / False:エラーなし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function isErr( _
+        )
+        isErr = PboIsErr
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : setValue()
+    'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : this_setValue()に委譲する
+    'Argument
+    '     avRet                  : 戻り値
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
+    '2024/01/03         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function addContent( _
-        byRef avCont _
+    Public Function setValue( _
+        byRef avRet _
         )
-        Dim vArr : cf_bind vArr, PoTagInfo.Item("content")
-        cf_push vArr, avCont
-        cf_bindAt PoTagInfo, "content", vArr
-
-        Set addContent = Me
+        Set setValue = this_setValue(avRet)
     End Function
-        
+
     '***************************************************************************************************
-    'Function/Sub Name           : addAttribute()
-    'Overview                    : 属性を追加する
-    'Detailed Description        : 工事中
+    'Function/Sub Name           : setValueByState()
+    'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : this_setValueByState()に委譲する
     'Argument
-    '     asKey                  : 追加する属性のキー
-    '     asValue                : 追加する属性の値
+    '     avNormal               : 正常の場合の戻り値
+    '     avAbnormal             : 異常の場合の戻り値
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/10/23         Y.Fujii                  First edition
+    '2024/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function addAttribute( _
-        byVal asKey _
-        , byVal asValue _
+    Public Function setValueByState( _
+        byRef avNormal _
+        , byRef avAbnormal _
         )
-        Dim oNewAttr : Set oNewAttr = new_DicOf(Array("key", asKey, "value", asValue))
-        Dim vArr : cf_bind vArr, PoTagInfo.Item("attribute")
-        cf_push vArr, oNewAttr
-        cf_bindAt PoTagInfo, "attribute", vArr
-
-        Set addAttribute = Me
-        Set oNewAttr = Nothing
-    End Function
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : generate()
-    'Overview                    : HTMLを生成する
-    'Detailed Description        : this_generate()に委譲する
-    'Argument
-    '     なし
-    'Return Value
-    '     生成したHTML
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/10/22         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Function generate( _
-        )
-        generate = this_generate(TypeName(Me)&"+generate()")
+        Set setValueByState = this_setValueByState(avNormal,avAbnormal)
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : toString()
+    'Overview                    : オブジェクトの内容を文字列で表示する
+    'Detailed Description        : func_CmReturnValueToString()に委譲する
+    'Argument
+    '     なし
+    'Return Value
+    '     文字列に変換したオブジェクトの内容
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/04         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function toString( _
+        )
+        toString = func_CmReturnValueToString()
+    End Function
+
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setValue()
+    'Overview                    : 戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : 工事中
+    'Argument
+    '     avRet                  : 戻り値
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/01/03         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_setValue( _
+        byRef avRet _
+        )
+        cf_bind PvValue, avRet
+        this_getErrorStatus()
+        Set this_setValue = Me
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setValueByState()
+    'Overview                    : 状態による戻り値の設定とエラーがあればErrオブジェクトの情報を格納する
+    'Detailed Description        : 工事中
+    'Argument
+    '     avNormal               : 正常の場合の戻り値
+    '     avAbnormal             : 異常の場合の戻り値
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_setValueByState( _
+        byRef avNormal _
+        , byRef avAbnormal _
+        )
+        If Err.Number=0 Then
+            cf_bind PvValue, avNormal
+        Else
+            cf_bind PvValue, avAbnormal
+        End If
+        this_getErrorStatus()
+        Set this_setValueByState = Me
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_getErrorStatus()
+    'Overview                    : エラー状態を取得しエラーがある場合は情報を取得後にクリアする
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2024/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_getErrorStatus( _
+        )
+        If Err.Number=0 Then
+            PboIsErr = False
+            Set PoErr = Nothing
+        Else
+            PboIsErr = True
+            Set PoErr = fw_storeErr()
+            Err.Clear
+        End If
+    End Sub
+    '***************************************************************************************************
+    'Function/Sub Name           : func_CmReturnValueToString()
     'Overview                    : オブジェクトの内容を文字列で表示する
     'Detailed Description        : cf_toString()準拠
     'Argument
@@ -210,165 +298,16 @@ Class clsCmHtmlGenerator
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2023/12/27         Y.Fujii                  First edition
+    '2024/01/04         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Function toString( _
+    Private Function func_CmReturnValueToString( _
         )
-        toString = this_generate(TypeName(Me)&"+toString()")
-    End Function
-
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_generate()
-    'Overview                    : HTMLを生成する
-    'Detailed Description        : 工事中
-    'Argument
-    '     asSource               : ソース
-    'Return Value
-    '     生成したHTML
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/10/22         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_generate( _
-        byVal asSource _
-        )
-        ast_argNotEmpty PoTagInfo.Item("element"), asSource, "HTML tags without elements cannot be generated."
-'        If IsEmpty(PoTagInfo.Item("element")) Then
-'            Err.Raise 17, "clsCmHtmlGenerator.vbs:clsCmHtmlGenerator-this_generate()", "要素がないHTMLタグは生成できません。"
-'            Exit Function
-'        End If
-
-        '開始タグの編集
-        Dim sStt : sStt =  "<" & PoTagInfo.Item("element")
-        Dim vArr, vEle
-        '属性（attribute）の編集
-        If Not IsEmpty(PoTagInfo.Item("attribute")) Then
-        'attributeが空でない場合
-            For Each vEle In PoTagInfo.Item("attribute")
-                cf_push vArr, this_editAttribute(vEle)
-            Next
-            sStt = sStt & " " & Join(vArr, " ")
-        End If
-        If Not IsEmpty(PoTagInfo.Item("content")) Then
-        'contentが空でない場合
-            sStt = sStt & ">"
-        Else
-        'contentが空の場合
-            sStt = sStt & " />"
-        End If
-        
-        '内容（content）の編集
-        Dim sCont : sCont = ""
-        If Not IsEmpty(PoTagInfo.Item("content")) Then
-        'contentが空でない場合
-            vArr = Array()
-            For Each vEle In PoTagInfo.Item("content")
-                cf_push vArr, this_editContent(vEle)
-            Next
-            sCont = new_Re("^([^\n])", "igm").Replace(Join(vArr, vbNewLine),"  $1")
-        End If
-
-        '終了タグの編集
-        Dim sEnd : sEnd =  ""
-        If Not IsEmpty(PoTagInfo.Item("content")) Then
-        'contentが空でない場合
-            sEnd =  "</" & PoTagInfo.Item("element") & ">"
-        End If
-
-        '生成したHTMLを返却
-        sRet = sStt
-        If Not IsEmpty(PoTagInfo.Item("content")) Then sRet = sRet & vbNewLine & sCont & vbNewLine & sEnd
-        this_generate = sRet
-
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_editAttribute()
-    'Overview                    : 属性（attribute）の編集処理
-    'Detailed Description        : 工事中
-    'Argument
-    '     aoAttr                 : 編集する属性（attribute）
-    'Return Value
-    '     編集結果
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/10/22         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_editAttribute( _
-        byRef aoAttr _
-        )
-        Dim sRet
-        If IsEmpty(aoAttr.Item("value")) Then
-            sRet = aoAttr.Item("key")
-        Else
-            sRet = aoAttr.Item("key") & "=" & Chr(34) & aoAttr.Item("value") & Chr(34)
-        End If
-        this_editAttribute = sRet
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_editContent()
-    'Overview                    : 内容（content）の編集処理
-    'Detailed Description        : 工事中
-    'Argument
-    '     aoCont                 : 編集する内容（content）
-    'Return Value
-    '     編集結果
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/10/22         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_editContent( _
-        byRef aoCont _
-        )
-        Dim sRet
-        On Error Resume Next
-        sRet = aoCont.generate()
-        If Err.Number<>0 Then
-            sRet = this_htmlEntityReference(aoCont)
-        End If
-        On Error GoTo 0
-        this_editContent = sRet
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_htmlEntityReference()
-    'Overview                    : HTMLの特殊文字を実体参照（entity reference）処理する
-    'Detailed Description        : HTMLとして特殊な意味を持つ文字（特殊文字またはメタ文字）を意味を持たない
-    '                              別の文字列に置換する
-    'Argument
-    '     asTarget               : 実体参照処理する文字列
-    'Return Value
-    '     実体参照処理した文字列
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2023/11/04         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_htmlEntityReference( _
-        byRef asTarget _
-        )
-        Dim vSettings : vSettings = Array( _
-            Array("&", "&amp;") _
-            , Array("'", "&#39;") _
-            , Array("""", "&quot;") _
-            , Array("<", "&lt;") _
-            , Array(">", "&gt;") _
-            )
-        Dim sTarget : sTarget = asTarget
-        Dim i
-        For Each i In vSettings
-            sTarget = Replace(sTarget, i(0), i(1))
-        Next
-        this_htmlEntityReference = sTarget
+        func_CmReturnValueToString = _
+            "<" & TypeName(Me) & ">[" _
+            & "returnValue:" & cf_toString(PvValue) _
+            & ",isErr:" & cf_toString(PboIsErr) _
+            & ",getErr:" & cf_toString(PoErr) _
+            & "]"
     End Function
 
 End Class

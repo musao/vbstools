@@ -1,15 +1,15 @@
 ' libCom.vbs: fw_* procedure test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
@@ -81,7 +81,7 @@ Sub Test_fw_excuteSub_NoArg_NoBroker_Err
 End Sub
 Sub Test_fw_excuteSub_Arg_Broker_Normal
     Dim f,e,d,a,b
-    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("brokerTest") : PvLog = Array()
     f = "subArg"
     d = "Arg_Broker_Normal"
     e = d
@@ -93,7 +93,7 @@ Sub Test_fw_excuteSub_Arg_Broker_Normal
 End Sub
 Sub Test_fw_excuteSub_Arg_Broker_Err
     Dim f,d,b
-    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("brokerTest") : PvLog = Array()
     f = "subArg"
     d = "Arg_Broker_Err"
     
@@ -103,7 +103,7 @@ Sub Test_fw_excuteSub_Arg_Broker_Err
 End Sub
 Sub Test_fw_excuteSub_NoArg_Broker_Normal
     Dim f,e,d,a,b
-    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("brokerTest") : PvLog = Array()
     f = "subNoArg"
     d = Empty
     e = NoArg_CONT
@@ -115,7 +115,7 @@ Sub Test_fw_excuteSub_NoArg_Broker_Normal
 End Sub
 Sub Test_fw_excuteSub_NoArg_Broker_Err
     Dim f,d,b
-    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("broker") : PvLog = Array()
+    Set b = new_Broker() : b.subscribe topic.LOG, GetRef("brokerTest") : PvLog = Array()
     f = "subNoArgErr"
     Set d = Nothing
     
@@ -506,7 +506,7 @@ Function readFile()
     On Error Goto 0
     new_Fso().DeleteFile PsPath
 End Function
-Sub broker(arg)
+Sub brokerTest(arg)
     cf_push PvLog, arg
 End Sub
 Function assertLogs(f,d,isErr)

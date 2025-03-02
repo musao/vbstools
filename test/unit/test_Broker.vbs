@@ -1,31 +1,31 @@
-' clsCmBroker.vbs: test.
+' Broker.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 Option Explicit
 
 '###################################################################################################
-'clsCmBroker
-Sub Test_clsCmBroker
-    Dim a : Set a = new clsCmBroker
+'Broker
+Sub Test_Broker
+    Dim a : Set a = new Broker
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmBroker", TypeName(a)
+    AssertEqual "Broker", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmBroker.subscribe()/publish()/unsubscribe()
-Sub Test_clsCmBroker_subscribe_publish
+'Broker.subscribe()/publish()/unsubscribe()
+Sub Test_Broker_subscribe_publish
     Dim ao,a,e
-    Set ao = new clsCmBroker
+    Set ao = new Broker
     ao.subscribe "test1", new_Func("function(a){a=2*a}")
     ao.subscribe "test2", new_Func("function(a){a=10*a}")
 

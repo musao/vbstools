@@ -1,32 +1,32 @@
-' clsCmReadOnlyObject.vbs: test.
+' ReadOnlyObject.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
 
 '###################################################################################################
-'clsCmReadOnlyObject
-Sub Test_clsCmReadOnlyObject
-    Dim a : Set a = new clsCmReadOnlyObject
+'ReadOnlyObject
+Sub Test_ReadOnlyObject
+    Dim a : Set a = new ReadOnlyObject
     AssertEqual 0, VarType(a)
-    AssertEqual "clsCmReadOnlyObject", TypeName(a)
+    AssertEqual "ReadOnlyObject", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmReadOnlyObject.value()
-Sub Test_clsCmReadOnlyObject_value
+'ReadOnlyObject.value()
+Sub Test_ReadOnlyObject_value
     Dim d : d = Array("EnumTest", "TEST", 100)
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(d(0),d(1),d(2))
+    Dim ao : Set ao = (new ReadOnlyObject).of(d(0),d(1),d(2))
 
     Dim e : e = d(2)
     Dim a
@@ -35,8 +35,8 @@ Sub Test_clsCmReadOnlyObject_value
     a = ao.value()
     AssertEqualWithMessage e, a, "value()"
 End Sub
-Sub Test_clsCmReadOnlyObject_value_InitialValue
-    Dim ao : Set ao = (new clsCmReadOnlyObject)
+Sub Test_ReadOnlyObject_value_InitialValue
+    Dim ao : Set ao = (new ReadOnlyObject)
     Dim e : e = Empty
     Dim a
     a = ao
@@ -46,66 +46,66 @@ Sub Test_clsCmReadOnlyObject_value_InitialValue
 End Sub
 
 '###################################################################################################
-'clsCmReadOnlyObject.parent()
-Sub Test_clsCmReadOnlyObject_parent
+'ReadOnlyObject.parent()
+Sub Test_ReadOnlyObject_parent
     Dim d : d = Array(CreateObject("Scripting.Dictionary"), "TEST", 100)
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(d(0),d(1),d(2))
+    Dim ao : Set ao = (new ReadOnlyObject).of(d(0),d(1),d(2))
 
     Dim e : Set e = d(0)
     Dim a : Set a = ao.parent()
     AssertSameWithMessage e, a, "parent()"
 End Sub
-Sub Test_clsCmReadOnlyObject_parent_InitialValue
-    Dim ao : Set ao = (new clsCmReadOnlyObject)
+Sub Test_ReadOnlyObject_parent_InitialValue
+    Dim ao : Set ao = (new ReadOnlyObject)
     Dim e : Set e = Nothing
     Dim a : Set a = ao.parent()
     AssertSameWithMessage e, a, "parent()"
 End Sub
 
 '###################################################################################################
-'clsCmReadOnlyObject.name()
-Sub Test_clsCmReadOnlyObject_name
+'ReadOnlyObject.name()
+Sub Test_ReadOnlyObject_name
     Dim d : d = Array("EnumTest", "TEST", 100)
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(d(0),d(1),d(2))
+    Dim ao : Set ao = (new ReadOnlyObject).of(d(0),d(1),d(2))
 
     Dim e : e = d(1)
     Dim a : a = ao.name()
     AssertEqualWithMessage e, a, "name()"
 End Sub
-Sub Test_clsCmReadOnlyObject_name_InitialValue
-    Dim ao : Set ao = (new clsCmReadOnlyObject)
+Sub Test_ReadOnlyObject_name_InitialValue
+    Dim ao : Set ao = (new ReadOnlyObject)
     Dim e : e = Empty
     Dim a : a = ao.name()
     AssertEqualWithMessage e, a, "name()"
 End Sub
 
 '###################################################################################################
-'clsCmReadOnlyObject.toString()
-Sub Test_clsCmReadOnlyObject_toString
+'ReadOnlyObject.toString()
+Sub Test_ReadOnlyObject_toString
     Dim d : d = Array("EnumTest", "TEST", 0)
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(d(0),d(1),d(2))
+    Dim ao : Set ao = (new ReadOnlyObject).of(d(0),d(1),d(2))
     Dim e : e = "<" & TypeName(ao) & ">{" & cf_toString(d(1)) & ":" & cf_toString(d(2)) & "}"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
-Sub Test_clsCmReadOnlyObject_toString_Initial
-    Dim ao : Set ao = (new clsCmReadOnlyObject)
+Sub Test_ReadOnlyObject_toString_Initial
+    Dim ao : Set ao = (new ReadOnlyObject)
     Dim e : e = "<" & TypeName(ao) & ">{" & cf_toString(Empty) & ":" & cf_toString(Empty) & "}"
     Dim a : a = ao.toString()
     AssertEqualWithMessage e, a, "toString()"
 End Sub
 
 '###################################################################################################
-'clsCmReadOnlyObject.compareTo()
-Sub Test_clsCmReadOnlyObject_compareTo_ok
+'ReadOnlyObject.compareTo()
+Sub Test_ReadOnlyObject_compareTo_ok
     Dim parent,name,value
     Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(parent,name,value)
+    Dim ao : Set ao = (new ReadOnlyObject).of(parent,name,value)
 
     Dim data : data = Array( _
-        Array((new clsCmReadOnlyObject).of(parent,name,9),1) _
-        , Array((new clsCmReadOnlyObject).of(parent,name,value),0) _
-        , Array((new clsCmReadOnlyObject).of(parent,name,11),-1) _
+        Array((new ReadOnlyObject).of(parent,name,9),1) _
+        , Array((new ReadOnlyObject).of(parent,name,value),0) _
+        , Array((new ReadOnlyObject).of(parent,name,11),-1) _
         )
 
     Dim i,d,a,e
@@ -116,16 +116,16 @@ Sub Test_clsCmReadOnlyObject_compareTo_ok
         AssertEqualWithMessage e, a, "i=" & i
     Next
 End Sub
-Sub Test_clsCmReadOnlyObject_compareTo_ng
+Sub Test_ReadOnlyObject_compareTo_ng
     Dim parent,name,value
     Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(parent,name,value)
+    Dim ao : Set ao = (new ReadOnlyObject).of(parent,name,value)
 
     Dim sou,dis
-    sou="clsCmReadOnlyObject+compareTo()":dis="The type of the argument is different."
+    sou="ReadOnlyObject+compareTo()":dis="The type of the argument is different."
     Dim data : data = Array( _
-        Array((new clsCmReadOnlyObject).of(CreateObject("Wscript.Shell"),name,value),Array(sou,dis)) _
-        , Array((new clsCmReadOnlyObject).of(parent,"name2",value),Array(sou,dis)) _
+        Array((new ReadOnlyObject).of(CreateObject("Wscript.Shell"),name,value),Array(sou,dis)) _
+        , Array((new ReadOnlyObject).of(parent,"name2",value),Array(sou,dis)) _
         , Array(CreateObject("Scripting.Dictionary"),Array(sou,dis)) _
         )
 
@@ -148,18 +148,18 @@ Sub Test_clsCmReadOnlyObject_compareTo_ng
 End Sub
 
 '###################################################################################################
-'clsCmReadOnlyObject.equals()
-Sub Test_clsCmReadOnlyObject_equals
+'ReadOnlyObject.equals()
+Sub Test_ReadOnlyObject_equals
     Dim parent,name,value
     Set parent=CreateObject("Scripting.Dictionary"):name="name":value=10
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(parent,name,value)
+    Dim ao : Set ao = (new ReadOnlyObject).of(parent,name,value)
 
     Dim data : data = Array( _
-        Array((new clsCmReadOnlyObject).of(parent,name,value),True) _
-        , Array((new clsCmReadOnlyObject).of(parent,name,11),False) _
-        , Array((new clsCmReadOnlyObject).of(CreateObject("Wscript.Shell"),name,value),False) _
-        , Array((new clsCmReadOnlyObject).of(parent,"name2",value),True) _
-        , Array((new clsCmReadOnlyObject).of(parent,name,9),False) _
+        Array((new ReadOnlyObject).of(parent,name,value),True) _
+        , Array((new ReadOnlyObject).of(parent,name,11),False) _
+        , Array((new ReadOnlyObject).of(CreateObject("Wscript.Shell"),name,value),False) _
+        , Array((new ReadOnlyObject).of(parent,"name2",value),True) _
+        , Array((new ReadOnlyObject).of(parent,name,9),False) _
         , Array(CreateObject("Scripting.Dictionary"),False) _
         )
 
@@ -174,10 +174,10 @@ End Sub
 
 
 '###################################################################################################
-'clsCmReadOnlyObject.of()
-Sub Test_clsCmReadOnlyObject_is_Err
+'ReadOnlyObject.of()
+Sub Test_ReadOnlyObject_is_Err
     Dim d : d = Array(CreateObject("Scripting.Dictionary"), "TEST", 100)
-    Dim ao : Set ao = (new clsCmReadOnlyObject).of(d(0),d(1),d(2))
+    Dim ao : Set ao = (new ReadOnlyObject).of(d(0),d(1),d(2))
 
     Dim d2 : d2 = Array(CreateObject("Wscript.Shell"), "TEST2", 200)
     On Error Resume Next
@@ -196,7 +196,7 @@ Sub Test_clsCmReadOnlyObject_is_Err
     a = ao.value
     AssertEqualWithMessage e,a,"value"
 
-    e = "clsCmReadOnlyObject+of()"
+    e = "ReadOnlyObject+of()"
     a = Err.Source
     AssertEqualWithMessage e,a,"Err.Source"
 

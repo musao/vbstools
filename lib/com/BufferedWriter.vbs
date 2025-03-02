@@ -1,5 +1,5 @@
 '***************************************************************************************************
-'FILENAME                    : clsCmBufferedWriter.vbs
+'FILENAME                    : BufferedWriter.vbs
 'Overview                    : ファイル出力バッファリング処理クラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@
 '----------         ----------------------   -------------------------------------------------------
 '2023/01/07         Y.Fujii                  First edition
 '***************************************************************************************************
-Class clsCmBufferedWriter
+Class BufferedWriter
     'クラス内変数、定数
     Private PoTextStream, PdbWriteBufferSize, PdbWriteIntervalTime, PoOutbound, PoInbound, PoBuffer
     

@@ -1,15 +1,15 @@
-' clsCmBufferedWriter_regression.vbs: test.
+' BufferedWriter_regression.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
@@ -21,7 +21,7 @@ Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 '###################################################################################################
 'SetUp()/TearDown()
 Sub SetUp()
-    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedWriter")
+    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_BufferedWriter")
     If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
 '    fs_createFolder PsPathTempFolder
     PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
@@ -38,11 +38,11 @@ End Sub
 
 
 '###################################################################################################
-'clsCmBufferedReader.write/writeBlankLines/writeLine()
-Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_Normal_Write
+'BufferedReader.write/writeBlankLines/writeLine()
+Sub Test_BufferedReader_write_writeBlankLines_writeLine_Normal_Write
     writer_testCommon getref("operations_write_writeBlankLines_writeLine_Normal"), "Write"
 End Sub
-Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_Normal_Append
+Sub Test_BufferedReader_write_writeBlankLines_writeLine_Normal_Append
     writer_testCommon getref("operations_write_writeBlankLines_writeLine_Normal"), "Appending"
 End Sub
 Sub operations_write_writeBlankLines_writeLine_Normal(o,r)
@@ -64,10 +64,10 @@ Sub operations_write_writeBlankLines_writeLine_Normal(o,r)
     o.Close
 End Sub
 
-Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_NewLineOnly_Write
+Sub Test_BufferedReader_write_writeBlankLines_writeLine_NewLineOnly_Write
     writer_testCommon getref("operations_write_writeBlankLines_writeLine_NewLineOnly"), "Write"
 End Sub
-Sub Test_clsCmBufferedReader_write_writeBlankLines_writeLine_NewLineOnly_Append
+Sub Test_BufferedReader_write_writeBlankLines_writeLine_NewLineOnly_Append
     writer_testCommon getref("operations_write_writeBlankLines_writeLine_NewLineOnly"), "Appending"
 End Sub
 Sub operations_write_writeBlankLines_writeLine_NewLineOnly(o,r)
@@ -117,7 +117,7 @@ Sub writer_testCommon(f,p)
                 f eo,er
                 ev = new_Fso().GetFile(pt).Size
             Else
-                Set ao = New clsCmBufferedWriter
+                Set ao = New BufferedWriter
                 ao.writeBufferSize = rs(j)
                 ao.setTextStream(eo)
                 f ao,ar

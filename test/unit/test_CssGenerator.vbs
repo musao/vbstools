@@ -1,32 +1,32 @@
-' clsCmCssGenerator.vbs: test.
+' CssGenerator.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
 
 '###################################################################################################
-'clsCmCssGenerator
-Sub Test_clsCmBroker
-    Dim a : Set a = new clsCmCssGenerator
+'CssGenerator
+Sub Test_CssGenerator
+    Dim a : Set a = new CssGenerator
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmCssGenerator", TypeName(a)
+    AssertEqual "CssGenerator", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmCssGenerator.property/addProperty()
-Sub Test_clsCmCssGenerator_property_addProperty_FirstTime
+'CssGenerator.property/addProperty()
+Sub Test_CssGenerator_property_addProperty_FirstTime
     Dim ao,a,ek1,ev1
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
     
     ek1 = "hoge" : ev1 = "fuga"
     ao.addProperty ek1,ev1
@@ -35,9 +35,9 @@ Sub Test_clsCmCssGenerator_property_addProperty_FirstTime
     AssertEqualWithMessage ek1, a(0).Item("key"), "key1"
     AssertEqualWithMessage ev1, a(0).Item("value"), "value1"
 End Sub
-Sub Test_clsCmCssGenerator_property_addProperty_SecondTimes
+Sub Test_CssGenerator_property_addProperty_SecondTimes
     Dim ao,a,ek1,ek2,ev1,ev2
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
     
     ek1 = "hoge" : ev1 = "fuga"
     ao.addProperty ek1,ev1
@@ -52,10 +52,10 @@ Sub Test_clsCmCssGenerator_property_addProperty_SecondTimes
 End Sub
 
 '###################################################################################################
-'clsCmCssGenerator.selector()
-Sub Test_clsCmCssGenerator_selector
+'CssGenerator.selector()
+Sub Test_CssGenerator_selector
     Dim ao,a,d,e
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
 
     e = Empty
     a = ao.selector
@@ -73,9 +73,9 @@ Sub Test_clsCmCssGenerator_selector
     a = ao.selector
     AssertEqualWithMessage e, a, "1-3"
 End Sub
-'Sub Test_clsCmCssGenerator_selector_Err
+'Sub Test_CssGenerator_selector_Err
 '    Dim ao,a,d
-'    Set ao = new clsCmCssGenerator
+'    Set ao = new CssGenerator
 '
 '    On Error Resume Next
 '    d = "ÇgÇèÇáÇÖ"
@@ -86,10 +86,10 @@ End Sub
 'End Sub
 
 '###################################################################################################
-'clsCmCssGenerator.generate()
-Sub Test_clsCmCssGenerator_generate_SelectorOnly
+'CssGenerator.generate()
+Sub Test_CssGenerator_generate_SelectorOnly
     Dim ao,a,d,e
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
     
     d = "hoge"
     e = "hoge {" & vbNewLine & "}"
@@ -98,9 +98,9 @@ Sub Test_clsCmCssGenerator_generate_SelectorOnly
 
     AssertEqualWithMessage e, a, "1"
 End Sub
-Sub Test_clsCmCssGenerator_generate_All
+Sub Test_CssGenerator_generate_All
     Dim ao,a,de,dak1,dak2,dav1,dav2,e
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
     de = "hoge" : ao.selector = de
 
     dak1 = "foo" : dav1 = "bar"
@@ -122,22 +122,22 @@ Sub Test_clsCmCssGenerator_generate_All
     a = ao.generate
     AssertEqualWithMessage e, a, "2"
 End Sub
-Sub Test_clsCmCssGenerator_generate_Err
+Sub Test_CssGenerator_generate_Err
     Dim ao
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
 
     On Error Resume Next
     ao.generate()
 
-    AssertEqualWithMessage "clsCmCssGenerator+generate()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "CssGenerator+generate()", Err.Source, "Err.Source"
     AssertEqualWithMessage "CSS without selectors cannot be generated.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
-'clsCmCssGenerator.toString()
-Sub Test_clsCmCssGenerator_toString
+'CssGenerator.toString()
+Sub Test_CssGenerator_toString
     Dim ao,a,d,e
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
     
     d = "hoge"
     ao.selector = d
@@ -146,14 +146,14 @@ Sub Test_clsCmCssGenerator_toString
 
     AssertEqualWithMessage e, a, "1"
 End Sub
-Sub Test_clsCmCssGenerator_toString_Err
+Sub Test_CssGenerator_toString_Err
     Dim ao
-    Set ao = new clsCmCssGenerator
+    Set ao = new CssGenerator
 
     On Error Resume Next
     ao.toString()
 
-    AssertEqualWithMessage "clsCmCssGenerator+toString()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "CssGenerator+toString()", Err.Source, "Err.Source"
     AssertEqualWithMessage "CSS without selectors cannot be generated.", Err.Description, "Err.Description"
 End Sub
 

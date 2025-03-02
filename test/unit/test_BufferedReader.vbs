@@ -1,15 +1,15 @@
-' clsCmBufferedReader.vbs: test.
+' BufferedReader.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
@@ -18,18 +18,18 @@ Option Explicit
 Const ForReading = 1, ForWriting = 2, ForAppending = 8
 
 '###################################################################################################
-'clsCmBufferedReader
-Sub Test_clsCmBufferedReader
-    Dim a : Set a = new clsCmBufferedReader
+'BufferedReader
+Sub Test_BufferedReader
+    Dim a : Set a = new BufferedReader
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmBufferedReader", TypeName(a)
+    AssertEqual "BufferedReader", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmBufferedReader.readSize()
-Sub Test_clsCmBufferedReader_readSize
+'BufferedReader.readSize()
+Sub Test_BufferedReader_readSize
     Dim a,e
-    Set a = new clsCmBufferedReader
+    Set a = new BufferedReader
 
     AssertEqual 5000, a.readSize
 
@@ -47,36 +47,36 @@ Sub Test_clsCmBufferedReader_readSize
 '    AssertEqual e, a.readSize
     AssertEqualWithMessage e, a.readSize, "e="&e
 End Sub
-Sub Test_clsCmBufferedReader_readSize_Err_Zero
+Sub Test_BufferedReader_readSize_Err_Zero
     On Error Resume Next
     Dim a,d
-    Set a = new clsCmBufferedReader
+    Set a = new BufferedReader
     
     e = a.readSize
     d = 0
     a.readSize = d
     
-    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedReader+readSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
-Sub Test_clsCmBufferedReader_readSize_Err_OverLower
+Sub Test_BufferedReader_readSize_Err_OverLower
     On Error Resume Next
     Dim a,d
-    Set a = new clsCmBufferedReader
+    Set a = new BufferedReader
     
     e = a.readSize
     d = -1*2^31 -1
     a.readSize = d
     
-    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedReader+readSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
-Sub Test_clsCmBufferedReader_readSize_Err_OverUpper
+Sub Test_BufferedReader_readSize_Err_OverUpper
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedReader
+    Set a = new BufferedReader
     
     e = 100
     a.readSize = e
@@ -84,30 +84,30 @@ Sub Test_clsCmBufferedReader_readSize_Err_OverUpper
     d = 2^(2^10)
     a.readSize = d
     
-    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedReader+readSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
-Sub Test_clsCmBufferedReader_readSize_Err_NotNumeric
+Sub Test_BufferedReader_readSize_Err_NotNumeric
     On Error Resume Next
     Dim a,d
-    Set a = new clsCmBufferedReader
+    Set a = new BufferedReader
     
     e = a.readSize
 
     d = "abc"
     a.readSize = d
     
-    AssertEqualWithMessage "clsCmBufferedReader+readSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedReader+readSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a positive integer.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.readSize, "readSize"
 End Sub
 
 '###################################################################################################
-'clsCmBufferedReader.textStream()/setTextStream()
-Sub Test_clsCmBufferedReader_textStream_setTextStream
+'BufferedReader.textStream()/setTextStream()
+Sub Test_BufferedReader_textStream_setTextStream
     Dim e : Set e = new_Fso().OpenTextFile(WScript.ScriptFullName, ForReading, False, -2)
-    Dim a : Set a = New clsCmBufferedReader
+    Dim a : Set a = New BufferedReader
     a.setTextStream(e)
     
     AssertSame e, a.textStream
@@ -115,21 +115,21 @@ Sub Test_clsCmBufferedReader_textStream_setTextStream
     
     e.Close
 End Sub
-Sub Test_clsCmBufferedReader_textStream_setTextStream_Err_Value
+Sub Test_BufferedReader_textStream_setTextStream_Err_Value
     On Error Resume Next
-    Dim a : Set a = New clsCmBufferedReader
+    Dim a : Set a = New BufferedReader
     a.setTextStream(vbNullString)
     
-    AssertEqualWithMessage "clsCmBufferedReader+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedReader+setTextStream()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
     AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
-Sub Test_clsCmBufferedReader_textStream_setTextStream_Err_Object
+Sub Test_BufferedReader_textStream_setTextStream_Err_Object
     On Error Resume Next
-    Dim a : Set a = New clsCmBufferedReader
+    Dim a : Set a = New BufferedReader
     a.setTextStream(new_Dic())
     
-    AssertEqualWithMessage "clsCmBufferedReader+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedReader+setTextStream()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
     AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub

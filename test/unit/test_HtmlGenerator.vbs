@@ -1,32 +1,32 @@
-' clsCmHtmlGenerator.vbs: test.
+' HtmlGenerator.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
 
 '###################################################################################################
-'clsCmHtmlGenerator
-Sub Test_clsCmBroker
-    Dim a : Set a = new clsCmHtmlGenerator
+'HtmlGenerator
+Sub Test_HtmlGenerator
+    Dim a : Set a = new HtmlGenerator
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmHtmlGenerator", TypeName(a)
+    AssertEqual "HtmlGenerator", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.attribute/addAttribute()
-Sub Test_clsCmHtmlGenerator_attribute_addAttribute_FirstTime
+'HtmlGenerator.attribute/addAttribute()
+Sub Test_HtmlGenerator_attribute_addAttribute_FirstTime
     Dim ao,a,ek1,ev1
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     
     ek1 = "hoge" : ev1 = "fuga"
     ao.addAttribute ek1,ev1
@@ -35,9 +35,9 @@ Sub Test_clsCmHtmlGenerator_attribute_addAttribute_FirstTime
     AssertEqualWithMessage ek1, a(0).Item("key"), "key1"
     AssertEqualWithMessage ev1, a(0).Item("value"), "value1"
 End Sub
-Sub Test_clsCmHtmlGenerator_attribute_addAttribute_SecondTimes
+Sub Test_HtmlGenerator_attribute_addAttribute_SecondTimes
     Dim ao,a,ek1,ek2,ev1,ev2
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     
     ek1 = "hoge" : ev1 = "fuga"
     ao.addAttribute ek1,ev1
@@ -52,10 +52,10 @@ Sub Test_clsCmHtmlGenerator_attribute_addAttribute_SecondTimes
 End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.content/addcontent()
-Sub Test_clsCmHtmlGenerator_content_addcontent_FirstTime
+'HtmlGenerator.content/addcontent()
+Sub Test_HtmlGenerator_content_addcontent_FirstTime
     Dim ao,a,d1,e1
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     
     d1 = "hoge"
     e1 = d1
@@ -64,9 +64,9 @@ Sub Test_clsCmHtmlGenerator_content_addcontent_FirstTime
     AssertEqualWithMessage 0, Ubound(a), "Ubound"
     AssertEqualWithMessage e1, a(0), "1"
 End Sub
-Sub Test_clsCmHtmlGenerator_content_addcontent_SecondTimes
+Sub Test_HtmlGenerator_content_addcontent_SecondTimes
     Dim ao,a,d1,d2,e1,e2
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     
     d1 = "hoge" : Set d2 = new_Dic()
     e1 = d1 : Set e2 = d2
@@ -79,10 +79,10 @@ Sub Test_clsCmHtmlGenerator_content_addcontent_SecondTimes
 End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.element()
-Sub Test_clsCmHtmlGenerator_element
+'HtmlGenerator.element()
+Sub Test_HtmlGenerator_element
     Dim ao,a,d,e
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
 
     e = Empty
     a = ao.element
@@ -100,9 +100,9 @@ Sub Test_clsCmHtmlGenerator_element
     a = ao.element
     AssertEqualWithMessage e, a, "1-3"
 End Sub
-'Sub Test_clsCmHtmlGenerator_element_Err
+'Sub Test_HtmlGenerator_element_Err
 '    Dim ao,d
-'    Set ao = new clsCmHtmlGenerator
+'    Set ao = new HtmlGenerator
 '
 '    On Error Resume Next
 '    d = "ÇgÇèÇáÇÖ"
@@ -113,10 +113,10 @@ End Sub
 'End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.generate()
-Sub Test_clsCmHtmlGenerator_generate_ElementOnly
+'HtmlGenerator.generate()
+Sub Test_HtmlGenerator_generate_ElementOnly
     Dim ao,a,d,e
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     
     d = "hoge"
     e = "<hoge />"
@@ -125,9 +125,9 @@ Sub Test_clsCmHtmlGenerator_generate_ElementOnly
 
     AssertEqualWithMessage e, a, "1"
 End Sub
-Sub Test_clsCmHtmlGenerator_generate_ElementAndAttribute
+Sub Test_HtmlGenerator_generate_ElementAndAttribute
     Dim ao,a,de,dak1,dak2,dav1,dav2,e
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     de = "hoge" : ao.element = de
 
     dak1 = "foo" : dav1 = "bar"
@@ -142,9 +142,9 @@ Sub Test_clsCmHtmlGenerator_generate_ElementAndAttribute
     a = ao.generate
     AssertEqualWithMessage e, a, "2"
 End Sub
-Sub Test_clsCmHtmlGenerator_generate_ElementAndContent
+Sub Test_HtmlGenerator_generate_ElementAndContent
     Dim ao,a,de,dc1,dc2,e
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     de = "hoge" : ao.element = de
 
     dc1 = "fuga"
@@ -156,7 +156,7 @@ Sub Test_clsCmHtmlGenerator_generate_ElementAndContent
     a = ao.generate
     AssertEqualWithMessage e, a, "1"
     
-    Set dc2 = new clsCmHtmlGenerator
+    Set dc2 = new HtmlGenerator
     dc2.element = "foo"
     dc2.addContent "bar"
     e = _
@@ -170,15 +170,15 @@ Sub Test_clsCmHtmlGenerator_generate_ElementAndContent
     a = ao.generate
     AssertEqualWithMessage e, a, "2"
 End Sub
-Sub Test_clsCmHtmlGenerator_generate_All
+Sub Test_HtmlGenerator_generate_All
     Dim ao,a,de,dx,e
-    Set dx = new clsCmHtmlGenerator
+    Set dx = new HtmlGenerator
     dx.element = "fuga2"
     dx.addAttribute "foo2","bar2"
     dx.addAttribute "woo2",Empty
     dx.addContent "wao2"
 
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     ao.element = "hoge"
     ao.addAttribute "foo1","bar1"
     ao.addAttribute "woo1",Empty
@@ -195,20 +195,20 @@ Sub Test_clsCmHtmlGenerator_generate_All
     a = ao.generate
     AssertEqualWithMessage e, a, "1"
 End Sub
-Sub Test_clsCmHtmlGenerator_generate_Err
+Sub Test_HtmlGenerator_generate_Err
     Dim ao
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
 
     On Error Resume Next
     ao.generate()
 
-    AssertEqualWithMessage "clsCmHtmlGenerator+generate()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "HtmlGenerator+generate()", Err.Source, "Err.Source"
     AssertEqualWithMessage "HTML tags without elements cannot be generated.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.generate()EntityReference
-Sub Test_clsCmHtmlGenerator_generate_EntityReference
+'HtmlGenerator.generate()EntityReference
+Sub Test_HtmlGenerator_generate_EntityReference
     Dim ao,a,d,dc,e,i
     
     d = Array( _
@@ -227,7 +227,7 @@ Sub Test_clsCmHtmlGenerator_generate_EntityReference
             & "  " & i.Item("Expected") & vbNewLine _
             & "</hoge>"
 
-        Set ao = new clsCmHtmlGenerator
+        Set ao = new HtmlGenerator
         ao.element = "hoge"
         ao.addContent dc
         a = ao.generate
@@ -237,10 +237,10 @@ Sub Test_clsCmHtmlGenerator_generate_EntityReference
 End Sub
 
 '###################################################################################################
-'clsCmHtmlGenerator.toString()
-Sub Test_clsCmHtmlGenerator_toString
+'HtmlGenerator.toString()
+Sub Test_HtmlGenerator_toString
     Dim ao,a,d,e
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
     
     d = "hoge"
     ao.element = d 
@@ -249,14 +249,14 @@ Sub Test_clsCmHtmlGenerator_toString
 
     AssertEqualWithMessage e, a, "1"
 End Sub
-Sub Test_clsCmHtmlGenerator_toString_Err
+Sub Test_HtmlGenerator_toString_Err
     Dim ao
-    Set ao = new clsCmHtmlGenerator
+    Set ao = new HtmlGenerator
 
     On Error Resume Next
     ao.toString()
 
-    AssertEqualWithMessage "clsCmHtmlGenerator+toString()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "HtmlGenerator+toString()", Err.Source, "Err.Source"
     AssertEqualWithMessage "HTML tags without elements cannot be generated.", Err.Description, "Err.Description"
 End Sub
 

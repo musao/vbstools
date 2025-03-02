@@ -1,15 +1,15 @@
-' clsCmBufferedWriter.vbs: test.
+' BufferedWriter.vbs: test.
 ' @import ../../lib/com/clsAdptFile.vbs
-' @import ../../lib/com/clsCmArray.vbs
-' @import ../../lib/com/clsCmBroker.vbs
-' @import ../../lib/com/clsCmBufferedReader.vbs
-' @import ../../lib/com/clsCmBufferedWriter.vbs
-' @import ../../lib/com/clsCmCalendar.vbs
-' @import ../../lib/com/clsCmCharacterType.vbs
-' @import ../../lib/com/clsCmCssGenerator.vbs
-' @import ../../lib/com/clsCmHtmlGenerator.vbs
-' @import ../../lib/com/clsCmReadOnlyObject.vbs
-' @import ../../lib/com/clsCmReturnValue.vbs
+' @import ../../lib/com/ArrayList.vbs
+' @import ../../lib/com/Broker.vbs
+' @import ../../lib/com/BufferedReader.vbs
+' @import ../../lib/com/BufferedWriter.vbs
+' @import ../../lib/com/Calendar.vbs
+' @import ../../lib/com/CharacterType.vbs
+' @import ../../lib/com/CssGenerator.vbs
+' @import ../../lib/com/HtmlGenerator.vbs
+' @import ../../lib/com/ReadOnlyObject.vbs
+' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
 Option Explicit
@@ -21,7 +21,7 @@ Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 '###################################################################################################
 'SetUp()/TearDown()
 Sub SetUp()
-    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_clsCmBufferedWriter")
+    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), "test_BufferedWriter")
     If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
 '    fs_createFolder PsPathTempFolder
     PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Fso().GetTempName())
@@ -42,18 +42,18 @@ End Sub
 
 
 '###################################################################################################
-'clsCmBufferedWriter
-Sub Test_clsCmBufferedWriter
-    Dim a : Set a = new clsCmBufferedWriter
+'BufferedWriter
+Sub Test_BufferedWriter
+    Dim a : Set a = new BufferedWriter
     AssertEqual 9, VarType(a)
-    AssertEqual "clsCmBufferedWriter", TypeName(a)
+    AssertEqual "BufferedWriter", TypeName(a)
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.writeBufferSize()
-Sub Test_clsCmBufferedWriter_writeBufferSize
+'BufferedWriter.writeBufferSize()
+Sub Test_BufferedWriter_writeBufferSize
     Dim a,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
 
     AssertEqualWithMessage 5000, a.writeBufferSize, "1"
     
@@ -81,23 +81,23 @@ Sub Test_clsCmBufferedWriter_writeBufferSize
     a.writeBufferSize = e
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverLower
+Sub Test_BufferedWriter_writeBufferSize_Err_OverLower
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
     
     e = a.writeBufferSize
     d = -1*2^(2^1024)
     a.writeBufferSize = d
     
-    AssertEqualWithMessage "clsCmBufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverUpper
+Sub Test_BufferedWriter_writeBufferSize_Err_OverUpper
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
     
     e = 100
     a.writeBufferSize = e
@@ -105,30 +105,30 @@ Sub Test_clsCmBufferedWriter_writeBufferSize_Err_OverUpper
     d = 2^(2^1024)
     a.writeBufferSize = d
     
-    AssertEqualWithMessage "clsCmBufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeBufferSize_Err_NotNumeric
+Sub Test_BufferedWriter_writeBufferSize_Err_NotNumeric
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
     
     e = a.writeBufferSize
 
     d = "abc"
     a.writeBufferSize = d
     
-    AssertEqualWithMessage "clsCmBufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+writeBufferSize() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeBufferSize, "e="&e
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.writeIntervalTime()
-Sub Test_clsCmBufferedWriter_writeIntervalTime
+'BufferedWriter.writeIntervalTime()
+Sub Test_BufferedWriter_writeIntervalTime
     Dim a,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
 
     AssertEqualWithMessage 0, a.writeIntervalTime, "1"
     
@@ -156,23 +156,23 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime
     a.writeIntervalTime = e
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverLower
+Sub Test_BufferedWriter_writeIntervalTime_Err_OverLower
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
     
     e = a.writeIntervalTime
     d = -1*2^(2^10)
     a.writeIntervalTime = d
     
-    AssertEqualWithMessage "clsCmBufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverUpper
+Sub Test_BufferedWriter_writeIntervalTime_Err_OverUpper
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
     
     e = 100
     a.writeIntervalTime = e
@@ -180,31 +180,31 @@ Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_OverUpper
     d = 2^(2^10)
     a.writeIntervalTime = d
     
-    AssertEqualWithMessage "clsCmBufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
-Sub Test_clsCmBufferedWriter_writeIntervalTime_Err_NonNumeric
+Sub Test_BufferedWriter_writeIntervalTime_Err_NonNumeric
     On Error Resume Next
     Dim a,d,e
-    Set a = new clsCmBufferedWriter
+    Set a = new BufferedWriter
     
     e = a.writeIntervalTime
 
     d = "abc"
     a.writeIntervalTime = d
     
-    AssertEqualWithMessage "clsCmBufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+writeIntervalTime() Let", Err.Source, "Err.Source"
     AssertEqualWithMessage "Invalid number.", Err.Description, "Err.Description"
     AssertEqualWithMessage e, a.writeIntervalTime, "e="&e
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.textStream()/setTextStream()
-Sub Test_clsCmBufferedWriter_textStream_setTextStream_Write
+'BufferedWriter.textStream()/setTextStream()
+Sub Test_BufferedWriter_textStream_setTextStream_Write
     Dim pt : pt = PsPathForWriting
     Dim e : Set e = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
-    Dim a : Set a = New clsCmBufferedWriter
+    Dim a : Set a = New BufferedWriter
     a.setTextStream(e)
     
     AssertSame e, a.textStream
@@ -212,10 +212,10 @@ Sub Test_clsCmBufferedWriter_textStream_setTextStream_Write
 
     e.Close
 End Sub
-Sub Test_clsCmBufferedWriter_textStream_setTextStream_Append
+Sub Test_BufferedWriter_textStream_setTextStream_Append
     Dim pt : pt = PsPathForAppending
     Dim e : Set e = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
-    Dim a : Set a = New clsCmBufferedWriter
+    Dim a : Set a = New BufferedWriter
     a.setTextStream(e)
     
     AssertSame e, a.textStream
@@ -223,32 +223,32 @@ Sub Test_clsCmBufferedWriter_textStream_setTextStream_Append
 
     e.Close
 End Sub
-Sub Test_clsCmBufferedWriter_textStream_setTextStream_Err_Value
+Sub Test_BufferedWriter_textStream_setTextStream_Err_Value
     On Error Resume Next
-    Dim a : Set a = New clsCmBufferedWriter
+    Dim a : Set a = New BufferedWriter
     a.setTextStream(vbNullString)
     
-    AssertEqualWithMessage "clsCmBufferedWriter+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+setTextStream()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
     AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
-Sub Test_clsCmBufferedWriter_textStream_setTextStream_Err_Object
+Sub Test_BufferedWriter_textStream_setTextStream_Err_Object
     On Error Resume Next
-    Dim a : Set a = New clsCmBufferedWriter
+    Dim a : Set a = New BufferedWriter
     a.setTextStream(new_Dic())
     
-    AssertEqualWithMessage "clsCmBufferedWriter+setTextStream()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "BufferedWriter+setTextStream()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Not a TextStream object.", Err.Description, "Err.Description"
     AssertSameWithMessage Nothing, a.textStream, "textStream"
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.currentBufferSize()
-Sub Test_clsCmBufferedWriter_currentBufferSize
+'BufferedWriter.currentBufferSize()
+Sub Test_BufferedWriter_currentBufferSize
     Dim pt,ts,ao,a,e,d,sz
     pt = PsPathForWriting
     Set ts = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
 
     With ao
         .setTextStream(ts)
@@ -283,9 +283,9 @@ Sub Test_clsCmBufferedWriter_currentBufferSize
 
     ts.Close
 End Sub
-Sub Test_clsCmBufferedWriter_currentBufferSize_Empty
+Sub Test_BufferedWriter_currentBufferSize_Empty
     Dim ao,a,e
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
     
     e = Empty
     a = ao.currentBufferSize
@@ -293,12 +293,12 @@ Sub Test_clsCmBufferedWriter_currentBufferSize_Empty
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.lastWriteTime()
-Sub Test_clsCmBufferedWriter_lastWriteTime
+'BufferedWriter.lastWriteTime()
+Sub Test_BufferedWriter_lastWriteTime
     Dim pt,ts,ao,a,e,d,sz,nsz
     pt = PsPathForAppending
     Set ts = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
 
     With ao
         .setTextStream(ts)
@@ -339,9 +339,9 @@ Sub Test_clsCmBufferedWriter_lastWriteTime
 
     ts.Close
 End Sub
-Sub Test_clsCmBufferedWriter_lastWriteTime_Empty
+Sub Test_BufferedWriter_lastWriteTime_Empty
     Dim ao,a,e
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
     
     e = Empty
     a = ao.lastWriteTime
@@ -349,12 +349,12 @@ Sub Test_clsCmBufferedWriter_lastWriteTime_Empty
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.newLine()
-Sub Test_clsCmBufferedWriter_newLine
+'BufferedWriter.newLine()
+Sub Test_BufferedWriter_newLine
     Dim pt,ts,ao,a,el,ec,es,sz,nsz
     pt = PsPathForWriting
     Set ts = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
 
     With ao
         .setTextStream(ts)
@@ -393,12 +393,12 @@ Sub Test_clsCmBufferedWriter_newLine
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.flush()
-Sub Test_clsCmBufferedWriter_flush
+'BufferedWriter.flush()
+Sub Test_BufferedWriter_flush
    Dim pt,ts,ao,at,ab,et,eb,d,sz,nsz
     pt = PsPathForAppending
     Set ts = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
 
     With ao
         .setTextStream(ts)
@@ -433,12 +433,12 @@ Sub Test_clsCmBufferedWriter_flush
 End Sub
 
 '###################################################################################################
-'clsCmBufferedWriter.close()
-Sub Test_clsCmBufferedWriter_close
+'BufferedWriter.close()
+Sub Test_BufferedWriter_close
     Dim pt,ts,d,ao,et,eb,at,ab,sz,nsz
     pt = PsPathForWriting
     Set ts = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
-    Set ao = New clsCmBufferedWriter
+    Set ao = New BufferedWriter
 
     With ao
         .setTextStream(ts)

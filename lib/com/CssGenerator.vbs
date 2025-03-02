@@ -1,5 +1,5 @@
 '***************************************************************************************************
-'FILENAME                    : clsCmCssGenerator.vbs
+'FILENAME                    : CssGenerator.vbs
 'Overview                    : CSS生成クラス
 'Detailed Description        : 工事中
 '---------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@
 '----------         ----------------------   -------------------------------------------------------
 '2023/10/25         Y.Fujii                  First edition
 '***************************************************************************************************
-Class clsCmCssGenerator
+Class CssGenerator
     'クラス内変数、定数
     Private PoTagInfo
     
@@ -87,7 +87,7 @@ Class clsCmCssGenerator
 '        If new_Re("^[!-~][ -~]*$", "i").Test(asSelector) Then
 '            PoTagInfo.Item("selector") = asSelector
 '        Else
-'            Err.Raise 1032, "clsCmCssGenerator.vbs:clsCmCssGenerator+selector()", "セレクタには半角以外の文字を指定できません。"
+'            Err.Raise 1032, "CssGenerator.vbs:CssGenerator+selector()", "セレクタには半角以外の文字を指定できません。"
 '        End If
     End Property
     

@@ -917,7 +917,7 @@ Private Sub fw_logger( _
     Next
 
     Dim oType : cf_bind oType, avParams(0)
-    If cf_isSame("clsCmReadOnlyObject", TypeName(oType)) Then avParams(0) = oType.name
+    If cf_isSame("ReadOnlyObject", TypeName(oType)) Then avParams(0) = oType.name
 
     With aoWriter
         .WriteLine(new_ArrOf(Array(new_Now(), Join(vIps,","), new_Network().ComputerName)).Concat(avParams).join(vbTab))
@@ -1197,7 +1197,7 @@ End Function
 '***************************************************************************************************
 Private Function new_Arr( _
     )
-    Set new_Arr = (New clsCmArray)
+    Set new_Arr = (New ArrayList)
 End Function
 
 '***************************************************************************************************
@@ -1261,7 +1261,7 @@ End Function
 '***************************************************************************************************
 Private Function new_Broker( _
     )
-    Set new_Broker = (New clsCmBroker)
+    Set new_Broker = (New Broker)
 End Function
 
 '***************************************************************************************************
@@ -1281,7 +1281,7 @@ End Function
 Private Function new_CalAt( _
     ByVal avDateTime _
     )
-    Set new_CalAt = (New clsCmCalendar).of(avDateTime)
+    Set new_CalAt = (New Calendar).of(avDateTime)
 End Function
 
 '***************************************************************************************************
@@ -1300,7 +1300,7 @@ End Function
 '***************************************************************************************************
 Private Function new_Char( _
     )
-    Set new_Char = (New clsCmCharacterType)
+    Set new_Char = (New CharacterType)
 End Function
 
 '***************************************************************************************************
@@ -1320,7 +1320,7 @@ End Function
 Private Function new_CssOf( _
     byVal asSelector _
     )
-    Dim oCss : Set oCss = New clsCmCssGenerator
+    Dim oCss : Set oCss = New CssGenerator
     oCss.selector = asSelector
     Set new_CssOf = oCss
     Set oCss = Nothing
@@ -1439,7 +1439,7 @@ Private Sub new_Enum( _
     cf_push vCode, "Private Sub Class_Initialize()"
     cf_push vCode, "    Set PoLists = CreateObject('Scripting.Dictionary')"
     For Each i in aoDef.Keys
-        cf_push vCode, "    Set " & i & "_ = (new clsCmReadOnlyObject).of(Me, '" & i & "', " & aoDef.Item(i) & ")"
+        cf_push vCode, "    Set " & i & "_ = (new ReadOnlyObject).of(Me, '" & i & "', " & aoDef.Item(i) & ")"
         cf_push vCode, "    cf_bindAt PoLists, '" & i & "', " & i
     Next
     cf_push vCode, "End Sub"
@@ -1651,7 +1651,7 @@ End Function
 Private Function new_HtmlOf( _
     byVal asElement _
     )
-    Dim oHtml : Set oHtml = New clsCmHtmlGenerator
+    Dim oHtml : Set oHtml = New HtmlGenerator
     oHtml.element = asElement
     Set new_HtmlOf = oHtml
     Set oHtml = Nothing
@@ -1692,7 +1692,7 @@ End Function
 '***************************************************************************************************
 Private Function new_Now( _
     )
-    Set new_Now = (New clsCmCalendar).ofNow()
+    Set new_Now = (New Calendar).ofNow()
 End Function
 
 '***************************************************************************************************
@@ -1748,7 +1748,7 @@ End Function
 Private Function new_Reader( _
     byRef aoTextStream _
     )
-    Set new_Reader = (New clsCmBufferedReader).setTextStream(aoTextStream)
+    Set new_Reader = (New BufferedReader).setTextStream(aoTextStream)
 End Function
 
 '***************************************************************************************************
@@ -1768,7 +1768,7 @@ End Function
 Private Function new_ReaderFrom( _
     byVal asPath _
     )
-    Set new_ReaderFrom = (New clsCmBufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
+    Set new_ReaderFrom = (New BufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
 End Function
 
 '***************************************************************************************************
@@ -1788,7 +1788,7 @@ End Function
 Private Function new_Ret( _
     byRef avRet _
     )
-    Set new_Ret = (New clsCmReturnValue).setValue(avRet)
+    Set new_Ret = (New ReturnValue).setValue(avRet)
 End Function
 
 '***************************************************************************************************
@@ -1810,7 +1810,7 @@ Private Function new_RetByState( _
     byRef avNormal _
     , byRef avAbnormal _
     )
-    Set new_RetByState = (New clsCmReturnValue).setValueByState(avNormal,avAbnormal)
+    Set new_RetByState = (New ReturnValue).setValueByState(avNormal,avAbnormal)
 End Function
 
 '***************************************************************************************************
@@ -1894,7 +1894,7 @@ End Function
 Private Function new_Writer( _
     byRef aoTextStream _
     )
-    Set new_Writer = (New clsCmBufferedWriter).setTextStream(aoTextStream)
+    Set new_Writer = (New BufferedWriter).setTextStream(aoTextStream)
 End Function
 
 '***************************************************************************************************
@@ -1920,7 +1920,7 @@ Private Function new_WriterTo( _
     , byVal aboCreate _
     , byVal alFileFormat _
     )
-    Set new_WriterTo = (New clsCmBufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
+    Set new_WriterTo = (New BufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
 End Function
 
 '---------------------------------------------------------------------------------------------------
