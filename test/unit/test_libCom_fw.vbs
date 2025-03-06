@@ -12,6 +12,8 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
 Const MY_NAME = "test_libCom_fw.vbs"

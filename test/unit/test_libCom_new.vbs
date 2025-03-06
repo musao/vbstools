@@ -96,6 +96,53 @@ Sub Test_new_Broker
 End Sub
 
 '###################################################################################################
+'new_BrokerOf()
+Sub Test_new_BrokerOf_1Arg
+    Dim d,ao,e,a
+    d = Array("test1")
+    Set ao = new_BrokerOf(d)
+
+    e = 1 : a = 1
+    ao.publish "test1",a
+    AssertEqualWithMessage e, a, "test1 unchanging"
+End Sub
+Sub Test_new_BrokerOf_2Args
+    Dim d,ao,e,a
+    d = Array("test1", new_Func("function(a){a=2*a}"))
+    Set ao = new_BrokerOf(d)
+
+    e = 2 : a = 1
+    ao.publish "test1",a
+    AssertEqualWithMessage e, a, "test1"
+End Sub
+Sub Test_new_BrokerOf_3Args
+    Dim d,ao,e,a
+    d = Array("test1", new_Func("function(a){a=2*a}"), "test2")
+    Set ao = new_BrokerOf(d)
+
+    e = 2 : a = 1
+    ao.publish "test1",a
+    AssertEqualWithMessage e, a, "test1"
+
+    e = 1 : a = 1
+    ao.publish "test2",a
+    AssertEqualWithMessage e, a, "test2 unchanging"
+End Sub
+Sub Test_new_BrokerOf_4Args
+    Dim d,ao,e,a
+    d = Array("test1", new_Func("function(a){a=2*a}"), "test2", new_Func("function(a){a=10*a}"))
+    Set ao = new_BrokerOf(d)
+
+    e = 2 : a = 1
+    ao.publish "test1",a
+    AssertEqualWithMessage e, a, "test1"
+
+    e = 10 : a = 1
+    ao.publish "test2",a
+    AssertEqualWithMessage e, a, "test2"
+End Sub
+
+'###################################################################################################
 'new_CalAt()
 Sub Test_new_CalAt
     Dim e : Set e = New Calendar
@@ -546,17 +593,17 @@ Sub Test_new_Reader
 End Sub
 
 '###################################################################################################
-'new_ReaderFrom()
-Sub Test_new_ReaderFrom
+'new_ReaderOf()
+Sub Test_new_ReaderOf
     Dim e : Set e = New BufferedReader
-    Dim a : Set a = new_ReaderFrom(WScript.ScriptFullName)
+    Dim a : Set a = new_ReaderOf(WScript.ScriptFullName)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-Sub Test_new_ReaderFrom_Err
+Sub Test_new_ReaderOf_Err
     On Error Resume Next
-    Dim a : Set a = new_ReaderFrom(vbNullString)
+    Dim a : Set a = new_ReaderOf(vbNullString)
     
     AssertEqual 5, Err.Number
     AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description
@@ -612,7 +659,7 @@ Sub Test_new_Ts
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-Sub Test_new_WriterTo_Err
+Sub Test_new_WriterOf_Err
     On Error Resume Next
     Dim a : Set a = new_Ts(vbNullString, 8, False, -2)
     
@@ -634,17 +681,17 @@ Sub Test_new_Writer
 End Sub
 
 '###################################################################################################
-'new_WriterTo()
-Sub Test_new_WriterTo
+'new_WriterOf()
+Sub Test_new_WriterOf
     Dim e : Set e = New BufferedWriter
-    Dim a : Set a = new_WriterTo(WScript.ScriptFullName, 8, False, -2)
+    Dim a : Set a = new_WriterOf(WScript.ScriptFullName, 8, False, -2)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
-Sub Test_new_WriterTo_Err
+Sub Test_new_WriterOf_Err
     On Error Resume Next
-    Dim a : Set a = new_WriterTo(vbNullString, 8, False, -2)
+    Dim a : Set a = new_WriterOf(vbNullString, 8, False, -2)
     
     AssertEqual 5, Err.Number
     AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description

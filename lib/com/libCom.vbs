@@ -10,53 +10,6 @@
 '***************************************************************************************************
 
 '###################################################################################################
-'Enum定数
-'###################################################################################################
-Call new_Enum( _
-    "topic" _
-    , new_DicOf( _
-        Array( _
-            "LOG", 1 _
-        ) _
-    ) _
-)
-Call new_Enum( _
-    "logType" _
-    , new_DicOf( _
-        Array( _
-            "ERROR", 1 _
-            , "WARNING", 3 _
-            , "INFO", 5 _
-            , "DETAIL", 9 _
-        ) _
-    ) _
-)
-Call new_Enum( _
-    "charType" _
-    , new_DicOf( _
-        Array( _
-            "HALF_WIDTH_ALPHABET_UPPERCASE", 2^0 _
-            , "HALF_WIDTH_ALPHABET_LOWERCASE", 2^1 _
-            , "HALF_WIDTH_NUMBERS", 2^2 _
-            , "HALF_WIDTH_SYMBOL", 2^3 _
-            , "HALF_WIDTH_KATAKANA", 2^4 _
-            , "HALF_WIDTH_KATAKANA_SYMBOL", 2^5 _
-            , "FULL_WIDTH_ALPHABET_UPPERCASE", 2^6 _
-            , "FULL_WIDTH_ALPHABET_LOWERCASE", 2^7 _
-            , "FULL_WIDTH_NUMBERS", 2^8 _
-            , "FULL_WIDTH_SYMBOL", 2^9 _
-            , "FULL_WIDTH_HIRAGANA", 2^10 _
-            , "FULL_WIDTH_KATAKANA", 2^11 _
-            , "FULL_WIDTH_GREEK_CYRILLIC_UPPERCASE", 2^12 _
-            , "FULL_WIDTH_GREEK_CYRILLIC_LOWERCASE", 2^13 _
-            , "FULL_WIDTH_LINEFRAME", 2^14 _
-            , "FULL_WIDTH_KANJI_LEVEL1", 2^15 _
-            , "FULL_WIDTH_KANJI_LEVEL2", 2^16 _
-        ) _
-    ) _
-)
-
-'###################################################################################################
 'カスタム関数
 '###################################################################################################
 
@@ -837,6 +790,25 @@ Private Function fw_getLogPath( _
 End Function
 
 '***************************************************************************************************
+'Function/Sub Name           : fw_getTextstreamForLog()
+'Overview                    : log出力用のテキストストリームを作成する
+'Detailed Description        : log出力先はfw_getLogPath()で取得する
+'Argument
+'     なし
+'Return Value
+'     ファイル出力バッファリング処理クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_getTextstreamForLog( _
+    )
+    Set fw_getTextstreamForLog = new_WriterOf(fw_getLogPath, 8, True, -1)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fw_getPrivatePath()
 'Overview                    : 実行中のスクリプトがあるフォルダ以下のフルパスを返す
 'Detailed Description        : 親フォルダ名の指定があればそのフォルダ以下のパスを返す
@@ -1262,6 +1234,35 @@ End Function
 Private Function new_Broker( _
     )
     Set new_Broker = (New Broker)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : new_BrokerOf()
+'Overview                    : インスタンス生成関数
+'Detailed Description        : 出版-購読型（Publish/Subscribe）クラスに指定したtopicをsubscribeして返す
+'Argument
+'     avParams               : 奇数（1,3,5,...）番目はtopic、偶数（2,4,6,...）番目はコールバック関数ポインタ
+'                              topicだけの場合はコールバック関数ポインタをsubscribeしない
+'Return Value
+'     出版-購読型（Publish/Subscribe）クラスのインスタンス
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/06         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function new_BrokerOf( _
+    byVal avParams _
+    )
+    Dim i,vTmp,lCnt,oBroker
+    Set oBroker = New Broker
+    lCnt = 0
+    For Each i In avParams
+        lCnt = lCnt + 1
+        cf_push vTmp, i
+        If lCnt Mod 2 = 0 Then oBroker.subscribe vTmp(lCnt-2), vTmp(lCnt-1)
+    Next
+    Set new_BrokerOf = oBroker
 End Function
 
 '***************************************************************************************************
@@ -1752,7 +1753,7 @@ Private Function new_Reader( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_ReaderFrom()
+'Function/Sub Name           : new_ReaderOf()
 'Overview                    : ファイル読込バッファリング処理クラスのインスタンス生成関数
 'Detailed Description        : 工事中
 'Argument
@@ -1765,10 +1766,10 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/10/09         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_ReaderFrom( _
+Private Function new_ReaderOf( _
     byVal asPath _
     )
-    Set new_ReaderFrom = (New BufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
+    Set new_ReaderOf = (New BufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
 End Function
 
 '***************************************************************************************************
@@ -1898,7 +1899,7 @@ Private Function new_Writer( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_WriterTo()
+'Function/Sub Name           : new_WriterOf()
 'Overview                    : ファイル出力バッファリング処理クラスのインスタンス生成関数
 'Detailed Description        : 工事中
 'Argument
@@ -1914,13 +1915,13 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/10/09         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_WriterTo( _
+Private Function new_WriterOf( _
     byVal asPath _
     , byVal alIomode _
     , byVal aboCreate _
     , byVal alFileFormat _
     )
-    Set new_WriterTo = (New BufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
+    Set new_WriterOf = (New BufferedWriter).setTextStream(new_Ts(asPath, alIomode, aboCreate, alFileFormat))
 End Function
 
 '---------------------------------------------------------------------------------------------------

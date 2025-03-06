@@ -325,7 +325,7 @@ Class clsCompareExcel
         '★ログ出力
         this_publishLog logType.WARNING, sMyName, "Attempt to unprotect Excel file."
         '文書の保護を解除する
-        Call this_tryCatchAfterProc(fw_tryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName)
+        this_tryCatchAfterProc fw_tryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName
         
         With oWorkBook
             'ワークシートのリネーム情報格納用配列（clsCmArray型）

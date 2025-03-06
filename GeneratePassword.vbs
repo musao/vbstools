@@ -20,9 +20,6 @@
 '***************************************************************************************************
 Option Explicit
 
-'変数
-Private PoWriter
-
 'lib\com import
 Dim sRelativeFolderName : sRelativeFolderName = "lib\com"
 With CreateObject("Scripting.FileSystemObject")
@@ -36,9 +33,25 @@ With CreateObject("Scripting.FileSystemObject")
     Next
 End With
 Set oLibFile = Nothing
+'lib import
+sRelativeFolderName = "lib"
+With new_FSO()
+    sLibFolderPath = .BuildPath(sParentFolderPath, sRelativeFolderName)
+    ExecuteGlobal .OpenTextfile(.BuildPath(sLibFolderPath,"libEnum.vbs")).ReadAll
+End With
 
-'メイン関数実行
+
+'ログ出力先、ブローカークラスのインスタンスの設定
+Private PoTs4Log, PoBroker
+Set PoTs4Log = fw_getTextstreamForLog()
+Set PoBroker = new_BrokerOf(Array(topic.LOG, GetRef("this_logger")))
+
+'Main関数実行
 Call Main()
+
+'終了処理
+PoTs4Log.close()
+Set PoBroker = Nothing : Set PoTs4Log = Nothing
 Wscript.Quit
 
 
@@ -58,27 +71,20 @@ Wscript.Quit
 '2023/09/24         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
-    'ログ出力の設定
-    Set PoWriter = new_WriterTo(fw_getLogPath, 8, True, -1)
-    'ブローカークラスのインスタンスの設定
-    Dim oBroker : Set oBroker = new_Broker()
-    oBroker.subscribe topic.LOG, GetRef("this_logger")
     'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
     '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
-    fw_excuteSub "this_getParameters", oParams, oBroker
+    fw_excuteSub "this_getParameters", oParams, PoBroker
     
     'パスワードを生成する
-    fw_excuteSub "this_generate", oParams, oBroker
+    fw_excuteSub "this_generate", oParams, PoBroker
     
     'ログ出力をクローズ
-    PoWriter.close()
+    PoTs4Log.close()
     
     'オブジェクトを開放
     Set oParams = Nothing
-    Set oBroker = Nothing
-    Set PoWriter = Nothing
 End Sub
 
 '***************************************************************************************************
@@ -224,5 +230,5 @@ End Sub
 Private Sub this_logger( _
     byRef avParams _
     )
-    fw_logger avParams, PoWriter
+    fw_logger avParams, PoTs4Log
 End Sub
