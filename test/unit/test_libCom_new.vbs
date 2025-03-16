@@ -1,5 +1,5 @@
 ' libCom.vbs: new_* procedure test.
-' @import ../../lib/com/clsAdptFile.vbs
+' @import ../../lib/com/FileProxy.vbs
 ' @import ../../lib/com/ArrayList.vbs
 ' @import ../../lib/com/Broker.vbs
 ' @import ../../lib/com/BufferedReader.vbs
@@ -27,7 +27,7 @@ End Sub
 '###################################################################################################
 'new_AdptFile()
 '###################################################################################################
-'new_AdptFileOf()
+'new_FileProxyOf()
 
 '###################################################################################################
 'new_Arr()

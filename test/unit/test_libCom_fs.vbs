@@ -1,5 +1,5 @@
 ' libCom.vbs: fs_* procedure test.
-' @import ../../lib/com/clsAdptFile.vbs
+' @import ../../lib/com/FileProxy.vbs
 ' @import ../../lib/com/ArrayList.vbs
 ' @import ../../lib/com/Broker.vbs
 ' @import ../../lib/com/BufferedReader.vbs
@@ -30,6 +30,15 @@ Sub TearDown()
     '当テストで作成した一時フォルダを削除する
     fso.DeleteFolder PsPathTempFolder
 End Sub
+
+'###################################################################################################
+'fs_getAllFiles()
+Sub Test_fs_getAllFiles_OnlyFiles
+    'データ定義と生成
+    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,False,"Test_fs_copyFile_Normal"))
+    
+End Sub
+
 
 '###################################################################################################
 'fs_copyFile()
@@ -1285,6 +1294,7 @@ Sub Test_func_FsReadFile_Err
     assertFolderItems(createExpectDefinitionUnchange("target",d))
 End Sub
 
+
 '###################################################################################################
 'common
 Function readTestFile(c,p)
@@ -1385,6 +1395,16 @@ Sub getTestItemInfo(i)
         End If
     End With
 End Sub
+
+'★For Test_fs_getAllFiles_*()
+Function createTestItemDefinitionForGetAllFiles(f,t,n)
+    Dim Folder : Folder = getTempName()
+    createTestItemDefinitionForGetAllFiles = Array( _
+        Array(  "folder", "folder"  , fromFolder, vbNullString , True , Empty) _
+        , Array("folder", "textfile", fromFolder, getTempName(), False, Empty) _
+        )
+End Function
+
 'For Test_fs_copyFile_*(),Test_fs_moveFile_*()
 Function createTestItemDefinitionForFile(f,t,n)
     Dim fromFolder : fromFolder = getTempName()

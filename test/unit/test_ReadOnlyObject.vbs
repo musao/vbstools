@@ -1,5 +1,5 @@
 ' ReadOnlyObject.vbs: test.
-' @import ../../lib/com/clsAdptFile.vbs
+' @import ../../lib/com/FileProxy.vbs
 ' @import ../../lib/com/ArrayList.vbs
 ' @import ../../lib/com/Broker.vbs
 ' @import ../../lib/com/BufferedReader.vbs

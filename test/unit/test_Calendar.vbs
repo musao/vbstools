@@ -1,5 +1,5 @@
 ' Calendar.vbs: test.
-' @import ../../lib/com/clsAdptFile.vbs
+' @import ../../lib/com/FileProxy.vbs
 ' @import ../../lib/com/ArrayList.vbs
 ' @import ../../lib/com/Broker.vbs
 ' @import ../../lib/com/BufferedReader.vbs
@@ -23,8 +23,8 @@ Sub Test_Calendar
 End Sub
 
 '###################################################################################################
-'Calendar.dateTime,fractionalPartOfelapsedSeconds,elapsedSeconds,serial
-Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_initial
+'Calendar.dateTime,fractionalPartOfElapsedSeconds,elapsedSeconds,serial
+Sub Test_Calendar_dateTime_fractionalPartOfElapsedSeconds_elapsedSeconds_serial_initial
     dim tg,a,ao,e
     set ao = (new Calendar)
 
@@ -33,9 +33,9 @@ Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_
     a = ao.dateTime
     AssertEqualWithMessage e, a, tg
 
-    tg = "B.fractionalPartOfelapsedSeconds"
+    tg = "B.fractionalPartOfElapsedSeconds"
     e = Null
-    a = ao.fractionalPartOfelapsedSeconds
+    a = ao.fractionalPartOfElapsedSeconds
     AssertEqualWithMessage e, a, tg
 
     tg = "C.elapsedSeconds"
@@ -48,7 +48,7 @@ Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_
     a = ao.serial
     AssertEqualWithMessage e, a, tg
 End Sub
-Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_elapsedSeconds_Null
+Sub Test_Calendar_dateTime_fractionalPartOfElapsedSeconds_elapsedSeconds_serial_elapsedSeconds_Null
     dim tg,a,ao,e,d,i,data
     d = Array ( _
             new_DicOf(Array(  "No",1 ,"date", Now()               )) _
@@ -68,9 +68,9 @@ Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_
         a = ao.dateTime
         AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
         
-        tg = "B.fractionalPartOfelapsedSeconds"
+        tg = "B.fractionalPartOfElapsedSeconds"
         e = 0
-        a = ao.fractionalPartOfelapsedSeconds
+        a = ao.fractionalPartOfElapsedSeconds
         AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
         
         tg = "C.elapsedSeconds"
@@ -84,7 +84,7 @@ Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_
         AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&i.Item("date")
     Next
 End Sub
-Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_elapsedSeconds_NotNull
+Sub Test_Calendar_dateTime_fractionalPartOfElapsedSeconds_elapsedSeconds_serial_elapsedSeconds_NotNull
     dim tg,a,ao,e,d,i,data
     d = Array ( _
             new_DicOf(Array(  "No",1 ,"date", Now()               , "elapsed", Timer()                 )) _
@@ -105,9 +105,9 @@ Sub Test_Calendar_dateTime_fractionalPartOfelapsedSeconds_elapsedSeconds_serial_
         a = ao.dateTime
         AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&cf_toString(data)
         
-        tg = "B.fractionalPartOfelapsedSeconds"
+        tg = "B.fractionalPartOfElapsedSeconds"
         e = data(1)-Fix(data(1))
-        a = ao.fractionalPartOfelapsedSeconds
+        a = ao.fractionalPartOfElapsedSeconds
         AssertWithMessage Abs(e-a)<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
 '        AssertWithMessage Abs(e-a)<0.0000001 Or (1-Abs(e-a))<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
         

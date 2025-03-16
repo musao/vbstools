@@ -1,5 +1,5 @@
-' clsAdptFile.vbs: test.
-' @import ../../lib/com/clsAdptFile.vbs
+' FileProxy.vbs: test.
+' @import ../../lib/com/FileProxy.vbs
 ' @import ../../lib/com/ArrayList.vbs
 ' @import ../../lib/com/Broker.vbs
 ' @import ../../lib/com/BufferedReader.vbs
@@ -14,7 +14,7 @@
 
 Option Explicit
 
-Const MY_NAME = "test_clsAdptFile.vbs"
+Const MY_NAME = "test_FileProxy.vbs"
 Dim PsPathTempFolder
 
 '###################################################################################################
@@ -30,73 +30,85 @@ Sub TearDown()
 End Sub
 
 '###################################################################################################
-'clsAdptFile
-Sub Test_clsAdptFile
-    Dim a : Set a = new clsAdptFile
-    AssertEqualWithMessage 0, VarType(a), "VarType"
-    AssertEqualWithMessage "clsAdptFile", TypeName(a), "TypeName"
+'FileProxy
+Sub Test_FileProxy
+    Dim a : Set a = new FileProxy
+    AssertEqualWithMessage 1, VarType(a), "VarType"
+    AssertEqualWithMessage "FileProxy", TypeName(a), "TypeName"
 End Sub
 
 '###################################################################################################
-'clsAdptFile.setFileObject()
-Sub Test_clsAdptFile_setFileObject
-    Dim p,d
+'FileProxy.of()
+Sub Test_FileProxy_of
+    Dim p,a
     p = WScript.ScriptFullName
-    Set d = new_ShellApp().Namespace(new_Fso().GetParentFolderName(p)).Items().Item(new_Fso().GetFileName(p))
-
-    Dim ao,a
-    Set ao = new clsAdptFile
-    Set a = ao.setFileObject(d)
+    Set a = (new FileProxy).of(p)
 
     AssertEqualWithMessage 8, VarType(a), "VarType"
-    AssertEqualWithMessage "clsAdptFile", TypeName(a), "TypeName"
+    AssertEqualWithMessage "FileProxy", TypeName(a), "TypeName"
     AssertEqualWithMessage p, a.path, "path"
 End Sub
-Sub Test_clsAdptFile_setFileObject_Err
-    Dim d
-    Set d = new_Dic()
-
-    Dim ao,a
-    Set ao = new clsAdptFile
+Sub Test_FileProxy_of_Err
+    Dim a,d : d = vbNullString
     On Error Resume Next
-    Set a = ao.setFileObject(d)
+    Call (new FileProxy).of(d)
 
-    AssertEqualWithMessage 438, Err.Number, "Err.Number"
-    AssertEqualWithMessage "clsAdptFile.vbs:clsAdptFile+setFileObject()", Err.Source, "Err.Source"
-    AssertEqualWithMessage "オブジェクトでサポートされていないプロパティまたはメソッドです。", Err.Description, "Err.Description"
+    AssertEqualWithMessage "FileProxy+of()", Err.Source, "Err.Source"
+    AssertMatchWithMessage "^invalid argument.*", Err.Description, "Err.Description"
+End Sub
+Sub Test_FileProxy_of_ErrImmutable
+    On Error Resume Next
+    Dim ao
+    Set ao = (new FileProxy).of(makeShortCut())
+    Call ao.of(makeUrlShortCut())
+
+    AssertEqualWithMessage "FileProxy+of()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Because it is an immutable variable, its value cannot be changed.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
-'clsAdptFile.setFilePath()
-Sub Test_clsAdptFile_setFilePath
-    Dim p
-    p = WScript.ScriptFullName
+'FileProxy.dateLastModified,name,parentFolder,path,size,toString,type
+Sub Test_FileProxy_dateLastModified_name_parentFolder_path_size_toString_type_initial
+    dim tg,a,ao,e
+    set ao = (new FileProxy)
 
-    Dim ao,a
-    Set ao = new clsAdptFile
-    Set a = ao.setFilePath(p)
+    tg = "A.dateLastModified"
+    e = Null
+    a = ao.dateLastModified
+    AssertEqualWithMessage e, a, tg
 
-    AssertEqualWithMessage 8, VarType(a), "VarType"
-    AssertEqualWithMessage "clsAdptFile", TypeName(a), "TypeName"
-    AssertEqualWithMessage p, a.path, "path"
+    tg = "B.name"
+    e = Null
+    a = ao.name
+    AssertEqualWithMessage e, a, tg
+
+    tg = "C.parentFolder"
+    e = Null
+    a = ao.parentFolder
+    AssertEqualWithMessage e, a, tg
+
+    tg = "D.path"
+    e = Null
+    a = ao.path
+    AssertEqualWithMessage e, a, tg
+
+    tg = "E.size"
+    e = Null
+    a = ao.size
+    AssertEqualWithMessage e, a, tg
+
+    tg = "F.toString"
+    e = "<FileProxy>"
+    a = ao.toString
+    AssertEqualWithMessage e, a, tg
+
+    tg = "G.type"
+    e = Null
+    a = ao.type
+    AssertEqualWithMessage e, a, tg
 End Sub
-Sub Test_clsAdptFile_setFilePath_Err
-    Dim d
-    d = vbNullString
 
-    Dim ao,a
-    Set ao = new clsAdptFile
-    On Error Resume Next
-    Set a = ao.setFilePath(d)
-
-    AssertEqualWithMessage 76, Err.Number, "Err.Number"
-    AssertEqualWithMessage "clsAdptFile.vbs:clsAdptFile+setFilePath()", Err.Source, "Err.Source"
-    AssertEqualWithMessage "パスが見つかりません。", Err.Description, "Err.Description"
-End Sub
-
-'###################################################################################################
-'clsAdptFile.getters DateLastModified,Name,ParentFolder,Path,Size,Type
-Sub Test_clsAdptFile_getters
+Sub Test_FileProxy_dateLastModified_name_parentFolder_path_size_toString_type
     Dim data
     data = Array( _
                 WScript.ScriptFullName _
@@ -108,7 +120,7 @@ Sub Test_clsAdptFile_getters
     For i=0 To Ubound(data)
         d = data(i)
         Set eo = CreateObject("Scripting.FileSystemObject").GetFile(d)
-        Set ao = new clsAdptFile : ao.setFilePath(d)
+        Set ao = new FileProxy : ao.of(d)
 
         AssertEqualWithMessage eo, ao, "i="&i&",Default"
         AssertEqualWithMessage eo.DateLastModified, ao.DateLastModified, "i="&i&",DateLastModified"
@@ -116,6 +128,7 @@ Sub Test_clsAdptFile_getters
         AssertEqualWithMessage eo.ParentFolder, ao.ParentFolder, "i="&i&",ParentFolder"
         AssertEqualWithMessage eo.Path, ao.Path, "i="&i&",Path"
         AssertEqualWithMessage eo.Size, ao.Size, "i="&i&",Size"
+        AssertEqualWithMessage "<FileProxy>"&ao.Path, ao.toString, "i="&i&",toString"
         AssertEqualWithMessage eo.Type, ao.Type, "i="&i&",Type"
     Next
 End Sub

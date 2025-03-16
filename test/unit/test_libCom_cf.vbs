@@ -1,5 +1,5 @@
 ' libCom.vbs: cf_* procedure test.
-' @import ../../lib/com/clsAdptFile.vbs
+' @import ../../lib/com/FileProxy.vbs
 ' @import ../../lib/com/ArrayList.vbs
 ' @import ../../lib/com/Broker.vbs
 ' @import ../../lib/com/BufferedReader.vbs
@@ -235,95 +235,30 @@ End Sub
 
 '###################################################################################################
 'cf_isSame()
-Sub Test_cf_isSame_OvsO_Same
-    Dim a,da,db,e
-    Set da = new_Dic()
-    Set db = da
-    e = True
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_OvsO_NotSame
-    Dim a,da,db,e
-    Set da = new_Dic()
-    Set db = new_Dic()
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_OvsV_NotSame
-    Dim a,da,db,e
-    Set da = new_Dic()
-    db = "a"
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsO_NotSame
-    Dim a,da,db,e
-    da = 5
-    Set db = new_Dic()
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsV_and_SvsS_Same
-    Dim a,da,db,e
-    da = "a"
-    db = "a"
-    e = True
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsV_and_SvsS_NotSame
-    Dim a,da,db,e
-    da = "a"
-    db = "A"
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsV_and_NvsN_Same
-    Dim a,da,db,e
-    da = 9
-    db = 9
-    e = True
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsV_and_NvsN_NotSame
-    Dim a,da,db,e
-    da = 8
-    db = 9
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsV_and_SvsN_NotSame
-    Dim a,da,db,e
-    da = "9"
-    db = 9
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
-End Sub
-Sub Test_cf_isSame_VvsV_and_NvsS_NotSame
-    Dim a,da,db,e
-    da = 500
-    db = "abc"
-    e = False
-    a = cf_isSame(da,db)
-
-    AssertEqual e,a
+Sub Test_cf_isSame
+    Dim data : data = Array ( _
+                Nothing _
+                , CreateObject("Scripting.Dictionary") _
+                , Null _
+                , Empty _
+                , vbNullString _
+                , "abc" _
+                , 123 _
+                , "2035/3/15 14:25:09" _
+                , "2035/3/15" _
+                , "09:59:01" _
+                , True _
+                , False _
+                )
+    Dim a,b,i,j,e
+    i=-1
+    For Each a In data:i=i+1
+        j=-1
+        For Each b In data:j=j+1
+            If i=j Then e=True Else e=False
+            AssertEqualWithMessage e, cf_isSame(a,b), "i="&i&" j="&j&" data(i)="&cf_toString(a)&" data(j)="&cf_toString(b)
+        Next
+    Next
 End Sub
 
 '###################################################################################################

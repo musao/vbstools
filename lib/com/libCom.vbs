@@ -206,7 +206,16 @@ Private Function cf_isSame( _
     If IsObject(avA) And IsObject(avB) Then
         If avA Is avB Then boFlg = True
     ElseIf Not IsObject(avA) And Not IsObject(avB) Then
-        If VarType(avA) = vbString And VarType(avB) = vbString Then
+        If IsNull(avA) And IsNull(avB) _
+            Or _
+            IsEmpty(avA) And IsEmpty(avB) Then
+            boFlg = True
+        ElseIf IsNull(avA) _
+            Or IsNull(avB) _
+            Or IsEmpty(avA) _
+            Or IsEmpty(avB) Then
+            boFlg = False
+        ElseIf VarType(avA) = vbString And VarType(avB) = vbString Then
             If Strcomp(avA, avB, vbBinaryCompare)=0 Then boFlg = True
         Else
             If avA = avB Then boFlg = True
@@ -719,6 +728,85 @@ Private Sub ast_failure( _
     fw_throwException 8199, asSource, asDescription
 End Sub
 
+'***************************************************************************************************
+'Function/Sub Name           : ast_argEmpty()
+'Overview                    : 引数がEmptyであるか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argEmpty( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If Not(IsEmpty(avArgument)) Then fw_throwException 8200, asSource, asDescription
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argNotNothing()
+'Overview                    : 引数がNothingでないか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argNotNothing( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    If IsObject(avArgument) Then
+        If avArgument Is Nothing Then fw_throwException 8201, asSource, asDescription
+    End If
+End Sub
+
+'***************************************************************************************************
+'Function/Sub Name           : ast_argNothing()
+'Overview                    : 引数がNothingであるか検査する
+'Detailed Description        : 検査結果がNGの場合は例外を出す
+'Argument
+'     avArgument             : 対象
+'     asSource               : ソース
+'     asDescription          : 説明
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'Histroy
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/03/09         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub ast_argNothing( _
+    byRef avArgument _
+    , byVal asSource _
+    , byVal asDescription _
+    )
+    Dim boFlg : boFlg=True
+    If IsObject(avArgument) Then
+        If avArgument Is Nothing Then boFlg=False
+    End If
+    If boFlg Then fw_throwException 8202, asSource, asDescription
+End Sub
+
+
 '###################################################################################################
 'フレームワーク系の関数
 '###################################################################################################
@@ -1114,43 +1202,23 @@ Private Function new_Adodb( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_AdptFile()
-'Overview                    : Fileオブジェクトのアダプター生成関数
-'Detailed Description        : 工事中
-'Argument
-'     aoFile                 : ファイルのオブジェクト
-'Return Value
-'     生成したFileオブジェクトのアダプターのインスタンス
-'---------------------------------------------------------------------------------------------------
-'Histroy
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function new_AdptFile( _
-    byRef aoFile _
-    )
-    Set new_AdptFile = (New clsAdptFile).setFileObject(aoFile)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : new_AdptFileOf()
-'Overview                    : Fileオブジェクトのアダプター生成関数
+'Function/Sub Name           : new_FileProxyOf()
+'Overview                    : FileProxyオブジェクトの生成関数
 'Detailed Description        : 工事中
 'Argument
 '     asPath                 : ファイルのパス
 'Return Value
-'     生成したFileオブジェクトのアダプターのインスタンス
+'     生成したFileFroxyオブジェクトのインスタンス
 '---------------------------------------------------------------------------------------------------
 'Histroy
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_AdptFileOf( _
+Private Function new_FileProxyOf( _
     byVal asPath _
     )
-    Set new_AdptFileOf = (New clsAdptFile).setFilePath(asPath)
+    Set new_FileProxyOf = (New FileProxy).of(asPath)
 End Function
 
 '***************************************************************************************************
@@ -2926,7 +2994,7 @@ Private Function func_FsGetAllFilesByFso( _
                 cf_pushA vRet, func_FsGetAllFilesByShell(oEle.Path)
             Else
             'zipファイル以外の場合、ファイル情報を取得する
-                cf_push vRet, new_AdptFileOf(oEle.Path)
+                cf_push vRet, new_FileProxyOf(oEle.Path)
             End If
         Next
         'フォルダの取得
@@ -2936,7 +3004,7 @@ Private Function func_FsGetAllFilesByFso( _
         func_FsGetAllFilesByFso = vRet
     Else
     'ファイルの場合
-        func_FsGetAllFilesByFso = Array(new_AdptFileOf(asPath))
+        func_FsGetAllFilesByFso = Array(new_FileProxyOf(asPath))
     End If
 
     Set oFolder = Nothing
@@ -2976,14 +3044,15 @@ Private Function func_FsGetAllFilesByShell( _
                 cf_pushA vRet, func_FsGetAllFilesByShell(oItem.Path)
             Else
             'ファイルの場合
-                cf_push vRet, new_AdptFile(oItem)
+                cf_push vRet, new_FileProxyOf(oItem.Path)
+'                cf_push vRet, new_AdptFile(oItem)
             End If
         Next
         func_FsGetAllFilesByShell = vRet
         Set oItem = Nothing
     Else
     '上記以外の場合
-        func_FsGetAllFilesByShell = Array(new_AdptFileOf(asPath))
+        func_FsGetAllFilesByShell = Array(new_FileProxyOf(asPath))
     End If
 End Function
 
@@ -3019,7 +3088,7 @@ Private Function func_FsGetAllFilesByDir( _
             cf_pushA vRet, func_FsGetAllFilesByShell(sList)
         Else
         'zipファイル以外の場合、ファイル情報を取得する
-            cf_push vRet, new_AdptFileOf(sList)
+            cf_push vRet, new_FileProxyOf(sList)
         End If
     Next
     func_FsGetAllFilesByDir = vRet

@@ -68,7 +68,7 @@ Class Calendar
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get fractionalPartOfelapsedSeconds()
+    'Function/Sub Name           : Property Get fractionalPartOfElapsedSeconds()
     'Overview                    : åoâﬂïbÇÃè¨êîïîÇï‘Ç∑
     'Detailed Description        : çHéñíÜ
     'Argument
@@ -81,9 +81,9 @@ Class Calendar
     '----------         ----------------------   -------------------------------------------------------
     '2025/02/12         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get fractionalPartOfelapsedSeconds()
-       fractionalPartOfelapsedSeconds = Null
-       If Not IsNull(PdtDateTime) Then fractionalPartOfelapsedSeconds = this_getFractionalPartOfElapsedSeconds()
+    Public Property Get fractionalPartOfElapsedSeconds()
+       fractionalPartOfElapsedSeconds = Null
+       If Not IsNull(PdtDateTime) Then fractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds()
     End Property
     
     '***************************************************************************************************
@@ -328,8 +328,8 @@ Class Calendar
             Exit Function
         End If
         
-        If (this_getFractionalPartOfElapsedSeconds < aoTarget.fractionalPartOfelapsedSeconds) Then lResult = -1
-        If (this_getFractionalPartOfElapsedSeconds > aoTarget.fractionalPartOfelapsedSeconds) Then lResult = 1
+        If (this_getfractionalPartOfElapsedSeconds < aoTarget.fractionalPartOfElapsedSeconds) Then lResult = -1
+        If (this_getfractionalPartOfElapsedSeconds > aoTarget.fractionalPartOfElapsedSeconds) Then lResult = 1
         this_compareTo = lResult
 
     End Function
@@ -357,15 +357,15 @@ Class Calendar
         End If
 
         Dim dbResult : dbResult = 0
-        If IsNull(PdtDateTime) Then dbResult = -1 * ((aoTarget.dateTime)*60*60*24 + aoTarget.fractionalPartOfelapsedSeconds)
-        If IsNull(aoTarget.dateTime) Then dbResult = PdtDateTime*60*60*24 + this_getFractionalPartOfElapsedSeconds
+        If IsNull(PdtDateTime) Then dbResult = -1 * ((aoTarget.dateTime)*60*60*24 + aoTarget.fractionalPartOfElapsedSeconds)
+        If IsNull(aoTarget.dateTime) Then dbResult = PdtDateTime*60*60*24 + this_getfractionalPartOfElapsedSeconds
         If dbResult <> 0 Then
             this_differenceFrom = dbResult
             Exit Function
         End If
 
         Dim dbDiffElapsedSeconds
-        dbDiffElapsedSeconds = this_getFractionalPartOfElapsedSeconds-aoTarget.fractionalPartOfelapsedSeconds
+        dbDiffElapsedSeconds = this_getfractionalPartOfElapsedSeconds-aoTarget.fractionalPartOfElapsedSeconds
 
         If (PdtDateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(PdtDateTime-aoTarget.dateTime)*60*60*24
         this_differenceFrom = math_round(dbDiffElapsedSeconds, 6)
@@ -449,7 +449,7 @@ Class Calendar
                             sItemValue = func_CM_FillInTheCharacters(DatePart(vItem(1), PdtDateTime), lKeyLen, "0", vItem(2), True)
                         Else
                         'ïbêîÇÃè¨êîïîÇéÊÇËèoÇ∑èÍçá
-                            sItemValue = func_CM_FillInTheCharacters(math_tranc(this_getFractionalPartOfElapsedSeconds*10^lKeyLen), lKeyLen, "0", False, True)
+                            sItemValue = func_CM_FillInTheCharacters(math_tranc(this_getfractionalPartOfElapsedSeconds*10^lKeyLen), lKeyLen, "0", False, True)
                         End If
                         boIsMatch = True : Exit For
                     End If
@@ -470,7 +470,7 @@ Class Calendar
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : this_getFractionalPartOfElapsedSeconds()
+    'Function/Sub Name           : this_getfractionalPartOfElapsedSeconds()
     'Overview                    : åoâﬂïbÇÃè¨êîïîÇï‘Ç∑
     'Detailed Description        : çHéñíÜ
     'Argument
@@ -483,11 +483,11 @@ Class Calendar
     '----------         ----------------------   -------------------------------------------------------
     '2025/02/12         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_getFractionalPartOfElapsedSeconds( _
+    Private Function this_getfractionalPartOfElapsedSeconds( _
         )
         Dim dbFract : dbFract = 0
         If Not IsNull(PdbElapsedSeconds) Then dbFract = math_round(math_fractional(PdbElapsedSeconds),7)
-        this_getFractionalPartOfElapsedSeconds = dbFract
+        this_getfractionalPartOfElapsedSeconds = dbFract
     End Function
 
     '***************************************************************************************************
