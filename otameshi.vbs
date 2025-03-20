@@ -1,5 +1,14 @@
 Option Explicit
 
+inputbox "","",CreateObject("Scripting.FileSystemObject").getbasename("C:\Users\89585\Documents\dev\vbs\test\trial")
+
+'inputbox "","",CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\").items.item("vbs").getfolder.items.item(0).isFolder
+'inputbox "","",CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip").self.size
+'inputbox "","",CreateObject("Scripting.FileSystemObject").GetFolder("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip").size
+
+wscript.quit
+
+
 'lib import
 Private Const Cs_FOLDER_LIB = "lib"
 With CreateObject("Scripting.FileSystemObject")

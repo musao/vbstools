@@ -1202,7 +1202,7 @@ Private Function new_Adodb( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_FileProxyOf()
+'Function/Sub Name           : new_FsProxyOf()
 'Overview                    : FileProxyオブジェクトの生成関数
 'Detailed Description        : 工事中
 'Argument
@@ -1215,10 +1215,10 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/26         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_FileProxyOf( _
+Private Function new_FsProxyOf( _
     byVal asPath _
     )
-    Set new_FileProxyOf = (New FileProxy).of(asPath)
+    Set new_FsProxyOf = (New FileSystemProxy).of(asPath)
 End Function
 
 '***************************************************************************************************
@@ -2994,7 +2994,7 @@ Private Function func_FsGetAllFilesByFso( _
                 cf_pushA vRet, func_FsGetAllFilesByShell(oEle.Path)
             Else
             'zipファイル以外の場合、ファイル情報を取得する
-                cf_push vRet, new_FileProxyOf(oEle.Path)
+                cf_push vRet, new_FsProxyOf(oEle.Path)
             End If
         Next
         'フォルダの取得
@@ -3004,7 +3004,7 @@ Private Function func_FsGetAllFilesByFso( _
         func_FsGetAllFilesByFso = vRet
     Else
     'ファイルの場合
-        func_FsGetAllFilesByFso = Array(new_FileProxyOf(asPath))
+        func_FsGetAllFilesByFso = Array(new_FsProxyOf(asPath))
     End If
 
     Set oFolder = Nothing
@@ -3044,7 +3044,7 @@ Private Function func_FsGetAllFilesByShell( _
                 cf_pushA vRet, func_FsGetAllFilesByShell(oItem.Path)
             Else
             'ファイルの場合
-                cf_push vRet, new_FileProxyOf(oItem.Path)
+                cf_push vRet, new_FsProxyOf(oItem.Path)
 '                cf_push vRet, new_AdptFile(oItem)
             End If
         Next
@@ -3052,7 +3052,7 @@ Private Function func_FsGetAllFilesByShell( _
         Set oItem = Nothing
     Else
     '上記以外の場合
-        func_FsGetAllFilesByShell = Array(new_FileProxyOf(asPath))
+        func_FsGetAllFilesByShell = Array(new_FsProxyOf(asPath))
     End If
 End Function
 
@@ -3088,7 +3088,7 @@ Private Function func_FsGetAllFilesByDir( _
             cf_pushA vRet, func_FsGetAllFilesByShell(sList)
         Else
         'zipファイル以外の場合、ファイル情報を取得する
-            cf_push vRet, new_FileProxyOf(sList)
+            cf_push vRet, new_FsProxyOf(sList)
         End If
     Next
     func_FsGetAllFilesByDir = vRet
