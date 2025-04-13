@@ -1,6 +1,42 @@
 Option Explicit
 
-inputbox "","",CreateObject("Scripting.FileSystemObject").getbasename("C:\Users\89585\Documents\dev\vbs\test\trial")
+inputbox "","",(Null=True)
+
+wscript.quit
+
+
+With CreateObject("Scripting.FileSystemObject")
+Dim adte
+
+adte = "C:\Users\89585\Documents\dev\vbs\BackupFiles.vbs"
+inputbox "False","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+
+adte = "C:\Users\89585\Documents\dev\vbs\wk"
+inputbox "True","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+inputbox "13","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).GetFolder.Items.Count
+
+adte = "C:\Users\89585\Documents\dev\vbs\wk_"
+inputbox "True","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+inputbox "0","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).GetFolder.Items.Count
+
+adte = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip"
+inputbox "True","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+inputbox "2","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).GetFolder.Items.Count
+
+adte = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip\VbsBasicLibCommonTest.vbs"
+inputbox "False","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+'inputbox "0","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).GetFolder.Items.Count
+
+adte = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip\VbsBasicLibCommonTest"
+inputbox "True","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+inputbox "2","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).GetFolder.Items.Count
+
+adte = "C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip\VbsBasicLibCommonTest\VbsBasicLibCommonTest_20221013_160319.log"
+inputbox "False","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder
+'inputbox "0","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).GetFolder.Items.Count
+
+End With
+
 
 'inputbox "","",CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\").items.item("vbs").getfolder.items.item(0).isFolder
 'inputbox "","",CreateObject("Shell.Application").Namespace("C:\Users\89585\Documents\dev\vbs\test\trial\forZip\f3.zip").self.size
@@ -23,17 +59,17 @@ With CreateObject("Scripting.FileSystemObject")
 End With
 Set oLibFile = Nothing
 
-Dim adte,adte2
-adte = #2024/09/30 17:15:02#
-inputbox "","",cdbl(adte)             '45565.7187731481
-adte = #2024/10/01 17:15:02#
-inputbox "","",cdbl(adte)             '45566.7187731481
-
-adte = now():adte2 = timer()
-inputbox "","",adte                   '2024/09/30 17:20:02
-inputbox "","",cdbl(adte)             '45565.7222453704
-inputbox "","",cdbl(adte2)            '62402.703125
-
+'Dim adte,adte2
+'adte = #2024/09/30 17:15:02#
+'inputbox "","",cdbl(adte)             '45565.7187731481
+'adte = #2024/10/01 17:15:02#
+'inputbox "","",cdbl(adte)             '45566.7187731481
+'
+'adte = now():adte2 = timer()
+'inputbox "","",adte                   '2024/09/30 17:20:02
+'inputbox "","",cdbl(adte)             '45565.7222453704
+'inputbox "","",cdbl(adte2)            '62402.703125
+'
 
 '0.7222453704 day -> 62402.00000256 s
 

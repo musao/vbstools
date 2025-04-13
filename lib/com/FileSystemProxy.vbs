@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class FileSystemProxy
     'クラス内変数、定数
-    Private PoFolderItem ,PsPath
+    Private PoFolderItem,PoParent,PsPath
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -29,6 +29,7 @@ Class FileSystemProxy
     Private Sub Class_Initialize()
         PsPath = vbNullString
         Set PoFolderItem = Nothing
+        Set PoParent = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -47,7 +48,27 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Sub Class_Terminate()
         Set PoFolderItem = Nothing
+        Set PoParent = Nothing
     End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get allItems()
+    'Overview                    : フォルダー内のアイテムの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/20         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get allItems( _
+        )
+        allItems = this_items(True)
+    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get basename()
@@ -101,6 +122,24 @@ Class FileSystemProxy
     '***************************************************************************************************
     Public Property Get extension()
         extension = this_extension()
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get hasItem()
+    'Overview                    : 配下にアイテムを1つ以上持つか返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     配下にアイテムを1つ以上持つか
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/29         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get hasItem()
+        hasItem = this_hasItem()
     End Property
     
     '***************************************************************************************************
@@ -191,7 +230,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     Public Property Get items( _
         )
-        items = this_items()
+        items = this_items(False)
     End Property
     
     '***************************************************************************************************
@@ -219,7 +258,7 @@ Class FileSystemProxy
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの親フォルダのフルパス
+    '     ファイル／フォルダの親フォルダの当クラスのインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -227,7 +266,7 @@ Class FileSystemProxy
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get parentFolder()
-        parentFolder = this_parentFolder()
+        cf_bind parentFolder, this_parentFolder()
     End Property
     
     '***************************************************************************************************
@@ -322,6 +361,27 @@ Class FileSystemProxy
         this_setData asPath, TypeName(Me)&"+of()"
         Set of = Me
     End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : setParent()
+    'Overview                    : 親フォルダのインスタンスを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoParent               : 親フォルダのインスタンス
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function setParent( _
+        byRef aoParent _
+        )
+        this_setParent aoParent, TypeName(Me)&"+setParent()"
+        Set setParent = Me
+    End Function
 
     
     '***************************************************************************************************
@@ -380,13 +440,34 @@ Class FileSystemProxy
         this_extension = Null
         If this_notInInitial() Then this_extension = new_Fso().GetExtensionName(PsPath)
     End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_hasItem()
+    'Overview                    : 配下にアイテムを1つ以上持つか返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     配下にアイテムを1つ以上持つか
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/29         Y.Fujii                  First edition
+    Private Function this_hasItem()
+        this_hasItem = Null
+        If Not this_notInInitial() Then Exit Function
+
+        this_hasItem = False
+        If this_isFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
+    End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : this_items()
     'Overview                    : フォルダー内のアイテムの配列を返す
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -395,15 +476,21 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_items()
+    Private Function this_items( _
+        byVal aboRecursiveFlg _
+        )
         this_items=Null
+        If Not this_notInInitial() Then Exit Function
 
+        this_items = Array()
+        If Not this_hasItem Then Exit Function
+        
         If new_Fso().FolderExists(PsPath) Then
         'フォルダの場合
-            this_items = this_itemsForFolder()
+            this_items = this_itemsForFolder(aboRecursiveFlg)
         ElseIf this_isFolder() Then
         'zipの場合
-            this_items = this_itemsForZip()
+            this_items = this_itemsForZip(aboRecursiveFlg)
         End If
     End Function
 
@@ -412,7 +499,7 @@ Class FileSystemProxy
     'Overview                    : フォルダー内のアイテムの配列を返す
     'Detailed Description        : フォルダの場合
     'Argument
-    '     なし
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -421,20 +508,23 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_itemsForFolder()
-        Dim oFolder : Set oFolder = new_FolderOf(PsPath)
-        Dim oEle, vRet()
-        'ファイルの取得
-        For Each oEle In oFolder.Files
-            cf_push vRet, new_FsProxyOf(oEle.Path)
-        Next
-        'フォルダの取得
-        For Each oEle In oFolder.SubFolders
-            cf_push vRet, new_FsProxyOf(oEle.Path)
-        Next
+    Private Function this_itemsForFolder( _
+        byVal aboRecursiveFlg _
+        )
+        Dim oEle,vRet()
+        With new_FolderOf(PsPath)
+            'ファイルの取得
+            For Each oEle In .Files
+                this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg
+            Next
+            'フォルダの取得
+            For Each oEle In .SubFolders
+                this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg
+            Next
+        End With
+
         this_itemsForFolder = vRet
         Set oEle = Nothing
-        Set oFolder = Nothing
     End Function
 
     '***************************************************************************************************
@@ -442,7 +532,7 @@ Class FileSystemProxy
     'Overview                    : フォルダー内のアイテムの配列を返す
     'Detailed Description        : zipの場合
     'Argument
-    '     なし
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -451,14 +541,46 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_itemsForZip()
-        Dim oEle, vRet()
+    Private Function this_itemsForZip( _
+        byVal aboRecursiveFlg _
+        )
+        Dim oEle,vRet()
         For Each oEle In PoFolderItem.GetFolder.Items
-            cf_push vRet, new_FsProxyOf(oEle.Path)
+            this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg
         Next
+
         this_itemsForZip = vRet
         Set oEle = Nothing
     End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_itemsGetItems()
+    'Overview                    : アイテムを取得する
+    'Detailed Description        : 再帰処理する場合は下位のアイテムも取得する
+    'Argument
+    '     avAr                   : 取得したアイテムを格納する配列
+    '     asPath                 : パス
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_itemsGetItems( _
+        byRef avAr _
+        , byVal asPath _
+        , byVal aboRecursiveFlg _
+        )
+        Dim oFsProx : Set oFsProx = new_FsProxyOf(asPath).setParent(Me)
+        cf_push avAr, oFsProx
+        If aboRecursiveFlg And Not IsNull(oFsProx.hasItem()) Then
+            If oFsProx.hasItem() Then cf_pushA avAr, oFsProx.allItems()
+        End If
+        Set oFsProx = Nothing
+    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : this_name()
@@ -504,7 +626,7 @@ Class FileSystemProxy
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの親フォルダのフルパス
+    '     ファイル／フォルダの親フォルダの当クラスのインスタンス
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
@@ -513,7 +635,9 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_parentFolder()
         this_parentFolder = Null
-        If this_notInInitial() Then this_parentFolder = new_Fso().GetParentFolderName(PsPath)
+        If Not this_notInInitial() Then Exit Function
+        If PoParent Is Nothing Then Set PoParent = new_FsProxyOf(new_Fso().GetParentFolderName(PsPath))
+        Set this_parentFolder = PoParent
     End Function
     
     '***************************************************************************************************
@@ -534,6 +658,32 @@ Class FileSystemProxy
         this_path = Null
         If this_notInInitial() Then this_path = PsPath
     End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setParent()
+    'Overview                    : 親フォルダのインスタンスを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     aoParent               : 親フォルダのインスタンス
+    'Return Value
+    '     自身のインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_setParent( _
+        byRef aoParent _
+        , byVal asSource _
+        )
+        ast_argNotNothing PoFolderItem, asSource, "Please set the value before setting the parent folder."
+'        ast_argNothing PoParent, asSource, "Because it is an immutable variable, its parent cannot be changed."
+        ast_argsAreSame TypeName(Me), TypeName(aoParent), asSource, "This is not " & TypeName(Me) &"."
+        ast_argsAreSame new_Fso().GetParentFolderName(PsPath), aoParent.path, asSource, "This is not a parent folder."
+
+        Set PoParent = aoParent
+    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : this_size()

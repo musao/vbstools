@@ -38,6 +38,119 @@ Sub Test_FileProxy
 End Sub
 
 '###################################################################################################
+'FileSystemProxy.allItems,basename,dateLastModified,extension,hasItem,isBrowsable,isFileSystem,isFolder,isLink,items,name,parentFolder,path,size,toString,type
+Sub Test_FileProxy_allItems_basename_dateLastModified_extension_hasItem_isBrowsable_isFileSystem_isFolder_isLink_items_name_parentFolder_path_size_toString_type_initial
+    dim tg,a,ao,e
+    set ao = (new FileSystemProxy)
+
+    tg = "allItems"
+    e = Null
+    a = ao.allItems
+    AssertEqualWithMessage e, a, tg
+
+    tg = "basename"
+    e = Null
+    a = ao.basename
+    AssertEqualWithMessage e, a, tg
+
+    tg = "dateLastModified"
+    e = Null
+    a = ao.dateLastModified
+    AssertEqualWithMessage e, a, tg
+
+    tg = "extension"
+    e = Null
+    a = ao.extension
+    AssertEqualWithMessage e, a, tg
+
+    tg = "hasItem"
+    e = Null
+    a = ao.hasItem
+    AssertEqualWithMessage e, a, tg
+
+    tg = "isBrowsable"
+    e = Null
+    a = ao.isBrowsable
+    AssertEqualWithMessage e, a, tg
+
+    tg = "isFileSystem"
+    e = Null
+    a = ao.isFileSystem
+    AssertEqualWithMessage e, a, tg
+
+    tg = "isFolder"
+    e = Null
+    a = ao.isFolder
+    AssertEqualWithMessage e, a, tg
+
+    tg = "isLink"
+    e = Null
+    a = ao.isLink
+    AssertEqualWithMessage e, a, tg
+
+    tg = "items"
+    e = Null
+    a = ao.items
+    AssertEqualWithMessage e, a, tg
+
+    tg = "name"
+    e = Null
+    a = ao.name
+    AssertEqualWithMessage e, a, tg
+
+    tg = "parentFolder"
+    e = Null
+    a = ao.parentFolder
+    AssertEqualWithMessage e, a, tg
+
+    tg = "path"
+    e = Null
+    a = ao.path
+    AssertEqualWithMessage e, a, tg
+
+    tg = "size"
+    e = Null
+    a = ao.size
+    AssertEqualWithMessage e, a, tg
+
+    tg = "toString"
+    e = "<FileSystemProxy>"
+    a = ao.toString
+    AssertEqualWithMessage e, a, tg
+
+    tg = "type"
+    e = Null
+    a = ao.type
+    AssertEqualWithMessage e, a, tg
+End Sub
+Sub Test_FileProxy_allItems_basename_dateLastModified_extension_hasItem_isBrowsable_isFileSystem_isFolder_isLink_items_name_parentFolder_path_size_toString_type
+    Dim data : data = createData()
+    Dim i,d,ao,obj,expectHasItem
+    For i=0 To Ubound(data)
+        d = data(i)
+        Set ao = new FileSystemProxy : ao.of(d)
+
+        AssertEqualWithMessage d, ao, "i="&i&",Default"
+        assertFsProp ao,d,i
+        AssertEqualWithMessage "<FileSystemProxy>"&d, ao.toString, "i="&i&",toString"
+        
+        Set obj = shellApp.Namespace(fso.GetParentFolderName(d)).Items().Item(fso.GetFileName(d))
+        expectHasItem=False
+        If obj.IsFolder Then expectHasItem = obj.GetFolder.Items.Count>0
+        AssertEqualWithMessage expectHasItem, ao.hasItem, "i="&i&",hasItem"
+
+        If expectHasItem Then
+            assertFsItems ao.items,d,i,False
+            assertFsItems ao.allItems,d,i,True
+        Else
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.items), "i="&i&",items"
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.allItems), "i="&i&",allItems"
+        End If
+
+    Next
+End Sub
+
+'###################################################################################################
 'FileSystemProxy.of()
 Sub Test_FileProxy_of
     Dim p,a
@@ -67,103 +180,78 @@ Sub Test_FileProxy_of_ErrImmutable
 End Sub
 
 '###################################################################################################
-'FileSystemProxy.basename,dateLastModified,isBrowsable,isFileSystem,isFolder,isLink,name,parentFolder,path,size,toString,type
-Sub Test_FileProxy_dateLastModified_isBrowsable_isFileSystem_isFolder_isLink_name_parentFolder_path_size_toString_type_initial
-    dim tg,a,ao,e
-    set ao = (new FileSystemProxy)
+'FileSystemProxy.setParent()
+Sub Test_FileProxy_setParent
+    Dim p,a,e
+    p = WScript.ScriptFullName
+    Set a = (new FileSystemProxy).of(p)
+    Set e = (new FileSystemProxy).of(fso.GetParentFolderName(p))
 
-    tg = "A.basename"
-    e = Null
-    a = ao.basename
-    AssertEqualWithMessage e, a, tg
-
-    tg = "B.dateLastModified"
-    e = Null
-    a = ao.dateLastModified
-    AssertEqualWithMessage e, a, tg
-
-    tg = "C.extension"
-    e = Null
-    a = ao.extension
-    AssertEqualWithMessage e, a, tg
-
-    tg = "D.isBrowsable"
-    e = Null
-    a = ao.isBrowsable
-    AssertEqualWithMessage e, a, tg
-
-    tg = "E.isFileSystem"
-    e = Null
-    a = ao.isFileSystem
-    AssertEqualWithMessage e, a, tg
-
-    tg = "F.isFolder"
-    e = Null
-    a = ao.isFolder
-    AssertEqualWithMessage e, a, tg
-
-    tg = "G.isLink"
-    e = Null
-    a = ao.isLink
-    AssertEqualWithMessage e, a, tg
-
-    tg = "H.name"
-    e = Null
-    a = ao.name
-    AssertEqualWithMessage e, a, tg
-
-    tg = "I.parentFolder"
-    e = Null
-    a = ao.parentFolder
-    AssertEqualWithMessage e, a, tg
-
-    tg = "J.path"
-    e = Null
-    a = ao.path
-    AssertEqualWithMessage e, a, tg
-
-    tg = "K.size"
-    e = Null
-    a = ao.size
-    AssertEqualWithMessage e, a, tg
-
-    tg = "L.toString"
-    e = "<FileSystemProxy>"
-    a = ao.toString
-    AssertEqualWithMessage e, a, tg
-
-    tg = "M.type"
-    e = Null
-    a = ao.type
-    AssertEqualWithMessage e, a, tg
+    a.setParent(e)
+    AssertEqualWithMessage e, a.parentFolder, "parentFolder"
 End Sub
+Sub Test_FileProxy_setParent_2times
+    Dim p,a,e
+    p = WScript.ScriptFullName
+    Set a = (new FileSystemProxy).of(p)
+    Dim tmp:Set tmp = a.parentFolder
 
-Sub Test_FileProxy_dateLastModified_isBrowsable_isFileSystem_isFolder_isLink_name_parentFolder_path_size_toString_type
-    Dim data
-    data = Array( _
-                WScript.ScriptFullName _
-                , createShortCutDefault() _
-                , createUrlShortCutDefault() _
-                , createTextFileDefault() _
-                , createFolderDefault() _
-                , createZipDefault() _
-                )
-
-    Dim i,d,ao
-    For i=0 To Ubound(data)
-        d = data(i)
-        Set ao = new FileSystemProxy : ao.of(d)
-
-        AssertEqualWithMessage d, ao, "i="&i&",Default"
-        AssertEqualWithMessage "<FileSystemProxy>"&d, ao.toString, "i="&i&",toString"
-        assertFsItems ao,d,i
-    Next
+    Set e = (new FileSystemProxy).of(fso.GetParentFolderName(p))
+    a.setParent(e)
+    AssertEqualWithMessage e, a.parentFolder, "parentFolder"
 End Sub
+Sub Test_FileProxy_setParent_Err_Initial
+    On Error Resume Next
+    Dim p,a
+    p = WScript.ScriptFullName
+    Call (new FileSystemProxy).setParent(fso.GetParentFolderName(p))
 
+    AssertEqualWithMessage "FileSystemProxy+setParent()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Please set the value before setting the parent folder.", Err.Description, "Err.Description"
+End Sub
+Sub Test_FileProxy_setParent_Err_NotFileSystemProxy
+    On Error Resume Next
+    Dim p,a
+    p = WScript.ScriptFullName
+    Set a = (new FileSystemProxy).of(p)
+    Call a.setParent(dictionary)
+
+    AssertEqualWithMessage "FileSystemProxy+setParent()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "This is not FileSystemProxy.", Err.Description, "Err.Description"
+End Sub
+Sub Test_FileProxy_setParent_Err_NotPrentFolder
+    On Error Resume Next
+    Dim p,a
+    p = WScript.ScriptFullName
+    Set a = (new FileSystemProxy).of(p)
+    Call a.setParent(a)
+
+    AssertEqualWithMessage "FileSystemProxy+setParent()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "This is not a parent folder.", Err.Description, "Err.Description"
+End Sub
 
 
 '###################################################################################################
 'common
+Function createData
+    Dim ret,i
+    ret = Array( _
+                WScript.ScriptFullName _
+                , createShortCutDefault() _
+                , createUrlShortCutDefault() _
+                , createTextFileDefault() _
+                , createEmptyFolderDefault() _
+                )
+    For Each i In createFolderDefault()
+        Redim Preserve ret(Ubound(ret)+1)
+        ret(Ubound(ret)) = i
+    Next
+    For Each i In createZipDefault()
+        Redim Preserve ret(Ubound(ret)+1)
+        ret(Ubound(ret)) = i
+    Next
+    createData = ret
+End Function
 Function createShortCutDefault
     createShortCutDefault = createShortCutCommon(getTempFilePath(PsPathTempFolder,"lnk"), WScript.ScriptFullName)
 End Function
@@ -178,34 +266,80 @@ Function createTextFileDefault
     End With
     createTextFileDefault = path
 End Function
-Function createFolderDefault
-    Dim path : path = getTempFolderPath(PsPathTempFolder)
+Function createEmptyFolderDefault
+    Dim path
+    path = getTempFolderPath(PsPathTempFolder)
     fso.CreateFolder path
-    createFolderDefault = path
+    createEmptyFolderDefault=path
+End Function
+Function createFolderDefault
+    Dim path,ret(2)
+    path = getTempFolderPath(PsPathTempFolder)
+    fso.CreateFolder path
+
+    ret(0)=path
+    ret(1)=createShortCutCommon(getTempFilePath(path,"lnk"), WScript.ScriptFullName)
+    ret(2)=createShortCutCommon(getTempFilePath(path,"url"), "https://www.google.com/")
+
+    createFolderDefault=ret
 End Function
 Function createZipDefault
-    Dim paths(3)
-    paths(0)=WScript.ScriptFullName
-    paths(1)=createShortCutDefault()
-    paths(2)=createUrlShortCutDefault()
-    paths(3)=createTextFileDefault()
+    Dim fpaths(1),fold,fdef : fdef = createFolderDefault
+    fold=fdef(0)
+    fpaths(0)=fdef(1)
+    fpaths(1)=fdef(2)
+
+    Dim paths() : Redim paths(4)
+    paths(0)=fold
+    paths(1)=WScript.ScriptFullName
+    paths(2)=createShortCutDefault()
+    paths(3)=createUrlShortCutDefault()
+    paths(4)=createTextFileDefault()
     
     Dim path : path = getTempFilePath(PsPathTempFolder,"zip")
     zip paths,path
-    createZipDefault = path
+
+    Dim ret() : Redim ret(7)
+    ret(0)=path
+    ret(1)=fso.BuildPath(path, fso.GetFileName(fold))
+    ret(2)=fso.BuildPath(ret(1), fso.GetFileName(fpaths(0)))
+    ret(3)=fso.BuildPath(ret(1), fso.GetFileName(fpaths(1)))
+    ret(4)=fso.BuildPath(path, fso.GetFileName(paths(1)))
+    ret(5)=fso.BuildPath(path, fso.GetFileName(paths(2)))
+    ret(6)=fso.BuildPath(path, fso.GetFileName(paths(3)))
+    ret(7)=fso.BuildPath(path, fso.GetFileName(paths(4)))
+
+    createZipDefault = Ret
 End Function
-Sub assertFsItems(target,path,comment)
-    Dim obj
+Sub assertFsProp(target,path,comment)
+    Dim obj : obj = Null
     
-    If fso.FolderExists(path) Then Set obj=fso.GetFolder(path) Else Set obj=fso.GetFile(path)
-    With obj
-        AssertEqualWithMessage .DateLastModified, target.dateLastModified, "comment="&comment&",dateLastModified"
-        AssertEqualWithMessage .Name, target.name, "comment="&comment&",name"
-        AssertEqualWithMessage .ParentFolder, target.parentFolder, "comment="&comment&",parentFolder"
-        AssertEqualWithMessage .Path, target.path, "comment="&comment&",path"
-        AssertEqualWithMessage .Size, target.size, "comment="&comment&",size"
-        AssertEqualWithMessage .Type, target.type, "comment="&comment&",type"
-    End With
+    If fso.FolderExists(path) Then
+        Set obj=fso.GetFolder(path)
+    ElseIf fso.FileExists(path) Then
+        Set obj=fso.GetFile(path)
+    End IF
+    If Isnull(obj) Then
+        With shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path))
+            AssertEqualWithMessage .ModifyDate, target.dateLastModified, "comment="&comment&",dateLastModified"
+            AssertEqualWithMessage fso.GetFileName(path), target.name, "comment="&comment&",name"
+            AssertEqualWithMessage "FileSystemProxy", TypeName(target.parentFolder), "comment="&comment&",parentFolder object"
+            AssertEqualWithMessage fso.GetParentFolderName(path), target.parentFolder, "comment="&comment&",parentFolder"
+            AssertEqualWithMessage .Path, target.path, "comment="&comment&",path"
+            AssertEqualWithMessage .Size, target.size, "comment="&comment&",size"
+            AssertEqualWithMessage .Type, target.type, "comment="&comment&",type"
+        End With
+    Else
+        With obj
+            AssertEqualWithMessage .DateLastModified, target.dateLastModified, "comment="&comment&",dateLastModified"
+            AssertEqualWithMessage .Name, target.name, "comment="&comment&",name"
+            AssertEqualWithMessage "FileSystemProxy", TypeName(target.parentFolder), "comment="&comment&",parentFolder object"
+            AssertEqualWithMessage .ParentFolder, target.parentFolder, "comment="&comment&",parentFolder"
+            AssertEqualWithMessage .Path, target.path, "comment="&comment&",path"
+            AssertEqualWithMessage .Size, target.size, "comment="&comment&",size"
+            AssertEqualWithMessage .Type, target.type, "comment="&comment&",type"
+        End With
+    End If
 
     Set obj = shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path))
     With obj
@@ -222,6 +356,47 @@ Sub assertFsItems(target,path,comment)
     
     Set obj = Nothing
 End Sub
+Sub assertFsItems(items,path,comment,recursive)
+    Dim dic
+    Set dic = dictionary
+    For Each i In items
+        If dic.Exists(i) Then AssertFailWithMessage "comment="&comment&",items Duplication!"
+        dic.Add i.path,False
+    Next
+
+    assertFsItemsEachItem path,comment,dic,recursive
+    
+    Dim i
+    For Each i In dic.Keys
+        If Not dic(i) Then AssertFailWithMessage "comment="&comment&", " & i & " Not Found !"
+    Next
+
+    AssertWithMessage True, "all ok"
+    Set dic = Nothing
+End Sub
+Sub assertFsItemsEachItem(path,comment,dic,recursive)
+    Dim i
+    If fso.FolderExists(path) Then
+        For Each i in fso.GetFolder(path).Files
+            existsItem i,comment,dic
+        Next
+        For Each i in fso.GetFolder(path).SubFolders
+            existsItem i,comment,dic
+            If recursive Then assertFsItemsEachItem i.path,comment,dic,recursive
+        Next
+    Else
+        For Each i in shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path)).GetFolder.Items
+            existsItem i,comment,dic
+            If recursive And i.IsFolder Then
+                If i.GetFolder.Items.Count>0 Then assertFsItemsEachItem i.path,comment,dic,recursive
+            End If
+        Next
+    End If
+End Sub
+Sub existsItem(target,comment,dic)
+    If Not dic.Exists(target.path) Then AssertFailWithMessage "comment="&comment&",items Not Exists " & target
+    dic(target.path)=True
+End Sub
 
 Function fso
     Set fso = CreateObject("Scripting.FileSystemObject")
@@ -231,6 +406,9 @@ Function shellApp
 End Function
 Function shell
     Set shell = CreateObject("WScript.Shell")
+End Function
+Function dictionary
+    Set dictionary = CreateObject("Scripting.Dictionary")
 End Function
 Function getTempFilePath(parent,extention)
     getTempFilePath = fso.BuildPath(parent, getTempFile(extention))
