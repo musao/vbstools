@@ -140,12 +140,13 @@ Sub Test_FileProxy_allItems_basename_dateLastModified_extension_hasItem_isBrowsa
         AssertEqualWithMessage expectHasItem, ao.hasItem, "i="&i&",hasItem"
 
         If expectHasItem Then
-            assertFsItems ao.items,d,i,False
-            assertFsItems ao.allItems,d,i,True
+'            assertFsItems ao.items,d,i&".items",False,False
+'            assertFsItems ao.allItems,d,i&".allItems",False,True
         Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.items), "i="&i&",items"
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.allItems), "i="&i&",allItems"
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.items), "i="&i&",.items"
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.allItems), "i="&i&",.allItems"
         End If
+        assertFsItems ao.selfAndAllItems,d,i&".selfAndAllItems",True,True
 
     Next
 End Sub
@@ -345,18 +346,18 @@ Sub assertFsProp(target,path,comment)
     With obj
         AssertEqualWithMessage .IsBrowsable, target.isBrowsable, "comment="&comment&",isBrowsable"
         AssertEqualWithMessage .IsFileSystem, target.isFileSystem, "comment="&comment&",isFileSystem"
-        AssertEqualWithMessage .IsFolder, target.isFolder, "comment="&comment&",isFolder"
         AssertEqualWithMessage .IsLink, target.isLink, "comment="&comment&",isLink"
     End With
 
     With fso
+        AssertEqualWithMessage .FolderExists(path), target.isFolder, "comment="&comment&",isFolder"
         AssertEqualWithMessage .GetBaseName(path), target.basename, "comment="&comment&",basename"
         AssertEqualWithMessage .GetExtensionName(path), target.extension, "comment="&comment&",extension"
     End With
     
     Set obj = Nothing
 End Sub
-Sub assertFsItems(items,path,comment,recursive)
+Sub assertFsItems(items,path,comment,self,recursive)
     Dim dic
     Set dic = dictionary
     For Each i In items
@@ -364,7 +365,7 @@ Sub assertFsItems(items,path,comment,recursive)
         dic.Add i.path,False
     Next
 
-    assertFsItemsEachItem path,comment,dic,recursive
+    assertFsItemsEachItem path,comment,dic,self,recursive
     
     Dim i
     For Each i In dic.Keys
@@ -374,28 +375,29 @@ Sub assertFsItems(items,path,comment,recursive)
     AssertWithMessage True, "all ok"
     Set dic = Nothing
 End Sub
-Sub assertFsItemsEachItem(path,comment,dic,recursive)
+Sub assertFsItemsEachItem(path,comment,dic,self,recursive)
+    If self Then existsItem path,comment,dic
     Dim i
     If fso.FolderExists(path) Then
         For Each i in fso.GetFolder(path).Files
-            existsItem i,comment,dic
+            existsItem i.path,comment,dic
         Next
         For Each i in fso.GetFolder(path).SubFolders
-            existsItem i,comment,dic
-            If recursive Then assertFsItemsEachItem i.path,comment,dic,recursive
+            existsItem i.path,comment,dic
+            If recursive Then assertFsItemsEachItem i.path,comment,dic,self,recursive
         Next
-    Else
+    ElseIf shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path)).IsFolder Then
         For Each i in shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path)).GetFolder.Items
-            existsItem i,comment,dic
+            existsItem i.path,comment,dic
             If recursive And i.IsFolder Then
-                If i.GetFolder.Items.Count>0 Then assertFsItemsEachItem i.path,comment,dic,recursive
+                If i.GetFolder.Items.Count>0 Then assertFsItemsEachItem i.path,comment,dic,self,recursive
             End If
         Next
     End If
 End Sub
-Sub existsItem(target,comment,dic)
-    If Not dic.Exists(target.path) Then AssertFailWithMessage "comment="&comment&",items Not Exists " & target
-    dic(target.path)=True
+Sub existsItem(path,comment,dic)
+    If Not dic.Exists(path) Then AssertFailWithMessage "comment="&comment&",items Not Exists " & path
+    dic(path)=True
 End Sub
 
 Function fso

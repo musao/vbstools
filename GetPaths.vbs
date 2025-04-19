@@ -101,7 +101,7 @@ Private Sub this_getParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
+    this_logger Array(logType.TRACE, "this_getParameters()", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,vbNullString)

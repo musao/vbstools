@@ -112,7 +112,7 @@ Private Sub this_getParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
+    this_logger Array(logType.TRACE, "this_getParameters()", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
     cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,2)
@@ -205,7 +205,7 @@ Private Sub this_compareFiles( _
     oParam.sortUsing new_Func("(c,n)=>new_CalAt(new_FileOf(c).DateLastModified).compareTo(new_CalAt(new_FileOf(n).DateLastModified))>0")
     '★ログ出力
     this_logger Array(logType.INFO, "this_compareFiles()", "aoParams sorted.")
-    this_logger Array(logType.DETAIL, "this_compareFiles()", "aoParams is " & cf_toString(aoParams))
+    this_logger Array(logType.TRACE, "this_compareFiles()", "aoParams is " & cf_toString(aoParams))
     
     '比較
     With New clsCompareExcel

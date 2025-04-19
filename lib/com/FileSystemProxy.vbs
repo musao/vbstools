@@ -181,7 +181,8 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : Property Get isFolder()
     'Overview                    : アイテムがフォルダであるかどうかを返す
-    'Detailed Description        : https://learn.microsoft.com/ja-jp/windows/win32/shell/folderitem
+    'Detailed Description        : FolderItem2オブジェクトのIsFolder()ではなく
+    '                              FileSystemObjectのFolderExists()と同じ
     'Argument
     '     なし
     'Return Value
@@ -285,6 +286,24 @@ Class FileSystemProxy
     '***************************************************************************************************
     Public Default Property Get path()
         path = this_path()
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get selfAndAllItems()
+    'Overview                    : 自身とフォルダー内のアイテムの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get selfAndAllItems()
+        selfAndAllItems = this_selfAndAllItems()
     End Property
     
     '***************************************************************************************************
@@ -454,12 +473,13 @@ Class FileSystemProxy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/29         Y.Fujii                  First edition
+    '***************************************************************************************************
     Private Function this_hasItem()
         this_hasItem = Null
         If Not this_notInInitial() Then Exit Function
 
         this_hasItem = False
-        If this_isFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
+        If PoFolderItem.IsFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
     End Function
 
     '***************************************************************************************************
@@ -488,7 +508,7 @@ Class FileSystemProxy
         If new_Fso().FolderExists(PsPath) Then
         'フォルダの場合
             this_items = this_itemsForFolder(aboRecursiveFlg)
-        ElseIf this_isFolder() Then
+        ElseIf PoFolderItem.IsFolder Then
         'zipの場合
             this_items = this_itemsForZip(aboRecursiveFlg)
         End If
@@ -574,12 +594,15 @@ Class FileSystemProxy
         , byVal asPath _
         , byVal aboRecursiveFlg _
         )
-        Dim oFsProx : Set oFsProx = new_FsProxyOf(asPath).setParent(Me)
-        cf_push avAr, oFsProx
-        If aboRecursiveFlg And Not IsNull(oFsProx.hasItem()) Then
-            If oFsProx.hasItem() Then cf_pushA avAr, oFsProx.allItems()
+        If aboRecursiveFlg Then
+            cf_pushA avAr, new_FsProxyOf(asPath).setParent(Me).selfAndAllItems()
+        Else
+            cf_push avAr, new_FsProxyOf(asPath).setParent(Me)
         End If
-        Set oFsProx = Nothing
+'        Dim oFsProx : Set oFsProx = new_FsProxyOf(asPath).setParent(Me)
+'        cf_push avAr, oFsProx
+'        If aboRecursiveFlg And oFsProx.hasItem() Then cf_pushA avAr, oFsProx.allItems()
+'        Set oFsProx = Nothing
     End Sub
 
     '***************************************************************************************************
@@ -686,6 +709,29 @@ Class FileSystemProxy
     End Sub
     
     '***************************************************************************************************
+    'Function/Sub Name           : this_selfAndAllItems()
+    'Overview                    : 自身とフォルダー内のアイテムの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_selfAndAllItems()
+        this_selfAndAllItems = Null
+        If Not this_notInInitial() Then Exit Function
+
+        Dim vRet : vRet=Array(Me)
+        cf_pushA vRet, this_items(True)
+        this_selfAndAllItems = vRet
+    End Function
+    
+    '***************************************************************************************************
     'Function/Sub Name           : this_size()
     'Overview                    : ファイル／フォルダのサイズを返す
     'Detailed Description        : 工事中
@@ -772,7 +818,8 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : this_isFolder()
     'Overview                    : アイテムがフォルダであるかどうかを返す
-    'Detailed Description        : https://learn.microsoft.com/ja-jp/windows/win32/shell/folderitem
+    'Detailed Description        : FolderItem2オブジェクトのIsFolder()ではなく
+    '                              FileSystemObjectのFolderExists()と同じ
     'Argument
     '     なし
     'Return Value
@@ -785,7 +832,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_isFolder()
         this_isFolder = Null
-        If this_notInInitial() Then this_isFolder = PoFolderItem.IsFolder
+        If this_notInInitial() Then this_isFolder = new_Fso().FolderExists(PsPath)
     End Function
     
     '***************************************************************************************************

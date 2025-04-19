@@ -184,7 +184,7 @@ Class clsCompareExcel
         Dim sMyName : sMyName = "+compare()"
         '★ログ出力
         this_publishLog logType.INFO, sMyName, "Start"
-        this_publishLog logType.DETAIL, sMyName, "PsPathFrom = " & cf_toString(PsPathFrom) & ", PsPathTo = " & cf_toString(PsPathTo)
+        this_publishLog logType.TRACE, sMyName, "PsPathFrom = " & cf_toString(PsPathFrom) & ", PsPathTo = " & cf_toString(PsPathTo)
         
         compare = False
         
@@ -246,7 +246,7 @@ Class clsCompareExcel
         Dim sMyName : sMyName = "-this_copyAllSheetsToWorkbookForResults()"
         '★ログ出力
         this_publishLog logType.INFO, sMyName, "Start"
-        this_publishLog logType.DETAIL, sMyName, cf_toString(aoParams)
+        this_publishLog logType.TRACE, sMyName, cf_toString(aoParams)
         
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : cf_bind oWorkbookForResults, aoParams.Item("WorkbookForResults")
@@ -259,7 +259,7 @@ Class clsCompareExcel
         
         '★ログ出力
         this_publishLog logType.WARNING, sMyName, "Source file copy completed."
-        this_publishLog logType.DETAIL, sMyName, cf_toString(aoParams)
+        this_publishLog logType.TRACE, sMyName, cf_toString(aoParams)
         
         '比較先ファイルのコピー
         sPath = PsPathTo : sFromToString = "To"
@@ -268,7 +268,7 @@ Class clsCompareExcel
         
         '★ログ出力
         this_publishLog logType.INFO, sMyName, "End"
-        this_publishLog logType.DETAIL, sMyName, cf_toString(aoParams)
+        this_publishLog logType.TRACE, sMyName, cf_toString(aoParams)
         
         Set oWorkbookForResults = Nothing
     End Sub
@@ -304,7 +304,7 @@ Class clsCompareExcel
         
         '★ログ出力
         this_publishLog logType.INFO, sMyName, "Start"
-        this_publishLog logType.DETAIL, sMyName, "aoWorkbookForResults = " & cf_toString(aoWorkbookForResults) & ", asPath = " & cf_toString(asPath)& ", asFromToString = " & cf_toString(asFromToString)
+        this_publishLog logType.TRACE, sMyName, "aoWorkbookForResults = " & cf_toString(aoWorkbookForResults) & ", asPath = " & cf_toString(asPath)& ", asFromToString = " & cf_toString(asFromToString)
 
         '比較対象ファイルを開く
         Dim oExcel : Set oExcel = aoWorkbookForResults.Parent
@@ -352,7 +352,7 @@ Class clsCompareExcel
                     sNewSheetName = this_makeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
                     oWorkSheetRenameInfo.Push new_DicOf( Array("Before", oWorksheet.Name, "After", sNewSheetName) )
                     '★ログ出力
-                    this_publishLog logType.DETAIL, sMyName, "oWorkSheetRenameInfo = " & cf_toString(oWorkSheetRenameInfo)
+                    this_publishLog logType.TRACE, sMyName, "oWorkSheetRenameInfo = " & cf_toString(oWorkSheetRenameInfo)
                     
                     'シート名変更＆タブの色を変更
                     oWorksheet.Name = sNewSheetName
@@ -410,7 +410,7 @@ Class clsCompareExcel
         Set this_copyAllSheetsToWorkbookForResultsDetail = oWorkSheetRenameInfo
         '★ログ出力
         this_publishLog logType.INFO, sMyName, "End"
-        this_publishLog logType.DETAIL, sMyName, "this_copyAllSheetsToWorkbookForResultsDetail = " & cf_toString(oWorkSheetRenameInfo)
+        this_publishLog logType.TRACE, sMyName, "this_copyAllSheetsToWorkbookForResultsDetail = " & cf_toString(oWorkSheetRenameInfo)
         
         'オブジェクトを開放
         Set oStringToColumn = Nothing
@@ -465,7 +465,7 @@ Class clsCompareExcel
         Dim sMyName : sMyName = "-this_compare()"
         '★ログ出力
         this_publishLog logType.INFO, sMyName, "Start"
-        this_publishLog logType.DETAIL, sMyName, "aoParams = " & cf_toString(aoParams)
+        this_publishLog logType.TRACE, sMyName, "aoParams = " & cf_toString(aoParams)
         
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : cf_bind oWorkbookForResults, aoParams.Item("WorkbookForResults")
@@ -660,7 +660,7 @@ Class clsCompareExcel
         )
         If Not aoRet.isErr() Then Exit Sub
         this_publishLog logType.WARNING, asYourName, "It couldn't."
-        this_publishLog logType.DETAIL, asYourName, "<Err> " & cf_toString(aoRet.Item("Err"))
+        this_publishLog logType.TRACE, asYourName, "<Err> " & cf_toString(aoRet.Item("Err"))
     End Sub
 
     '***************************************************************************************************

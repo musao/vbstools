@@ -837,7 +837,7 @@ Private Sub fw_excuteSub( _
     '実行前の出版（Publish） 処理
     If cf_isAvailableObject(aoBroker) Then
         aoBroker.publish topic.LOG, Array(logType.INFO ,sSubNameForPublish ,"Start")
-        aoBroker.publish topic.LOG, Array(logType.DETAIL ,sSubNameForPublish ,cf_toString(aoArg))
+        aoBroker.publish topic.LOG, Array(logType.TRACE ,sSubNameForPublish ,cf_toString(aoArg))
     End If
     
     '関数の実行
@@ -850,7 +850,7 @@ Private Sub fw_excuteSub( _
             aoBroker.publish topic.LOG, Array(logType.ERROR, sSubNameForPublish, cf_toString(oRet.getErr()))
         End If
         aoBroker.publish topic.LOG, Array(logType.INFO, sSubNameForPublish, "End")
-        aoBroker.publish topic.LOG, Array(logType.DETAIL, sSubNameForPublish, cf_toString(aoArg))
+        aoBroker.publish topic.LOG, Array(logType.TRACE, sSubNameForPublish, cf_toString(aoArg))
     End If
     
     Set oRet = Nothing

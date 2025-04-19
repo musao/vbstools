@@ -24,10 +24,12 @@ Call new_Enum( _
             "ERROR", 1 _
             , "WARNING", 3 _
             , "INFO", 5 _
-            , "DETAIL", 9 _
+            , "DEBUG", 7 _
+            , "TRACE", 9 _
         ) _
     ) _
 )
+'            , "DETAIL", 11 _
 Call new_Enum( _
     "charType" _
     , new_DicOf( _

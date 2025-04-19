@@ -356,6 +356,15 @@ Sub Test_cf_pushA_AddIsArray_ArrAvailable
     
     assertAllElements e, a
 End Sub
+Sub Test_cf_pushA_AddIsArray_ArrAvailableInitial
+    Dim a,d,e
+    Redim a(0)
+    d = Array()
+    e = Array(Empty)
+    cf_pushA a, d
+    
+    assertAllElements e, a
+End Sub
 Sub Test_cf_pushA_AddIsArray_ArrNotAvailable
     Dim a,d,e
     d = Array(1,2)

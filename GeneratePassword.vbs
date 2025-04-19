@@ -122,7 +122,7 @@ Private Sub this_getParameters( _
     'オリジナルの引数を取得
     Dim oArg : Set oArg = fw_storeArguments()
     '★ログ出力
-    this_logger Array(logType.DETAIL, "this_getParameters()", cf_toString(oArg))
+    this_logger Array(logType.TRACE, "this_getParameters()", cf_toString(oArg))
     
     '引数の内容を解析
     

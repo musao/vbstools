@@ -523,7 +523,7 @@ Function assertLogs(f,d,isErr)
     AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "Start", PvLog(i)(2), i&"-2"
     i=i+1
-    AssertSameWithMessage logType.DETAIL, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.TRACE, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
     If isErr Then
@@ -537,7 +537,7 @@ Function assertLogs(f,d,isErr)
     AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "End", PvLog(i)(2), i&"-2"
     i=i+1
-    AssertSameWithMessage logType.DETAIL, PvLog(i)(0), i&"-0"
+    AssertSameWithMessage logType.TRACE, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
 End Function
