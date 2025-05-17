@@ -32,15 +32,6 @@ Sub TearDown()
 End Sub
 
 '###################################################################################################
-'fs_getAllFiles()
-Sub Test_fs_getAllFiles_OnlyFiles
-    'データ定義と生成
-    Dim d : Set d = createTestItems(createTestItemDefinitionForFile(True,False,"Test_fs_copyFile_Normal"))
-    
-End Sub
-
-
-'###################################################################################################
 'fs_copyFile()
 Sub Test_fs_copyFile_Normal
     'データ定義と生成

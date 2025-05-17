@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class FileSystemProxy
     'クラス内変数、定数
-    Private PoFolderItem,PoParent,PsPath
+    Private PoFolderItem,PoParent,PsPath,Cl_FILE,Cl_FOLDER
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -30,6 +30,7 @@ Class FileSystemProxy
         PsPath = vbNullString
         Set PoFolderItem = Nothing
         Set PoParent = Nothing
+        Cl_FILE=1 : Cl_FOLDER=2
     End Sub
     
     '***************************************************************************************************
@@ -52,8 +53,44 @@ Class FileSystemProxy
     End Sub
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get allFiles()
+    'Overview                    : フォルダー以下の全てのファイルの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get allFiles()
+        allFiles = this_items(True, Cl_FILE)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get allFolders()
+    'Overview                    : フォルダー以下の全てのファイルの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get allFolders()
+        allFolders = this_items(True, Cl_FOLDER)
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get allItems()
-    'Overview                    : フォルダー内のアイテムの配列を返す
+    'Overview                    : フォルダー以下の全てのアイテムの配列を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -65,13 +102,12 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get allItems( _
-        )
-        allItems = this_items(True)
+    Public Property Get allItems()
+        allItems = this_items(True, Empty)
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get basename()
+    'Function/Sub Name           : Property Get baseName()
     'Overview                    : ファイル／フォルダの拡張子を除いた名前を返す
     'Detailed Description        : 工事中
     'Argument
@@ -84,8 +120,8 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get basename()
-        basename = this_basename()
+    Public Property Get baseName()
+        baseName = this_baseName()
     End Property
     
     '***************************************************************************************************
@@ -123,6 +159,78 @@ Class FileSystemProxy
     Public Property Get extension()
         extension = this_extension()
     End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get files()
+    'Overview                    : フォルダー内のファイルの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get files()
+        files = this_items(False, Cl_FILE)
+    End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get folders()
+    'Overview                    : フォルダー内のフォルダーの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get folders()
+        folders = this_items(False, Cl_FOLDER)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get hasFile()
+    'Overview                    : 配下にファイルを1つ以上持つか返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     配下にファイルを1つ以上持つか
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get hasFile()
+        hasFile = this_hasItem(Cl_FILE)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get hasFolder()
+    'Overview                    : 配下にファイルを1つ以上持つか返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     配下にファイルを1つ以上持つか
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get hasFolder()
+        hasFolder = this_hasItem(Cl_FOLDER)
+    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get hasItem()
@@ -139,7 +247,7 @@ Class FileSystemProxy
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasItem()
-        hasItem = this_hasItem()
+        hasItem = this_hasItem(Empty)
     End Property
     
     '***************************************************************************************************
@@ -229,9 +337,8 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get items( _
-        )
-        items = this_items(False)
+    Public Property Get items()
+        items = this_items(False, Empty)
     End Property
     
     '***************************************************************************************************
@@ -289,8 +396,44 @@ Class FileSystemProxy
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get selfAndAllFiles()
+    'Overview                    : 自身と配下の全てファイルの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get selfAndAllFiles()
+        selfAndAllFiles = this_selfAndAllItems(Cl_FILE)
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get selfAndAllFolders()
+    'Overview                    : 自身と配下の全てフォルダーの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get selfAndAllFolders()
+        selfAndAllFolders = this_selfAndAllItems(Cl_FOLDER)
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get selfAndAllItems()
-    'Overview                    : 自身とフォルダー内のアイテムの配列を返す
+    'Overview                    : 自身と配下の全てアイテムの配列を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -303,7 +446,7 @@ Class FileSystemProxy
     '2025/04/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get selfAndAllItems()
-        selfAndAllItems = this_selfAndAllItems()
+        selfAndAllItems = this_selfAndAllItems(Empty)
     End Property
     
     '***************************************************************************************************
@@ -404,7 +547,7 @@ Class FileSystemProxy
 
     
     '***************************************************************************************************
-    'Function/Sub Name           : this_basename()
+    'Function/Sub Name           : this_baseName()
     'Overview                    : ファイル／フォルダの拡張子を除いた名前を返す
     'Detailed Description        : 工事中
     'Argument
@@ -417,9 +560,9 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_basename()
-        this_basename = Null
-        If this_notInInitial() Then this_basename = new_Fso().GetBaseName(PsPath)
+    Private Function this_baseName()
+        this_baseName = Null
+        If this_notInInitial() Then this_baseName = new_Fso().GetBaseName(PsPath)
     End Function
    
     '***************************************************************************************************
@@ -462,10 +605,10 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : this_hasItem()
-    'Overview                    : 配下にアイテムを1つ以上持つか返す
+    'Overview                    : 配下に引数で指定したアイテムを1つ以上持つか返す
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     配下にアイテムを1つ以上持つか
     '---------------------------------------------------------------------------------------------------
@@ -474,12 +617,40 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_hasItem()
+    Private Function this_hasItem( _
+        byVal alItemType _
+        )
         this_hasItem = Null
         If Not this_notInInitial() Then Exit Function
 
         this_hasItem = False
-        If PoFolderItem.IsFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
+        Select Case alItemType  
+            Case Cl_FILE,Cl_FOLDER
+            '対象がファイルのみかフォルダーのみの場合
+                If new_Fso().FolderExists(PsPath) Then
+                '自身がフォルダの場合
+                    If alItemType=Cl_FILE Then
+                    '対象がファイルのみの場合
+                        this_hasItem=(new_FolderOf(PsPath).Files.Count>0)
+                    Else
+                    '対象がフォルダーのみの場合
+                        this_hasItem=(new_FolderOf(PsPath).SubFolders.Count>0)
+                    End If
+                ElseIf PoFolderItem.IsFolder Then
+                '自身がzipの場合
+                    Dim oEle,boFlg
+                    If alItemType=Cl_FILE Then boFlg=False Else boFlg=True
+                    For Each oEle In PoFolderItem.GetFolder.Items
+                        If oEle.IsFolder=boFlg Then
+                            this_hasItem=True
+                            Exit For
+                        End If
+                    Next
+                End If
+            Case Else
+            '上記以外の場合
+                If PoFolderItem.IsFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
+        End Select
     End Function
 
     '***************************************************************************************************
@@ -488,6 +659,7 @@ Class FileSystemProxy
     'Detailed Description        : 工事中
     'Argument
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -498,20 +670,73 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_items( _
         byVal aboRecursiveFlg _
+        , byVal alItemType _
         )
         this_items=Null
         If Not this_notInInitial() Then Exit Function
 
         this_items = Array()
-        If Not this_hasItem Then Exit Function
-        
+        If Not this_hasItem(Empty) Then Exit Function
+'        If Not this_hasItem(alItemType) Then Exit Function
+
         If new_Fso().FolderExists(PsPath) Then
         'フォルダの場合
-            this_items = this_itemsForFolder(aboRecursiveFlg)
-        ElseIf PoFolderItem.IsFolder Then
+            this_items = this_itemsForFolder(aboRecursiveFlg, alItemType)
+'            this_items = this_itemsByDir(aboRecursiveFlg, alItemType)
+        Else
         'zipの場合
-            this_items = this_itemsForZip(aboRecursiveFlg)
+            this_items = this_itemsForZip(aboRecursiveFlg, alItemType)
         End If
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_itemsByDir()
+    'Overview                    : フォルダー内のアイテムの配列を返す
+    'Detailed Description        : cmdのdir版
+    'Argument
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_itemsByDir( _
+        byVal aboRecursiveFlg _
+        , byVal alItemType _
+        )
+        Dim sFlg,sDir
+        sFlg="" : If aboRecursiveFlg Then sFlg="/S "
+        sDir = "dir /B " & sFlg & fs_wrapInQuotes(PsPath)
+        Dim sTmpPath : sTmpPath = fw_getTempPath()
+        
+        fw_runShellSilently "cmd /U /C " & sDir & " > " & fs_wrapInQuotes(sTmpPath)
+        Dim vArrList : vArrList = Split(fs_readFile(sTmpPath), vbNewLine)
+        fs_deleteFile sTmpPath
+        Redim Preserve vArrList(Ubound(vArrList)-1)
+
+        Dim oParents : Set oParents = new_DicOf(Array(PsPath,Me))
+        Dim sPath,sEle,sParentPath,oFsp,vRet()
+        For Each sEle In vArrList
+            If aboRecursiveFlg Then sPath=sEle Else sPath=new_Fso().BuildPath(PsPath,sEle)
+            Set oFsp = new_FspOf(sPath)
+            sParentPath = new_Fso().GetParentFolderName(sPath)
+            If oParents.Exists(sParentPath) Then oFsp.setParent oParents(sParentPath)
+            
+            If aboRecursiveFlg Then
+                cf_pushA vRet, oFsp.selfAndAllItems()
+                If oFsp.isFolder And Not oParents.Exists(sPath) Then oParents.Add sPath, oFsp
+            Else
+                cf_push vRet, oFsp
+            End If
+        Next
+
+        this_itemsByDir = vRet
+        Set oFsp = Nothing
+        Set oParents = Nothing
     End Function
 
     '***************************************************************************************************
@@ -520,6 +745,7 @@ Class FileSystemProxy
     'Detailed Description        : フォルダの場合
     'Argument
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -530,17 +756,22 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_itemsForFolder( _
         byVal aboRecursiveFlg _
+        , byVal alItemType _
         )
         Dim oEle,vRet()
         With new_FolderOf(PsPath)
             'ファイルの取得
             For Each oEle In .Files
-                this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg
+                this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
             Next
+            
             'フォルダの取得
-            For Each oEle In .SubFolders
-                this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg
-            Next
+            If aboRecursiveFlg Or alItemType<>Cl_FILE Then
+            '再帰処理するかファイルのみ対象以外フォルダを取得する
+                For Each oEle In .SubFolders
+                    this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
+                Next
+            End If
         End With
 
         this_itemsForFolder = vRet
@@ -553,6 +784,7 @@ Class FileSystemProxy
     'Detailed Description        : zipの場合
     'Argument
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -563,10 +795,11 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_itemsForZip( _
         byVal aboRecursiveFlg _
+        , byVal alItemType _
         )
         Dim oEle,vRet()
         For Each oEle In PoFolderItem.GetFolder.Items
-            this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg
+            this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
         Next
 
         this_itemsForZip = vRet
@@ -581,6 +814,7 @@ Class FileSystemProxy
     '     avAr                   : 取得したアイテムを格納する配列
     '     asPath                 : パス
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -593,16 +827,32 @@ Class FileSystemProxy
         byRef avAr _
         , byVal asPath _
         , byVal aboRecursiveFlg _
+        , byVal alItemType _
         )
+        Dim oNewItem : Set oNewItem = new_FspOf(asPath).setParent(Me)
+
         If aboRecursiveFlg Then
-            cf_pushA avAr, new_FsProxyOf(asPath).setParent(Me).selfAndAllItems()
+        '再帰処理する場合
+            Select Case alItemType
+                Case Cl_FILE
+                    cf_pushA avAr, oNewItem.selfAndAllFiles()
+                Case Cl_FOLDER
+                    cf_pushA avAr, oNewItem.selfAndAllFolders()
+                Case Else
+                    cf_pushA avAr, oNewItem.selfAndAllItems()
+            End Select
         Else
-            cf_push avAr, new_FsProxyOf(asPath).setParent(Me)
+        '再帰処理しない場合
+            Select Case alItemType
+                Case Cl_FILE,Cl_FOLDER
+                    Dim boFlg : If alItemType=Cl_FILE Then boFlg=False Else boFlg=True
+                    If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push avAr, oNewItem
+                Case Else
+                    cf_push avAr, oNewItem
+            End Select
         End If
-'        Dim oFsProx : Set oFsProx = new_FsProxyOf(asPath).setParent(Me)
-'        cf_push avAr, oFsProx
-'        If aboRecursiveFlg And oFsProx.hasItem() Then cf_pushA avAr, oFsProx.allItems()
-'        Set oFsProx = Nothing
+
+        Set oNewItem=Nothing
     End Sub
 
     '***************************************************************************************************
@@ -659,7 +909,7 @@ Class FileSystemProxy
     Private Function this_parentFolder()
         this_parentFolder = Null
         If Not this_notInInitial() Then Exit Function
-        If PoParent Is Nothing Then Set PoParent = new_FsProxyOf(new_Fso().GetParentFolderName(PsPath))
+        If PoParent Is Nothing Then Set PoParent = new_FspOf(new_Fso().GetParentFolderName(PsPath))
         Set this_parentFolder = PoParent
     End Function
     
@@ -713,7 +963,7 @@ Class FileSystemProxy
     'Overview                    : 自身とフォルダー内のアイテムの配列を返す
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -722,12 +972,21 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/17         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_selfAndAllItems()
+    Private Function this_selfAndAllItems( _
+        byVal alItemType _
+        )
         this_selfAndAllItems = Null
         If Not this_notInInitial() Then Exit Function
 
-        Dim vRet : vRet=Array(Me)
-        cf_pushA vRet, this_items(True)
+        Dim vRet : vRet=Array()
+        If alItemType=Cl_FILE Then
+            If Not (this_isFolder() Or this_hasItem(Empty)) Then vRet=Array(Me)
+        ElseIf alItemType=Cl_FOLDER Then
+            If (this_isFolder() Or this_hasItem(Empty)) Then vRet=Array(Me)
+        Else
+            vRet=Array(Me)
+        End If
+        cf_pushA vRet, this_items(True, alItemType)
         this_selfAndAllItems = vRet
     End Function
     

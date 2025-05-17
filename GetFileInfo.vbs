@@ -153,10 +153,9 @@ Private Sub this_getFileInfomations( _
     'ファイルオブジェクトのリストを取得
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-'        oList.pushA fs_getAllFiles(oParam.pop().Path)
-        oList.pushA new_FsProxyOf(oParam.pop().Path).selfAndAllItems()
+'        oList.pushA fs_getAllFiles(oParam.pop().path)
+        oList.pushA new_FspOf(oParam.pop().path).selfAndAllFiles()
     Loop
-    Set oList = oList.filter(new_Func("(e,i,a)=>{Not(e.hasItem() or e.isFolder())}"))
 
     '★ログ出力
     this_logger Array(logType.INFO, "this_getFileInfomations()", "Before sorting.")

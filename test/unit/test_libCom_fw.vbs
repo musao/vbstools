@@ -129,6 +129,7 @@ End Sub
 '---------------------------------------------------------------------------------------------------
 'stub()
 Sub subArg(aArg)
+    wscript.Sleep 1
     If Instr(1,aArg,"Err",vbBinaryCompare)>0 Then
         Err.Raise 9999, "エラー", "test_libCom_fw.vbsのエラーケース"
         Exit Sub
@@ -514,9 +515,9 @@ End Sub
 Function assertLogs(f,d,isErr)
     Const ERR_STR = "<Err>{<String>""Number""=><Long>9999,<String>""Description""=><String>""test_libCom_fw.vbsのエラーケース"",<String>""Source""=><String>""エラー""}"
     If isErr Then
-        AssertEqualWithMessage 4, Ubound(PvLog), "Ubound"
+        AssertEqualWithMessage 6, Ubound(PvLog), "Ubound"
     Else
-        AssertEqualWithMessage 3, Ubound(PvLog), "Ubound"
+        AssertEqualWithMessage 4, Ubound(PvLog), "Ubound"
     End If
     Dim i : i=0
     AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
@@ -528,6 +529,10 @@ Function assertLogs(f,d,isErr)
     AssertEqualWithMessage cf_toString(d), PvLog(i)(2), i&"-2"
     If isErr Then
         i=i+1
+        AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
+        AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
+        AssertEqualWithMessage "Error", PvLog(i)(2), i&"-2"
+        i=i+1
         AssertSameWithMessage logType.ERROR, PvLog(i)(0), i&"-0"
         AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
         AssertEqualWithMessage ERR_STR, PvLog(i)(2), i&"-2"
@@ -536,6 +541,10 @@ Function assertLogs(f,d,isErr)
     AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
     AssertEqualWithMessage "End", PvLog(i)(2), i&"-2"
+    i=i+1
+    AssertSameWithMessage logType.INFO, PvLog(i)(0), i&"-0"
+    AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"
+    AssertMatchWithMessage "^Elapsed Time:.*", PvLog(i)(2), i&"-2"
     i=i+1
     AssertSameWithMessage logType.TRACE, PvLog(i)(0), i&"-0"
     AssertEqualWithMessage f&"()", PvLog(i)(1), i&"-1"

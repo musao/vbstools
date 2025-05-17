@@ -1,12 +1,23 @@
 Option Explicit
 
+Dim adte,dfddr
+adte="powershell -Command ""[Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding('shift_jis'); dir 'C:\Users\89585\Documents\dev\vbs\lib\com' -Directory | Select-Object -ExpandProperty FullName"""
+'adte="powershell -Command ""[Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding('shift_jis'); dir 'C:\Users\89585\Documents\dev\vbs\lib\com\' | Select-Object -ExpandProperty FullName"""
+Set dfddr = CreateObject("WScript.Shell").Exec(adte)
+msgbox dfddr.exitcode
+msgbox "["&dfddr.StdOut.Readall()&"]"
+
+
+
+wscript.quit
+
 inputbox "","",(Null=True)
 
 wscript.quit
 
 
 With CreateObject("Scripting.FileSystemObject")
-Dim adte
+'Dim adte
 
 adte = "C:\Users\89585\Documents\dev\vbs\BackupFiles.vbs"
 inputbox "False","",CreateObject("Shell.Application").Namespace(.GetParentFolderName(adte)).Items().Item(.GetFileName(adte)).IsFolder

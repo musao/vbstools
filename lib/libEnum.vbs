@@ -29,7 +29,26 @@ Call new_Enum( _
         ) _
     ) _
 )
-'            , "DETAIL", 11 _
+Call new_Enum( _
+    "tsFormat" _
+    , new_DicOf( _
+        Array( _
+            "USE_DEFAULT", -2 _
+            , "UNICODE", -1 _
+            , "ASCII", 0 _
+        ) _
+    ) _
+)
+Call new_Enum( _
+    "tsMode" _
+    , new_DicOf( _
+        Array( _
+            "FOR_READING", 1 _
+            , "FOR_WRITING", 2 _
+            , "FOR_APPENDING", 8 _
+        ) _
+    ) _
+)
 Call new_Enum( _
     "charType" _
     , new_DicOf( _
