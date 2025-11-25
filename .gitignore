@@ -1,0 +1,14 @@
+# Ignore directories
+bin/
+data/
+log/
+report/
+test/performance/
+test/trial/
+test/unit/sample/
+tmp/
+wk/
+
+# Ignore files
+*.lnk
+ファイルリスト取得高速化2.xlsm

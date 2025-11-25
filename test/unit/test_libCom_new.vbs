@@ -25,11 +25,6 @@ Sub Test_new_Adodb
 End Sub
 
 '###################################################################################################
-'new_AdptFile()
-'###################################################################################################
-'new_FspOf()
-
-'###################################################################################################
 'new_Arr()
 Sub Test_new_Arr
     Dim e : Set e = New ArrayList
@@ -410,6 +405,23 @@ Sub Test_new_Fso
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
+End Sub
+
+'###################################################################################################
+'new_FspOf()
+Sub Test_new_FspOf
+    Dim a : Set a = new_FspOf(WScript.ScriptFullName)
+    
+    AssertEqualWithMessage 8, VarType(a), "VarType"
+    AssertEqualWithMessage "FileSystemProxy", TypeName(a), "TypeName"
+End Sub
+Sub Test_new_FspOf_Err
+    On Error Resume Next
+    Dim a : Set a = new_FspOf(vbNullString)
+    
+    AssertMatchWithMessage "^invalid argument.*", Err.Description, "Err.Description"
+    AssertEqualWithMessage Null, a, "value"
+    On Error Goto 0
 End Sub
 
 '###################################################################################################

@@ -92,7 +92,7 @@ Sub Test_Calendar_dateTime_fractionalPartOfElapsedSeconds_elapsedSeconds_serial_
             , new_DicOf(Array("No",3 ,"date", Time()              , "elapsed", "Cal"                   )) _
             , new_DicOf(Array("No",4 ,"date", "2025/2/12 11:22:33", "elapsed", 11*60*60+22*60+33+0.2345)) _
             , new_DicOf(Array("No",5 ,"date", "2025/12/31"        , "elapsed", 0.8901234               )) _
-            , new_DicOf(Array("No",6 ,"date", "12:34:56"          , "elapsed", 0                       )) _
+            , new_DicOf(Array("No",6 ,"date", "12:34:56"          , "elapsed", 12*60*60+34*60+56       )) _
             )
 
     For Each i In d
@@ -103,10 +103,11 @@ Sub Test_Calendar_dateTime_fractionalPartOfElapsedSeconds_elapsedSeconds_serial_
         tg = "A.dateTime"
         e = CDate(data(0))
         a = ao.dateTime
-        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&cf_toString(data)
+        AssertEqualWithMessage e, a, tg&" No="&i.Item("No")&", data="&cf_toString(data) & ", e="&cf_toString(e)&", a="&cf_toString(a)
         
         tg = "B.fractionalPartOfElapsedSeconds"
-        e = data(1)-Fix(data(1))
+        e = data(1)-Fix((data(1)*1000000+0.5)/1000000)
+'        e = data(1)-Fix(data(1))
         a = ao.fractionalPartOfElapsedSeconds
         AssertWithMessage Abs(e-a)<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
 '        AssertWithMessage Abs(e-a)<0.0000001 Or (1-Abs(e-a))<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
@@ -136,12 +137,12 @@ End Sub
 Sub Test_Calendar_toString
     dim a,e,d,i,data
     d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        , "expect", "2025/02/12 11:22:33.000"))_
-            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                 , "expect", "2025/12/01 00:00:00.000"))_
-            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                  , "expect", "1899/12/30 12:34:56.000"))_
-            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234), "expect", "2025/02/12 11:22:33.123"))_
-            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876), "expect", "2025/12/01 00:00:00.987"))_
-            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 0)     , "expect", "1899/12/30 12:34:56.000"))_
+            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")                          , "expect", "2025/02/12 11:22:33.000"))_
+            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                                   , "expect", "2025/12/01 00:00:00.000"))_
+            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                                    , "expect", "1899/12/30 12:34:56.000"))_
+            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 11*60*60+22*60+33+0.1234), "expect", "2025/02/12 11:22:33.123"))_
+            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876)                  , "expect", "2025/12/01 00:00:00.987"))_
+            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 12*60*60+34*60+56)       , "expect", "1899/12/30 12:34:56.000"))_
             )
 
     For Each i In d
@@ -166,12 +167,12 @@ End Sub
 Sub Test_Calendar_clone
     dim a,e,d,i,data,ao,bo
     d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")        ))_
-            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                 ))_
-            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                  ))_
-            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 0.1234)))_
-            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876)))_
-            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 0)     ))_
+            new_DicOf(Array(  "No", 1,"data", Array("2025/2/12 11:22:33")                          ))_
+            , new_DicOf(Array("No", 2,"data", Array("2025/12/1")                                   ))_
+            , new_DicOf(Array("No", 3,"data", Array("12:34:56")                                    ))_
+            , new_DicOf(Array("No", 4,"data", Array("2025/2/12 11:22:33", 11*60*60+22*60+33+0.1234)))_
+            , new_DicOf(Array("No", 5,"data", Array("2025/12/1"         , 0.9876)                  ))_
+            , new_DicOf(Array("No", 6,"data", Array("12:34:56"          , 12*60*60+34*60+56)       ))_
             )
 
     For Each i In d
@@ -228,7 +229,7 @@ Sub Test_Calendar_compareTo_WithDecimal
     d = Array ( _
             new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:31.123455", "expect", 1 ))_
             , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31.123456", "expect", 0 ))_
-            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31.123457", "expect", -1))_
+            , new_DicOf(Array("No", 3,"data", "2024/02/29 00:59:31.123457", "expect", -1))_
             )
     Set ao = (new Calendar).of("2024/02/29 00:59:31.123456")
 
@@ -311,7 +312,7 @@ Sub Test_Calendar_differenceFrom
     d = Array ( _
             new_DicOf(Array(  "No", 1,"data", "2024/02/29 00:59:30", "expect", 1 ))_
             , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:31", "expect", 0 ))_
-            , new_DicOf(Array("No", 2,"data", "2024/02/29 00:59:32", "expect", -1))_
+            , new_DicOf(Array("No", 3,"data", "2024/02/29 00:59:32", "expect", -1))_
             )
     Set ao = (new Calendar).of("2024/02/29 00:59:31")
 

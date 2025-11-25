@@ -677,7 +677,6 @@ Class FileSystemProxy
 
         this_items = Array()
         If Not this_hasItem(Empty) Then Exit Function
-'        If Not this_hasItem(alItemType) Then Exit Function
 
         If new_Fso().FolderExists(PsPath) Then
         'ÉtÉHÉãÉ_ÇÃèÍçá
@@ -719,19 +718,22 @@ Class FileSystemProxy
         Redim Preserve vArrList(Ubound(vArrList)-1)
 
         Dim oParents : Set oParents = new_DicOf(Array(PsPath,Me))
-        Dim sPath,sEle,sParentPath,oFsp,vRet()
+        Dim boFlg : If alItemType=Cl_FILE Then boFlg=False Else boFlg=True
+        Dim sPath,sEle,sParentPath,oNewItem,vRet()
         For Each sEle In vArrList
             If aboRecursiveFlg Then sPath=sEle Else sPath=new_Fso().BuildPath(PsPath,sEle)
-            Set oFsp = new_FspOf(sPath)
+            Set oNewItem = new_FspOf(sPath)
             sParentPath = new_Fso().GetParentFolderName(sPath)
-            If oParents.Exists(sParentPath) Then oFsp.setParent oParents(sParentPath)
-            
-            If aboRecursiveFlg Then
-                cf_pushA vRet, oFsp.selfAndAllItems()
-                If oFsp.isFolder And Not oParents.Exists(sPath) Then oParents.Add sPath, oFsp
-            Else
-                cf_push vRet, oFsp
-            End If
+            If oParents.Exists(sParentPath) Then oNewItemoFsp.setParent oParents(sParentPath)
+
+            Select Case alItemType
+                Case Cl_FILE,Cl_FOLDER
+                    If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push vRet, oNewItem
+                Case Else
+                    cf_push vRet, oNewItem
+            End Select
+
+            If aboRecursiveFlg And oNewItem.isFolder And Not oParents.Exists(sPath) Then oParents.Add sPath, oNewItem
         Next
 
         this_itemsByDir = vRet
@@ -951,7 +953,6 @@ Class FileSystemProxy
         , byVal asSource _
         )
         ast_argNotNothing PoFolderItem, asSource, "Please set the value before setting the parent folder."
-'        ast_argNothing PoParent, asSource, "Because it is an immutable variable, its parent cannot be changed."
         ast_argsAreSame TypeName(Me), TypeName(aoParent), asSource, "This is not " & TypeName(Me) &"."
         ast_argsAreSame new_Fso().GetParentFolderName(PsPath), aoParent.path, asSource, "This is not a parent folder."
 
@@ -1136,7 +1137,8 @@ Class FileSystemProxy
         Dim oFolderItem : Set oFolderItem = Nothing
         On Error Resume Next
         Set oFolderItem = new_FolderItem2Of(asPath)
-        ast_argNotNothing PoFolderItem , asSource, "invalid argument. " & cf_toString(asPath)
+        On Error Goto 0
+        ast_argNotNothing oFolderItem , asSource, "invalid argument. " & cf_toString(asPath)
 
         If oFolderItem Is Nothing Then Exit Sub
 

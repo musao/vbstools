@@ -110,13 +110,13 @@ Private Sub this_getParameters( _
     Dim oParam, oRet, oItem
     Set oParam = new_Arr()
     For Each oItem In oArg.Item("Unnamed")
-        Set oRet = fw_tryCatch(Getref("new_FileOf"), oItem, Empty, Empty)
-        If oRet.isErr() Then Set oRet = fw_tryCatch(Getref("new_FolderOf"), oItem, Empty, Empty)
+        '引数からファイルシステムプロキシオブジェクトを生成する
+        Set oRet = fw_tryCatch(Getref("new_FspOf"), oItem, Empty, Empty)
         If Not oRet.isErr() Then
             oParam.push oRet.returnValue
         Else
             '★ログ出力
-            this_logger Array(logType.WARNING, "this_getParameters()", oItem & "is an invalid argument.")
+            this_logger Array(logType.WARNING, "this_getParameters()", oItem & " is an invalid argument.")
         End If
     Next
     cf_bindAt aoParams, "Param", oParam
@@ -150,11 +150,10 @@ Private Sub this_getFileInfomations( _
 
     '★ログ出力
     this_logger Array(logType.INFO, "this_getFileInfomations()", "Before getting list of files.")
-    'ファイルオブジェクトのリストを取得
+    '配下のファイルを全て取得する
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-'        oList.pushA fs_getAllFiles(oParam.pop().path)
-        oList.pushA new_FspOf(oParam.pop().path).selfAndAllFiles()
+        oList.pushA oParam.pop().selfAndAllFiles()
     Loop
 
     '★ログ出力

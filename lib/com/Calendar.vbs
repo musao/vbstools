@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class Calendar
     'クラス内変数、定数
-    Private PdtDateTime, PdbElapsedSeconds, PsDefaultFormat
+    Private PdtDateTime, PdbElapsedSeconds, PsDefaultFormat, Cl_NUMBER_OF_SECONDS_IN_A_DAY
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -30,6 +30,7 @@ Class Calendar
         PdtDateTime = Null
         PdbElapsedSeconds = Null
         PsDefaultFormat = "YYYY/MM/DD hh:mm:ss.000"
+        Cl_NUMBER_OF_SECONDS_IN_A_DAY = 86400 '24時間分の秒数
     End Sub
     
     '***************************************************************************************************
@@ -267,6 +268,51 @@ Class Calendar
 
 
 
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_checkConsistencyOfDateTimeAndElapsedSeconds()
+    'Overview                    : 日時と経過秒の整合をチェックする
+    'Detailed Description        : 経過秒がNullでない場合に、日時の小数部と経過秒の値が整合するかをチェックする
+    '                              浮動小数点の丸め誤差がある場合は大きい方を採用する
+    'Argument
+    '     adtDateTime            : 日時
+    '     adbElapsedSeconds      : 経過秒
+    '     asSource               : ソース
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/11/24         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_checkConsistencyOfDateTimeAndElapsedSeconds( _
+        byRef adtDateTime _
+        , byRef adbElapsedSeconds _
+        , byVal asSource _
+        )
+        If IsNull(adbElapsedSeconds) Then Exit Sub
+        ast_argTrue IsDate(adtDateTime), asSource, "DateTime is not a date/time."
+        ast_argTrue cf_isNonNegativeNumber(adbElapsedSeconds), asSource, "ElapsedSeconds must be a non-negative number."
+        ast_argTrue adbElapsedSeconds < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
+
+        Dim lFromDateTime, lFromElapsedSeconds
+        lFromDateTime = Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime)
+        lFromElapsedSeconds = math_tranc(Cdbl(adbElapsedSeconds))
+
+        '24時間分の秒数の差か1秒以内の差でなければ不整合とみなす
+        '浮動小数点の丸め誤差がある場合は大きい方を採用する
+        Select Case (lFromDateTime - lFromElapsedSeconds)
+        Case 0
+            '整合している場合は何もしない
+        case Cl_NUMBER_OF_SECONDS_IN_A_DAY * -1, -1
+            adtDateTime = DateAdd("s", 1, adtDateTime)
+        case Cl_NUMBER_OF_SECONDS_IN_A_DAY, 1
+            adbElapsedSeconds = Cdbl(Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime))
+        Case Else
+            ast_failure asSource, "The date/time and elapsed seconds are inconsistent."
+        End Select
+    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : this_clone()
@@ -357,8 +403,8 @@ Class Calendar
         End If
 
         Dim dbResult : dbResult = 0
-        If IsNull(PdtDateTime) Then dbResult = -1 * ((aoTarget.dateTime)*60*60*24 + aoTarget.fractionalPartOfElapsedSeconds)
-        If IsNull(aoTarget.dateTime) Then dbResult = PdtDateTime*60*60*24 + this_getfractionalPartOfElapsedSeconds
+        If IsNull(PdtDateTime) Then dbResult = -1 * ((aoTarget.dateTime)*Cl_NUMBER_OF_SECONDS_IN_A_DAY + aoTarget.fractionalPartOfElapsedSeconds)
+        If IsNull(aoTarget.dateTime) Then dbResult = PdtDateTime*Cl_NUMBER_OF_SECONDS_IN_A_DAY + this_getfractionalPartOfElapsedSeconds
         If dbResult <> 0 Then
             this_differenceFrom = dbResult
             Exit Function
@@ -367,7 +413,7 @@ Class Calendar
         Dim dbDiffElapsedSeconds
         dbDiffElapsedSeconds = this_getfractionalPartOfElapsedSeconds-aoTarget.fractionalPartOfElapsedSeconds
 
-        If (PdtDateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(PdtDateTime-aoTarget.dateTime)*60*60*24
+        If (PdtDateTime <> aoTarget.dateTime) Then dbDiffElapsedSeconds = dbDiffElapsedSeconds+(PdtDateTime-aoTarget.dateTime)*Cl_NUMBER_OF_SECONDS_IN_A_DAY
         this_differenceFrom = math_round(dbDiffElapsedSeconds, 6)
 
     End Function
@@ -581,8 +627,8 @@ Class Calendar
         Dim oRe : Set oRe = new_Re("^([^.]+)\.(\d+)$", "")
         If oRe.Test(avDateTime) Then
             adtDateTime = Cdate(oRe.Replace(avDateTime, "$1"))
-            Dim dbElapsedSecondsByDt : dbElapsedSecondsByDt = math_tranc(math_fractional(adtDateTime)*24*60*60)
-            adbElapsedSeconds = dbElapsedSecondsByDt + Cdbl("0." & oRe.Replace(avDateTime, "$2"))
+            Dim lElapsedSecondsByDt : lElapsedSecondsByDt = Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime)
+            adbElapsedSeconds = Cdbl(lElapsedSecondsByDt + Cdbl("0." & oRe.Replace(avDateTime, "$2")))
         Else
             adtDateTime = Cdate(avDateTime)
         End If
@@ -611,8 +657,13 @@ Class Calendar
         , byVal asSource _
         )
         ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
+
+        '日時（adtDateTime）と経過秒（adbElapsedSeconds）の整合をチェックする
+        this_checkConsistencyOfDateTimeAndElapsedSeconds adtDateTime, adbElapsedSeconds, asSource
+
         this_setDateTime adtDateTime, asSource
         this_setElapsedSeconds adbElapsedSeconds, asSource
+        
         Set this_setData = Me
     End Function
 
@@ -658,8 +709,11 @@ Class Calendar
         byVal adbElapsedSeconds _
         , byVal asSource _
         )
-        ast_argTrue (IsNull(adbElapsedSeconds) Or cf_isNonNegativeNumber(adbElapsedSeconds)), asSource, "ElapsedSeconds must be null or a non-negative number."
-        If Not(IsNull(adbElapsedSeconds)) Then PdbElapsedSeconds = Cdbl(adbElapsedSeconds)
+        If IsNull(adbElapsedSeconds) Then Exit Sub
+        ast_argTrue cf_isNonNegativeNumber(adbElapsedSeconds), asSource, "ElapsedSeconds must be a non-negative number."
+        ast_argTrue adbElapsedSeconds < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
+
+        PdbElapsedSeconds = Cdbl(adbElapsedSeconds)
     End Sub
     
 End Class
