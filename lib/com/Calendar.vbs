@@ -30,7 +30,7 @@ Class Calendar
         PdtDateTime = Null
         PdbElapsedSeconds = Null
         PsDefaultFormat = "YYYY/MM/DD hh:mm:ss.000"
-        Cl_NUMBER_OF_SECONDS_IN_A_DAY = 86400 '24時間分の秒数
+        Cl_NUMBER_OF_SECONDS_IN_A_DAY = 24 * 60 * 60 '24時間分の秒数
     End Sub
     
     '***************************************************************************************************
@@ -294,7 +294,7 @@ Class Calendar
         If IsNull(adbElapsedSeconds) Then Exit Sub
         ast_argTrue IsDate(adtDateTime), asSource, "DateTime is not a date/time."
         ast_argTrue cf_isNonNegativeNumber(adbElapsedSeconds), asSource, "ElapsedSeconds must be a non-negative number."
-        ast_argTrue adbElapsedSeconds < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
+        ast_argTrue Cdbl(adbElapsedSeconds) < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
 
         Dim lFromDateTime, lFromElapsedSeconds
         lFromDateTime = Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime)
@@ -305,9 +305,9 @@ Class Calendar
         Select Case (lFromDateTime - lFromElapsedSeconds)
         Case 0
             '整合している場合は何もしない
-        case Cl_NUMBER_OF_SECONDS_IN_A_DAY * -1, -1
+        case (Cl_NUMBER_OF_SECONDS_IN_A_DAY - 1), -1
             adtDateTime = DateAdd("s", 1, adtDateTime)
-        case Cl_NUMBER_OF_SECONDS_IN_A_DAY, 1
+        case (1 - Cl_NUMBER_OF_SECONDS_IN_A_DAY), 1
             adbElapsedSeconds = Cdbl(Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime))
         Case Else
             ast_failure asSource, "The date/time and elapsed seconds are inconsistent."
@@ -330,17 +330,11 @@ Class Calendar
     '***************************************************************************************************
     Private Function this_clone( _
         )
-        Dim oNewIns : Set oNewIns = new Calendar
-        If IsNull(PdtDateTime) Then
-        Else
-            If IsNull(PdbElapsedSeconds) Then
-                Call oNewIns.of(Array(PdtDateTime))
-            Else
-                Call oNewIns.of(Array(PdtDateTime, PdbElapsedSeconds))
-            End If
-        End If
-        Set this_clone = oNewIns
-        Set oNewIns = Nothing
+        Dim oClone : Set oClone = new Calendar
+        If Not IsNull(PdtDateTime) Then oClone.of(Array(PdtDateTime, PdbElapsedSeconds))
+
+        Set this_clone = oClone
+        Set oClone = Nothing
     End Function
     
     '***************************************************************************************************
@@ -570,47 +564,39 @@ Class Calendar
         byRef avArgument _
         , byVal asSource _
         )
-        Dim dtDateTime, dbElapsedSeconds, boIsError
-        dtDateTime = Null
-        dbElapsedSeconds = Null
-        boIsError = False
-        
-        On Error Resume Next
+
         If Not(IsArray(avArgument)) Then
         '配列でない場合
-            Call this_ofForOneArg(avArgument, dtDateTime, dbElapsedSeconds)
+            this_ofForOneArg avArgument, asSource
         ElseIf new_Arr().hasElement(avArgument) Then
         '配列の要素がある場合
             Dim e : e = avArgument
             Select Case Ubound(e)
                 Case 0:
-                    Call this_ofForOneArg(e(0), dtDateTime, dbElapsedSeconds)
+                    this_ofForOneArg e(0), asSource
                 Case 1:
-                    dtDateTime = Cdate(e(0))
-                    dbElapsedSeconds = Cdbl(e(1))
+                    this_setData e(0), e(1), asSource
                 Case 5:
-                    dtDateTime = Cdate(e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5))
+                    this_setDateTime e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5), asSource
                 Case 6:
-                    dtDateTime = Cdate(e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5))
-                    dbElapsedSeconds = Cdbl(e(6))
+                    this_setData e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5), e(6), asSource
+                Case Else:
+                    ast_failure asSource, "invalid argument. " & cf_toString(avArgument)
             End Select
+        Else
+            ast_failure asSource, "invalid argument. " & cf_toString(avArgument)
         End If
-        If Err.Number<>0 Then boIsError=True
-        On Error Goto 0
 
-        ast_argFalse boIsError, asSource, "invalid argument. " & cf_toString(avArgument)
-
-        Set this_of = this_setData(dtDateTime, dbElapsedSeconds, asSource)
+        Set this_of = Me
     End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : this_ofForOneArg()
-    'Overview                    : 日付型に変換する
+    'Overview                    : 引数が1つの場合のインスタンス作成処理
     'Detailed Description        : 工事中
     'Argument
     '     avDateTime             : 引数の日付時刻
-    '     adtDateTime            : 日時
-    '     dbElapsedSeconds       : 経過秒
+    '     asSource               : ソース
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -620,17 +606,23 @@ Class Calendar
     '2025/02/11         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub this_ofForOneArg( _
-        byRef avDateTime _
-        , byRef adtDateTime _
-        , byRef adbElapsedSeconds _
+        byVal avDateTime _
+        , byVal asSource _
         )
-        Dim oRe : Set oRe = new_Re("^([^.]+)\.(\d+)$", "")
+        Dim oRe : Set oRe = new_Re("^(\s?(?=.*\d)(?:\d{1,4}([-/])\d{1,4}\2\d{1,4})?(?:\s+)?(?:\d{1,2}([-:.])\d{1,2}\3\d{1,2})?)\.([^.]+)$", "")
+'        Dim oRe : Set oRe = new_Re("^([^.]+)\.(\d+)$", "")
+'        Dim oRe : Set oRe = new_Re("^(.+)\.(.+)$", "")
         If oRe.Test(avDateTime) Then
-            adtDateTime = Cdate(oRe.Replace(avDateTime, "$1"))
-            Dim lElapsedSecondsByDt : lElapsedSecondsByDt = Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime)
-            adbElapsedSeconds = Cdbl(lElapsedSecondsByDt + Cdbl("0." & oRe.Replace(avDateTime, "$2")))
+            Dim dtDateTime : dtDateTime = oRe.Replace(avDateTime, "$1")
+            this_setDateTime dtDateTime, asSource
+            
+            Dim lElapsedSecondsByDt : lElapsedSecondsByDt = Hour(PdtDateTime) * 60 * 60 + Minute(PdtDateTime) * 60 + Second(PdtDateTime)
+            PdtDateTime = Null '一旦Nullにすることで、this_setData内の整合チェックを通過させる
+
+            this_setData dtDateTime, Cstr(lElapsedSecondsByDt) & "." & oRe.Replace(avDateTime, "$4"), asSource
+'            this_setData dtDateTime, Cstr(lElapsedSecondsByDt) & "." & oRe.Replace(avDateTime, "$2"), asSource
         Else
-            adtDateTime = Cdate(avDateTime)
+            this_setDateTime avDateTime, asSource
         End If
         Set oRe = Nothing
     End Sub
@@ -669,7 +661,7 @@ Class Calendar
 
     '***************************************************************************************************
     'Function/Sub Name           : this_setDateTime()
-    'Overview                    : PadtDateTimeのセッター
+    'Overview                    : PdtDateTimeのセッター
     'Detailed Description        : 工事中
     'Argument
     '     adtDateTime            : 日時
@@ -677,7 +669,7 @@ Class Calendar
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2024/09/30         Y.Fujii                  First edition
@@ -686,6 +678,7 @@ Class Calendar
         byVal adtDateTime _
         , byVal asSource _
         )
+        ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
         ast_argTrue IsDate(adtDateTime), asSource, "DateTime is not a date/time."
         PdtDateTime = Cdate(adtDateTime)
     End Sub
@@ -700,7 +693,7 @@ Class Calendar
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2024/09/30         Y.Fujii                  First edition
@@ -711,7 +704,7 @@ Class Calendar
         )
         If IsNull(adbElapsedSeconds) Then Exit Sub
         ast_argTrue cf_isNonNegativeNumber(adbElapsedSeconds), asSource, "ElapsedSeconds must be a non-negative number."
-        ast_argTrue adbElapsedSeconds < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
+        ast_argTrue Cdbl(adbElapsedSeconds) < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
 
         PdbElapsedSeconds = Cdbl(adbElapsedSeconds)
     End Sub

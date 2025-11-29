@@ -107,10 +107,8 @@ Sub Test_Calendar_dateTime_fractionalPartOfElapsedSeconds_elapsedSeconds_serial_
         
         tg = "B.fractionalPartOfElapsedSeconds"
         e = data(1)-Fix((data(1)*1000000+0.5)/1000000)
-'        e = data(1)-Fix(data(1))
         a = ao.fractionalPartOfElapsedSeconds
         AssertWithMessage Abs(e-a)<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
-'        AssertWithMessage Abs(e-a)<0.0000001 Or (1-Abs(e-a))<0.0000001, tg&" No="&i.Item("No")&", data="&cf_toString(data)&", e="&cf_toString(e)&", a="&cf_toString(a)&", (e-a)="&cf_toString(e-a)
         
         tg = "C.elapsedSeconds"
         e = data(1)
@@ -448,501 +446,209 @@ End Sub
 
 '###################################################################################################
 'Calendar.of()
-Sub Test_Calendar_of_1Arg_yyyymmdd_hhmmss
-    dim a,e,d,i,data
+Sub Test_Calendar_of
+    dim d
     d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "1899-10-01 00:59:30", "expect", "1899/10/01 00:59:30.000" ))_
-            , new_DicOf(Array("No", 2,"data", "2024/02/29 23.00.59", "expect", "2024/02/29 23:00:59.000" ))_
-            , new_DicOf(Array("No", 3,"data", "3000/06/15 12:34:00", "expect", "3000/06/15 12:34:00.000"))_
+            new_DicOf(Array(  "Case", "1Arg_yyyymmdd-" & "1"               , "data", "1899-10-01", "expect", "1899/10/01 00:00:00.000")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd-" & "2"               , "data", "2024/02/29", "expect", "2024/02/29 00:00:00.000")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd-" & "3"               , "data", "3000/06/15", "expect", "3000/06/15 00:00:00.000")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "1"        , "data", "1899-10-01 00:59:30", "expect", "1899/10/01 00:59:30.000")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "2"        , "data", "2024/02/29 23.00.59", "expect", "2024/02/29 23:00:59.000")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "3"        , "data", "3000/06/15 12:34:00", "expect", "3000/06/15 12:34:00.000")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "1"    , "data", "1900/10/01 00:59:30.123", "expect", "1900/10/01 00:59:30.123")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "2"    , "data", "2024-02-29 23:00:59.999", "expect", "2024/02/29 23:00:59.999")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "3"    , "data", "3000/06/15 12:34:00.001", "expect", "3000/06/15 12:34:00.001")) _
+          _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "1" , "data", "1900/10/01 00:59:30.123456", "expect", "1900/10/01 00:59:30.123")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "2" , "data", "2024/02/29 23:00:59.999999", "expect", "2024/02/29 23:00:59.999")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "3" , "data", "3000-06-15 12:34:00.000001", "expect", "3000/06/15 12:34:00.000")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_hhmmss-" & "1"                 , "data", "00:59:30", "expect", "1899/12/30 00:59:30.000")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss-" & "2"                 , "data", "23:00:59", "expect", "1899/12/30 23:00:59.000")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss-" & "3"                 , "data", "12:34:00", "expect", "1899/12/30 12:34:00.000")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss-" & "4"                 , "data", "13.24.57", "expect", "1899/12/30 13:24:57.000")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000-" & "1"             , "data", "00:59:30.123", "expect", "1899/12/30 00:59:30.123")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000-" & "2"             , "data", "23:00:59.987", "expect", "1899/12/30 23:00:59.987")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000-" & "3"             , "data", "12:34:00.001", "expect", "1899/12/30 12:34:00.001")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000-" & "4"             , "data", "23.45.01.234", "expect", "1899/12/30 23:45:01.234")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000000-" & "1"          , "data", "00:59:30.123456", "expect", "1899/12/30 00:59:30.123")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000000-" & "2"          , "data", "23:00:59.999999", "expect", "1899/12/30 23:00:59.999")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000000-" & "3"          , "data", "12:34:00.000001", "expect", "1899/12/30 12:34:00.000")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000000-" & "4"          , "data", "23.45.01.234567", "expect", "1899/12/30 23:45:01.234")) _
+            _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000-" & "1"          , "data", Array("1900-10-01", Null) , "expect", "1900/10/01 00:00:00.000")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000-" & "2"          , "data", Array("1899/10/01", 0.987), "expect", "1899/10/01 00:00:00.987")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000-" & "3"          , "data", Array("2024/02/29", 0.001), "expect", "2024/02/29 00:00:00.001")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000-" & "4"          , "data", Array("3000-06-15", 0.123), "expect", "3000/06/15 00:00:00.123")) _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000000-" & "1"       , "data", Array("1899/10/01", 0.000001), "expect", "1899/10/01 00:00:00.000")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000000-" & "2"       , "data", Array("2024/02/29", 0.123456), "expect", "2024/02/29 00:00:00.123")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000000-" & "3"       , "data", Array("3000-06-15", 0.987654), "expect", "3000/06/15 00:00:00.987")) _
+            _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000-" & "1"            , "data", Array("00.59.30", Null)                       , "expect", "1899/12/30 00:59:30.000")) _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000-" & "2"            , "data", Array("00.59.30",  0*60*60 + 59*60 + 30+0.001), "expect", "1899/12/30 00:59:30.001" ))_
+            , new_DicOf(Array("Case", "2Args_hhmmss_000-" & "3"            , "data", Array("23:00:59", 23*60*60 +  0*60 + 59+0.357), "expect", "1899/12/30 23:00:59.357" ))_
+            , new_DicOf(Array("Case", "2Args_hhmmss_000-" & "4"            , "data", Array("12:34:00", 12*60*60 + 34*60 +  0+0.123), "expect", "1899/12/30 12:34:00.123" ))_
+            _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000000-" & "1"         , "data", Array("00:59:30",  0*60*60 + 59*60 + 30+0.000001), "expect", "1899/12/30 00:59:30.000" ))_
+            , new_DicOf(Array("Case", "2Args_hhmmss_000000-" & "2"         , "data", Array("23:00:59", 23*60*60 +  0*60 + 59+0.123456), "expect", "1899/12/30 23:00:59.123" ))_
+            , new_DicOf(Array("Case", "2Args_hhmmss_000000-" & "3"         , "data", Array("12:34:00", 12*60*60 + 34*60 +  0+0.987654), "expect", "1899/12/30 12:34:00.987" ))_
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "1"   , "data", Array("1900-10-01 00:59:30",  0*60*60 + 59*60 + 30+0.123), "expect", "1900/10/01 00:59:30.123")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "2"   , "data", Array("2024/02/29 23:00:59", 23*60*60 +  0*60 + 59+0.987), "expect", "2024/02/29 23:00:59.987")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "3"   , "data", Array("3000/06/15 12:34:00", 12*60*60 + 34*60 +  0+0.001), "expect", "3000/06/15 12:34:00.001")) _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "expect", "1900/10/01 00:59:30.123")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "2", "data", Array("2024/02/29 23:00:59", 23*60*60 +  0*60 + 59+0.987654), "expect", "2024/02/29 23:00:59.987")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "3", "data", Array("3000-06-15 12:34:10", 12*60*60 + 34*60 + 09+0.000000), "expect", "3000/06/15 12:34:10.000")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "4", "data", Array("3000-06-15 12:34:10", 12*60*60 + 34*60 + 11+0.999999), "expect", "3000/06/15 12:34:11.999")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "5", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.999999), "expect", "2024/02/29 23:59:59.999")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "6", "data", Array("2024/03/01 00:00:00", 23*60*60 + 59*60 + 59+0.999999), "expect", "2024/03/01 00:00:00.000")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "7", "data", Array("2024/02/29 23:59:59",  0*60*60 +  0*60 +  0+0.000000), "expect", "2024/03/01 00:00:00.000")) _
+            _
+            _
+            , new_DicOf(Array("Case", "6Args_yyyymmdd_hhmmss-" & "1"       , "data", Array(1899, 10,  1,  0, 59, 30), "expect", "1899/10/01 00:59:30.000")) _
+            , new_DicOf(Array("Case", "6Args_yyyymmdd_hhmmss-" & "2"       , "data", Array(2024,  2, 29, 23,  0, 59), "expect", "2024/02/29 23:00:59.000")) _
+            , new_DicOf(Array("Case", "6Args_yyyymmdd_hhmmss-" & "3"       , "data", Array(3000,  6, 15, 12, 34,  0), "expect", "3000/06/15 12:34:00.000")) _
+            _
+            _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "1"   , "data", Array(1900, 10,  1,  0, 59, 30, Null)                       , "expect", "1900/10/01 00:59:30.000")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "2"   , "data", Array(1900, 10,  1,  0, 59, 30,  0*60*60 + 59*60 + 30+0.001), "expect", "1900/10/01 00:59:30.001")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "3"   , "data", Array(2024,  2, 29, 23,  0, 59, 23*60*60 +  0*60 + 59+0.123), "expect", "2024/02/29 23:00:59.123")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "4"   , "data", Array(3000,  6, 15, 12, 34,  0, 12*60*60 + 34*60 +  0+0.987), "expect", "3000/06/15 12:34:00.987")) _
+            _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "1", "data", Array(1900, 10,  1,  0, 59, 30,  0*60*60 + 59*60 + 30+0.123456), "expect", "1900/10/01 00:59:30.123")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "2", "data", Array(2024,  2, 29, 23,  0, 59, 23*60*60 +  0*60 + 59+0.987654), "expect", "2024/02/29 23:00:59.987")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "3", "data", Array(3000,  6, 15, 12, 34, 10, 12*60*60 + 34*60 + 09+0.000000), "expect", "3000/06/15 12:34:10.000")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "4", "data", Array(3000,  6, 15, 12, 34, 10, 12*60*60 + 34*60 + 11+0.999999), "expect", "3000/06/15 12:34:11.999")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "5", "data", Array(2024,  2, 29, 23, 59, 59, 23*60*60 + 59*60 + 59+0.999999), "expect", "2024/02/29 23:59:59.999")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "6", "data", Array(2024,  3,  1,  0,  0,  0, 23*60*60 + 59*60 + 59+0.999999), "expect", "2024/03/01 00:00:00.000")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "7", "data", Array(2024,  2, 29, 23, 59, 59,  0*60*60 +  0*60 +  0+0.000000), "expect", "2024/03/01 00:00:00.000")) _
+            _
             )
     
+    dim a,e,i,data
     For Each i In d
         data = i.Item("data")
         e = i.Item("expect")
+        
         a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
+        AssertEqualWithMessage e, a, "Case="&i.Item("Case")&" data="&cf_toString(i)
+        if Not IsArray(data) Then
+            a = (new Calendar).of(Array(data))
+            AssertEqualWithMessage e, a, "Case="&i.Item("Case")&"(array) data="&cf_toString(i)
+        end if
     Next
 End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd_hhmmss_Err
+Sub Test_Calendar_of_Err
     Dim d
     d = Array ( _
-            "2022-02-29 00:59:30" _
-            , "2024/02/29 00.ab.30" _
+            new_DicOf(Array(  "Case", "1Arg_yyyymmdd-" & "1"               , "data", "1899/02/29", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd-" & "2"               , "data", "2024/00/01", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd-" & "3"               , "data", "3000/13/15", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd-" & "4"               , "data", "2025.02.23", "msg", "DateTime is not a date/time.")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "1"        , "data", "2022-02-29 00:59:30", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "2"        , "data", "2024/02/29 24.00.59", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "3"        , "data", "2024/02/29 00.ab.30", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss-" & "4"        , "data", "2024.02.29 23.00.59", "msg", "DateTime is not a date/time.")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "1"    , "data", "1900/13/31 00:59:30.123", "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "2"    , "data", "2024/12/31 00:59:60.123", "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "3"    , "data", "3000/12/31 00:59:30.12a", "msg", "ElapsedSeconds must be a non-negative number.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000-" & "4"    , "data", "2025.02.23 12:34:56.789", "msg", "DateTime is not a date/time."                 )) _
+            _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "1" , "data", "1899/13/31 00:59:30.123456", "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "2" , "data", "2023/12/31 00:59:60.123456", "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "3" , "data", "3000/12/31 00:59:30.12a456", "msg", "ElapsedSeconds must be a non-negative number.")) _
+            , new_DicOf(Array("Case", "1Arg_yyyymmdd_hhmmss_000000-" & "4" , "data", "2025.02.23 12:34:56.123456", "msg", "DateTime is not a date/time."                 )) _
+            _
+            , new_DicOf(Array("Case", "1Arg_hhmmss-" & "1"                 , "data", "25:59:30", "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss-" & "2"                 , "data", "00:ab:30", "msg", "DateTime is not a date/time.")) _
+            _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000-" & "1"             , "data", "23:59:30.12c", "msg", "ElapsedSeconds must be a non-negative number.")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000-" & "2"             , "data", "00:ab:30.987", "msg", "DateTime is not a date/time."                 )) _
+            _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000000-" & "1"          , "data", "23:59:30.12c456", "msg", "ElapsedSeconds must be a non-negative number.")) _
+            , new_DicOf(Array("Case", "1Arg_hhmmss_000000-" & "2"          , "data", "ab:00:30.987656", "msg", "DateTime is not a date/time."                 )) _
+            _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000-" & "1"          , "data", Array("1899/02/29", 0.001)  , "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000-" & "2"          , "data", Array("2025/02/23", "0.op1"), "msg", "ElapsedSeconds must be a non-negative number.")) _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000000-" & "1"       , "data", Array("2025.02.23", 0.000001)  , "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_000000-" & "2"       , "data", Array("2025/02/23", "0.00xyz1"), "msg", "ElapsedSeconds must be a non-negative number.")) _
+            _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000-" & "1"            , "data", Array("00:ab:30", 0.987)  , "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000-" & "2"            , "data", Array("23:59:30", "0.12c"), "msg", "ElapsedSeconds must be a non-negative number.")) _
+            _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000000-" & "1"         , "data", Array("00:ab:30", 0.98765)   , "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "2Args_hhmmss_000000-" & "2"         , "data", Array("23:59:30", "0.12c456"), "msg", "ElapsedSeconds must be a non-negative number.")) _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "1"   , "data", Array("1899/13/31 00:59:30",  0*60*60 + 59*60 + 30+0.123)        , "msg", "DateTime is not a date/time."                                 )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "2"   , "data", Array("2023-12-31 00:59:60",  0*60*60 + 59*60 + 60+0.123)        , "msg", "DateTime is not a date/time."                                 )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "3"   , "data", Array("2025.02.23 12:34:56", 12*60*60 + 34*60 + 56+0.123)        , "msg", "DateTime is not a date/time."                                 )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "4"   , "data", Array("3000/12/31 00:59:30", Cstr(0*60*60 + 59*60 + 30) & ".12a"), "msg", "ElapsedSeconds must be a non-negative number."                )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "5"   , "data", Array("3000/12/31 00:59:30", -1)                                 , "msg", "ElapsedSeconds must be a non-negative number."                )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000-" & "6"   , "data", Array("3000/12/31 00:59:30", 86400)                              , "msg", "ElapsedSeconds must be within the number of seconds in a day.")) _
+            _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "1", "data", Array("1899/13/31 00:59:30",  0*60*60 + 59*60 + 30+0.123456)        , "msg", "DateTime is not a date/time."                       )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "2", "data", Array("2023/12/31 00:59:60",  0*60*60 + 59*60 + 60+0.123456)        , "msg", "DateTime is not a date/time."                       )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "3", "data", Array("3000/12/31 00:59:30", Cstr(0*60*60 + 59*60 + 30) & ".12a456"), "msg", "ElapsedSeconds must be a non-negative number."      )) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "4", "data", Array("3000-06-15 12:34:10", 12*60*60 + 34*60 + 08+0.999999)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "5", "data", Array("3000-06-15 12:34:10", 12*60*60 + 34*60 + 12+0.000000)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "6", "data", Array("2024/03/01 00:00:01", 23*60*60 + 59*60 + 59+0.999999)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            , new_DicOf(Array("Case", "2Args_yyyymmdd_hhmmss_000000-" & "7", "data", Array("2024/02/29 23:59:58",  0*60*60 +  0*60 +  0+0.000000)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            _
+            _
+            , new_DicOf(Array("Case", "6Args_yyyymmdd_hhmmss-" & "1"       , "data", Array(2022,  2, 29,  0, 59, 30)  , "msg", "DateTime is not a date/time.")) _
+            , new_DicOf(Array("Case", "6Args_yyyymmdd_hhmmss-" & "2"       , "data", Array(2024,  2, 29,  0, "ab", 30), "msg", "DateTime is not a date/time.")) _
+            _
+            _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "1"   , "data", Array(1899, 13, 31,  0, 59, 30,  0*60*60 + 59*60 + 30+0.123)        , "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "2"   , "data", Array(2023, 12, 31,  0, 59, 60,  0*60*60 + 59*60 + 60+0.123)        , "msg", "DateTime is not a date/time."                 )) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000-" & "3"   , "data", Array(3000, 12, 31,  0, 59, 30, Cstr(0*60*60 + 59*60 + 30) & ".12a"), "msg", "ElapsedSeconds must be a non-negative number.")) _
+            _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "1", "data", Array(1899, 13, 31,  0, 59, 30,  0*60*60 + 59*60 + 30+0.123456)        , "msg", "DateTime is not a date/time."                       )) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "2", "data", Array(2023, 12, 31,  0, 59, 60,  0*60*60 + 59*60 + 60+0.123456)        , "msg", "DateTime is not a date/time."                       )) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "3", "data", Array(3000, 12, 31,  0, 59, 30, Cstr(0*60*60 + 59*60 + 30) & ".12a456"), "msg", "ElapsedSeconds must be a non-negative number."      )) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "4", "data", Array(3000,  6, 15, 12, 34, 10, 12*60*60 + 34*60 + 08+0.999999)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "5", "data", Array(3000,  6, 15, 12, 34, 10, 12*60*60 + 34*60 + 12+0.000000)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "6", "data", Array(2024,  3,  1,  0,  0,  1, 23*60*60 + 59*60 + 59+0.999999)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            , new_DicOf(Array("Case", "7Args_yyyymmdd_hhmmss_000000-" & "7", "data", Array(2024,  2, 29, 23, 59, 58,  0*60*60 +  0*60 +  0+0.000000)        , "msg", "The date/time and elapsed seconds are inconsistent.")) _
+            _
         )
 
     Dim i
     For Each i In d
         Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
+        if Not IsArray(i("data")) Then
+            i("data") = Array(i("data"))
+            Call of_Err_Detail(i)
+        End If
     Next
 End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd_hhmmss_000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "1900/10/01 00:59:30.123", "expect", "1900/10/01 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", "2024-02-29 23:00:59.987", "expect", "2024/02/29 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", "3000/06/15 12:34:00.001", "expect", "3000/06/15 12:34:00.001" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd_hhmmss_000_Err
+Sub Test_Calendar_of_Err_Other
     Dim d
     d = Array ( _
-            , "1900/13/31 00:59:30.123" _
-            , "2024/12/31 00:59:60.123" _
-            , "3000/12/31 00:59:30.12a" _
-            , "2025.02.23 12:34:56.789" _
+            new_DicOf(  Array("No", 1,"data", Array()                                                                                                      , "msg", "^invalid argument.*"))_
+            , new_DicOf(Array("No", 2,"data", Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3")                                        , "msg", "^invalid argument.*"))_
+            , new_DicOf(Array("No", 3,"data", Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3", "arg4")                                , "msg", "^invalid argument.*"))_
+            , new_DicOf(Array("No", 4,"data", Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3", "arg4", "arg5")                        , "msg", "^invalid argument.*"))_
+            , new_DicOf(Array("No", 5,"data", Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3", "arg4", "arg5", "arg6", "arg7", "arg8"), "msg", "^invalid argument.*"))_
         )
 
     Dim i
     For Each i In d
-        Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
+        Call of_Err_Detail_Match(i)
     Next
 End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd_hhmmss_000000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "1900/10/01 00:59:30.123456", "expect", "1900/10/01 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", "2024/02/29 23:00:59.987654", "expect", "2024/02/29 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", "3000-06-15 12:34:00.000001", "expect", "3000/06/15 12:34:00.000"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd_hhmmss_000000_Err
-    Dim d
-    d = Array ( _
-            , "1899/13/31 00:59:30.123456" _
-            , "2023/12/31 00:59:60.123456" _
-            , "3000/12/31 00:59:30.12a456" _
-            , "2025.02.23 12:34:56.123456" _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "1899-10-01", "expect", "1899/10/01 00:00:00.000" ))_
-            , new_DicOf(Array("No", 2,"data", "2024/02/29", "expect", "2024/02/29 00:00:00.000" ))_
-            , new_DicOf(Array("No", 3,"data", "3000/06/15", "expect", "3000/06/15 00:00:00.000"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_yyyymmdd_Err
-    Dim d
-    d = Array ( _
-            "1899/02/29" _
-            , "2024/00/01" _
-            , "3000/13/15" _
-            , "2025.02.23" _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_hhmmss
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "00:59:30", "expect", "1899/12/30 00:59:30.000" ))_
-            , new_DicOf(Array("No", 2,"data", "23:00:59", "expect", "1899/12/30 23:00:59.000" ))_
-            , new_DicOf(Array("No", 3,"data", "12:34:00", "expect", "1899/12/30 12:34:00.000"))_
-            , new_DicOf(Array("No", 4,"data", "13.24.57", "expect", "1899/12/30 13:24:57.000"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_hhmmss_Err
-    Dim d
-    d = Array ( _
-            "25:59:30" _
-            , "00:ab:30" _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_hhmmss_000000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "00:59:30.123456", "expect", "1899/12/30 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", "23:00:59.987654", "expect", "1899/12/30 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", "12:34:00.000001", "expect", "1899/12/30 12:34:00.000"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_hhmmss_000000_Err
-    Dim d
-    d = Array ( _
-            "23:59:30.12c456" _
-            , "00:ab:30.98765" _
-            , "23.45.01.23456" _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_hhmmss_000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", "00:59:30.123", "expect", "1899/12/30 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", "23:00:59.987", "expect", "1899/12/30 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", "12:34:00.001", "expect", "1899/12/30 12:34:00.001"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-        a = (new Calendar).of(Array(data))
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&"(array) data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_1Arg_hhmmss_000_Err
-    Dim d
-    d = Array ( _
-            "23:59:30.12c" _
-            , "00:ab:30.987" _
-            , "12.34.56.789" _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-        Call of_Err_Detail(Array(i))
-    Next
-End Sub
-
-Sub Test_Calendar_of_2Args_yyyymmdd_hhmmss_000000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "expect", "1900/10/01 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", Array("2024/02/29 23:00:59", 23*60*60 +  0*60 + 59+0.987654), "expect", "2024/02/29 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", Array("3000-06-15 12:34:00", 12*60*60 + 34*60 +  0+0.000001), "expect", "3000/06/15 12:34:00.000" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_hhmmss_000000_Err
-    Dim d
-    d = Array ( _
-            Array("1899/13/31 00:59:30", 0.123456  ) _
-            , Array("2023/12/31 00:59:60", 0.123456  ) _
-            , Array("3000/12/31 00:59:30", "0.12a456") _
-            , Array("2025.02.23 12:34:56", 0.123456  ) _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_hhmmss_000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("1900-10-01 00:59:30",  0*60*60 + 59*60 + 30+0.123), "expect", "1900/10/01 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", Array("2024/02/29 23:00:59", 23*60*60 +  0*60 + 59+0.987), "expect", "2024/02/29 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", Array("3000/06/15 12:34:00", 12*60*60 + 34*60 +  0+0.001), "expect", "3000/06/15 12:34:00.001" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_hhmmss_000_Err
-    Dim d
-    d = Array ( _
-            Array("1899/13/31 00:59:30", 0.123  ) _
-            , Array("2023-12-31 00:59:60", 0.123  ) _
-            , Array("3000/12/31 00:59:30", "0.12a") _
-            , Array("2025.02.23 12:34:56", 0.123  ) _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_000000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("1899/10/01", 0.000001), "expect", "1899/10/01 00:00:00.000" ))_
-            , new_DicOf(Array("No", 2,"data", Array("2024/02/29", 0.123456), "expect", "2024/02/29 00:00:00.123" ))_
-            , new_DicOf(Array("No", 3,"data", Array("3000-06-15", 0.987654), "expect", "3000/06/15 00:00:00.987"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_000000_Err
-    Dim d
-    d = Array ( _
-            Array("1899/02/29", 0.000001  ) _
-            , Array("2024-00-01", 0.000001  ) _
-            , Array("3000/13/15", 0.000001  ) _
-            , Array("2025.02.23", 0.000001  ) _
-            , Array("2025/02/23", "0.00xyz1") _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("1899/10/01", 0.987), "expect", "1899/10/01 00:00:00.987" ))_
-            , new_DicOf(Array("No", 2,"data", Array("2024/02/29", 0.001), "expect", "2024/02/29 00:00:00.001" ))_
-            , new_DicOf(Array("No", 3,"data", Array("3000-06-15", 0.123), "expect", "3000/06/15 00:00:00.123"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_yyyymmdd_000_Err
-    Dim d
-    d = Array ( _
-            Array("1899/02/29", 0.001  ) _
-            , Array("2024/00/01", 0.001  ) _
-            , Array("3000/13/15", 0.001  ) _
-            , Array("2025.02.23", 0.001  ) _
-            , Array("2025/02/23", "0.op1") _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_hhmmss_000000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("00:59:30",  0*60*60 + 59*60 + 30+0.000001), "expect", "1899/12/30 00:59:30.000" ))_
-            , new_DicOf(Array("No", 2,"data", Array("23:00:59", 23*60*60 +  0*60 + 59+0.123456), "expect", "1899/12/30 23:00:59.123" ))_
-            , new_DicOf(Array("No", 3,"data", Array("12:34:00", 12*60*60 + 34*60 +  0+0.987654), "expect", "1899/12/30 12:34:00.987" ))_
-            , new_DicOf(Array("No", 4,"data", Array("01.23.45",  1*60*60 + 23*60 + 45+0.357913), "expect", "1899/12/30 01:23:45.357" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_hhmmss_000000_Err
-    Dim d
-    d = Array ( _
-            Array("23:59:30", "0.12c456") _
-            , Array("00:ab:30", 0.98765) _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_hhmmss_000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array("00.59.30",  0*60*60 + 59*60 + 30+0.001), "expect", "1899/12/30 00:59:30.001" ))_
-            , new_DicOf(Array("No", 2,"data", Array("23:00:59", 23*60*60 +  0*60 + 59+0.357), "expect", "1899/12/30 23:00:59.357" ))_
-            , new_DicOf(Array("No", 3,"data", Array("12:34:00", 12*60*60 + 34*60 +  0+0.123), "expect", "1899/12/30 12:34:00.123" ))_
-            , new_DicOf(Array("No", 4,"data", Array("01:23:45",  1*60*60 + 23*60 + 45+0.987), "expect", "1899/12/30 01:23:45.987" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_2Args_hhmmss_000_Err
-    Dim d
-    d = Array ( _
-            Array("23:59:30", "0.12c") _
-            , Array("00:ab:30", 0.987) _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-
-Sub Test_Calendar_of_6Args_yyyymmdd_hhmmss
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array(1899, 10,  1,  0, 59, 30), "expect", "1899/10/01 00:59:30.000" ))_
-            , new_DicOf(Array("No", 2,"data", Array(2024,  2, 29, 23,  0, 59), "expect", "2024/02/29 23:00:59.000" ))_
-            , new_DicOf(Array("No", 3,"data", Array(3000,  6, 15, 12, 34,  0), "expect", "3000/06/15 12:34:00.000"))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_6Args_yyyymmdd_hhmmss_Err
-    Dim d
-    d = Array ( _
-            Array(2022,  2, 29,  0, 59, 30) _
-            , Array(2024,  2, 29,  0, "ab", 30) _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-
-Sub Test_Calendar_of_7Args_yyyymmdd_hhmmss_000000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array(1900, 10,  1,  0, 59, 30,  0*60*60 + 59*60 + 30+0.123456), "expect", "1900/10/01 00:59:30.123" ))_
-            , new_DicOf(Array("No", 2,"data", Array(2024,  2, 29, 23,  0, 59, 23*60*60 +  0*60 + 59+0.987654), "expect", "2024/02/29 23:00:59.987" ))_
-            , new_DicOf(Array("No", 3,"data", Array(3000,  6, 15, 12, 34,  0, 12*60*60 + 34*60 +  0+0.000001), "expect", "3000/06/15 12:34:00.000" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_7Args_yyyymmdd_hhmmss_000000_Err
-    Dim d
-    d = Array ( _
-            Array(  1899, 13, 31,  0, 59, 30, 0.123456  ) _
-            , Array(2023, 12, 31,  0, 59, 60, 0.123456  ) _
-            , Array(3000, 12, 31,  0, 59, 30, "0.12a456") _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_7Args_yyyymmdd_hhmmss_000
-    dim a,e,d,i,data
-    d = Array ( _
-            new_DicOf(Array(  "No", 1,"data", Array(1900, 10,  1,  0, 59, 30,  0*60*60 + 59*60 + 30+0.001), "expect", "1900/10/01 00:59:30.001" ))_
-            , new_DicOf(Array("No", 2,"data", Array(2024,  2, 29, 23,  0, 59, 23*60*60 +  0*60 + 59+0.123), "expect", "2024/02/29 23:00:59.123" ))_
-            , new_DicOf(Array("No", 3,"data", Array(3000,  6, 15, 12, 34,  0, 12*60*60 + 34*60 +  0+0.987), "expect", "3000/06/15 12:34:00.987" ))_
-            )
-    
-    For Each i In d
-        data = i.Item("data")
-        e = i.Item("expect")
-        a = (new Calendar).of(data)
-        AssertEqualWithMessage e, a, "No="&i.Item("No")&" data="&cf_toString(i)
-    Next
-End Sub
-Sub Test_Calendar_of_7Args_yyyymmdd_hhmmss_000_Err
-    Dim d
-    d = Array ( _
-            Array(  1899, 13, 31,  0, 59, 30, 0.123  ) _
-            , Array(2023, 12, 31,  0, 59, 60, 0.123  ) _
-            , Array(3000, 12, 31,  0, 59, 30, "0.12a") _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-
-Sub Test_Calendar_of_Other_Err
-    Dim d
-    d = Array ( _
-            Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3") _
-            , Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3", "arg4") _
-            , Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3", "arg4", "arg5") _
-            , Array("2025/02/23 17:09:30", 17*60*60 + 9*60 + 30 + 0.123456, "arg3", "arg4", "arg5", "arg6", "arg7", "arg8") _
-        )
-
-    Dim i
-    For Each i In d
-        Call of_Err_Detail(i)
-    Next
-End Sub
-Sub Test_Calendar_of_ErrImmutable
+Sub Test_Calendar_of_Err_Immutable
     On Error Resume Next
     Dim ao
     Set ao = (new Calendar).ofNow()
@@ -971,19 +677,30 @@ Sub Test_Calendar_ofNow
 End Sub
 
 
-
 '###################################################################################################
 'common
 Sub of_Err_Detail(arg)
     On Error Resume Next
-    Dim ao : Set ao = (new Calendar).of(arg)
+    Dim ao : Set ao = (new Calendar).of(arg("data"))
 
     Dim sSource,sDescription
     sSource = Err.Source
     sDescription = Err.Description
 
-    AssertEqualWithMessage "Calendar+of()", sSource, "a="&ao.toString()&" Err.Source="&sSource&" arg="&cf_toString(arg)
-    AssertMatchWithMessage "^invalid argument.*", sDescription, "a="&ao.toString()&" Err.Description="&sDescription&" arg="&cf_toString(arg)
+    AssertEqualWithMessage "Calendar+of()", sSource, "Err.Source="&sSource&", arg="&cf_toString(arg)
+    AssertEqualWithMessage arg("msg"), sDescription, "Err.Description="&sDescription&", arg="&cf_toString(arg)
+    On Error Goto 0
+End Sub
+Sub of_Err_Detail_Match(arg)
+    On Error Resume Next
+    Dim ao : Set ao = (new Calendar).of(arg("data"))
+
+    Dim sSource,sDescription
+    sSource = Err.Source
+    sDescription = Err.Description
+
+    AssertEqualWithMessage "Calendar+of()", sSource, "Err.Source="&sSource&", arg="&cf_toString(arg)
+    AssertMatchWithMessage arg("msg"), sDescription, "Err.Description="&sDescription&", arg="&cf_toString(arg)
     On Error Goto 0
 End Sub
 

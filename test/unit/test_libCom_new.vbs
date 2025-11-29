@@ -157,7 +157,7 @@ Sub Test_new_CalAt_Err
     
     AssertEqualWithMessage e, a, "ret"
     AssertEqualWithMessage "Calendar+of()", Err.Source, "Err.Source"
-    AssertMatchWithMessage "^invalid argument.*", Err.Description, "Err.Description"
+    AssertEqualWithMessage "DateTime is not a date/time.", Err.Description, "Err.Description"
 End Sub
 
 '###################################################################################################
