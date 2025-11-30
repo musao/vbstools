@@ -84,7 +84,7 @@ Class Calendar
     '***************************************************************************************************
     Public Property Get fractionalPartOfElapsedSeconds()
        fractionalPartOfElapsedSeconds = Null
-       If Not IsNull(PdtDateTime) Then fractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds()
+       If Not this_isInitial() Then fractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds()
     End Property
     
     '***************************************************************************************************
@@ -121,7 +121,7 @@ Class Calendar
     '***************************************************************************************************
     Public Property Get serial()
        serial = Null
-       If Not IsNull(PdtDateTime) Then serial = Cdbl(PdtDateTime)
+       If Not this_isInitial() Then serial = Cdbl(PdtDateTime)
     End Property
     
     '***************************************************************************************************
@@ -231,7 +231,7 @@ Class Calendar
     'Overview                    : 引数に応じたインスタンスを作成する
     'Detailed Description        : this_of()に委譲する
     'Argument
-    '     avArgument             : 引数
+    '     avArg                  : 引数
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
@@ -241,15 +241,15 @@ Class Calendar
     '2024/09/30         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Function of( _
-        byRef avArgument _
+        byRef avArg _
         )
-        Set of = this_of(avArgument, TypeName(Me)&"+of()")
+        Set of = this_of(avArg, TypeName(Me)&"+of()")
     End Function
      
     '***************************************************************************************************
     'Function/Sub Name           : ofNow()
     'Overview                    : 今の日付時刻を取得する
-    'Detailed Description        : this_setData()に委譲する
+    'Detailed Description        : this_of()に委譲する
     'Argument
     '     なし
     'Return Value
@@ -262,7 +262,7 @@ Class Calendar
     '***************************************************************************************************
     Public Function ofNow( _
         )
-        Set ofNow = this_setData(Now(), Timer(), TypeName(Me)&"+ofNow()")
+        Set ofNow = this_of(Array(Now(), Timer()), TypeName(Me)&"+ofNow()")
     End Function
        
 
@@ -270,13 +270,11 @@ Class Calendar
 
 
     '***************************************************************************************************
-    'Function/Sub Name           : this_checkConsistencyOfDateTimeAndElapsedSeconds()
-    'Overview                    : 日時と経過秒の整合をチェックする
-    'Detailed Description        : 経過秒がNullでない場合に、日時の小数部と経過秒の値が整合するかをチェックする
+    'Function/Sub Name           : this_correctDatetimeAndElapsedSeconds()
+    'Overview                    : 日時と経過秒を補正する
+    'Detailed Description        : 経過秒がNullでない場合に、日時の小数部と経過秒の値が整合するよう補正する
     '                              浮動小数点の丸め誤差がある場合は大きい方を採用する
     'Argument
-    '     adtDateTime            : 日時
-    '     adbElapsedSeconds      : 経過秒
     '     asSource               : ソース
     'Return Value
     '     なし
@@ -286,19 +284,14 @@ Class Calendar
     '----------         ----------------------   -------------------------------------------------------
     '2025/11/24         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub this_checkConsistencyOfDateTimeAndElapsedSeconds( _
-        byRef adtDateTime _
-        , byRef adbElapsedSeconds _
-        , byVal asSource _
+    Private Sub this_correctDatetimeAndElapsedSeconds( _
+        byVal asSource _
         )
-        If IsNull(adbElapsedSeconds) Then Exit Sub
-        ast_argTrue IsDate(adtDateTime), asSource, "DateTime is not a date/time."
-        ast_argTrue cf_isNonNegativeNumber(adbElapsedSeconds), asSource, "ElapsedSeconds must be a non-negative number."
-        ast_argTrue Cdbl(adbElapsedSeconds) < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
+        If IsNull(PdbElapsedSeconds) Then Exit Sub
 
         Dim lFromDateTime, lFromElapsedSeconds
-        lFromDateTime = Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime)
-        lFromElapsedSeconds = math_tranc(Cdbl(adbElapsedSeconds))
+        lFromDateTime = Hour(PdtDateTime) * 60 * 60 + Minute(PdtDateTime) * 60 + Second(PdtDateTime)
+        lFromElapsedSeconds = math_tranc(Cdbl(PdbElapsedSeconds))
 
         '24時間分の秒数の差か1秒以内の差でなければ不整合とみなす
         '浮動小数点の丸め誤差がある場合は大きい方を採用する
@@ -306,9 +299,9 @@ Class Calendar
         Case 0
             '整合している場合は何もしない
         case (Cl_NUMBER_OF_SECONDS_IN_A_DAY - 1), -1
-            adtDateTime = DateAdd("s", 1, adtDateTime)
+            PdtDateTime = DateAdd("s", 1, PdtDateTime)
         case (1 - Cl_NUMBER_OF_SECONDS_IN_A_DAY), 1
-            adbElapsedSeconds = Cdbl(Hour(adtDateTime) * 60 * 60 + Minute(adtDateTime) * 60 + Second(adtDateTime))
+            PdbElapsedSeconds = Cdbl(Hour(PdtDateTime) * 60 * 60 + Minute(PdtDateTime) * 60 + Second(PdtDateTime))
         Case Else
             ast_failure asSource, "The date/time and elapsed seconds are inconsistent."
         End Select
@@ -331,7 +324,7 @@ Class Calendar
     Private Function this_clone( _
         )
         Dim oClone : Set oClone = new Calendar
-        If Not IsNull(PdtDateTime) Then oClone.of(Array(PdtDateTime, PdbElapsedSeconds))
+        If Not this_isInitial() Then oClone.of(Array(PdtDateTime, PdbElapsedSeconds))
 
         Set this_clone = oClone
         Set oClone = Nothing
@@ -358,10 +351,10 @@ Class Calendar
         byRef aoTarget _
         )
         this_compareTo = 0
-        If IsNull(PdtDateTime) And IsNull(aoTarget.dateTime) Then Exit Function
+        If this_isInitial() And IsNull(aoTarget.dateTime) Then Exit Function
         
         Dim lResult : lResult = 0
-        If IsNull(PdtDateTime) Or (PdtDateTime < aoTarget.dateTime) Then lResult = -1
+        If this_isInitial() Or (PdtDateTime < aoTarget.dateTime) Then lResult = -1
         If IsNull(aoTarget.dateTime) Or (PdtDateTime > aoTarget.dateTime) Then lResult = 1
         If lResult <> 0 Then
             this_compareTo = lResult
@@ -397,7 +390,7 @@ Class Calendar
         End If
 
         Dim dbResult : dbResult = 0
-        If IsNull(PdtDateTime) Then dbResult = -1 * ((aoTarget.dateTime)*Cl_NUMBER_OF_SECONDS_IN_A_DAY + aoTarget.fractionalPartOfElapsedSeconds)
+        If this_isInitial() Then dbResult = -1 * ((aoTarget.dateTime)*Cl_NUMBER_OF_SECONDS_IN_A_DAY + aoTarget.fractionalPartOfElapsedSeconds)
         If IsNull(aoTarget.dateTime) Then dbResult = PdtDateTime*Cl_NUMBER_OF_SECONDS_IN_A_DAY + this_getfractionalPartOfElapsedSeconds
         If dbResult <> 0 Then
             this_differenceFrom = dbResult
@@ -440,7 +433,7 @@ Class Calendar
         byVal asFormat _
         )
         this_formatAs = "<"&TypeName(Me)&">"&cf_toString(Null)
-        If IsNull(PdtDateTime) Then Exit Function
+        If this_isInitial() Then Exit Function
 
         Const Cl_USE_DATAPART = 0
         Const Cl_USE_FRACTIONAL_SECONDS = 1
@@ -529,28 +522,50 @@ Class Calendar
         If Not IsNull(PdbElapsedSeconds) Then dbFract = math_round(math_fractional(PdbElapsedSeconds),7)
         this_getfractionalPartOfElapsedSeconds = dbFract
     End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_isInitial()
+    'Overview                    : 初期状態かどうかを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     初期状態の場合True、そうでない場合False
+    '---------------------------------------------------------------------------------------------------
+    'Histroy
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/11/29         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_isInitial( _
+        )
+        this_isInitial = IsNull(PdtDateTime)
+    End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : this_of()
     'Overview                    : 引数に応じたインスタンスを作成する
-    'Detailed Description        : this_setData()に委譲する
+    'Detailed Description        : this_ofFor1Arg(),this_ofFor2Args()に委譲する
     '                              以下の入力検査を行う
     '                              1.配列でない場合
-    '                                Date型（小数点以下の秒数があってもよい）
+    '                                this_ofFor1Arg()に委譲する
     '                              2.配列の場合は要素数に応じたチェックを行う
     '                                1-1.要素数が1つ
-    '                                 e(0) -> Date型（小数点以下の秒数があってもよい）
+    '                                 this_ofFor1Arg()に委譲する
     '                                1-2.要素数が2つ
-    '                                 e(0) -> Date型
-    '                                 e(1) -> Double型
+    '                                 this_ofFor2Args()に委譲する
+    '                                  e(0) -> 第1引数(Date型)
+    '                                  e(1) -> 第2引数(Double型)
     '                                1-3.要素数が6つ
-    '                                 e(0-5) -> "e(0)/e(1)/e(2) e(3):e(4):e(5)"がDate型
+    '                                 this_ofFor2Args()に委譲する
+    '                                  e(0-5) -> 第1引数(Date型)
     '                                1-4.要素数が7つ
-    '                                 e(0-5) -> "e(0)/e(1)/e(2) e(3):e(4):e(5)"がDate型
-    '                                 e(6) -> Double型
+    '                                 this_ofFor2Args()に委譲する
+    '                                  e(0-5) -> 第1引数(Date型)
+    '                                  e(6) -> 第2引数(Double型)
     '                                1-5.上記以外の要素数はエラーとする
     'Argument
-    '     avArgument             : 引数
+    '     avArg                  : 引数
     '     asSource               : ソース
     'Return Value
     '     自身のインスタンス
@@ -561,37 +576,38 @@ Class Calendar
     '2025/02/02         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_of( _
-        byRef avArgument _
+        byRef avArg _
         , byVal asSource _
         )
+        ast_argTrue this_isInitial(), asSource, "Because it is an immutable variable, its value cannot be changed."
 
-        If Not(IsArray(avArgument)) Then
+        If Not(IsArray(avArg)) Then
         '配列でない場合
-            this_ofForOneArg avArgument, asSource
-        ElseIf new_Arr().hasElement(avArgument) Then
+            this_ofFor1Arg avArg, asSource
+        ElseIf new_Arr().hasElement(avArg) Then
         '配列の要素がある場合
-            Dim e : e = avArgument
+            Dim e : e = avArg
             Select Case Ubound(e)
                 Case 0:
-                    this_ofForOneArg e(0), asSource
+                    this_ofFor1Arg e(0), asSource
                 Case 1:
-                    this_setData e(0), e(1), asSource
+                    this_ofFor2Args e(0), e(1), asSource
                 Case 5:
-                    this_setDateTime e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5), asSource
+                    this_ofFor2Args e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5), Null, asSource
                 Case 6:
-                    this_setData e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5), e(6), asSource
+                    this_ofFor2Args e(0)&"/"&e(1)&"/"&e(2)&" "&e(3)&":"&e(4)&":"&e(5), e(6), asSource
                 Case Else:
-                    ast_failure asSource, "invalid argument. " & cf_toString(avArgument)
+                    ast_failure asSource, "invalid argument. " & cf_toString(avArg)
             End Select
         Else
-            ast_failure asSource, "invalid argument. " & cf_toString(avArgument)
+            ast_failure asSource, "invalid argument. " & cf_toString(avArg)
         End If
 
         Set this_of = Me
     End Function
 
     '***************************************************************************************************
-    'Function/Sub Name           : this_ofForOneArg()
+    'Function/Sub Name           : this_ofFor1Arg()
     'Overview                    : 引数が1つの場合のインスタンス作成処理
     'Detailed Description        : 工事中
     'Argument
@@ -605,22 +621,17 @@ Class Calendar
     '----------         ----------------------   -------------------------------------------------------
     '2025/02/11         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub this_ofForOneArg( _
+    Private Sub this_ofFor1Arg( _
         byVal avDateTime _
         , byVal asSource _
         )
         Dim oRe : Set oRe = new_Re("^(\s?(?=.*\d)(?:\d{1,4}([-/])\d{1,4}\2\d{1,4})?(?:\s+)?(?:\d{1,2}([-:.])\d{1,2}\3\d{1,2})?)\.([^.]+)$", "")
-'        Dim oRe : Set oRe = new_Re("^([^.]+)\.(\d+)$", "")
-'        Dim oRe : Set oRe = new_Re("^(.+)\.(.+)$", "")
         If oRe.Test(avDateTime) Then
             Dim dtDateTime : dtDateTime = oRe.Replace(avDateTime, "$1")
             this_setDateTime dtDateTime, asSource
             
             Dim lElapsedSecondsByDt : lElapsedSecondsByDt = Hour(PdtDateTime) * 60 * 60 + Minute(PdtDateTime) * 60 + Second(PdtDateTime)
-            PdtDateTime = Null '一旦Nullにすることで、this_setData内の整合チェックを通過させる
-
-            this_setData dtDateTime, Cstr(lElapsedSecondsByDt) & "." & oRe.Replace(avDateTime, "$4"), asSource
-'            this_setData dtDateTime, Cstr(lElapsedSecondsByDt) & "." & oRe.Replace(avDateTime, "$2"), asSource
+            this_setElapsedSeconds Cstr(lElapsedSecondsByDt) & "." & oRe.Replace(avDateTime, "$4"), asSource
         Else
             this_setDateTime avDateTime, asSource
         End If
@@ -628,7 +639,7 @@ Class Calendar
     End Sub
 
     '***************************************************************************************************
-    'Function/Sub Name           : this_setData()
+    'Function/Sub Name           : this_ofFor2Args()
     'Overview                    : データを設定する
     'Detailed Description        : 工事中
     'Argument
@@ -636,28 +647,24 @@ Class Calendar
     '     adbElapsedSeconds      : 経過秒
     '     asSource               : ソース
     'Return Value
-    '     自身のインスタンス
+    '     なし
     '---------------------------------------------------------------------------------------------------
     'Histroy
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2024/09/30         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_setData( _
+    Private Sub this_ofFor2Args( _
         byVal adtDateTime _
         , byVal adbElapsedSeconds _
         , byVal asSource _
         )
-        ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
-
-        '日時（adtDateTime）と経過秒（adbElapsedSeconds）の整合をチェックする
-        this_checkConsistencyOfDateTimeAndElapsedSeconds adtDateTime, adbElapsedSeconds, asSource
-
         this_setDateTime adtDateTime, asSource
         this_setElapsedSeconds adbElapsedSeconds, asSource
-        
-        Set this_setData = Me
-    End Function
+
+        '日時（adtDateTime）と経過秒（adbElapsedSeconds）の整合をチェックする
+        this_correctDatetimeAndElapsedSeconds asSource
+    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : this_setDateTime()
@@ -678,7 +685,7 @@ Class Calendar
         byVal adtDateTime _
         , byVal asSource _
         )
-        ast_argNull PdtDateTime, asSource, "Because it is an immutable variable, its value cannot be changed."
+        ast_argTrue this_isInitial(), asSource, "Because it is an immutable variable, its value cannot be changed."
         ast_argTrue IsDate(adtDateTime), asSource, "DateTime is not a date/time."
         PdtDateTime = Cdate(adtDateTime)
     End Sub
@@ -703,6 +710,7 @@ Class Calendar
         , byVal asSource _
         )
         If IsNull(adbElapsedSeconds) Then Exit Sub
+
         ast_argTrue cf_isNonNegativeNumber(adbElapsedSeconds), asSource, "ElapsedSeconds must be a non-negative number."
         ast_argTrue Cdbl(adbElapsedSeconds) < Cl_NUMBER_OF_SECONDS_IN_A_DAY, asSource, "ElapsedSeconds must be within the number of seconds in a day."
 
