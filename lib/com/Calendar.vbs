@@ -640,7 +640,7 @@ Class Calendar
 
     '***************************************************************************************************
     'Function/Sub Name           : this_ofFor2Args()
-    'Overview                    : データを設定する
+    'Overview                    : 引数が2つの場合のインスタンス作成処理
     'Detailed Description        : 工事中
     'Argument
     '     adtDateTime            : 日時
