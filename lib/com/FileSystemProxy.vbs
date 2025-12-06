@@ -3,7 +3,7 @@
 'Overview                    : File/Folderオブジェクトのプロキシクラス
 'Detailed Description        : File/Folderオブジェクトと同じIFを提供する
 '---------------------------------------------------------------------------------------------------
-'Histroy
+'History
 'Date               Name                     Reason for Changes
 '----------         ----------------------   -------------------------------------------------------
 '2023/11/26         Y.Fujii                  First edition
@@ -21,7 +21,7 @@ Class FileSystemProxy
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -42,7 +42,7 @@ Class FileSystemProxy
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -61,7 +61,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
@@ -79,7 +79,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
@@ -97,7 +97,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -115,7 +115,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの拡張子を除いた名前
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -133,7 +133,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの最終更新日時
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -151,7 +151,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの拡張子
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -169,7 +169,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
@@ -187,7 +187,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
@@ -205,7 +205,7 @@ Class FileSystemProxy
     'Return Value
     '     配下にファイルを1つ以上持つか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/26         Y.Fujii                  First edition
@@ -223,7 +223,7 @@ Class FileSystemProxy
     'Return Value
     '     配下にファイルを1つ以上持つか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
@@ -241,7 +241,7 @@ Class FileSystemProxy
     'Return Value
     '     配下にアイテムを1つ以上持つか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/29         Y.Fujii                  First edition
@@ -259,7 +259,7 @@ Class FileSystemProxy
     'Return Value
     '     ブラウザーまたはWindowsエクスプローラーフレーム内でアイテムをホストできるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -277,7 +277,7 @@ Class FileSystemProxy
     'Return Value
     '     項目がファイルシステムの一部であるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -296,7 +296,7 @@ Class FileSystemProxy
     'Return Value
     '     アイテムがフォルダであるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -314,7 +314,7 @@ Class FileSystemProxy
     'Return Value
     '     項目がショートカットであるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -332,7 +332,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -350,7 +350,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの名前
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -368,7 +368,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの親フォルダの当クラスのインスタンス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -386,7 +386,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダのフルパス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -404,7 +404,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/25         Y.Fujii                  First edition
@@ -422,7 +422,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/25         Y.Fujii                  First edition
@@ -440,7 +440,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/17         Y.Fujii                  First edition
@@ -458,7 +458,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダのサイズ（バイト単位）
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -476,7 +476,7 @@ Class FileSystemProxy
     'Return Value
     '     変換した文字列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -494,7 +494,7 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの種類
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/11/26         Y.Fujii                  First edition
@@ -512,7 +512,7 @@ Class FileSystemProxy
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2023/12/19         Y.Fujii                  First edition
@@ -533,7 +533,7 @@ Class FileSystemProxy
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/23         Y.Fujii                  First edition
@@ -555,14 +555,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの拡張子を除いた名前
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_baseName()
         this_baseName = Null
-        If this_notInInitial() Then this_baseName = new_Fso().GetBaseName(PsPath)
+        If Not this_isInitial() Then this_baseName = new_Fso().GetBaseName(PsPath)
     End Function
    
     '***************************************************************************************************
@@ -574,14 +574,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの最終更新日時
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_dateLastModified()
         this_dateLastModified = Null
-        If this_notInInitial() Then this_dateLastModified = PoFolderItem.ModifyDate
+        If Not this_isInitial() Then this_dateLastModified = PoFolderItem.ModifyDate
     End Function
     
     '***************************************************************************************************
@@ -593,14 +593,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの拡張子
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_extension()
         this_extension = Null
-        If this_notInInitial() Then this_extension = new_Fso().GetExtensionName(PsPath)
+        If Not this_isInitial() Then this_extension = new_Fso().GetExtensionName(PsPath)
     End Function
     
     '***************************************************************************************************
@@ -612,7 +612,7 @@ Class FileSystemProxy
     'Return Value
     '     配下にアイテムを1つ以上持つか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/29         Y.Fujii                  First edition
@@ -621,7 +621,7 @@ Class FileSystemProxy
         byVal alItemType _
         )
         this_hasItem = Null
-        If Not this_notInInitial() Then Exit Function
+        If this_isInitial() Then Exit Function
 
         this_hasItem = False
         Select Case alItemType  
@@ -663,7 +663,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -673,7 +673,7 @@ Class FileSystemProxy
         , byVal alItemType _
         )
         this_items=Null
-        If Not this_notInInitial() Then Exit Function
+        If this_isInitial() Then Exit Function
 
         this_items = Array()
         If Not this_hasItem(Empty) Then Exit Function
@@ -698,7 +698,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/26         Y.Fujii                  First edition
@@ -751,7 +751,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -790,7 +790,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
@@ -820,7 +820,7 @@ Class FileSystemProxy
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/23         Y.Fujii                  First edition
@@ -866,32 +866,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの名前
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_name()
         this_name = Null
-        If this_notInInitial() Then this_name = new_Fso().GetFileName(PsPath)
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_notInInitial()
-    'Overview                    : 当インスタンスが初期状態でないか否かを返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     当インスタンスが初期状態でないか否か
-    '---------------------------------------------------------------------------------------------------
-    'Histroy
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/20         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_notInInitial()
-        this_notInInitial = Not(PoFolderItem Is Nothing)
+        If Not this_isInitial() Then this_name = new_Fso().GetFileName(PsPath)
     End Function
     
     '***************************************************************************************************
@@ -903,14 +885,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの親フォルダの当クラスのインスタンス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_parentFolder()
         this_parentFolder = Null
-        If Not this_notInInitial() Then Exit Function
+        If this_isInitial() Then Exit Function
         If PoParent Is Nothing Then Set PoParent = new_FspOf(new_Fso().GetParentFolderName(PsPath))
         Set this_parentFolder = PoParent
     End Function
@@ -924,14 +906,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダのフルパス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_path()
         this_path = Null
-        If this_notInInitial() Then this_path = PsPath
+        If Not this_isInitial() Then this_path = PsPath
     End Function
     
     '***************************************************************************************************
@@ -943,7 +925,7 @@ Class FileSystemProxy
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/23         Y.Fujii                  First edition
@@ -968,7 +950,7 @@ Class FileSystemProxy
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/17         Y.Fujii                  First edition
@@ -977,7 +959,7 @@ Class FileSystemProxy
         byVal alItemType _
         )
         this_selfAndAllItems = Null
-        If Not this_notInInitial() Then Exit Function
+        If this_isInitial() Then Exit Function
 
         Dim vRet : vRet=Array()
         If alItemType=Cl_FILE Then
@@ -1000,14 +982,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダのサイズ（バイト単位）
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_size()
         this_size = Null
-        If Not this_notInInitial() Then Exit Function
+        If this_isInitial() Then Exit Function
 
         If new_Fso().FolderExists(PsPath) Then
         'フォルダの場合
@@ -1027,14 +1009,14 @@ Class FileSystemProxy
     'Return Value
     '     ファイル／フォルダの種類
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_type()
         this_type = Null
-        If this_notInInitial() Then this_type = PoFolderItem.Type
+        If Not this_isInitial() Then this_type = PoFolderItem.Type
     End Function
     
     '***************************************************************************************************
@@ -1046,14 +1028,14 @@ Class FileSystemProxy
     'Return Value
     '     ブラウザーまたはWindowsエクスプローラーフレーム内でアイテムをホストできるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_isBrowsable()
         this_isBrowsable = Null
-        If this_notInInitial() Then this_isBrowsable = PoFolderItem.IsBrowsable
+        If Not this_isInitial() Then this_isBrowsable = PoFolderItem.IsBrowsable
     End Function
     
     '***************************************************************************************************
@@ -1065,14 +1047,14 @@ Class FileSystemProxy
     'Return Value
     '     項目がファイルシステムの一部であるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_isFileSystem()
         this_isFileSystem = Null
-        If this_notInInitial() Then this_isFileSystem = PoFolderItem.IsFileSystem
+        If Not this_isInitial() Then this_isFileSystem = PoFolderItem.IsFileSystem
     End Function
     
     '***************************************************************************************************
@@ -1085,14 +1067,32 @@ Class FileSystemProxy
     'Return Value
     '     アイテムがフォルダであるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_isFolder()
         this_isFolder = Null
-        If this_notInInitial() Then this_isFolder = new_Fso().FolderExists(PsPath)
+        If Not this_isInitial() Then this_isFolder = new_Fso().FolderExists(PsPath)
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_isInitial()
+    'Overview                    : 当インスタンスが初期状態か返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     結果 True:初期状態 / False:初期状態でない
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/12/06         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_isInitial()
+        this_isInitial = (PoFolderItem Is Nothing)
     End Function
     
     '***************************************************************************************************
@@ -1104,14 +1104,14 @@ Class FileSystemProxy
     'Return Value
     '     項目がショートカットであるかどうか
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_isLink()
         this_isLink = Null
-        If this_notInInitial() Then this_isLink = PoFolderItem.IsLink
+        If Not this_isInitial() Then this_isLink = PoFolderItem.IsLink
     End Function
     
     '***************************************************************************************************
@@ -1123,7 +1123,7 @@ Class FileSystemProxy
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -1156,7 +1156,7 @@ Class FileSystemProxy
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
@@ -1178,7 +1178,7 @@ Class FileSystemProxy
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
-    'Histroy
+    'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/16         Y.Fujii                  First edition
