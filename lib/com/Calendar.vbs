@@ -143,6 +143,46 @@ Class Calendar
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : addMilliSeconds()
+    'Overview                    : 指定ミリ秒数を加算または減算した新しいインスタンスを返す
+    'Detailed Description        : this_addDate()に委譲する
+    'Argument
+    '     avVal                  : 指定ミリ秒数
+    'Return Value
+    '     指定ミリ秒数を加算または減算した新しいインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/12/07         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function addMilliSeconds( _
+        byVal avVal _
+        )
+        cf_bind addMilliSeconds, this_addDate("ms", avVal, TypeName(Me)&"+addMilliSeconds()")
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : addSeconds()
+    'Overview                    : 指定秒数を加算または減算した新しいインスタンスを返す
+    'Detailed Description        : this_addDate()に委譲する
+    'Argument
+    '     avVal                  : 指定秒数
+    'Return Value
+    '     指定秒数を加算または減算した新しいインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/12/07         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function addSeconds( _
+        byVal avVal _
+        )
+        cf_bind addSeconds, this_addDate("s", avVal, TypeName(Me)&"+addSeconds()")
+    End Function
+    
+    '***************************************************************************************************
     'Function/Sub Name           : clone()
     'Overview                    : 自身と同じ内容の新しいインスタンスを作る
     'Detailed Description        : 工事中
@@ -245,7 +285,7 @@ Class Calendar
         )
         Set of = this_of(avArg, TypeName(Me)&"+of()")
     End Function
-     
+    
     '***************************************************************************************************
     'Function/Sub Name           : ofNow()
     'Overview                    : 今の日付時刻を取得する
@@ -264,10 +304,78 @@ Class Calendar
         )
         Set ofNow = this_of(Array(Now(), Timer()), TypeName(Me)&"+ofNow()")
     End Function
-       
 
 
+    
 
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_addDate()
+    'Overview                    : 指定された日付に、指定した時間間隔（年、月、日、時間など）を加算
+    '                              または減算して、新しい日付のインスタンスを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     asInterval             : 時間間隔を表す文字列
+    '                               "yyyy" 年
+    '                               "q"    四半期
+    '                               "m"    月
+    '                               "w"    週
+    '                               "d"    日
+    '                               "h"    時
+    '                               "n"    分
+    '                               "s"    秒
+    '                               "ms"   ミリ秒
+    '     avVal                  : 時間間隔の数値
+    '     asSource               : ソース
+    'Return Value
+    '     指定秒数を加算または減算した新しいインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/12/07         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_addDate( _
+        byVal asInterval _
+        , byVal avVal _
+        , byVal asSource _
+        )
+        this_addDate = Null
+        If this_isInitial() Then Exit Function
+        
+        Dim sInterval, boFlg : boFlg = False
+        For Each sInterval In Array("yyyy", "q", "m", "w", "d", "h", "n", "s", "ms")
+            If cf_isSame(asInterval, sInterval) Then
+                boFlg = True : Exit For
+            End If
+        Next
+        ast_argTrue boFlg, asSource, "The value of Interval is invalid."
+        ast_argTrue cf_isInteger(avVal), asSource, "The value of avVal must be an integer."
+
+        Dim dtDateTime
+        If cf_isSame(asInterval, "ms") Then
+            dtDateTime = DateAdd("s", avVal \ 1000, PdtDateTime)
+        Else
+            dtDateTime = DateAdd(asInterval, avVal, PdtDateTime)
+        End If
+
+        dbElapsedSeconds = Hour(dtDateTime) * 60 * 60 + Minute(dtDateTime) * 60 + Second(dtDateTime)
+
+        Dim dbFractionalPartOfElapsedSeconds : dbFractionalPartOfElapsedSeconds = Null
+        If cf_isSame(asInterval, "ms") Then
+            dbFractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds() + (avVal Mod 1000) / 1000
+            if dbFractionalPartOfElapsedSeconds >= 1 Then
+                dtDateTime = DateAdd("s", 1, dtDateTime)
+                dbFractionalPartOfElapsedSeconds = dbFractionalPartOfElapsedSeconds - 1
+            End If
+            If dbFractionalPartOfElapsedSeconds < 0 Then dbFractionalPartOfElapsedSeconds = dbFractionalPartOfElapsedSeconds + 1
+        ElseIf Not IsNull(PdbElapsedSeconds) Then
+            dbFractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds()
+        End if
+        If Not IsNull(dbFractionalPartOfElapsedSeconds) Then dbElapsedSeconds = dbElapsedSeconds + dbFractionalPartOfElapsedSeconds
+
+        Set this_addDate = (new Calendar).of(Array(dtDateTime, dbElapsedSeconds))
+    End Function
 
     '***************************************************************************************************
     'Function/Sub Name           : this_correctDatetimeAndElapsedSeconds()
