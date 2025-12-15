@@ -152,24 +152,21 @@ Sub Test_Calendar_toString
 End Sub
 
 '###################################################################################################
-'Calendar.addSeconds()
-Sub Test_Calendar_addSeconds_initial
+'Calendar.addMilliSeconds()
+Sub Test_Calendar_addMilliSeconds_initial
     dim ao : set ao = (new Calendar)
 
-    AssertEqualWithMessage Null, ao.addSeconds(10), "addSeconds() on initial Calendar"
+    AssertEqualWithMessage Null, ao.addMilliSeconds(10), "addMilliSeconds() on initial Calendar"
 End Sub
-
-'###################################################################################################
-'Calendar.addMilliSeconds()
-Sub Test_Calendar_addMilliSeconds
+Sub Test_Calendar_addMilliSeconds_normal
     dim data
     data = Array ( _
-            new_DicOf(Array(  "Case", "addMilliSeconds-" & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",        10, "expect", "1900/10/01 00:59:30.133")) _
-            , new_DicOf(Array("Case", "addMilliSeconds-" & "2", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",       -10, "expect", "1900/10/01 00:59:30.113")) _
-            , new_DicOf(Array("Case", "addMilliSeconds-" & "3", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",  86400000, "expect", "2024/03/01 23:59:59.987")) _
-            , new_DicOf(Array("Case", "addMilliSeconds-" & "4", "data", Array("2026/01/01 00:00:01",  0*60*60 +  0*60 +  1+0.000000), "value", -86400000, "expect", "2025/12/31 00:00:01.000")) _
-            , new_DicOf(Array("Case", "addMilliSeconds-" & "5", "data", Array("2025-12-31 23:59:51", Null)                          , "value",        10, "expect", "2025/12/31 23:59:51.010")) _
-            , new_DicOf(Array("Case", "addMilliSeconds-" & "6", "data", Array("2026/01/01 00:00:01", Null)                          , "value", -86400000, "expect", "2025/12/31 00:00:01.000")) _
+            new_DicOf(Array(  "Case", "addMilliSeconds_normal-" & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",        10, "expect", "1900/10/01 00:59:30.133")) _
+            , new_DicOf(Array("Case", "addMilliSeconds_normal-" & "2", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",       -10, "expect", "1900/10/01 00:59:30.113")) _
+            , new_DicOf(Array("Case", "addMilliSeconds_normal-" & "3", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",  86400000, "expect", "2024/03/01 23:59:59.987")) _
+            , new_DicOf(Array("Case", "addMilliSeconds_normal-" & "4", "data", Array("2026/01/01 00:00:01",  0*60*60 +  0*60 +  1+0.000000), "value", -86400000, "expect", "2025/12/31 00:00:01.000")) _
+            , new_DicOf(Array("Case", "addMilliSeconds_normal-" & "5", "data", Array("2025-12-31 23:59:51", Null)                          , "value",        10, "expect", "2025/12/31 23:59:51.010")) _
+            , new_DicOf(Array("Case", "addMilliSeconds_normal-" & "6", "data", Array("2026/01/01 00:00:01", Null)                          , "value", -86400000, "expect", "2025/12/31 00:00:01.000")) _
             )
     
     dim a,e,i,d,v
@@ -182,18 +179,46 @@ Sub Test_Calendar_addMilliSeconds
         AssertEqualWithMessage e, a.toString(), "Case="&i("Case")&" data="&cf_toString(i)
     Next
 End Sub
+Sub Test_Calendar_addMilliSeconds_error
+    dim data
+    data = Array ( _
+            new_DicOf(Array(  "Case", "addMilliSeconds_error-" & "1", "data", Array("2025/12/15 21:16:27", 21*60*60 + 16*60 + 27+0.987654), "value", 1.1, "Err.Description", "The value must be an integer.")) _
+            , new_DicOf(Array("Case", "addMilliSeconds_error-" & "2", "data", Array("2025/12/15 21:16:27", Null)                          , "value", "a", "Err.Description", "The value must be an integer.")) _
+            )
+    
+    dim a,e,i,d,v,src,des
+    For Each i In data
+        d = i("data")
+        v = i("value")
+        e = i("Err.Description")
+        
+        On Error Resume Next
+        cf_bind a, (new Calendar).of(d).addMilliSeconds(v)
+        src = Err.Source : des = Err.Description
+
+        AssertEqualWithMessage Null, a, "Case="&i("Case")&", data="&cf_toString(i)
+        AssertEqualWithMessage "Calendar+addMilliSeconds()", src, "Case="&i("Case")&" Err.Source, data="&cf_toString(i)
+        AssertEqualWithMessage e, des, "Case="&i("Case")&" Err.Description, data="&cf_toString(i)
+        On Error GoTo 0
+    Next
+End Sub
 
 '###################################################################################################
 'Calendar.addSeconds()
-Sub Test_Calendar_addSeconds
+Sub Test_Calendar_addSeconds_initial
+    dim ao : set ao = (new Calendar)
+
+    AssertEqualWithMessage Null, ao.addSeconds(10), "addSeconds() on initial Calendar"
+End Sub
+Sub Test_Calendar_addSeconds_normal
     dim data
     data = Array ( _
-            new_DicOf(Array(  "Case", "addSeconds-" & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",     10, "expect", "1900/10/01 00:59:40.123")) _
-            , new_DicOf(Array("Case", "addSeconds-" & "2", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",    -10, "expect", "1900/10/01 00:59:20.123")) _
-            , new_DicOf(Array("Case", "addSeconds-" & "3", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",  86400, "expect", "2024/03/01 23:59:59.987")) _
-            , new_DicOf(Array("Case", "addSeconds-" & "4", "data", Array("2026/01/01 00:00:01",  0*60*60 +  0*60 +  1+0.000000), "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
-            , new_DicOf(Array("Case", "addSeconds-" & "5", "data", Array("2025-12-31 23:59:51", Null)                          , "value",     10, "expect", "2026/01/01 00:00:01.000")) _
-            , new_DicOf(Array("Case", "addSeconds-" & "6", "data", Array("2026/01/01 00:00:01", Null)                          , "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
+            new_DicOf(Array(  "Case", "addSeconds_normal-" & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",     10, "expect", "1900/10/01 00:59:40.123")) _
+            , new_DicOf(Array("Case", "addSeconds_normal-" & "2", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",    -10, "expect", "1900/10/01 00:59:20.123")) _
+            , new_DicOf(Array("Case", "addSeconds_normal-" & "3", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",  86400, "expect", "2024/03/01 23:59:59.987")) _
+            , new_DicOf(Array("Case", "addSeconds_normal-" & "4", "data", Array("2026/01/01 00:00:01",  0*60*60 +  0*60 +  1+0.000000), "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
+            , new_DicOf(Array("Case", "addSeconds_normal-" & "5", "data", Array("2025-12-31 23:59:51", Null)                          , "value",     10, "expect", "2026/01/01 00:00:01.000")) _
+            , new_DicOf(Array("Case", "addSeconds_normal-" & "6", "data", Array("2026/01/01 00:00:01", Null)                          , "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
             )
     
     dim a,e,i,d,v
@@ -207,14 +232,27 @@ Sub Test_Calendar_addSeconds
     Next
 End Sub
 Sub Test_Calendar_addSeconds_error
-    dim ao : set ao = (new Calendar).ofNow()
+    dim data
+    data = Array ( _
+            new_DicOf(Array(  "Case", "addSeconds_error-" & "1", "data", Array("2025/12/15 21:16:27", 21*60*60 + 16*60 + 27+0.987654), "value", 1.5, "Err.Description", "The value must be an integer.")) _
+            , new_DicOf(Array("Case", "addSeconds_error-" & "2", "data", Array("2025/12/15 21:16:27", Null)                          , "value", "$", "Err.Description", "The value must be an integer.")) _
+            )
+    
+    dim a,e,i,d,v,src,des
+    For Each i In data
+        d = i("data")
+        v = i("value")
+        e = i("Err.Description")
+        
+        On Error Resume Next
+        cf_bind a, (new Calendar).of(d).addSeconds(v)
+        src = Err.Source : des = Err.Description
 
-    On Error Resume Next
-    Dim bo: cf_bind bo, ao.addSeconds(10.5)
-    AssertEqualWithMessage Null, bo, "ao.addSeconds(10.5)"
-    AssertEqualWithMessage "Calendar+addSeconds()", Err.Source, "Err.Source"
-    AssertEqualWithMessage "The value of avVal must be an integer.", Err.Description, "Err.Description"
-    On Error GoTo 0
+        AssertEqualWithMessage Null, a, "Case="&i("Case")&", data="&cf_toString(i)
+        AssertEqualWithMessage "Calendar+addSeconds()", src, "Case="&i("Case")&" Err.Source, data="&cf_toString(i)
+        AssertEqualWithMessage e, des, "Case="&i("Case")&" Err.Description, data="&cf_toString(i)
+        On Error GoTo 0
+    Next
 End Sub
 
 '###################################################################################################

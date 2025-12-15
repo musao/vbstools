@@ -343,6 +343,7 @@ Class Calendar
         this_addDate = Null
         If this_isInitial() Then Exit Function
         
+        '引数の妥当性チェック
         Dim sInterval, boFlg : boFlg = False
         For Each sInterval In Array("yyyy", "q", "m", "w", "d", "h", "n", "s", "ms")
             If cf_isSame(asInterval, sInterval) Then
@@ -350,8 +351,9 @@ Class Calendar
             End If
         Next
         ast_argTrue boFlg, asSource, "The value of Interval is invalid."
-        ast_argTrue cf_isInteger(avVal), asSource, "The value of avVal must be an integer."
+        ast_argTrue cf_isInteger(avVal), asSource, "The value must be an integer."
 
+        '日時の算出
         Dim dtDateTime
         If cf_isSame(asInterval, "ms") Then
             dtDateTime = DateAdd("s", avVal \ 1000, PdtDateTime)
@@ -359,21 +361,38 @@ Class Calendar
             dtDateTime = DateAdd(asInterval, avVal, PdtDateTime)
         End If
 
+        '経過秒の算出
         dbElapsedSeconds = Hour(dtDateTime) * 60 * 60 + Minute(dtDateTime) * 60 + Second(dtDateTime)
 
+        '経過秒の小数部の算出
         Dim dbFractionalPartOfElapsedSeconds : dbFractionalPartOfElapsedSeconds = Null
         If cf_isSame(asInterval, "ms") Then
+        '時間間隔の指定がミリ秒の場合
+            
+            '経過秒の小数部に補正を加える
             dbFractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds() + (avVal Mod 1000) / 1000
-            if dbFractionalPartOfElapsedSeconds >= 1 Then
+            
+            If dbFractionalPartOfElapsedSeconds >= 1 Then
+            '経過秒の小数部が1以上の場合
+                '日時と過秒数を+1秒補正
                 dtDateTime = DateAdd("s", 1, dtDateTime)
+                dbElapsedSeconds = dbElapsedSeconds + 1
+                '経過秒の小数部を-1秒補正
                 dbFractionalPartOfElapsedSeconds = dbFractionalPartOfElapsedSeconds - 1
             End If
+            
+            '経過秒の小数部が負の場合は+1秒補正
             If dbFractionalPartOfElapsedSeconds < 0 Then dbFractionalPartOfElapsedSeconds = dbFractionalPartOfElapsedSeconds + 1
+
         ElseIf Not IsNull(PdbElapsedSeconds) Then
+        '時間間隔の指定がミリ秒以外で自身の経過秒がNullでない場合は経過秒の小数部をそのまま使用する
             dbFractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds()
         End if
+        
+        '経過秒の小数部がNullでない（時間間隔の指定がミリ秒か自身の経過秒がNullでない）場合は経過秒を再計算する
         If Not IsNull(dbFractionalPartOfElapsedSeconds) Then dbElapsedSeconds = dbElapsedSeconds + dbFractionalPartOfElapsedSeconds
 
+        '新しいインスタンスを作成して返す
         Set this_addDate = (new Calendar).of(Array(dtDateTime, dbElapsedSeconds))
     End Function
 
@@ -776,7 +795,7 @@ Class Calendar
 
     '***************************************************************************************************
     'Function/Sub Name           : this_setDateTime()
-    'Overview                    : PdtDateTimeのセッター
+    'Overview                    : 日時（PdtDateTime）のセッター
     'Detailed Description        : 工事中
     'Argument
     '     adtDateTime            : 日時
@@ -800,7 +819,7 @@ Class Calendar
 
     '***************************************************************************************************
     'Function/Sub Name           : this_setElapsedSeconds()
-    'Overview                    : PadbElapsedSecondsのセッター
+    'Overview                    : 経過秒（PadbElapsedSeconds）のセッター
     'Detailed Description        : 工事中
     'Argument
     '     adbElapsedSeconds      : 経過秒
