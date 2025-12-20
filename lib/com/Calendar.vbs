@@ -370,19 +370,23 @@ Class Calendar
         '時間間隔の指定がミリ秒の場合
             
             '経過秒の小数部に補正を加える
-            dbFractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds() + (avVal Mod 1000) / 1000
+            Dim tmpVal, correctVal
+            tmpVal = this_getfractionalPartOfElapsedSeconds() + (avVal Mod 1000) / 1000
+            correctVal = 0
             
-            If dbFractionalPartOfElapsedSeconds >= 1 Then
-            '経過秒の小数部が1以上の場合
-                '日時と過秒数を+1秒補正
-                dtDateTime = DateAdd("s", 1, dtDateTime)
-                dbElapsedSeconds = dbElapsedSeconds + 1
-                '経過秒の小数部を-1秒補正
-                dbFractionalPartOfElapsedSeconds = dbFractionalPartOfElapsedSeconds - 1
+            '補正値の算出
+            If tmpVal >= 1 Then
+            '経過秒の小数部が1以上の場合は補正値：-1
+                correctVal = -1
+            ElseIf tmpVal < 0 Then
+            '経過秒の小数部が負値の場合は補正値：+1
+                correctVal = 1
             End If
-            
-            '経過秒の小数部が負の場合は+1秒補正
-            If dbFractionalPartOfElapsedSeconds < 0 Then dbFractionalPartOfElapsedSeconds = dbFractionalPartOfElapsedSeconds + 1
+
+            '補正の適用
+            dtDateTime = DateAdd("s", (-1*correctVal), dtDateTime)
+            dbElapsedSeconds = dbElapsedSeconds - correctVal
+            dbFractionalPartOfElapsedSeconds = tmpVal + correctVal
 
         ElseIf Not IsNull(PdbElapsedSeconds) Then
         '時間間隔の指定がミリ秒以外で自身の経過秒がNullでない場合は経過秒の小数部をそのまま使用する
