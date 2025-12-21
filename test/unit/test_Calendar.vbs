@@ -159,20 +159,20 @@ Sub Test_Calendar_addMilliSeconds_initial
     AssertEqualWithMessage Null, ao.addMilliSeconds(10), "addMilliSeconds() on initial Calendar"
 End Sub
 Sub Test_Calendar_addMilliSeconds_normal
-    dim data
+    Dim data, caseName : caseName = "addMilliSeconds_normal_"
     data = Array ( _
-            new_DicOf(Array(  "Case", "addMilliSeconds_normal_" & "1-1-1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",        10, "expect", "1900/10/01 00:59:30.133")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "1-1-2", "data", Array("1900/10/01 00:59:30", Null)                          , "value",        10, "expect", "1900/10/01 00:59:30.010")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "1-2-1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",       -10, "expect", "1900/10/01 00:59:30.113")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "1-2-2", "data", Array("1900/10/01 00:59:30", Null)                          , "value",       -10, "expect", "1900/10/01 00:59:29.990")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "2-1-1", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",      1010, "expect", "2024/03/01 00:00:00.997")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "2-1-2", "data", Array("2024/02/29 23:59:59", Null)                          , "value",      1010, "expect", "2024/03/01 00:00:00.010")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "2-2-1", "data", Array("2024/03/01 00:00:00",  0*60*60 +  0*60 +  0+0.987654), "value",     -1010, "expect", "2024/02/29 23:59:59.977")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "2-2-2", "data", Array("2024/03/01 00:00:00", Null)                          , "value",     -1010, "expect", "2024/02/29 23:59:58.990")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "3-1-1", "data", Array("2025-12-31 12:34:56", 12*60*60 + 34*60 + 56+0.123456), "value",  86400000, "expect", "2026/01/01 12:34:56.123")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "3-1-2", "data", Array("2025-12-31 12:34:56", Null)                          , "value",  86400000, "expect", "2026/01/01 12:34:56.000")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "3-2-1", "data", Array("2026-01-01 12:34:56", 12*60*60 + 34*60 + 56+0.123456), "value", -86400000, "expect", "2025/12/31 12:34:56.123")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_normal_" & "3-2-2", "data", Array("2026-01-01 12:34:56", Null)                          , "value", -86400000, "expect", "2025/12/31 12:34:56.000")) _
+            new_DicOf(Array(  "Case", caseName & "1-1-1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",        10, "expect", "1900/10/01 00:59:30.133")) _
+            , new_DicOf(Array("Case", caseName & "1-1-2", "data", Array("1900/10/01 00:59:30", Null)                          , "value",        10, "expect", "1900/10/01 00:59:30.010")) _
+            , new_DicOf(Array("Case", caseName & "1-2-1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",       -10, "expect", "1900/10/01 00:59:30.113")) _
+            , new_DicOf(Array("Case", caseName & "1-2-2", "data", Array("1900/10/01 00:59:30", Null)                          , "value",       -10, "expect", "1900/10/01 00:59:29.990")) _
+            , new_DicOf(Array("Case", caseName & "2-1-1", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",      1010, "expect", "2024/03/01 00:00:00.997")) _
+            , new_DicOf(Array("Case", caseName & "2-1-2", "data", Array("2024/02/29 23:59:59", Null)                          , "value",      1010, "expect", "2024/03/01 00:00:00.010")) _
+            , new_DicOf(Array("Case", caseName & "2-2-1", "data", Array("2024/03/01 00:00:00",  0*60*60 +  0*60 +  0+0.001000), "value",     -1010, "expect", "2024/02/29 23:59:58.991")) _
+            , new_DicOf(Array("Case", caseName & "2-2-2", "data", Array("2024/03/01 00:00:00", Null)                          , "value",     -1010, "expect", "2024/02/29 23:59:58.990")) _
+            , new_DicOf(Array("Case", caseName & "3-1-1", "data", Array("2025-12-31 12:34:56", 12*60*60 + 34*60 + 56+0.123456), "value",  86400000, "expect", "2026/01/01 12:34:56.123")) _
+            , new_DicOf(Array("Case", caseName & "3-1-2", "data", Array("2025-12-31 12:34:56", Null)                          , "value",  86400000, "expect", "2026/01/01 12:34:56.000")) _
+            , new_DicOf(Array("Case", caseName & "3-2-1", "data", Array("2026-01-01 12:34:56", 12*60*60 + 34*60 + 56+0.123456), "value", -86400000, "expect", "2025/12/31 12:34:56.123")) _
+            , new_DicOf(Array("Case", caseName & "3-2-2", "data", Array("2026-01-01 12:34:56", Null)                          , "value", -86400000, "expect", "2025/12/31 12:34:56.000")) _
             )
     
     dim a,e,i,d,v
@@ -186,10 +186,10 @@ Sub Test_Calendar_addMilliSeconds_normal
     Next
 End Sub
 Sub Test_Calendar_addMilliSeconds_error
-    dim data
+    Dim data, caseName : caseName = "addMilliSeconds_error_"
     data = Array ( _
-            new_DicOf(Array(  "Case", "addMilliSeconds_error_" & "1", "data", Array("2025/12/15 21:16:27", 21*60*60 + 16*60 + 27+0.987654), "value", 1.1, "Err.Description", "The value must be an integer.")) _
-            , new_DicOf(Array("Case", "addMilliSeconds_error_" & "2", "data", Array("2025/12/15 21:16:27", Null)                          , "value", "a", "Err.Description", "The value must be an integer.")) _
+            new_DicOf(Array(  "Case", caseName & "1", "data", Array("2025/12/15 21:16:27", 21*60*60 + 16*60 + 27+0.987654), "value", 1.1, "Err.Description", "The value must be an integer.")) _
+            , new_DicOf(Array("Case", caseName & "2", "data", Array("2025/12/15 21:16:27", Null)                          , "value", "a", "Err.Description", "The value must be an integer.")) _
             )
     
     dim a,e,i,d,v,src,des
@@ -217,14 +217,14 @@ Sub Test_Calendar_addSeconds_initial
     AssertEqualWithMessage Null, ao.addSeconds(10), "addSeconds() on initial Calendar"
 End Sub
 Sub Test_Calendar_addSeconds_normal
-    dim data
+    Dim data, caseName : caseName = "addSeconds_normal_"
     data = Array ( _
-            new_DicOf(Array(  "Case", "addSeconds_normal_" & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",     10, "expect", "1900/10/01 00:59:40.123")) _
-            , new_DicOf(Array("Case", "addSeconds_normal_" & "2", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",    -10, "expect", "1900/10/01 00:59:20.123")) _
-            , new_DicOf(Array("Case", "addSeconds_normal_" & "3", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",  86400, "expect", "2024/03/01 23:59:59.987")) _
-            , new_DicOf(Array("Case", "addSeconds_normal_" & "4", "data", Array("2026/01/01 00:00:01",  0*60*60 +  0*60 +  1+0.000000), "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
-            , new_DicOf(Array("Case", "addSeconds_normal_" & "5", "data", Array("2025-12-31 23:59:51", Null)                          , "value",     10, "expect", "2026/01/01 00:00:01.000")) _
-            , new_DicOf(Array("Case", "addSeconds_normal_" & "6", "data", Array("2026/01/01 00:00:01", Null)                          , "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
+            new_DicOf(Array(  "Case", caseName & "1", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",     10, "expect", "1900/10/01 00:59:40.123")) _
+            , new_DicOf(Array("Case", caseName & "2", "data", Array("1900/10/01 00:59:30",  0*60*60 + 59*60 + 30+0.123456), "value",    -10, "expect", "1900/10/01 00:59:20.123")) _
+            , new_DicOf(Array("Case", caseName & "3", "data", Array("2024/02/29 23:59:59", 23*60*60 + 59*60 + 59+0.987654), "value",  86400, "expect", "2024/03/01 23:59:59.987")) _
+            , new_DicOf(Array("Case", caseName & "4", "data", Array("2026/01/01 00:00:01",  0*60*60 +  0*60 +  1+0.000000), "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
+            , new_DicOf(Array("Case", caseName & "5", "data", Array("2025-12-31 23:59:51", Null)                          , "value",     10, "expect", "2026/01/01 00:00:01.000")) _
+            , new_DicOf(Array("Case", caseName & "6", "data", Array("2026/01/01 00:00:01", Null)                          , "value", -86400, "expect", "2025/12/31 00:00:01.000")) _
             )
     
     dim a,e,i,d,v
@@ -238,10 +238,10 @@ Sub Test_Calendar_addSeconds_normal
     Next
 End Sub
 Sub Test_Calendar_addSeconds_error
-    dim data
+    Dim data, caseName : caseName = "addSeconds_error_"
     data = Array ( _
-            new_DicOf(Array(  "Case", "addSeconds_error_" & "1", "data", Array("2025/12/15 21:16:27", 21*60*60 + 16*60 + 27+0.987654), "value", 1.5, "Err.Description", "The value must be an integer.")) _
-            , new_DicOf(Array("Case", "addSeconds_error_" & "2", "data", Array("2025/12/15 21:16:27", Null)                          , "value", "$", "Err.Description", "The value must be an integer.")) _
+            new_DicOf(Array(  "Case", caseName & "1", "data", Array("2025/12/15 21:16:27", 21*60*60 + 16*60 + 27+0.987654), "value", 1.5, "Err.Description", "The value must be an integer.")) _
+            , new_DicOf(Array("Case", caseName & "2", "data", Array("2025/12/15 21:16:27", Null)                          , "value", "$", "Err.Description", "The value must be an integer.")) _
             )
     
     dim a,e,i,d,v,src,des

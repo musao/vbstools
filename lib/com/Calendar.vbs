@@ -393,7 +393,7 @@ Class Calendar
             dbFractionalPartOfElapsedSeconds = this_getfractionalPartOfElapsedSeconds()
         End if
         
-        '経過秒の小数部がNullでない（時間間隔の指定がミリ秒か自身の経過秒がNullでない）場合は経過秒を再計算する
+        '経過秒の小数部がNullでない（時間間隔の指定がミリ秒か自身の経過秒がNullでない）場合は経過秒を算出する
         If Not IsNull(dbFractionalPartOfElapsedSeconds) Then dbElapsedSeconds = dbElapsedSeconds + dbFractionalPartOfElapsedSeconds
 
         '新しいインスタンスを作成して返す
@@ -424,14 +424,16 @@ Class Calendar
         lFromDateTime = Hour(PdtDateTime) * 60 * 60 + Minute(PdtDateTime) * 60 + Second(PdtDateTime)
         lFromElapsedSeconds = math_tranc(Cdbl(PdbElapsedSeconds))
 
-        '24時間分の秒数の差か1秒以内の差でなければ不整合とみなす
+        '24時間分の秒数か1秒以内の差でなければ不整合とみなす
         '浮動小数点の丸め誤差がある場合は大きい方を採用する
         Select Case (lFromDateTime - lFromElapsedSeconds)
         Case 0
-            '整合している場合は何もしない
+        '整合している場合は何もしない
         case (Cl_NUMBER_OF_SECONDS_IN_A_DAY - 1), -1
+        '日時＜経過秒の場合、日時を1秒進める
             PdtDateTime = DateAdd("s", 1, PdtDateTime)
         case (1 - Cl_NUMBER_OF_SECONDS_IN_A_DAY), 1
+        '日時＞経過秒の場合、経過秒を日時に合わせ小数部はなしとする
             PdbElapsedSeconds = Cdbl(Hour(PdtDateTime) * 60 * 60 + Minute(PdtDateTime) * 60 + Second(PdtDateTime))
         Case Else
             ast_failure asSource, "The date/time and elapsed seconds are inconsistent."
@@ -593,9 +595,9 @@ Class Calendar
             .Add "000000", Array(Cl_USE_FRACTIONAL_SECONDS)
             .Add "000", Array(Cl_USE_FRACTIONAL_SECONDS)
             
-            Dim lPos : lPos=1
-            Dim sResult : sResult=""
-            Dim lKeyLen : Dim boIsMatch : Dim sItemValue : Dim sKey : Dim vItem
+            Dim lPos, sResult, lKeyLen, boIsMatch, sItemValue, sKey, vItem
+            lPos=1
+            sResult=""
             Do Until(Len(asFormat)<lPos)
                 '初期化
                 boIsMatch = False : sItemValue = ""
