@@ -111,7 +111,7 @@ Private Sub this_getParameters( _
     Set oParam = new_Arr()
     For Each oItem In oArg.Item("Unnamed")
         '引数からファイルシステムプロキシオブジェクトを生成する
-        Set oRet = fw_tryCatch(Getref("new_FspOf"), oItem, Empty, Empty)
+        Set oRet = fw_try(Getref("new_FspOf"), oItem)
         If Not oRet.isErr() Then
             oParam.push oRet.returnValue
         Else

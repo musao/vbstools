@@ -1189,6 +1189,36 @@ Private Sub fw_throwException( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : fw_try()
+'Overview                    : 処理の実行
+'Detailed Description        : 工事中
+'Argument
+'     aoFunc                 : 実行する処理
+'     aoArgs                 : 実行する処理の引数
+'Return Value
+'     処理結果
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2025/12/24         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function fw_try( _
+    byRef aoFunc _
+    , byRef aoArgs _
+    )
+    On Error Resume Next
+    If cf_isValid(aoArgs) Then
+        cf_bind oRet, aoFunc(aoArgs)
+    Else
+        cf_bind oRet, aoFunc()
+    End If
+    Set fw_try = new_Ret(oRet)
+    On Error GoTo 0
+    Set oRet = Nothing
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : fw_tryCatch()
 'Overview                    : 処理の実行とエラー発生時の処理実行
 'Detailed Description        : 他の言語のtry-chatch文に準拠

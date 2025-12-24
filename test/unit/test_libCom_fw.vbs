@@ -362,6 +362,33 @@ Sub Test_fw_throwException
 End Sub
 
 '###################################################################################################
+'fw_try()
+Sub Test_cf_fw_try_Normal
+    Dim oRet : Set oRet = fw_try(new_Func("a=>1/a"), 2)
+    
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    AssertEqualWithMessage False, oRet.isErr(), "isErr()"
+    AssertEqualWithMessage 1/2, oRet, "oRet"
+End Sub
+Sub Test_cf_fw_try_Err
+    Dim oRet : Set oRet = fw_try(new_Func("a=>1/a"), 0)
+    
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    AssertEqualWithMessage True, oRet.isErr(), "isErr()"
+    AssertEqualWithMessage Empty, oRet, "oRet"
+    AssertEqualWithMessage 11, oRet.getErr().Item("Number"), "Number"
+    AssertEqualWithMessage "0 で除算しました。", oRet.getErr().Item("Description"), "Description"
+    AssertEqualWithMessage "Microsoft VBScript 実行時エラー", oRet.getErr().Item("Source"), "Source"
+End Sub
+Sub Test_cf_fw_try_ArgEmpty
+    Dim oRet : Set oRet = fw_try(new_Func("()=>1/2"), Empty)
+    
+    AssertEqualWithMessage 0, Err.Number, "Err.Number"
+    AssertEqualWithMessage False, oRet.isErr(), "isErr()"
+    AssertEqualWithMessage 1/2, oRet, "oRet"
+End Sub
+
+'###################################################################################################
 'fw_tryCatch()
 Sub Test_cf_tryCatch_TryOnly_Normal
     Dim oRet : Set oRet = fw_tryCatch(new_Func("a=>1/a"), 2, Nothing, Empty)

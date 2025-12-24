@@ -325,7 +325,7 @@ Class clsCompareExcel
         '★ログ出力
         this_publishLog logType.WARNING, sMyName, "Attempt to unprotect Excel file."
         '文書の保護を解除する
-        this_tryCatchAfterProc fw_tryCatch(new_Func("a=>a.Unprotect"), oWorkBook, empty, empty), sMyName
+        this_tryAfterProc fw_try(new_Func("a=>a.Unprotect"), oWorkBook), sMyName
         
         With oWorkBook
             'ワークシートのリネーム情報格納用配列（clsCmArray型）
@@ -342,11 +342,11 @@ Class clsCompareExcel
                     
                     'シート保護の解除
                     this_publishLog logType.WARNING, sMyName, "Try to unprotect a sheet."
-                    this_tryCatchAfterProc fw_tryCatch(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet, empty, empty), sMyName
+                    this_tryAfterProc fw_try(new_Func("a=>{If a.ProtectContents Then:a.Unprotect(vbNullString):End If}"), oWorksheet), sMyName
                     
                     'オートフィルタの解除
                     this_publishLog logType.WARNING, sMyName, "Try to clear the AutoFilter."
-                    this_tryCatchAfterProc fw_tryCatch(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet, empty, empty), sMyName
+                    this_tryAfterProc fw_try(new_Func("a=>{If a.AutoFilterMode Then:a.Cells(1,1).AutoFilter:End If}"), oWorksheet), sMyName
                     
                     'ワークシート名取得および変更する名称を決める
                     sNewSheetName = this_makeSheetName(oWorkSheetRenameInfo.Length+1, asFromToString)
@@ -398,7 +398,7 @@ Class clsCompareExcel
             lRow = 1
             .Cells(lRow, lColumn).Value = asPath
             'シート名
-            For Each oItem In oWorkSheetRenameInfo.map(new_Func( "(e,i,a)=>e.Item(""Before"")" ) ).items
+            For Each oItem In oWorkSheetRenameInfo.map(new_Func( "(e,i,a)=>e.Item('Before')" ) ).items
                 lRow = lRow + 1
                 .Cells(lRow, lColumn).Value = oItem
             Next
@@ -583,13 +583,13 @@ Class clsCompareExcel
         'オートシェイプの比較
         Dim oAutoshapeA, oAutoshapeB, oRet, sTextA
         For Each oAutoshapeA In aoWorkbookForResults.Worksheets(asSheetNameA).Shapes
-            Set oRet = fw_tryCatch(new_Func("(a)=>a(0).Item(a(1))"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name), Empty, Empty)
+            Set oRet = fw_try(new_Func("(a)=>a(0).Item(a(1))"), Array(aoWorkbookForResults.Worksheets(asSheetNameB).Shapes, oAutoshapeA.Name))
             If Not oRet.isErr() Then
                 Set oAutoshapeB = oRet.returnValue
-                Set oRet = fw_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA, Empty, Empty)
+                Set oRet = fw_try(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeA)
                 If Not oRet.isErr() Then
                     sTextA = oRet.returnValue
-                    Set oRet = fw_tryCatch(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB, Empty, Empty)
+                    Set oRet = fw_try(Getref("func_CM_ExcelGetTextFromAutoshape"), oAutoshapeB)
                 End If
                 If Not oRet.isErr() Then
                     If cf_isSame(sTextA, oRet.returnValue) Then
@@ -640,11 +640,11 @@ Class clsCompareExcel
     End Sub
 
     '***************************************************************************************************
-    'Function/Sub Name           : this_tryCatchAfterProc()
-    'Overview                    : TryCatchでエラー時の処理
+    'Function/Sub Name           : this_tryAfterProc()
+    'Overview                    : fw_try()でエラー時の処理
     'Detailed Description        : 工事中
     'Argument
-    '     aoRet                  : fw_tryCatch()の戻り値
+    '     aoRet                  : fw_try()の戻り値
     '     asYourName             : 処理を実行した関数名
     'Return Value
     '     なし
@@ -654,7 +654,7 @@ Class clsCompareExcel
     '----------         ----------------------   -------------------------------------------------------
     '2023/09/28         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Sub this_tryCatchAfterProc( _
+    Private Sub this_tryAfterProc( _
         byRef aoRet _
         , byVal asYourName _
         )
