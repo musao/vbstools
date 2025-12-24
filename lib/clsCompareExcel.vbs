@@ -251,7 +251,7 @@ Class clsCompareExcel
         'パラメータ格納用汎用オブジェクトから必要な要素を取り出す
         Dim oWorkbookForResults : cf_bind oWorkbookForResults, aoParams.Item("WorkbookForResults")
         
-        Dim sPath : Dim sFromToString
+        Dim sPath, sFromToString
         '比較元ファイルのコピー
         sPath = PsPathFrom : sFromToString = "From" 
         aoParams.Add sFromToString, _
@@ -391,7 +391,7 @@ Class clsCompareExcel
         'サマリーシートのカラム位置変換用ハッシュマップ定義
         Dim oStringToColumn : Set oStringToColumn = new_DicOf(Array("From", 1, "To", 2))
         'サマリーシートに比較対象ファイルの情報を出力
-        Dim lRow : Dim lColumn : Dim oItem
+        Dim lRow, lColumn, oItem
         lColumn = oStringToColumn.Item(asFromToString)
         With aoWorkbookForResults.Worksheets.Item(1)
             'ファイルパス

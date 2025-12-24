@@ -10,10 +10,7 @@
 '***************************************************************************************************
 Class CharacterType
     'ÉNÉâÉXì‡ïœêîÅAíËêî
-    Private Cl_MAX_POWER_OF_2
-    Private PvSettings
-    Private PoChar2Type
-    Private PoType2Chars
+    Private Cl_MAX_POWER_OF_2, PvSettings, PoChar2Type, PoType2Chars
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()

@@ -10,9 +10,7 @@
 '***************************************************************************************************
 Class ReturnValue
     'ÉNÉâÉXì‡ïœêîÅAíËêî
-    Private PvValue
-    Private PoErr
-    Private PboIsErr
+    Private PvValue, PoErr, PboIsErr
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()

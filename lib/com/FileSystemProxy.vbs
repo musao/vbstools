@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class FileSystemProxy
     'ÉNÉâÉXì‡ïœêîÅAíËêî
-    Private PoFolderItem,PoParent,PsPath,Cl_FILE,Cl_FOLDER
+    Private PoFolderItem, PoParent, PsPath, Cl_FILE, Cl_FOLDER
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
