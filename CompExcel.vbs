@@ -202,7 +202,7 @@ Private Sub this_compareFiles( _
     Dim oParam : Set oParam = aoParams.Item("Param")
     
     'ファイルの最終更新日昇順に並べ替える
-    oParam.sortUsing new_Func("(c,n)=>new_CalAt(new_FileOf(c).DateLastModified).compareTo(new_CalAt(new_FileOf(n).DateLastModified))>0")
+    oParam.sortUsing new_Func("(c,n)=>new_CalOf(new_FileOf(c).DateLastModified).compareTo(new_CalOf(new_FileOf(n).DateLastModified))>0")
     '★ログ出力
     this_logger Array(logType.INFO, "this_compareFiles()", "aoParams sorted.")
     this_logger Array(logType.TRACE, "this_compareFiles()", "aoParams is " & cf_toString(aoParams))

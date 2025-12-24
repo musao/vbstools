@@ -138,11 +138,11 @@ Sub Test_new_BrokerOf_4Args
 End Sub
 
 '###################################################################################################
-'new_CalAt()
-Sub Test_new_CalAt
+'new_CalOf()
+Sub Test_new_CalOf
     Dim e : Set e = New Calendar
     Dim ed : ed = CDate("2024/2/29")
-    Dim a : Set a = new_CalAt(ed)
+    Dim a : Set a = new_CalOf(ed)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
@@ -150,9 +150,9 @@ Sub Test_new_CalAt
     AssertEqual Cstr(DatePart("m", ed)), a.formatAs("M")
     AssertEqual Cstr(DatePart("d", ed)), a.formatAs("D")
 End Sub
-Sub Test_new_CalAt_Err
+Sub Test_new_CalOf_Err
     On Error Resume Next
-    Dim a : Set a = new_CalAt(vbNullString)
+    Dim a : Set a = new_CalOf(vbNullString)
     Dim e : e = Empty
     
     AssertEqualWithMessage e, a, "ret"

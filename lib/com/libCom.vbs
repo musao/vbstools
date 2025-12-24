@@ -1432,7 +1432,7 @@ Private Function new_BrokerOf( _
 End Function
 
 '***************************************************************************************************
-'Function/Sub Name           : new_CalAt()
+'Function/Sub Name           : new_CalOf()
 'Overview                    : インスタンス生成関数
 'Detailed Description        : 指定した日付時刻で生成した日付クラスのインスタンスを返す
 'Argument
@@ -1445,10 +1445,10 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2023/09/03         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Function new_CalAt( _
+Private Function new_CalOf( _
     ByVal avDateTime _
     )
-    Set new_CalAt = (New Calendar).of(avDateTime)
+    Set new_CalOf = (New Calendar).of(avDateTime)
 End Function
 
 '***************************************************************************************************
