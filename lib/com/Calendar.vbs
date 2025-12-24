@@ -612,10 +612,10 @@ Class Calendar
                         vItem = .Item(sKey)
                         If cf_isSame(Cl_USE_DATAPART, vItem(0)) Then
                         'PdtDate‚©‚çDatePart()‚Å’l‚ğæ‚èo‚·ê‡
-                            sItemValue = func_CM_FillInTheCharacters(DatePart(vItem(1), PdtDateTime), lKeyLen, "0", vItem(2), True)
+                            sItemValue = cf_fillChar(DatePart(vItem(1), PdtDateTime), lKeyLen, "0", vItem(2), True)
                         Else
                         '•b”‚Ì¬”•”‚ğæ‚èo‚·ê‡
-                            sItemValue = func_CM_FillInTheCharacters(math_tranc(this_getfractionalPartOfElapsedSeconds*10^lKeyLen), lKeyLen, "0", False, True)
+                            sItemValue = cf_fillChar(math_tranc(this_getfractionalPartOfElapsedSeconds*10^lKeyLen), lKeyLen, "0", False, True)
                         End If
                         boIsMatch = True : Exit For
                     End If

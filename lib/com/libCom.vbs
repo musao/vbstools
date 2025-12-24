@@ -63,6 +63,69 @@ Private Sub cf_bindAt( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_fillChar()
+'Overview                    : 指定したアライメントで指定した文字で埋める
+'Detailed Description        : 必要に応じて指定文字でアライメントに従って補完し、
+'                              文字数超過時は指定した文字数で切り詰める
+'Argument
+'     asTarget               : 対象文字列
+'     alWordCount            : 文字数
+'     asToFillCharacter      : 埋める文字
+'     aboIsCutOut            : 文字数で切り取り（True：する/False：しない）
+'     aboIsRightAlignment    : アライメント（True：右寄せ/False：左寄せ）
+'Return Value
+'     埋めた文字列
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2023/01/04         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_fillChar( _
+    byVal asTarget _
+    , byVal alWordCount _
+    , byVal asToFillCharacter _
+    , byVal aboIsCutOut _
+    , byVal aboIsRightAlignment _
+    )
+    
+    '切り取りなしで対象文字列が文字数より大きい場合は処理を抜ける
+    Dim lTargetLen : lTargetLen = Len(asTarget)
+    If Not(aboIsCutOut) And lTargetLen>=alWordCount Then
+        cf_fillChar = asTarget
+        Exit Function
+    End If
+    
+    '埋める文字列の作成
+    Dim sFillStrings : sFillStrings = ""
+    If alWordCount-lTargetLen > 0 Then
+        sFillStrings = String(alWordCount-lTargetLen , asToFillCharacter)
+    End If
+    
+    Dim sResult
+    'アライメント指定によって文字列を埋める
+    If aboIsRightAlignment Then
+        sResult = sFillStrings & asTarget
+    Else
+        sResult = asTarget & sFillStrings
+    End If
+    
+    '切り取りなしの場合は処理を抜ける
+    If Not(aboIsCutOut) Then
+        cf_fillChar = sResult
+        Exit Function
+    End If
+    
+    'アライメント指定によって文字列を切り取る
+    If aboIsRightAlignment Then
+        sResult = Right(sResult, alWordCount)
+    Else
+        sResult = Left(sResult, alWordCount)
+    End If
+    cf_fillChar = sResult
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_isAvailableObject()
 'Overview                    : オブジェクトが利用可能か判定する
 'Detailed Description        : 工事中
@@ -3477,69 +3540,6 @@ End Function
 '###################################################################################################
 
 '***************************************************************************************************
-'Function/Sub Name           : func_CM_FillInTheCharacters()
-'Overview                    : 文字を埋める
-'Detailed Description        : 対象文字の不足桁を指定したアライメントで指定した文字の1文字目で埋める
-'                              対象文字に不足桁がない場合は、指定した文字数で切り取る
-'Argument
-'     asTarget               : 対象文字列
-'     alWordCount            : 文字数
-'     asToFillCharacter      : 埋める文字
-'     aboIsCutOut            : 文字数で切り取り（True：する/False：しない）
-'     aboIsRightAlignment    : アライメント（True：右寄せ/False：左寄せ）
-'Return Value
-'     埋めた文字列
-'---------------------------------------------------------------------------------------------------
-'History
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/01/04         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_CM_FillInTheCharacters( _
-    byVal asTarget _
-    , byVal alWordCount _
-    , byVal asToFillCharacter _
-    , byVal aboIsCutOut _
-    , byVal aboIsRightAlignment _
-    )
-    
-    '切り取りなしで対象文字列が文字数より大きい場合は処理を抜ける
-    Dim lTargetLen : lTargetLen = Len(asTarget)
-    If Not(aboIsCutOut) And lTargetLen>=alWordCount Then
-        func_CM_FillInTheCharacters = asTarget
-        Exit Function
-    End If
-    
-    '埋める文字列の作成
-    Dim sFillStrings : sFillStrings = ""
-    If alWordCount-lTargetLen > 0 Then
-        sFillStrings = String(alWordCount-lTargetLen , asToFillCharacter)
-    End If
-    
-    Dim sResult
-    'アライメント指定によって文字列を埋める
-    If aboIsRightAlignment Then
-        sResult = sFillStrings & asTarget
-    Else
-        sResult = asTarget & sFillStrings
-    End If
-    
-    '切り取りなしの場合は処理を抜ける
-    If Not(aboIsCutOut) Then
-        func_CM_FillInTheCharacters = sResult
-        Exit Function
-    End If
-    
-    'アライメント指定によって文字列を切り取る
-    If aboIsRightAlignment Then
-        sResult = Right(sResult, alWordCount)
-    Else
-        sResult = Left(sResult, alWordCount)
-    End If
-    func_CM_FillInTheCharacters = sResult
-End Function
-
-'***************************************************************************************************
 'Function/Sub Name           : func_CM_FormatDecimalNumber()
 'Overview                    : 浮動小数点型を整形する
 'Detailed Description        : 工事中
@@ -3559,7 +3559,7 @@ Private Function func_CM_FormatDecimalNumber( _
     , byVal alDecimalPlaces _
     )
     func_CM_FormatDecimalNumber = Fix(adbNumber) & "." _
-                             & func_CM_FillInTheCharacters( _
+                             & cf_fillChar( _
                                                           Abs(Fix( (adbNumber - Fix(adbNumber))*10^alDecimalPlaces )) _
                                                           , alDecimalPlaces _
                                                           , "0" _

@@ -46,6 +46,49 @@ Sub Test_cf_bindAt_Object
 End Sub
 
 '###################################################################################################
+'cf_fillChar()
+Sub Test_cf_fillChar
+    Dim data, caseName : caseName = "fillChar_normal_"
+    data = Array ( _
+            new_DicOf(Array(  "Case", caseName & "1-1-1", "target", "a"     , "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", True , "expect", "@@@@a" )) _
+            , new_DicOf(Array("Case", caseName & "1-1-2", "target", "aa"    , "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", True , "expect", "@@@aa" )) _
+            , new_DicOf(Array("Case", caseName & "1-1-3", "target", "aaaaa" , "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", True , "expect", "aaaaa" )) _
+            , new_DicOf(Array("Case", caseName & "1-1-4", "target", "aaaaaa", "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", True , "expect", "aaaaa" )) _
+            , new_DicOf(Array("Case", caseName & "1-2-1", "target", "a"     , "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", False, "expect", "a@@@@" )) _
+            , new_DicOf(Array("Case", caseName & "1-2-2", "target", "aa"    , "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", False, "expect", "aa@@@" )) _
+            , new_DicOf(Array("Case", caseName & "1-2-3", "target", "aaaaa" , "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", False, "expect", "aaaaa" )) _
+            , new_DicOf(Array("Case", caseName & "1-2-4", "target", "aaaaaa", "wordCount", 5, "toFillCharacter", "@", "isCutOut", True, "isRightAlignment", False, "expect", "aaaaa" )) _
+            , new_DicOf(Array("Case", caseName & "2-1-1", "target", "a"     , "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", True , "expect", "@@@@a" )) _
+            , new_DicOf(Array("Case", caseName & "2-1-2", "target", "aa"    , "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", True , "expect", "@@@aa" )) _
+            , new_DicOf(Array("Case", caseName & "2-1-3", "target", "aaaaa" , "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", True , "expect", "aaaaa" )) _
+            , new_DicOf(Array("Case", caseName & "2-1-4", "target", "aaaaaa", "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", True , "expect", "aaaaaa")) _
+            , new_DicOf(Array("Case", caseName & "2-2-1", "target", "a"     , "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", False, "expect", "a@@@@" )) _
+            , new_DicOf(Array("Case", caseName & "2-2-2", "target", "aa"    , "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", False, "expect", "aa@@@" )) _
+            , new_DicOf(Array("Case", caseName & "2-2-3", "target", "aaaaa" , "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", False, "expect", "aaaaa" )) _
+            , new_DicOf(Array("Case", caseName & "2-2-4", "target", "aaaaaa", "wordCount", 5, "toFillCharacter", "@", "isCutOut", False,"isRightAlignment", False, "expect", "aaaaaa")) _
+            )
+    
+    Dim d,a,target,wordCount,toFillCharacter,isCutOut,isRightAlignment,expect
+    For Each d In data
+        target = d("target")
+        wordCount = d("wordCount")
+        toFillCharacter = d("toFillCharacter")
+        isCutOut = d("isCutOut")
+        isRightAlignment = d("isRightAlignment")
+        expect = d("expect")
+        
+        a = cf_fillChar( _
+                target _
+                , wordCount _
+                , toFillCharacter _
+                , isCutOut _
+                , isRightAlignment _
+                )
+        AssertEqualWithMessage expect, a, "data="&cf_toString(d)
+    Next
+End Sub
+
+'###################################################################################################
 'cf_isAvailableObject()
 Sub Test_cf_isAvailableObject
     Dim a,d,e
