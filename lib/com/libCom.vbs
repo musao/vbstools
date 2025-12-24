@@ -1590,12 +1590,9 @@ Private Sub new_Enum( _
     , byRef aoDef _
     )
     'クラス名（仮名）作成
-    Dim sClassName : sClassName = "clsTmp_" & new_Fso().GetBaseName(new_Fso().GetTempName())
-'    With new_Char()
-'        Dim vCharList : vCharList = .charList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
-'    End With
-'    cf_push vCharList, "_"
-'    Dim sClassName : sClassName = "clsTmp_" & util_randStr(vCharList, 10)
+    With new_Fso()
+        Dim sClassName : sClassName = "clsTmp_" & .GetBaseName(.GetTempName())
+    End With
 
     'クラス定義のソースコード作成
     Dim sThisName : sThisName = asName
@@ -1755,12 +1752,9 @@ Private Function new_Func( _
     sSoruceCode = Replace(sSoruceCode, "'", """")
     
     '関数名（仮名）を作る
-    Dim sFuncName : sFuncName = "anonymous_" & new_Fso().GetBaseName(new_Fso().GetTempName())
-'    With new_Char()
-'        Dim vCharList : vCharList = .charList(.typeHalfWidthAlphabetUppercase + .typeHalfWidthNumbers)
-'    End With
-'    cf_push vCharList, "_"
-'    Dim sFuncName : sFuncName = "anonymous_" & util_randStr(vCharList, 10)
+    With new_Fso()
+        Dim sFuncName : sFuncName = "anonymous_" & .GetBaseName(.GetTempName())
+    End With
     
     Dim sPattern, oRegExp, sArgStr, sProcStr
     '生成する関数のソースコードの様式が「1.通常」の場合
@@ -3039,157 +3033,6 @@ Private Function fs_writeFileDefault( _
     , byVal asCont _
     )
     Set fs_writeFileDefault = func_FsWriteFile(asPath, 2, True, -2, asCont)
-End Function
-
-
-'***************************************************************************************************
-'Function/Sub Name           : fs_getAllFiles()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する
-'Detailed Description        : 工事中
-'Argument
-'     asPath                 : ファイル/フォルダのパス
-'Return Value
-'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
-'---------------------------------------------------------------------------------------------------
-'History
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function fs_getAllFiles( _
-    byVal asPath _
-    )
-    fs_getAllFiles = func_FsGetAllFilesByFso(asPath)
-'    fs_getAllFiles = func_FsGetAllFilesByShell(asPath)
-'    fs_getAllFiles = func_FsGetAllFilesByDir(asPath)
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_FsGetAllFilesByFso()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する（FSO版）
-'Detailed Description        : zipファイル内の検索はfunc_FsGetAllFilesByShell()に委譲する
-'Argument
-'     asPath                 : ファイル/フォルダのパス
-'Return Value
-'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
-'---------------------------------------------------------------------------------------------------
-'History
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/12         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_FsGetAllFilesByFso( _
-    byVal asPath _
-    )
-    If new_Fso().FolderExists(asPath) Then
-    'フォルダの場合
-        Dim oFolder : Set oFolder = new_FolderOf(asPath)
-        Dim oEle, vRet()
-        'ファイルの取得
-        For Each oEle In oFolder.Files
-            If StrComp(new_Fso().GetExtensionName(oEle.Path), "zip", vbTextCompare)=0 Then
-            'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
-                cf_pushA vRet, func_FsGetAllFilesByShell(oEle.Path)
-            Else
-            'zipファイル以外の場合、ファイル情報を取得する
-                cf_push vRet, new_FspOf(oEle.Path)
-            End If
-        Next
-        'フォルダの取得
-        For Each oEle In oFolder.SubFolders
-            cf_pushA vRet, func_FsGetAllFilesByFso(oEle)
-        Next
-        func_FsGetAllFilesByFso = vRet
-    Else
-    'ファイルの場合
-        func_FsGetAllFilesByFso = Array(new_FspOf(asPath))
-    End If
-
-    Set oFolder = Nothing
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_FsGetAllFilesByShell()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する（ShellApp版）
-'Detailed Description        : zipファイル内のファイルリストを取得できる
-'Argument
-'     asPath                 : ファイル/フォルダのパス
-'Return Value
-'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
-'---------------------------------------------------------------------------------------------------
-'History
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/25         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_FsGetAllFilesByShell( _
-    byVal asPath _
-    )
-    '処理タイプ判定
-    Dim boFlg : boFlg = True 'AsFolder
-    If new_Fso().FileExists(asPath) Then
-        If StrComp(new_Fso().GetExtensionName(asPath), "zip", vbTextCompare)<>0 Then boFlg=False 'AsFile
-    End If
-    
-    If boFlg Then
-    'フォルダかzipファイルの場合
-        Dim oFolder : Set oFolder = new_ShellApp().Namespace(asPath)
-        Dim oItem, vRet()
-        For Each oItem In oFolder.Items
-        'フォルダ内全てのアイテムについて
-            If oItem.IsFolder Then
-            'フォルダの場合
-                cf_pushA vRet, func_FsGetAllFilesByShell(oItem.Path)
-            Else
-            'ファイルの場合
-                cf_push vRet, new_FspOf(oItem.Path)
-'                cf_push vRet, new_AdptFile(oItem)
-            End If
-        Next
-        func_FsGetAllFilesByShell = vRet
-        Set oItem = Nothing
-    Else
-    '上記以外の場合
-        func_FsGetAllFilesByShell = Array(new_FspOf(asPath))
-    End If
-End Function
-
-'***************************************************************************************************
-'Function/Sub Name           : func_FsGetAllFilesByDir()
-'Overview                    : フォルダ配下のファイルオブジェクトを取得する（Dir版）
-'Detailed Description        : zipファイル内の検索はfunc_FsGetAllFilesByShell()に委譲する
-'Argument
-'     asPath                 : ファイル/フォルダのパス
-'Return Value
-'     Fileオブジェクト相当（アダプターでラップした）のオブジェクトの配列
-'---------------------------------------------------------------------------------------------------
-'History
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2023/11/25         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_FsGetAllFilesByDir( _
-    byVal asPath _
-    )
-    Dim sDir : sDir = "dir /S /B /A-D " & fs_wrapInQuotes(asPath)
-    Dim sTmpPath : sTmpPath = fw_getTempPath()
-    fw_runShellSilently "cmd /U /C " & sDir & " > " & fs_wrapInQuotes(sTmpPath)
-    Dim sLists : sLists = fs_readFile(sTmpPath)
-    fs_deleteFile sTmpPath
-    
-    Dim vArrList : vArrList = Split(sLists, vbNewLine)
-    Redim Preserve vArrList(Ubound(vArrList)-1)
-    Dim sList, vRet()
-    For Each sList In vArrList
-        If StrComp(new_Fso().GetExtensionName(sList), "zip", vbTextCompare)=0 Then
-        'zipファイルの場合、func_FsGetAllFilesByShell()でzip内のファイルリストを取得する
-            cf_pushA vRet, func_FsGetAllFilesByShell(sList)
-        Else
-        'zipファイル以外の場合、ファイル情報を取得する
-            cf_push vRet, new_FspOf(sList)
-        End If
-    Next
-    func_FsGetAllFilesByDir = vRet
 End Function
 
 '***************************************************************************************************
