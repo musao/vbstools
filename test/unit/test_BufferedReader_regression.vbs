@@ -12,10 +12,10 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
-' for fso.OpenTextFile
-Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Dim PsPathTempFolder,PsPathData1,PsPathData2
 
 '###################################################################################################
@@ -25,12 +25,12 @@ Sub SetUp()
     If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
 '    fs_createFolder PsPathTempFolder
     PsPathData1 = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
-    With new_Ts(PsPathData1, ForWriting, True, -2)
+    With new_Ts(PsPathData1, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCrLf & vbCr & "abcde" & vbLf & vbLf & "12" & vbCr & "345")
         .Close
     End With
     PsPathData2 = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
-    With new_Ts(PsPathData2, ForWriting, True, -2)
+    With new_Ts(PsPathData2, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
         .Write("‚©‚«‚­‚¯‚±" & vbCr)
         .Close
     End With
@@ -160,7 +160,7 @@ Sub reader_testCommon(f,p)
         Dim ev,eo,er,av,ao,ar,i,flg
         flg=true
         For i=0 To 1
-            Set eo = new_Fso().OpenTextFile(p, ForReading, False, -2)
+            Set eo = new_Fso().OpenTextFile(p, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT)
             If flg Then
                 f ev,eo,er
             Else

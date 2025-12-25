@@ -134,13 +134,13 @@ Sub subArg(aArg)
         Err.Raise 9999, "エラー", "test_libCom_fw.vbsのエラーケース"
         Exit Sub
     End If
-    With new_Ts(PsPath, 2, True, -2)
+    With new_Ts(PsPath, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
         .Write aArg
         .Close
     End With
 End Sub
 Sub subNoArg()
-    With new_Ts(PsPath, 2, True, -2)
+    With new_Ts(PsPath, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
         .Write NoArg_CONT
         .Close
     End With
@@ -259,7 +259,7 @@ Sub Test_fw_logger
     Const RE_IP4 = "(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
     
     Dim ts,d,a,e
-    Set ts = new_Ts(PsPath, 2, True, -2)
+    Set ts = new_Ts(PsPath, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
     d = Array("fw_logger's Test")
     e = d(0)
     
@@ -529,7 +529,7 @@ End Sub
 Function readFile()
     readFile = Empty
     On Error Resume Next
-    With new_Ts(PsPath, 1, False, -2)
+    With new_Ts(PsPath, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT)
         readFile = .ReadAll
         .Close
     End With

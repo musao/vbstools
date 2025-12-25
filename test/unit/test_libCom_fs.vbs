@@ -12,6 +12,8 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
 Const MY_NAME = "test_libCom_fs.vbs"
@@ -319,7 +321,7 @@ End Sub
 Function CreateFileForCopyhere(c)
     With fso
         Dim p : p = .BuildPath(PsPathTempFolder, .GetTempName())
-        Dim ts : Set ts = .OpenTextFile(p, 2, True, -1)
+        Dim ts : Set ts = .OpenTextFile(p, tsMode.FOR_WRITING, True, tsFormat.UNICODE)
     End With
     With ts
         .Write c
@@ -1298,7 +1300,7 @@ Function readTestFile(c,p)
     End With
 End Function
 Function lockFile(p)
-    Set lockFile = fso.OpenTextFile(p, 8, True, -1)
+    Set lockFile = fso.OpenTextFile(p, tsMode.FOR_APPENDING, True, tsFormat.UNICODE)
 End Function
 Function getTempName()
     getTempName = fso.GetTempName()
@@ -1316,7 +1318,7 @@ Sub createTextFileInAscii(p,c)
     createTextFile p,c,0
 End Sub
 Sub createTextFile(p,c,f)
-    With fso.OpenTextFile(p, 2, True, f)
+    With fso.OpenTextFile(p, tsMode.FOR_WRITING, True, f)
         .Write c
         .Close
     End With

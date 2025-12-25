@@ -646,7 +646,7 @@ Class BufferedWriter
         this_isTextStream = _
                 cf_isSame(Vartype(aoObj),vbObject) _
                 And _
-                cf_isSame(Typename(aoObj),Typename(new_Ts(WScript.ScriptFullName,1,False,-2)))
+                cf_isSame(Typename(aoObj),Typename(new_Ts(WScript.ScriptFullName, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT)))
     End Function
     
 End Class

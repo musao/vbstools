@@ -12,6 +12,8 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
 '###################################################################################################
@@ -665,15 +667,15 @@ End Sub
 '###################################################################################################
 'new_Ts()
 Sub Test_new_Ts
-    Dim e : Set e = CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName, 1, False, -2)
-    Dim a : Set a = new_Ts(WScript.ScriptFullName, 1, False, -2)
+    Dim e : Set e = CreateObject("Scripting.FileSystemObject").OpenTextFile(WScript.ScriptFullName, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT)
+    Dim a : Set a = new_Ts(WScript.ScriptFullName, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT)
     
     AssertEqual VarType(e), VarType(a)
     AssertEqual TypeName(e), TypeName(a)
 End Sub
 Sub Test_new_WriterOf_Err
     On Error Resume Next
-    Dim a : Set a = new_Ts(vbNullString, 8, False, -2)
+    Dim a : Set a = new_Ts(vbNullString, tsMode.FOR_APPENDING, False, tsFormat.USE_DEFAULT)
     
     AssertEqual 5, Err.Number
     AssertEqual "プロシージャの呼び出し、または引数が不正です。", Err.Description

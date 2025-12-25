@@ -12,10 +12,10 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
-' for fso.OpenTextFile
-Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 
 '###################################################################################################
@@ -25,7 +25,7 @@ Sub SetUp()
     If Not(new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
 '    fs_createFolder PsPathTempFolder
     PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
-    With new_Ts(PsPathForAppending, ForWriting, True, -2)
+    With new_Ts(PsPathForAppending, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
         .Close
     End With
@@ -104,14 +104,14 @@ Sub writer_testCommon(f,p)
         For i=0 To 1
             If strcomp(p, "Write", vbBinaryCompare)=0 Then
                 pt = PsPathForWriting
-                Set eo = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
+                Set eo = new_Fso().OpenTextFile(pt, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
             Else
                 pt = PsPathForAppending
-                With new_Ts(pt, ForWriting, True, -2)
+                With new_Ts(pt, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
                     .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
                     .Close
                 End With
-                Set eo = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
+                Set eo = new_Fso().OpenTextFile(pt, tsMode.FOR_APPENDING, False, tsFormat.USE_DEFAULT)
             End If
             If flg Then
                 f eo,er

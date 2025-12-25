@@ -12,10 +12,10 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
-' for fso.OpenTextFile
-Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Dim PsPathTempFolder,PsPathForWriting,PsPathForAppending
 
 '###################################################################################################
@@ -26,7 +26,7 @@ Sub SetUp()
 '    fs_createFolder PsPathTempFolder
     PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Fso().GetTempName())
 '    PsPathForAppending = new_Fso().BuildPath(PsPathTempFolder, new_Now().formatAs("UTat_YYMMDD_hhmmss.000000.txt"))
-    With new_Ts(PsPathForAppending, ForWriting, True, -2)
+    With new_Ts(PsPathForAppending, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
         .Write("‚ ‚¢‚¤‚¦‚¨" & vbCr)
         .Close
     End With
@@ -203,7 +203,7 @@ End Sub
 'BufferedWriter.textStream()/setTextStream()
 Sub Test_BufferedWriter_textStream_setTextStream_Write
     Dim pt : pt = PsPathForWriting
-    Dim e : Set e = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
+    Dim e : Set e = new_Fso().OpenTextFile(pt, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
     Dim a : Set a = New BufferedWriter
     a.setTextStream(e)
     
@@ -214,7 +214,7 @@ Sub Test_BufferedWriter_textStream_setTextStream_Write
 End Sub
 Sub Test_BufferedWriter_textStream_setTextStream_Append
     Dim pt : pt = PsPathForAppending
-    Dim e : Set e = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
+    Dim e : Set e = new_Fso().OpenTextFile(pt, tsMode.FOR_APPENDING, False, tsFormat.USE_DEFAULT)
     Dim a : Set a = New BufferedWriter
     a.setTextStream(e)
     
@@ -247,7 +247,7 @@ End Sub
 Sub Test_BufferedWriter_currentBufferSize
     Dim pt,ts,ao,a,e,d,sz
     pt = PsPathForWriting
-    Set ts = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
+    Set ts = new_Fso().OpenTextFile(pt, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
     Set ao = New BufferedWriter
 
     With ao
@@ -297,7 +297,7 @@ End Sub
 Sub Test_BufferedWriter_lastWriteTime
     Dim pt,ts,ao,a,e,d,sz,nsz
     pt = PsPathForAppending
-    Set ts = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
+    Set ts = new_Fso().OpenTextFile(pt, tsMode.FOR_APPENDING, False, tsFormat.USE_DEFAULT)
     Set ao = New BufferedWriter
 
     With ao
@@ -353,7 +353,7 @@ End Sub
 Sub Test_BufferedWriter_newLine
     Dim pt,ts,ao,a,el,ec,es,sz,nsz
     pt = PsPathForWriting
-    Set ts = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
+    Set ts = new_Fso().OpenTextFile(pt, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
     Set ao = New BufferedWriter
 
     With ao
@@ -397,7 +397,7 @@ End Sub
 Sub Test_BufferedWriter_flush
    Dim pt,ts,ao,at,ab,et,eb,d,sz,nsz
     pt = PsPathForAppending
-    Set ts = new_Fso().OpenTextFile(pt, ForAppending, False, -2)
+    Set ts = new_Fso().OpenTextFile(pt, tsMode.FOR_APPENDING, False, tsFormat.USE_DEFAULT)
     Set ao = New BufferedWriter
 
     With ao
@@ -437,7 +437,7 @@ End Sub
 Sub Test_BufferedWriter_close
     Dim pt,ts,d,ao,et,eb,at,ab,sz,nsz
     pt = PsPathForWriting
-    Set ts = new_Fso().OpenTextFile(pt, ForWriting, True, -2)
+    Set ts = new_Fso().OpenTextFile(pt, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT)
     Set ao = New BufferedWriter
 
     With ao

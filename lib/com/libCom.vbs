@@ -324,12 +324,12 @@ End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : cf_lenB()
-'Overview                    : Shift-JIS形式の文字数を返す
-'Detailed Description        : 全角は2文字、半角は1文字として文字数を返す
+'Overview                    : Shift-JIS形式のバイト数を返す
+'Detailed Description        : 全角は2バイト、半角は1バイトとしてバイト数を返す
 'Argument
 '     asTarget               : 文字列
 'Return Value
-'     文字数
+'     バイト数
 '---------------------------------------------------------------------------------------------------
 'History
 'Date               Name                     Reason for Changes
@@ -1966,7 +1966,7 @@ End Function
 Private Function new_ReaderOf( _
     byVal asPath _
     )
-    Set new_ReaderOf = (New BufferedReader).setTextStream(new_Ts(asPath, 1, False, -2))
+    Set new_ReaderOf = (New BufferedReader).setTextStream(new_Ts(asPath, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT))
 End Function
 
 '***************************************************************************************************
@@ -3138,7 +3138,7 @@ Private Function func_FsReadFile( _
     )
     Dim sRet : sRet = Empty
     On Error Resume Next
-    With new_Ts(asPath, 1, False, alFormat)
+    With new_Ts(asPath, tsMode.FOR_READING, False, alFormat)
         sRet = .ReadAll
         .Close
     End With

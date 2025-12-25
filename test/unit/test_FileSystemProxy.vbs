@@ -12,6 +12,8 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
 Const MY_NAME = "test_FileProxy.vbs"
@@ -450,7 +452,7 @@ Function createUrlShortCutFileAt(basePath)
 End Function
 Function createTextFileAt(basePath)
     Dim path : path = getTempFilePath(basePath,"txt")
-    With fso.OpenTextFile(path, 2, True, -1)
+    With fso.OpenTextFile(path, tsMode.FOR_WRITING, True, tsFormat.UNICODE)
         .Write "hoge"
         .Close
     End With

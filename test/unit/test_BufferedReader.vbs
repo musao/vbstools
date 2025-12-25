@@ -12,10 +12,10 @@
 ' @import ../../lib/com/ReturnValue.vbs
 ' @import ../../lib/com/libCom.vbs
 
+' @import ../../lib/libEnum.vbs
+
 Option Explicit
 
-' for fso.OpenTextFile
-Const ForReading = 1, ForWriting = 2, ForAppending = 8
 
 '###################################################################################################
 'BufferedReader
@@ -106,7 +106,7 @@ End Sub
 '###################################################################################################
 'BufferedReader.textStream()/setTextStream()
 Sub Test_BufferedReader_textStream_setTextStream
-    Dim e : Set e = new_Fso().OpenTextFile(WScript.ScriptFullName, ForReading, False, -2)
+    Dim e : Set e = new_Fso().OpenTextFile(WScript.ScriptFullName, tsMode.FOR_READING, False, tsFormat.USE_DEFAULT)
     Dim a : Set a = New BufferedReader
     a.setTextStream(e)
     
