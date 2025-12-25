@@ -371,6 +371,30 @@ Sub Test_cf_isValid_Variable_InValid_NullString
 End Sub
 
 '###################################################################################################
+'cf_lenB()
+Sub Test_cf_lenB
+    Dim data, caseName : caseName = "lenB_normal_"
+    data = Array ( _
+            new_DicOf(Array(  "Case", caseName & "1-1"    , "target", ""      , "expect", 0 )) _
+            , new_DicOf(Array("Case", caseName & "1-2-1"  , "target", "a"     , "expect", 1 )) _
+            , new_DicOf(Array("Case", caseName & "1-2-2"  , "target", "‚ "    , "expect", 2 )) _
+            , new_DicOf(Array("Case", caseName & "1-3-1"  , "target", "aa"    , "expect", 2 )) _
+            , new_DicOf(Array("Case", caseName & "1-3-2-1", "target", "a‚ "   , "expect", 3 )) _
+            , new_DicOf(Array("Case", caseName & "1-3-2-2", "target", "‚ a"   , "expect", 3 )) _
+            , new_DicOf(Array("Case", caseName & "1-3-3"  , "target", "‚ ‚ "   , "expect", 4 )) _
+            )
+    
+    Dim d,a,target,expect
+    For Each d In data
+        target = d("target")
+        expect = d("expect")
+        
+        a = cf_lenB(target)
+        AssertEqualWithMessage expect, a, "data="&cf_toString(d)
+    Next
+End Sub
+
+'###################################################################################################
 'cf_push()
 Sub Test_cf_push_Available
     Redim a(0)

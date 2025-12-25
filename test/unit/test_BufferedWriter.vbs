@@ -257,7 +257,7 @@ Sub Test_BufferedWriter_currentBufferSize
         e = 0
         
         d = "ab‚ ‚¢c‚¤"
-        e = e + func_CM_StrLen(d)
+        e = e + cf_lenB(d)
         .write(d)
         a = .currentBufferSize
         sz = new_Fso().GetFile(pt).Size
@@ -265,7 +265,7 @@ Sub Test_BufferedWriter_currentBufferSize
         AssertEqualWithMessage 0, sz, "1-2"
         
         d = "d‚¦e‚¨"
-        e = e + func_CM_StrLen(d)
+        e = e + cf_lenB(d)
         .write(d)
         a = .currentBufferSize
         sz = new_Fso().GetFile(pt).Size
@@ -273,7 +273,7 @@ Sub Test_BufferedWriter_currentBufferSize
         AssertEqualWithMessage e, sz, "2-2"
         
         d = "‚©f‚«g‚­h‚¯i‚±j"
-        e = e + func_CM_StrLen(d)
+        e = e + cf_lenB(d)
         .write(d)
         a = .currentBufferSize
         sz = new_Fso().GetFile(pt).Size
@@ -409,7 +409,7 @@ Sub Test_BufferedWriter_flush
 
         d = "ab‚ ‚¢c‚¤"
         et = Empty
-        eb = eb + func_CM_StrLen(d)
+        eb = eb + cf_lenB(d)
         .write(d)
         at = .lastWriteTime
         ab = .currentBufferSize
@@ -449,7 +449,7 @@ Sub Test_BufferedWriter_close
 
         d = "ab‚ ‚¢c‚¤"
         et = Empty
-        eb = eb + func_CM_StrLen(d)
+        eb = eb + cf_lenB(d)
         .write(d)
         at = .lastWriteTime
         ab = .currentBufferSize

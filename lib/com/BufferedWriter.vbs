@@ -537,7 +537,7 @@ Class BufferedWriter
 
         With PoBuffer
             .Item("buffer") = .Item("buffer") & asCont
-            .Item("length") = func_CM_StrLen(.Item("buffer"))
+            .Item("length") = cf_lenB(.Item("buffer"))
         End With
 
         Set oArr = new_ArrSplit(asCont, vbLf)
