@@ -193,7 +193,7 @@ Private Sub this_makeReport( _
 
     'レポートの作成
     With new_HtmlOf("html")
-        .addContent this_makeReportHtmlHeader(aoParams)
+        .addContent this_makeReportHtmlHeader()
         .addContent this_makeReportHtmlBody(aoParams)
     
         '★ログ出力
@@ -217,9 +217,9 @@ End Sub
 'Overview                    : 結果HTMLのheadタグ内の編集
 'Detailed Description        : 工事中
 'Argument
-'     aoParams               : パラメータ格納用オブジェクト
-'Return Value
 '     なし
+'Return Value
+'     HTML生成クラスのheadタグオブジェクト
 '---------------------------------------------------------------------------------------------------
 'History
 'Date               Name                     Reason for Changes
@@ -227,7 +227,6 @@ End Sub
 '2023/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function this_makeReportHtmlHeader( _
-    byRef aoParams _
     )
     
     Dim oStyle : Set oStyle = _
@@ -289,7 +288,7 @@ End Function
 'Argument
 '     aoParams               : パラメータ格納用オブジェクト
 'Return Value
-'     なし
+'     HTML生成クラスのbodyタグオブジェクト
 '---------------------------------------------------------------------------------------------------
 'History
 'Date               Name                     Reason for Changes

@@ -3044,7 +3044,7 @@ Private Function fs_writeFile( _
     byVal asPath _
     , byVal asCont _
     )
-    Set fs_writeFile = func_FsWriteFile(asPath, 2, True, -1, asCont)
+    Set fs_writeFile = func_FsWriteFile(asPath, tsMode.FOR_WRITING, True, tsFormat.UNICODE, asCont)
 End Function
 
 '***************************************************************************************************
@@ -3069,7 +3069,7 @@ Private Function fs_writeFileDefault( _
     byVal asPath _
     , byVal asCont _
     )
-    Set fs_writeFileDefault = func_FsWriteFile(asPath, 2, True, -2, asCont)
+    Set fs_writeFileDefault = func_FsWriteFile(asPath, tsMode.FOR_WRITING, True, tsFormat.USE_DEFAULT, asCont)
 End Function
 
 '***************************************************************************************************
