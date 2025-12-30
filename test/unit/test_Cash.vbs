@@ -54,7 +54,7 @@ End Sub
 Sub Test_Cash_item_get_timeout_key
     Dim ao,k,v,t,e,waitTime
     Set ao = new Cash
-    t = 5 : waitTime = 10
+    t = 0 : waitTime = 1
 
     k = "timeout_key" : v = 123
     ao.put k, v, t
@@ -81,7 +81,7 @@ End Sub
 Sub Test_Cash_getOrCompute_timeout_key
     Dim ao,a,k,l,t,e,waitTime
     Set ao = new Cash
-    t = 5 : waitTime = 10 : Set l = GetRef("getOrComputeLoader")
+    t = 0 : waitTime = 1 : Set l = GetRef("getOrComputeLoader")
 
     k = "timeout_key" : e = LOADER_PREFIX & k
     a = ao.getOrCompute(k, l, t)
@@ -182,7 +182,7 @@ End Sub
 Sub Test_Cash_has_timeout_key
     Dim ao,a,k,v,t,e,waitTime
     Set ao = new Cash
-    t = 5 : waitTime = 10
+    t = 0 : waitTime = 1
 
     k = "timeout_key" : v = 123
     ao.put k, v, t
@@ -249,7 +249,7 @@ End Sub
 'Cash.size
 Sub Test_Cash_size
     Dim ao,a,t,e,waitTime
-    Set ao = new Cash : t = 10 : waitTime = 10
+    Set ao = new Cash : t = 50 : waitTime = 50
     
     e = 0 : a = ao.size()
     AssertEqualWithMessage e, a, "ao.size() initially"

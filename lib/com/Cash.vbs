@@ -350,7 +350,7 @@ Class Cash
         , byVal alTtl _
         )
         Dim oTime : oTime = Null
-        If alTtl > 0 Then Set oTime = new_Now().addMilliseconds(alTtl)
+        If alTtl >= 0 Then Set oTime = new_Now().addMilliseconds(alTtl)
 
         cf_bindAt PoCasher, avKey, _
                                 new_DicOf( _
