@@ -350,7 +350,7 @@ Class ArrayList
     Public Function indexOf( _
         byRef avTarget _
         )
-        indexOf = this_indexOf(avTarget, vbNullString, vbBinaryCompare, True)
+        indexOf = this_indexOf(avTarget, Null, vbBinaryCompare, True)
     End Function
 
     '***************************************************************************************************
@@ -391,7 +391,7 @@ Class ArrayList
     Public Function lastIndexOf( _
         byRef avTarget _
         )
-        lastIndexOf = this_indexOf(avTarget, vbNullString, vbBinaryCompare, False)
+        lastIndexOf = this_indexOf(avTarget, Null, vbBinaryCompare, False)
     End Function
 
     '***************************************************************************************************
@@ -564,7 +564,7 @@ Class ArrayList
     '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
     '     alEnd                  : 終了位置のインデックス番号、負値はalStartと同じ
     '                              切り出した配列に終了位置の要素は含まない
-    '                              vbNullStringを指定した場合は切り出した配列に最後の要素を含める
+    '                              Nullを指定した場合は切り出した配列に最後の要素を含める
     'Return Value
     '     同クラスの別インスタンス
     '---------------------------------------------------------------------------------------------------
@@ -1025,7 +1025,7 @@ Class ArrayList
     'Argument
     '     avTarget               : 一致を確認する内容
     '     alStart                : 検索開始位置のインデックス番号
-    '                              vbNullStringの場合はaboOrderが正順の場合は0、逆順の場合は全要素数-1
+    '                              Nullの場合はaboOrderが正順の場合は0、逆順の場合は全要素数-1
     '     alCompare              : 比較方法
     '                                0(vbBinaryCompare):バイナリ比較
     '                                1(vbTextCompare):テキスト比較
@@ -1052,7 +1052,7 @@ Class ArrayList
         lUb = Ubound(vArr)
         
         Dim lStart
-        If alStart=vbNullString Then
+        If IsNull(alStart) Then
             If aboOrder Then lStart=0 Else lStart=lUb
         Else
             lStart=alStart
@@ -1262,7 +1262,7 @@ Class ArrayList
     '                              例えば-1は最後、-2は最後から2つ目の要素を示す。
     '     alEnd                  : 終了位置のインデックス番号、負値はalStartと同じ
     '                              切り出した配列に終了位置の要素は含まない
-    '                              vbNullStringを指定した場合は切り出した配列に最後の要素を含める
+    '                              Nullを指定した場合は切り出した配列に最後の要素を含める
     'Return Value
     '     同クラスの別インスタンス
     '---------------------------------------------------------------------------------------------------
@@ -1288,7 +1288,7 @@ Class ArrayList
         lStart = math_min(lStart,lUb+1)
         
         Dim lEnd
-        if alEnd=vbNullString Then
+        if IsNull(alEnd) Then
             lEnd = lUb
         Else
             If alEnd<0 Then lEnd=lUb Else lEnd=-1

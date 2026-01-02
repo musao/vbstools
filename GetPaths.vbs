@@ -104,7 +104,7 @@ Private Sub this_getParameters( _
     this_logger Array(logType.TRACE, "this_getParameters()", cf_toString(oArg))
     
     'パラメータ格納用オブジェクトに設定
-    cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,vbNullString)
+    cf_bindAt aoParams, "Param", new_ArrOf(oArg.Item("Unnamed")).slice(0,Null)
     
     Set oArg = Nothing
 End Sub

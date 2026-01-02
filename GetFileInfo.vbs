@@ -145,7 +145,7 @@ Private Sub this_getFileInfomations( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
-    Dim oParam : Set oParam = aoParams.Item("Param").slice(0,vbNullString)
+    Dim oParam : Set oParam = aoParams.Item("Param").slice(0,Null)
 
     '★ログ出力
     this_logger Array(logType.INFO, "this_getFileInfomations()", "Before getting list of files.")
@@ -298,7 +298,7 @@ Private Function this_makeReportHtmlBody( _
     byRef aoParams _
     )
     'パラメータ格納用汎用オブジェクト
-    Dim oList : Set oList = aoParams.Item("List").slice(0,vbNullString)
+    Dim oList : Set oList = aoParams.Item("List").slice(0,Null)
     
     'thead
     Dim oTr : Set oTr = new_HtmlOf("tr")

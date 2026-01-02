@@ -628,7 +628,7 @@ Sub Test_Array_slice_Normal
     assertAllElements e, a1
     
     e = Array(4,5)
-    Set a1 = a.slice(3,vbNullString)
+    Set a1 = a.slice(3,Null)
     assertAllElements e, a1
     
     e = Array(2,3,4)
@@ -645,11 +645,11 @@ Sub Test_Array_slice_Limit_Upper
     Set a = new_ArrOf(d)
     
     e = Array(5)
-    Set a1 = a.slice(4,vbNullString)
+    Set a1 = a.slice(4,Null)
     assertAllElements e, a1
     
     e = Array(5)
-    Set a1 = a.slice(-1,vbNullString)
+    Set a1 = a.slice(-1,Null)
     assertAllElements e, a1
     
     Set a1 = a.slice(4,4)
@@ -704,7 +704,7 @@ Sub Test_Array_slice_Empty
     Set a1 = a.slice(0,3)
     AssertEqual 0, a1.length
     
-    Set a1 = a.slice(3,vbNullString)
+    Set a1 = a.slice(3,Null)
     AssertEqual 0, a1.length
     
     Set a1 = a.slice(1,-1)
