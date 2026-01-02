@@ -86,8 +86,7 @@ End Sub
 'Function/Sub Name           : this_getParameters()
 'Overview                    : 当スクリプトの引数をパラメータ格納用オブジェクトに取得する
 'Detailed Description        : パラメータ格納用汎用オブジェクトにKey="Param"で格納する
-'                              配列（clsCmArray型）に名前なし引数（/Key:Value 形式でない）を全て
-'                              取得する
+'                              配列（ArrayList型）に名前なし引数（/Key:Value 形式でない）を全て取得する
 'Argument
 '     aoParams               : パラメータ格納用オブジェクト
 'Return Value
