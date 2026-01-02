@@ -31,7 +31,7 @@ Sub Test_BufferedReader_readSize
     Dim a,e
     Set a = new BufferedReader
 
-    AssertEqual 5000, a.readSize
+    AssertEqual 8192, a.readSize
 
     e = 1
     a.readSize = e

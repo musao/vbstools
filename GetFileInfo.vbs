@@ -107,22 +107,21 @@ Private Sub this_getParameters( _
     this_logger Array(logType.TRACE, "this_getParameters()", cf_toString(oArg))
     
     '実在するパスだけパラメータ格納用オブジェクトに設定
-    Dim oParam, oRet, oItem
-    Set oParam = new_Arr()
+    Dim oParam, oItem : Set oParam = new_Arr()
     For Each oItem In oArg.Item("Unnamed")
         '引数からファイルシステムプロキシオブジェクトを生成する
-        Set oRet = fw_try(Getref("new_FspOf"), oItem)
-        If Not oRet.isErr() Then
-            oParam.push oRet.returnValue
-        Else
-            '★ログ出力
-            this_logger Array(logType.WARNING, "this_getParameters()", oItem & " is an invalid argument.")
-        End If
+        With fw_try(Getref("new_FspOf"), oItem)
+            If Not .isErr() Then
+                oParam.push .returnValue
+            Else
+                '★ログ出力
+                this_logger Array(logType.WARNING, "this_getParameters()", oItem & " is an invalid argument.")
+            End If
+        End With
     Next
     cf_bindAt aoParams, "Param", oParam
     
     Set oItem = Nothing
-    Set oRet = Nothing
     Set oParam = Nothing
     Set oArg = Nothing
 End Sub

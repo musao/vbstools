@@ -27,7 +27,7 @@ Class BufferedReader
     '2023/10/02         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        PlReadSize = 5000                 'デフォルトは5000バイト
+        PlReadSize = 8192                 'デフォルトは8192バイト
         Set PoTextStream = Nothing
         Dim vArr : vArr = Array("line", Empty, "column", Empty, "atEndOfLine", Empty, "atEndOfStream", Empty)
         Set PoOutbound = new_DicOf(vArr)

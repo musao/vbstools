@@ -182,7 +182,7 @@ End Sub
 Sub Test_Cash_has_timeout_key
     Dim ao,a,k,v,t,e,waitTime
     Set ao = new Cash
-    t = 0 : waitTime = 1
+    t = 50 : waitTime = 50
 
     k = "timeout_key" : v = 123
     ao.put k, v, t

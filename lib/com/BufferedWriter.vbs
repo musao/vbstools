@@ -28,7 +28,7 @@ Class BufferedWriter
     '***************************************************************************************************
     Private Sub Class_Initialize()
         Set PoTextStream = Nothing
-        PdbWriteBufferSize = 5000                'デフォルトは5000バイト
+        PdbWriteBufferSize = 8192                'デフォルトは8192バイト
         PdbWriteIntervalTime = 0                 'デフォルトは0秒
         
         Dim vArr : vArr = Array("line", Empty, "column", Empty)

@@ -998,7 +998,6 @@ End Function
 Private Function fw_getTextstreamForLog( _
     )
     Set fw_getTextstreamForLog = new_WriterOf(fw_getLogPath, tsMode.FOR_APPENDING, True, tsFormat.UNICODE)
-'    Set fw_getTextstreamForLog = new_WriterOf(fw_getLogPath, 8, True, -1)
 End Function
 
 '***************************************************************************************************

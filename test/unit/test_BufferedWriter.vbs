@@ -55,7 +55,7 @@ Sub Test_BufferedWriter_writeBufferSize
     Dim a,e
     Set a = new BufferedWriter
 
-    AssertEqualWithMessage 5000, a.writeBufferSize, "1"
+    AssertEqualWithMessage 8192, a.writeBufferSize, "1"
     
     e = -1*2^31
     a.writeBufferSize = e
