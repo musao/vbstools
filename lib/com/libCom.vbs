@@ -2999,7 +2999,7 @@ End Function
 Private Function fs_readFile( _
     byVal asPath _
     )
-    Set fs_readFile = func_FsReadFile(asPath, -1)
+    Set fs_readFile = func_FsReadFile(asPath, tsFormat.UNICODE)
 End Function
 
 '***************************************************************************************************
