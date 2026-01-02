@@ -15,37 +15,38 @@
 '***************************************************************************************************
 Option Explicit
 
-'定数
-Private Const Cs_FOLDER_LIB = "lib"
-
-'import定義
-Sub sub_import( _
-    byVal asIncludeFileName _
-    )
-    With CreateObject("Scripting.FileSystemObject")
-        Dim sParentFolderName : sParentFolderName = .GetParentFolderName(WScript.ScriptFullName)
-        Dim sIncludeFilePath
-        sIncludeFilePath = .BuildPath(sParentFolderName, Cs_FOLDER_LIB)
-        sIncludeFilePath = .BuildPath(sIncludeFilePath, asIncludeFileName)
-        ExecuteGlobal .OpenTextfile(sIncludeFilePath).ReadAll
-    End With
-End Sub
-'import
-sub_import "clsAdptFile.vbs"
-sub_import "clsCmArray.vbs"
-sub_import "clsCmBroker.vbs"
-sub_import "clsCmBufferedReader.vbs"
-sub_import "clsCmBufferedWriter.vbs"
-sub_import "clsCmCalendar.vbs"
-sub_import "clsCmCharacterType.vbs"
-sub_import "clsCmCssGenerator.vbs"
-sub_import "clsCmHtmlGenerator.vbs"
-sub_import "clsCmReturnValue.vbs"
-sub_import "libCom.vbs"
+'lib\com import
+Dim sRelativeFolderName : sRelativeFolderName = "lib\com"
+With CreateObject("Scripting.FileSystemObject")
+    Dim sParentFolderPath : sParentFolderPath = .GetParentFolderName(WScript.ScriptFullName)
+    Dim sLibFolderPath : sLibFolderPath = .BuildPath(sParentFolderPath, sRelativeFolderName)
+    Dim oLibFile
+    For Each oLibFile In CreateObject("Shell.Application").Namespace(sLibFolderPath).Items
+        If Not oLibFile.IsFolder Then
+            If StrComp(.GetExtensionName(oLibFile.Path), "vbs", vbTextCompare)=0 Then ExecuteGlobal .OpenTextfile(oLibFile.Path).ReadAll
+        End If
+    Next
+End With
+Set oLibFile = Nothing
+'lib import
+sRelativeFolderName = "lib"
+With new_FSO()
+    sLibFolderPath = .BuildPath(sParentFolderPath, sRelativeFolderName)
+    ExecuteGlobal .OpenTextfile(.BuildPath(sLibFolderPath,"libEnum.vbs")).ReadAll
+End With
 
 
-'メイン関数実行
+'ログ出力先、ブローカークラスのインスタンスの設定
+Private PoTs4Log, PoBroker
+Set PoTs4Log = fw_getTextstreamForLog()
+Set PoBroker = new_BrokerOf(Array(topic.LOG, GetRef("this_logger")))
+
+'Main関数実行
 Call Main()
+
+'終了処理
+PoTs4Log.close()
+Set PoBroker = Nothing : Set PoTs4Log = Nothing
 Wscript.Quit
 
 
@@ -65,36 +66,27 @@ Wscript.Quit
 '2016/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
 Sub Main()
-    
+    'パラメータ格納用オブジェクト宣言
     Dim oParams : Set oParams = new_Dic()
     
-    '当スクリプトの引数取得
-    Call sub_BackupFilesGetParameters( _
-                            oParams _
-                             )
+    '当スクリプトの引数をパラメータ格納用オブジェクトに取得する
+    fw_excuteSub "this_getParameters", oParams, PoBroker
     
     'バックアップする
-    Call sub_BackupFilesBackup( _
-                            oParams _
-                             )
+    fw_excuteSub "this_backup", oParams, PoBroker
     
     'オブジェクトを開放
     Set oParams = Nothing
-    
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 1
-'Function/Sub Name           : sub_BackupFilesGetParameters()
-'Overview                    : 当スクリプトの引数取得
-'Detailed Description        : パラメータ格納用汎用ハッシュマップにKey="Parameter"で格納する
-'                              個別パラメータ格納用ハッシュマップの構成
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              Seq(1,2,...)             個別パラメータ格納用ハッシュマップ
-'                              引数があり存在するファイルパスのみ取得する
+'Function/Sub Name           : this_getParameters()
+'Overview                    : 当スクリプトの引数をパラメータ格納用オブジェクトに取得する
+'Detailed Description        : パラメータ格納用汎用オブジェクトにKey="Param"で格納する
+'                              配列（ArrayList型）に名前なし引数（/Key:Value 形式でない）を全て取得する
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -103,72 +95,40 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2016/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_BackupFilesGetParameters( _
+Private Sub this_getParameters( _
     byRef aoParams _
     )
-    'パラメータ格納用ハッシュマップ
-    Dim oParameter : Set oParameter = new_Dic()
-    Dim lCnt : lCnt = 0
-    Dim lFileFolderKbn : Dim sParam
-    For Each sParam In WScript.Arguments
-        'ファイルが存在する場合1、フォルダが存在する場合2
-        lFileFolderKbn = 0
-        If new_Fso().FileExists(sParam) Then lFileFolderKbn = 1
-        If new_Fso().FolderExists(sParam) Then lFileFolderKbn = 2
-        
-        If lFileFolderKbn Then
-        'ファイルまたはフォルダが存在する場合パラメータを取得
-            lCnt = lCnt + 1
-            Call oParameter.Add(lCnt, func_BackupFilesGetMapParameterInfo(lFileFolderKbn, sParam))
-        End If
+    'オリジナルの引数を取得
+    Dim oArg : Set oArg = fw_storeArguments()
+    '★ログ出力
+    this_logger Array(logType.TRACE, "this_getParameters()", cf_toString(oArg))
+    
+    '実在するパスだけパラメータ格納用オブジェクトに設定
+    Dim oParam, oItem : Set oParam = new_Arr()
+    For Each oItem In oArg.Item("Unnamed")
+        '引数からファイルシステムプロキシオブジェクトを生成する
+        With fw_try(Getref("new_FspOf"), oItem)
+            If Not .isErr() Then
+                oParam.push .returnValue
+            Else
+                '★ログ出力
+                this_logger Array(logType.WARNING, "this_getParameters()", oItem & " is an invalid argument.")
+            End If
+        End With
     Next
+    cf_bindAt aoParams, "Param", oParam
     
-    Call aoParams.Add("Parameter", oParameter)
-    
-    'オブジェクトを開放
-    Set oParameter = Nothing
+    Set oItem = Nothing
+    Set oParam = Nothing
+    Set oArg = Nothing
 End Sub
-
-'***************************************************************************************************
-'Processing Order            : 1-1
-'Function/Sub Name           : func_BackupFilesGetMapParameterInfo()
-'Overview                    : 個別パラメータ格納用ハッシュマップ作成
-'Detailed Description        : 個別パラメータ格納用ハッシュマップの構成
-'                              Key                      Value
-'                              -------------------      --------------------------------------------
-'                              "isFile"                 True:対象がファイル / False:対象がフォルダ
-'                              "Path"                   フルパス
-'Argument
-'     alFileFolderKbn        : ファイルの場合1、フォルダの場合2
-'     asPath                 : フルパス
-'Return Value
-'     個別パラメータ格納用ハッシュマップ
-'---------------------------------------------------------------------------------------------------
-'History
-'Date               Name                     Reason for Changes
-'----------         ----------------------   -------------------------------------------------------
-'2017/04/26         Y.Fujii                  First edition
-'***************************************************************************************************
-Private Function func_BackupFilesGetMapParameterInfo( _
-    byVal alFileFolderKbn _
-    , byVal asPath _
-    )
-    Dim oTemp : Set oTemp = new_Dic()
-    Dim boIsFile : boIsFile = False
-    If alFileFolderKbn = 1 Then boIsFile = True
-    Call oTemp.Add("isFile", boIsFile)
-    Call oTemp.Add("Path", asPath)
-    Set func_BackupFilesGetMapParameterInfo = oTemp
-    Set oTemp = Nothing
-End Function
-
 '***************************************************************************************************
 'Processing Order            : 2
-'Function/Sub Name           : sub_BackupFilesBackup()
+'Function/Sub Name           : this_backup()
 'Overview                    : バックアップする
 'Detailed Description        : 工事中
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
+'     aoParams               : パラメータ格納用オブジェクト
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -177,30 +137,28 @@ End Function
 '----------         ----------------------   -------------------------------------------------------
 '2016/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_BackupFilesBackup( _
+Private Sub this_backup( _
     byRef aoParams _
     )
-    'パラメータ格納用汎用ハッシュマップ
-    Dim oParameter : Set oParameter = aoParams.Item("Parameter")
+    'パラメータ格納用オブジェクト
+    Dim oParam : Set oParam = aoParams.Item("Param").slice(0,Null)
     
-    Dim lKey
-    For lKey=1 To oParameter.Count
-    'パラメータごとのバックアップ処理
-        Call sub_BackupFileBackupDetail(aoParams, oParameter.Item(lKey))
-    Next
+    '個別のパラメータごとにバックアップを行う
+    Do While oParam.length>0
+        this_backupProc oParam.pop()
+    Loop
     
     'オブジェクトを開放
-    Set oParameter = Nothing
+    Set oParam = Nothing
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2-1
-'Function/Sub Name           : sub_BackupFileBackupDetail()
+'Function/Sub Name           : this_backupProc()
 'Overview                    : パラメータごとのバックアップ処理
 'Detailed Description        : 工事中
 'Argument
-'     aoParams               : パラメータ格納用汎用ハッシュマップ
-'     aoParameter            : 個別パラメータ格納用ハッシュマップ
+'     aoTarget               : backup対象（FileSystemProxy型のインスタンス）
 'Return Value
 '     なし
 '---------------------------------------------------------------------------------------------------
@@ -209,24 +167,28 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2016/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_BackupFileBackupDetail( _
-    byRef aoParams _
-    , byRef aoParameter _
+Private Sub this_backupProc( _
+    byRef aoTarget _
     )
-    
-    If aoParameter.Item("isFile") Then
-    'ファイルの場合
-        Call sub_BackupFileProcForOneFile(aoParams, aoParameter.Item("Path"))
-    Else
+    '★ログ出力
+    this_logger Array(logType.INFO, "this_backupProc()", "Start backing up '" & aoTarget.toString() & "'.")
+
+    If aoTarget.isFolder() Then
     'フォルダの場合
-        Call sub_BackupFileProcForFolder(aoParams, aoParameter.Item("Path"))
+'        this_backupProcForFolder aoTarget
+    Else
+    'ファイルの場合
+ '       this_backupProcForFile aoTarget
     End If
+
+    '★ログ出力
+    this_logger Array(logType.INFO, "this_backupProc()", "Backup of '" & aoTarget.toString() & "' has finished.")
     
 End Sub
 
 '***************************************************************************************************
 'Processing Order            : 2-1-1
-'Function/Sub Name           : sub_BackupFileProcForFolder()
+'Function/Sub Name           : this_backupProcForFolder()
 'Overview                    : フォルダのバックアップ処理
 'Detailed Description        : 工事中
 'Argument
@@ -240,7 +202,7 @@ End Sub
 '----------         ----------------------   -------------------------------------------------------
 '2016/09/21         Y.Fujii                  First edition
 '***************************************************************************************************
-Private Sub sub_BackupFileProcForFolder( _
+Private Sub this_backupProcForFolder( _
     byRef aoParams _
     , byVal asPath _
     )
@@ -450,4 +412,25 @@ Private Sub sub_BackupFileFindPreviousFile( _
     Set oTargetFile = Nothing
     Set oTempHistory = Nothing
     Set oTempProc = Nothing
+End Sub
+
+'***************************************************************************************************
+'Processing Order            : -
+'Function/Sub Name           : this_logger()
+'Overview                    : ログ出力する
+'Detailed Description        : fw_logger()に委譲する
+'Argument
+'     avParams               : 配列型のパラメータリスト
+'Return Value
+'     なし
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/02         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Sub this_logger( _
+    byRef avParams _
+    )
+    fw_logger avParams, PoTs4Log
 End Sub
