@@ -961,14 +961,17 @@ Class FileSystemProxy
         this_selfAndAllItems = Null
         If this_isInitial() Then Exit Function
 
-        Dim vRet : vRet=Array()
-        If alItemType=Cl_FILE Then
-            If Not (this_isFolder() Or this_hasItem(Empty)) Then vRet=Array(Me)
-        ElseIf alItemType=Cl_FOLDER Then
-            If (this_isFolder() Or this_hasItem(Empty)) Then vRet=Array(Me)
-        Else
-            vRet=Array(Me)
-        End If
+        Dim vRet : vRet = Array()
+        Dim boFlg : boFlg = (this_isFolder() Or this_hasItem(Empty))
+        Select Case alItemType  
+            Case Cl_FILE
+                If Not boFlg Then vRet=Array(Me)
+            Case Cl_FOLDER
+                If boFlg Then vRet=Array(Me)
+            Case Else
+                vRet=Array(Me)
+        End Select
+        
         cf_pushA vRet, this_items(True, alItemType)
         this_selfAndAllItems = vRet
     End Function
