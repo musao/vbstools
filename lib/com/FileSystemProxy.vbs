@@ -33,7 +33,7 @@ Class FileSystemProxy
         Set PeItemType = new_DicOf( _
             Array( _
                 "ALL", 0 _
-                , "FILE", 1 _
+                , "FILE", 2 _
                 , "FILE_EXCLUDE_ARCHIVE", 3 _
                 , "FOLDER", 4 _
                 , "FOLDER_INCLUDE_ARCHIVE", 5 _
@@ -636,7 +636,7 @@ Class FileSystemProxy
         Select Case alItemType  
             Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
             '対象がファイルのみかフォルダーのみの場合
-                If new_Fso().FolderExists(PsPath) Then
+                If this_isFolder() Then
                 '自身がフォルダの場合
                     If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then
                     '対象がファイルのみの場合
@@ -687,67 +687,13 @@ Class FileSystemProxy
         this_items = Array()
         If Not this_hasItem(PeItemType("ALL")) Then Exit Function
 
-        If new_Fso().FolderExists(PsPath) Then
+        If this_isFolder() Then
         'フォルダの場合
             this_items = this_itemsForFolder(aboRecursiveFlg, alItemType)
-'            this_items = this_itemsByDir(aboRecursiveFlg, alItemType)
         Else
         'zipの場合
             this_items = this_itemsForZip(aboRecursiveFlg, alItemType)
         End If
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_itemsByDir()
-    'Overview                    : フォルダー内のアイテムの配列を返す
-    'Detailed Description        : cmdのdir版
-    'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/26         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_itemsByDir( _
-        byVal aboRecursiveFlg _
-        , byVal alItemType _
-        )
-        Dim sFlg,sDir
-        sFlg="" : If aboRecursiveFlg Then sFlg="/S "
-        sDir = "dir /B " & sFlg & fs_wrapInQuotes(PsPath)
-        Dim sTmpPath : sTmpPath = fw_getTempPath()
-        
-        fw_runShellSilently "cmd /U /C " & sDir & " > " & fs_wrapInQuotes(sTmpPath)
-        Dim vArrList : vArrList = Split(fs_readFile(sTmpPath), vbNewLine)
-        fs_deleteFile sTmpPath
-        Redim Preserve vArrList(Ubound(vArrList)-1)
-
-        Dim oParents : Set oParents = new_DicOf(Array(PsPath,Me))
-        Dim boFlg : If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then boFlg=False Else boFlg=True
-        Dim sPath,sEle,sParentPath,oNewItem,vRet()
-        For Each sEle In vArrList
-            If aboRecursiveFlg Then sPath=sEle Else sPath=new_Fso().BuildPath(PsPath,sEle)
-            Set oNewItem = new_FspOf(sPath)
-            sParentPath = new_Fso().GetParentFolderName(sPath)
-            If oParents.Exists(sParentPath) Then oNewItemoFsp.setParent oParents(sParentPath)
-
-            Select Case alItemType
-                Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
-                    If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push vRet, oNewItem
-                Case Else
-                    cf_push vRet, oNewItem
-            End Select
-
-            If aboRecursiveFlg And oNewItem.isFolder And Not oParents.Exists(sPath) Then oParents.Add sPath, oNewItem
-        Next
-
-        this_itemsByDir = vRet
-        Set oFsp = Nothing
-        Set oParents = Nothing
     End Function
 
     '***************************************************************************************************
@@ -863,7 +809,7 @@ Class FileSystemProxy
             End Select
         End If
 
-        Set oNewItem=Nothing
+        Set oNewItem = Nothing
     End Sub
 
     '***************************************************************************************************
@@ -1003,7 +949,7 @@ Class FileSystemProxy
         this_size = Null
         If this_isInitial() Then Exit Function
 
-        If new_Fso().FolderExists(PsPath) Then
+        If this_isFolder() Then
         'フォルダの場合
             this_size = new_FolderOf(PsPath).Size
         Else
