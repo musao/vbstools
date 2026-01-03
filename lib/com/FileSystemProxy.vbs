@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class FileSystemProxy
     'クラス内変数、定数
-    Private PoFolderItem, PoParent, PsPath, Cl_FILE, Cl_FOLDER
+    Private PoFolderItem, PoParent, PsPath, PeItemType
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -30,7 +30,15 @@ Class FileSystemProxy
         PsPath = vbNullString
         Set PoFolderItem = Nothing
         Set PoParent = Nothing
-        Cl_FILE=1 : Cl_FOLDER=2
+        Set PeItemType = new_DicOf( _
+            Array( _
+                "ALL", 0 _
+                , "FILE", 1 _
+                , "FILE_EXCLUDE_ARCHIVE", 3 _
+                , "FOLDER", 4 _
+                , "FOLDER_INCLUDE_ARCHIVE", 5 _
+            ) _
+        )
     End Sub
     
     '***************************************************************************************************
@@ -50,6 +58,7 @@ Class FileSystemProxy
     Private Sub Class_Terminate()
         Set PoFolderItem = Nothing
         Set PoParent = Nothing
+        Set PeItemType = Nothing
     End Sub
     
     '***************************************************************************************************
@@ -67,7 +76,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allFiles()
-        allFiles = this_items(True, Cl_FILE)
+        allFiles = this_items(True, PeItemType("FILE_EXCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -85,7 +94,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allFolders()
-        allFolders = this_items(True, Cl_FOLDER)
+        allFolders = this_items(True, PeItemType("FOLDER_INCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -103,7 +112,7 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allItems()
-        allItems = this_items(True, Empty)
+        allItems = this_items(True, PeItemType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -175,7 +184,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get files()
-        files = this_items(False, Cl_FILE)
+        files = this_items(False, PeItemType("FILE_EXCLUDE_ARCHIVE"))
     End Property
 
     '***************************************************************************************************
@@ -193,7 +202,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get folders()
-        folders = this_items(False, Cl_FOLDER)
+        folders = this_items(False, PeItemType("FOLDER_INCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -211,7 +220,7 @@ Class FileSystemProxy
     '2025/04/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasFile()
-        hasFile = this_hasItem(Cl_FILE)
+        hasFile = this_hasItem(PeItemType("FILE_EXCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -229,7 +238,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasFolder()
-        hasFolder = this_hasItem(Cl_FOLDER)
+        hasFolder = this_hasItem(PeItemType("FOLDER_INCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -247,7 +256,7 @@ Class FileSystemProxy
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasItem()
-        hasItem = this_hasItem(Empty)
+        hasItem = this_hasItem(PeItemType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -338,7 +347,7 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get items()
-        items = this_items(False, Empty)
+        items = this_items(False, PeItemType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -410,7 +419,7 @@ Class FileSystemProxy
     '2025/04/25         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get selfAndAllFiles()
-        selfAndAllFiles = this_selfAndAllItems(Cl_FILE)
+        selfAndAllFiles = this_selfAndAllItems(PeItemType("FILE_EXCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -428,7 +437,7 @@ Class FileSystemProxy
     '2025/04/25         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get selfAndAllFolders()
-        selfAndAllFolders = this_selfAndAllItems(Cl_FOLDER)
+        selfAndAllFolders = this_selfAndAllItems(PeItemType("FOLDER_INCLUDE_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -446,7 +455,7 @@ Class FileSystemProxy
     '2025/04/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get selfAndAllItems()
-        selfAndAllItems = this_selfAndAllItems(Empty)
+        selfAndAllItems = this_selfAndAllItems(PeItemType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -625,11 +634,11 @@ Class FileSystemProxy
 
         this_hasItem = False
         Select Case alItemType  
-            Case Cl_FILE,Cl_FOLDER
+            Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
             '対象がファイルのみかフォルダーのみの場合
                 If new_Fso().FolderExists(PsPath) Then
                 '自身がフォルダの場合
-                    If alItemType=Cl_FILE Then
+                    If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then
                     '対象がファイルのみの場合
                         this_hasItem=(new_FolderOf(PsPath).Files.Count>0)
                     Else
@@ -639,7 +648,7 @@ Class FileSystemProxy
                 ElseIf PoFolderItem.IsFolder Then
                 '自身がzipの場合
                     Dim oEle,boFlg
-                    If alItemType=Cl_FILE Then boFlg=False Else boFlg=True
+                    If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then boFlg=False Else boFlg=True
                     For Each oEle In PoFolderItem.GetFolder.Items
                         If oEle.IsFolder=boFlg Then
                             this_hasItem=True
@@ -672,11 +681,11 @@ Class FileSystemProxy
         byVal aboRecursiveFlg _
         , byVal alItemType _
         )
-        this_items=Null
+        this_items = Null
         If this_isInitial() Then Exit Function
 
         this_items = Array()
-        If Not this_hasItem(Empty) Then Exit Function
+        If Not this_hasItem(PeItemType("ALL")) Then Exit Function
 
         If new_Fso().FolderExists(PsPath) Then
         'フォルダの場合
@@ -718,7 +727,7 @@ Class FileSystemProxy
         Redim Preserve vArrList(Ubound(vArrList)-1)
 
         Dim oParents : Set oParents = new_DicOf(Array(PsPath,Me))
-        Dim boFlg : If alItemType=Cl_FILE Then boFlg=False Else boFlg=True
+        Dim boFlg : If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then boFlg=False Else boFlg=True
         Dim sPath,sEle,sParentPath,oNewItem,vRet()
         For Each sEle In vArrList
             If aboRecursiveFlg Then sPath=sEle Else sPath=new_Fso().BuildPath(PsPath,sEle)
@@ -727,7 +736,7 @@ Class FileSystemProxy
             If oParents.Exists(sParentPath) Then oNewItemoFsp.setParent oParents(sParentPath)
 
             Select Case alItemType
-                Case Cl_FILE,Cl_FOLDER
+                Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
                     If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push vRet, oNewItem
                 Case Else
                     cf_push vRet, oNewItem
@@ -768,7 +777,7 @@ Class FileSystemProxy
             Next
             
             'フォルダの取得
-            If aboRecursiveFlg Or alItemType<>Cl_FILE Then
+            If aboRecursiveFlg Or alItemType<>PeItemType("FILE_EXCLUDE_ARCHIVE") Then
             '再帰処理するかファイルのみ対象以外フォルダを取得する
                 For Each oEle In .SubFolders
                     this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
@@ -836,9 +845,9 @@ Class FileSystemProxy
         If aboRecursiveFlg Then
         '再帰処理する場合
             Select Case alItemType
-                Case Cl_FILE
+                Case PeItemType("FILE_EXCLUDE_ARCHIVE")
                     cf_pushA avAr, oNewItem.selfAndAllFiles()
-                Case Cl_FOLDER
+                Case PeItemType("FOLDER_INCLUDE_ARCHIVE")
                     cf_pushA avAr, oNewItem.selfAndAllFolders()
                 Case Else
                     cf_pushA avAr, oNewItem.selfAndAllItems()
@@ -846,8 +855,8 @@ Class FileSystemProxy
         Else
         '再帰処理しない場合
             Select Case alItemType
-                Case Cl_FILE,Cl_FOLDER
-                    Dim boFlg : If alItemType=Cl_FILE Then boFlg=False Else boFlg=True
+                Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
+                    Dim boFlg : If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then boFlg=False Else boFlg=True
                     If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push avAr, oNewItem
                 Case Else
                     cf_push avAr, oNewItem
@@ -962,11 +971,11 @@ Class FileSystemProxy
         If this_isInitial() Then Exit Function
 
         Dim vRet : vRet = Array()
-        Dim boFlg : boFlg = (this_isFolder() Or this_hasItem(Empty))
+        Dim boFlg : boFlg = (this_isFolder() Or this_hasItem(PeItemType("ALL")))
         Select Case alItemType  
-            Case Cl_FILE
+            Case PeItemType("FILE_EXCLUDE_ARCHIVE")
                 If Not boFlg Then vRet=Array(Me)
-            Case Cl_FOLDER
+            Case PeItemType("FOLDER_INCLUDE_ARCHIVE")
                 If boFlg Then vRet=Array(Me)
             Case Else
                 vRet=Array(Me)
