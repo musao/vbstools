@@ -151,7 +151,7 @@ Private Sub this_getFileInfomations( _
     '配下のファイルを全て取得する
     Dim oList : Set oList = new_Arr()
     Do While oParam.length>0
-        oList.pushA oParam.pop().selfAndAllFiles()
+        oList.pushA oParam.pop().allFilesExcludingArchivesIncludingSelf()
     Loop
 
     '★ログ出力

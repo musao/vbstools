@@ -44,14 +44,17 @@ End Sub
 
 '###################################################################################################
 'FileSystemProxy.<properties>_initial
-'   .allFiles
-'   .allFolders
-'   .allItems
+'   .allContainers
+'   .allContainersIncludingSelf
+'   .allEntries
+'   .allEntriesIncludingSelf
+'   .allFilesExcludingArchives
+'   .allFilesExcludingArchivesIncludingSelf
 '   .baseName
 '   .dateLastModified
 '   .extension
-'   .files
-'   .folders
+'   .filesExcludingArchives
+'   .containers
 '   .hasFile
 '   .hasFolder
 '   .hasItem
@@ -59,13 +62,10 @@ End Sub
 '   .isFileSystem
 '   .isFolder
 '   .isLink
-'   .items
+'   .entries
 '   .name
 '   .parentFolder
 '   .path
-'   .selfAndAllFiles
-'   .selfAndAllFolders
-'   .selfAndAllItems
 '   .size
 '   .toString
 '   .type
@@ -73,19 +73,19 @@ Sub Test_FileProxy_proeerties_initial
     dim tg,a,ao,e
     set ao = (new FileSystemProxy)
 
-    tg = "allFiles"
+    tg = "allFilesExcludingArchives"
     e = Null
-    a = ao.allFiles
+    a = ao.allFilesExcludingArchives
     AssertEqualWithMessage e, a, tg
 
-    tg = "allFolders"
+    tg = "allContainers"
     e = Null
-    a = ao.allFolders
+    a = ao.allContainers
     AssertEqualWithMessage e, a, tg
 
-    tg = "allItems"
+    tg = "allEntries"
     e = Null
-    a = ao.allItems
+    a = ao.allEntries
     AssertEqualWithMessage e, a, tg
 
     tg = "baseName"
@@ -103,14 +103,14 @@ Sub Test_FileProxy_proeerties_initial
     a = ao.extension
     AssertEqualWithMessage e, a, tg
 
-    tg = "files"
+    tg = "filesExcludingArchives"
     e = Null
-    a = ao.files
+    a = ao.filesExcludingArchives
     AssertEqualWithMessage e, a, tg
 
-    tg = "folders"
+    tg = "containers"
     e = Null
-    a = ao.folders
+    a = ao.containers
     AssertEqualWithMessage e, a, tg
 
     tg = "hasFile"
@@ -148,9 +148,9 @@ Sub Test_FileProxy_proeerties_initial
     a = ao.isLink
     AssertEqualWithMessage e, a, tg
 
-    tg = "items"
+    tg = "entries"
     e = Null
-    a = ao.items
+    a = ao.entries
     AssertEqualWithMessage e, a, tg
 
     tg = "name"
@@ -168,19 +168,19 @@ Sub Test_FileProxy_proeerties_initial
     a = ao.path
     AssertEqualWithMessage e, a, tg
 
-    tg = "selfAndAllFiles"
+    tg = "allFilesExcludingArchivesIncludingSelf"
     e = Null
-    a = ao.selfAndAllFiles
+    a = ao.allFilesExcludingArchivesIncludingSelf
     AssertEqualWithMessage e, a, tg
 
-    tg = "selfAndAllFolders"
+    tg = "allContainersIncludingSelf"
     e = Null
-    a = ao.selfAndAllFolders
+    a = ao.allContainersIncludingSelf
     AssertEqualWithMessage e, a, tg
 
-    tg = "selfAndAllItems"
+    tg = "allEntriesIncludingSelf"
     e = Null
-    a = ao.selfAndAllItems
+    a = ao.allEntriesIncludingSelf
     AssertEqualWithMessage e, a, tg
 
     tg = "size"
@@ -214,33 +214,34 @@ Sub Test_FileProxy_properties
         hasSomething=expectHasFile(obj)
         AssertEqualWithMessage hasSomething, ao.hasFile, "i="&i&",hasFile"
         If hasSomething Then
-            assertFsItems ao.files,d,i&".files",False,False,Cl_FILE
+            assertFsItems ao.filesExcludingArchives,d,i&".filesExcludingArchives",False,False,Cl_FILE
         Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.files), "i="&i&",.files"
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.filesExcludingArchives), "i="&i&",.filesExcludingArchives"
         End If
-        assertFsItems ao.allFiles,d,i&".allFiles",False,True,Cl_FILE
-        assertFsItems ao.selfAndAllFiles,d,i&".selfAndAllFiles",True,True,Cl_FILE
+        assertFsItems ao.allFilesExcludingArchives,d,i&".allFilesExcludingArchives",False,True,Cl_FILE
+        assertFsItems ao.allFilesExcludingArchivesIncludingSelf,d,i&".allFilesExcludingArchivesIncludingSelf",True,True,Cl_FILE
 
         hasSomething=expectHasFolder(obj)
         AssertEqualWithMessage hasSomething, ao.hasFolder, "i="&i&",hasFolder"
         If hasSomething Then
-            assertFsItems ao.folders,d,i&".files",False,False,Cl_FOLDER
+            assertFsItems ao.containers,d,i&".filesExcludingArchives",False,False,Cl_FOLDER
         Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.folders), "i="&i&",.folders"
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.containers), "i="&i&",.containers"
         End If
-        assertFsItems ao.allFolders,d,i&".allFolders",False,True,Cl_FOLDER
-        assertFsItems ao.selfAndAllFolders,d,i&".selfAndAllFolders",True,True,Cl_FOLDER
+        assertFsItems ao.allContainers,d,i&".allContainers",False,True,Cl_FOLDER
+        assertFsItems ao.allContainersIncludingSelf,d,i&".allContainersIncludingSelf",True,True,Cl_FOLDER
 
         hasSomething=expectHasItem(obj)
         AssertEqualWithMessage hasSomething, ao.hasItem, "i="&i&",hasItem"
         If hasSomething Then
-            assertFsItems ao.items,d,i&".items",False,False,Empty
-            assertFsItems ao.allItems,d,i&".allItems",False,True,Empty
+            assertFsItems ao.entries,d,i&".entries",False,False,Empty
+            assertFsItems ao.allEntries,d,i&".allEntries",False,True,Empty
         Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.items), "i="&i&",.items"
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.allItems), "i="&i&",.allItems"
-        End If
-        assertFsItems ao.selfAndAllItems,d,i&".selfAndAllItems",True,True,Empty
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.entries), "i="&i&",.entries"
+            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.allEntries), "i="&i&",.allEntries"
+ 
+       End If
+        assertFsItems ao.allEntriesIncludingSelf,d,i&".allEntriesIncludingSelf",True,True,Empty
 
     Next
 End Sub
@@ -561,7 +562,7 @@ End Function
 '   .isFileSystem
 '   .isFolder
 '   .isLink
-'   .items
+'   .entries
 '   .name
 '   .parentFolder
 '   .path
@@ -613,15 +614,15 @@ Sub assertFsProperties(target,path,comment)
     Set obj = Nothing
 End Sub
 'to verify the following properties
-'   .allFiles
-'   .allFolders
-'   .allItems
-'   .files
-'   .folders
-'   .items
-'   .selfAndAllFiles
-'   .selfAndAllFolders
-'   .selfAndAllItems
+'   .allContainers
+'   .allContainersIncludingSelf
+'   .allEntries
+'   .allEntriesIncludingSelf
+'   .allFilesExcludingArchives
+'   .allFilesExcludingArchivesIncludingSelf
+'   .filesExcludingArchives
+'   .containers
+'   .entries
 Sub assertFsItems(items,path,comment,self,recursive,itemType)
     Dim dic : Set dic = dictionary
     For Each i In items
@@ -664,10 +665,10 @@ Sub existsItem(path,comment,dic,itemType)
     Dim sItemName : sItemName = "items"
     Select Case itemType
     Case Cl_FILE
-        sItemName = "files"
+        sItemName = "filesExcludingArchives"
         If Not getFolderItem2(path).IsFolder Then flg = True
     Case Cl_FOLDER
-        sItemName = "folders"
+        sItemName = "containers"
         If getFolderItem2(path).IsFolder Then flg = True
     Case Else
         flg = True

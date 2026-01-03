@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class FileSystemProxy
     'クラス内変数、定数
-    Private PoFolderItem, PoParent, PsPath, PeItemType
+    Private PoFolderItem, PoParent, PsPath, PeEntryType
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -30,13 +30,13 @@ Class FileSystemProxy
         PsPath = vbNullString
         Set PoFolderItem = Nothing
         Set PoParent = Nothing
-        Set PeItemType = new_DicOf( _
+        Set PeEntryType = new_DicOf( _
             Array( _
                 "ALL", 0 _
                 , "FILE", 2 _
-                , "FILE_EXCLUDE_ARCHIVE", 3 _
+                , "FILE_EXCLUDING_ARCHIVE", 3 _
                 , "FOLDER", 4 _
-                , "FOLDER_INCLUDE_ARCHIVE", 5 _
+                , "CONTAINER", 5 _
             ) _
         )
     End Sub
@@ -58,12 +58,12 @@ Class FileSystemProxy
     Private Sub Class_Terminate()
         Set PoFolderItem = Nothing
         Set PoParent = Nothing
-        Set PeItemType = Nothing
+        Set PeEntryType = Nothing
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get allFiles()
-    'Overview                    : フォルダー以下の全てのファイルの配列を返す
+    'Function/Sub Name           : Property Get allContainers()
+    'Overview                    : 配下の全てのフォルダーとアーカイブのリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -75,13 +75,13 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get allFiles()
-        allFiles = this_items(True, PeItemType("FILE_EXCLUDE_ARCHIVE"))
+    Public Property Get allContainers()
+        allContainers = this_entries(True, PeEntryType("CONTAINER"))
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get allFolders()
-    'Overview                    : フォルダー以下の全てのファイルの配列を返す
+    'Function/Sub Name           : Property Get allContainersIncludingSelf()
+    'Overview                    : 自身を含む配下の全てのフォルダーとアーカイブのリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -91,15 +91,15 @@ Class FileSystemProxy
     'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2025/04/27         Y.Fujii                  First edition
+    '2025/04/25         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get allFolders()
-        allFolders = this_items(True, PeItemType("FOLDER_INCLUDE_ARCHIVE"))
+    Public Property Get allContainersIncludingSelf()
+        allContainersIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("CONTAINER"))
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get allItems()
-    'Overview                    : フォルダー以下の全てのアイテムの配列を返す
+    'Function/Sub Name           : Property Get allEntries()
+    'Overview                    : 配下の全てのファイル、アーカイブ、フォルダーのリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -111,8 +111,62 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get allItems()
-        allItems = this_items(True, PeItemType("ALL"))
+    Public Property Get allEntries()
+        allEntries = this_entries(True, PeEntryType("ALL"))
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get allEntriesIncludingSelf()
+    'Overview                    : 自身を含む配下の全てのファイル、アーカイブ、フォルダーのリストを取得する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get allEntriesIncludingSelf()
+        allEntriesIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("ALL"))
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get allFilesExcludingArchives()
+    'Overview                    : 配下の全てのアーカイブを除くファイルのリストを取得する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get allFilesExcludingArchives()
+        allFilesExcludingArchives = this_entries(True, PeEntryType("FILE_EXCLUDING_ARCHIVE"))
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get allFilesExcludingArchivesIncludingSelf()
+    'Overview                    : 自身を含む配下の全てのアーカイブを除くファイルのリストを取得する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get allFilesExcludingArchivesIncludingSelf()
+        allFilesExcludingArchivesIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("FILE_EXCLUDING_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -132,6 +186,24 @@ Class FileSystemProxy
     Public Property Get baseName()
         baseName = this_baseName()
     End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get containers()
+    'Overview                    : 配下のフォルダーとアーカイブのリストを取得する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/27         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get containers()
+        containers = this_entries(False, PeEntryType("CONTAINER"))
+    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get dateLastModified()
@@ -149,6 +221,24 @@ Class FileSystemProxy
     '***************************************************************************************************
     Public Property Get dateLastModified()
         dateLastModified = this_dateLastModified()
+    End Property
+
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get entries()
+    'Overview                    : 配下のファイル、アーカイブ、フォルダーのリストを取得する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/20         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get entries()
+        entries = this_entries(False, PeEntryType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -170,8 +260,8 @@ Class FileSystemProxy
     End Property
 
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get files()
-    'Overview                    : フォルダー内のファイルの配列を返す
+    'Function/Sub Name           : Property Get filesExcludingArchives()
+    'Overview                    : 配下のアーカイブを除くファイルのリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -183,26 +273,8 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get files()
-        files = this_items(False, PeItemType("FILE_EXCLUDE_ARCHIVE"))
-    End Property
-
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get folders()
-    'Overview                    : フォルダー内のフォルダーの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/27         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get folders()
-        folders = this_items(False, PeItemType("FOLDER_INCLUDE_ARCHIVE"))
+    Public Property Get filesExcludingArchives()
+        filesExcludingArchives = this_entries(False, PeEntryType("FILE_EXCLUDING_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -220,7 +292,7 @@ Class FileSystemProxy
     '2025/04/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasFile()
-        hasFile = this_hasItem(PeItemType("FILE_EXCLUDE_ARCHIVE"))
+        hasFile = this_hasItem(PeEntryType("FILE_EXCLUDING_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -238,7 +310,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasFolder()
-        hasFolder = this_hasItem(PeItemType("FOLDER_INCLUDE_ARCHIVE"))
+        hasFolder = this_hasItem(PeEntryType("CONTAINER"))
     End Property
     
     '***************************************************************************************************
@@ -256,7 +328,7 @@ Class FileSystemProxy
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get hasItem()
-        hasItem = this_hasItem(PeItemType("ALL"))
+        hasItem = this_hasItem(PeEntryType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -331,24 +403,6 @@ Class FileSystemProxy
     Public Property Get isLink()
         isLink = this_isLink()
     End Property
-
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get items()
-    'Overview                    : フォルダー内のアイテムの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/20         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get items()
-        items = this_items(False, PeItemType("ALL"))
-    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get name()
@@ -402,60 +456,6 @@ Class FileSystemProxy
     '***************************************************************************************************
     Public Default Property Get path()
         path = this_path()
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get selfAndAllFiles()
-    'Overview                    : 自身と配下の全てファイルの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/25         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get selfAndAllFiles()
-        selfAndAllFiles = this_selfAndAllItems(PeItemType("FILE_EXCLUDE_ARCHIVE"))
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get selfAndAllFolders()
-    'Overview                    : 自身と配下の全てフォルダーの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/25         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get selfAndAllFolders()
-        selfAndAllFolders = this_selfAndAllItems(PeItemType("FOLDER_INCLUDE_ARCHIVE"))
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get selfAndAllItems()
-    'Overview                    : 自身と配下の全てアイテムの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/17         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get selfAndAllItems()
-        selfAndAllItems = this_selfAndAllItems(PeItemType("ALL"))
     End Property
     
     '***************************************************************************************************
@@ -554,6 +554,43 @@ Class FileSystemProxy
         Set setParent = Me
     End Function
 
+
+
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_allEntriesIncludingSelf()
+    'Overview                    : 自身とフォルダー内のエントリーの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/17         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_allEntriesIncludingSelf( _
+        byVal alEntryType _
+        )
+        this_allEntriesIncludingSelf = Null
+        If this_isInitial() Then Exit Function
+
+        Dim vRet : vRet = Array()
+        Dim boFlg : boFlg = (this_isFolder() Or this_hasItem(PeEntryType("ALL")))
+        Select Case alEntryType 
+            Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
+                If Not boFlg Then vRet=Array(Me)
+            Case PeEntryType("CONTAINER")
+                If boFlg Then vRet=Array(Me)
+            Case Else
+                vRet=Array(Me)
+        End Select
+        
+        cf_pushA vRet, this_entries(True, alEntryType)
+        this_allEntriesIncludingSelf = vRet
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : this_baseName()
@@ -592,6 +629,156 @@ Class FileSystemProxy
         this_dateLastModified = Null
         If Not this_isInitial() Then this_dateLastModified = PoFolderItem.ModifyDate
     End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_entries()
+    'Overview                    : フォルダー内のエントリーの配列を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/20         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_entries( _
+        byVal aboRecursiveFlg _
+        , byVal alEntryType _
+        )
+        this_entries = Null
+        If this_isInitial() Then Exit Function
+
+        this_entries = Array()
+        If Not this_hasItem(PeEntryType("ALL")) Then Exit Function
+
+        If this_isFolder() Then
+        'フォルダの場合
+            this_entries = this_entriesForFolder(aboRecursiveFlg, alEntryType)
+        Else
+        'zipの場合
+            this_entries = this_entriesForZip(aboRecursiveFlg, alEntryType)
+        End If
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_entriesForFolder()
+    'Overview                    : フォルダー内のエントリーの配列を返す
+    'Detailed Description        : フォルダの場合
+    'Argument
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/20         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_entriesForFolder( _
+        byVal aboRecursiveFlg _
+        , byVal alEntryType _
+        )
+        Dim oEle,vRet()
+        With new_FolderOf(PsPath)
+            'ファイルの取得
+            For Each oEle In .Files
+                this_entriesGetEntries vRet,oEle.Path,aboRecursiveFlg,alEntryType
+            Next
+            
+            'フォルダの取得
+            If aboRecursiveFlg Or alEntryType<>PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
+            '再帰処理するかファイルのみ対象以外フォルダを取得する
+                For Each oEle In .SubFolders
+                    this_entriesGetEntries vRet,oEle.Path,aboRecursiveFlg,alEntryType
+                Next
+            End If
+        End With
+
+        this_entriesForFolder = vRet
+        Set oEle = Nothing
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_entriesForZip()
+    'Overview                    : アーカイブ内のエントリーの配列を返す
+    'Detailed Description        : zipの場合
+    'Argument
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    'Return Value
+    '     当クラスのインスタンスの配列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/20         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_entriesForZip( _
+        byVal aboRecursiveFlg _
+        , byVal alEntryType _
+        )
+        Dim oEle,vRet()
+        For Each oEle In PoFolderItem.GetFolder.Items
+            this_entriesGetEntries vRet,oEle.Path,aboRecursiveFlg,alEntryType
+        Next
+
+        this_entriesForZip = vRet
+        Set oEle = Nothing
+    End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_entriesGetEntries()
+    'Overview                    : エントリーを取得する
+    'Detailed Description        : 再帰処理する場合は下位のエントリーも取得する
+    'Argument
+    '     avAr                   : 取得したエントリーを格納する配列
+    '     asPath                 : パス
+    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_entriesGetEntries( _
+        byRef avAr _
+        , byVal asPath _
+        , byVal aboRecursiveFlg _
+        , byVal alEntryType _
+        )
+        Dim oNewItem : Set oNewItem = new_FspOf(asPath).setParent(Me)
+
+        If aboRecursiveFlg Then
+        '再帰処理する場合
+            Select Case alEntryType
+                Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
+                    cf_pushA avAr, oNewItem.allFilesExcludingArchivesIncludingSelf()
+                Case PeEntryType("CONTAINER")
+                    cf_pushA avAr, oNewItem.allContainersIncludingSelf()
+                Case Else
+                    cf_pushA avAr, oNewItem.allEntriesIncludingSelf()
+            End Select
+        Else
+        '再帰処理しない場合
+            Select Case alEntryType
+                Case PeEntryType("FILE_EXCLUDING_ARCHIVE"),PeEntryType("CONTAINER")
+                    Dim boFlg : If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then boFlg=False Else boFlg=True
+                    If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push avAr, oNewItem
+                Case Else
+                    cf_push avAr, oNewItem
+            End Select
+        End If
+
+        Set oNewItem = Nothing
+    End Sub
     
     '***************************************************************************************************
     'Function/Sub Name           : this_extension()
@@ -617,7 +804,7 @@ Class FileSystemProxy
     'Overview                    : 配下に引数で指定したアイテムを1つ以上持つか返す
     'Detailed Description        : 工事中
     'Argument
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
     'Return Value
     '     配下にアイテムを1つ以上持つか
     '---------------------------------------------------------------------------------------------------
@@ -627,18 +814,18 @@ Class FileSystemProxy
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_hasItem( _
-        byVal alItemType _
+        byVal alEntryType _
         )
         this_hasItem = Null
         If this_isInitial() Then Exit Function
 
         this_hasItem = False
-        Select Case alItemType  
-            Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
+        Select Case alEntryType 
+            Case PeEntryType("FILE_EXCLUDING_ARCHIVE"),PeEntryType("CONTAINER")
             '対象がファイルのみかフォルダーのみの場合
                 If this_isFolder() Then
                 '自身がフォルダの場合
-                    If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then
+                    If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
                     '対象がファイルのみの場合
                         this_hasItem=(new_FolderOf(PsPath).Files.Count>0)
                     Else
@@ -648,7 +835,7 @@ Class FileSystemProxy
                 ElseIf PoFolderItem.IsFolder Then
                 '自身がzipの場合
                     Dim oEle,boFlg
-                    If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then boFlg=False Else boFlg=True
+                    If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then boFlg=False Else boFlg=True
                     For Each oEle In PoFolderItem.GetFolder.Items
                         If oEle.IsFolder=boFlg Then
                             this_hasItem=True
@@ -661,156 +848,6 @@ Class FileSystemProxy
                 If PoFolderItem.IsFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
         End Select
     End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_items()
-    'Overview                    : フォルダー内のアイテムの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/20         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_items( _
-        byVal aboRecursiveFlg _
-        , byVal alItemType _
-        )
-        this_items = Null
-        If this_isInitial() Then Exit Function
-
-        this_items = Array()
-        If Not this_hasItem(PeItemType("ALL")) Then Exit Function
-
-        If this_isFolder() Then
-        'フォルダの場合
-            this_items = this_itemsForFolder(aboRecursiveFlg, alItemType)
-        Else
-        'zipの場合
-            this_items = this_itemsForZip(aboRecursiveFlg, alItemType)
-        End If
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_itemsForFolder()
-    'Overview                    : フォルダー内のアイテムの配列を返す
-    'Detailed Description        : フォルダの場合
-    'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/20         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_itemsForFolder( _
-        byVal aboRecursiveFlg _
-        , byVal alItemType _
-        )
-        Dim oEle,vRet()
-        With new_FolderOf(PsPath)
-            'ファイルの取得
-            For Each oEle In .Files
-                this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
-            Next
-            
-            'フォルダの取得
-            If aboRecursiveFlg Or alItemType<>PeItemType("FILE_EXCLUDE_ARCHIVE") Then
-            '再帰処理するかファイルのみ対象以外フォルダを取得する
-                For Each oEle In .SubFolders
-                    this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
-                Next
-            End If
-        End With
-
-        this_itemsForFolder = vRet
-        Set oEle = Nothing
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_itemsForZip()
-    'Overview                    : フォルダー内のアイテムの配列を返す
-    'Detailed Description        : zipの場合
-    'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/20         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_itemsForZip( _
-        byVal aboRecursiveFlg _
-        , byVal alItemType _
-        )
-        Dim oEle,vRet()
-        For Each oEle In PoFolderItem.GetFolder.Items
-            this_itemsGetItems vRet,oEle.Path,aboRecursiveFlg,alItemType
-        Next
-
-        this_itemsForZip = vRet
-        Set oEle = Nothing
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_itemsGetItems()
-    'Overview                    : アイテムを取得する
-    'Detailed Description        : 再帰処理する場合は下位のアイテムも取得する
-    'Argument
-    '     avAr                   : 取得したアイテムを格納する配列
-    '     asPath                 : パス
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
-    'Return Value
-    '     なし
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/23         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Sub this_itemsGetItems( _
-        byRef avAr _
-        , byVal asPath _
-        , byVal aboRecursiveFlg _
-        , byVal alItemType _
-        )
-        Dim oNewItem : Set oNewItem = new_FspOf(asPath).setParent(Me)
-
-        If aboRecursiveFlg Then
-        '再帰処理する場合
-            Select Case alItemType
-                Case PeItemType("FILE_EXCLUDE_ARCHIVE")
-                    cf_pushA avAr, oNewItem.selfAndAllFiles()
-                Case PeItemType("FOLDER_INCLUDE_ARCHIVE")
-                    cf_pushA avAr, oNewItem.selfAndAllFolders()
-                Case Else
-                    cf_pushA avAr, oNewItem.selfAndAllItems()
-            End Select
-        Else
-        '再帰処理しない場合
-            Select Case alItemType
-                Case PeItemType("FILE_EXCLUDE_ARCHIVE"),PeItemType("FOLDER_INCLUDE_ARCHIVE")
-                    Dim boFlg : If alItemType=PeItemType("FILE_EXCLUDE_ARCHIVE") Then boFlg=False Else boFlg=True
-                    If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push avAr, oNewItem
-                Case Else
-                    cf_push avAr, oNewItem
-            End Select
-        End If
-
-        Set oNewItem = Nothing
-    End Sub
 
     '***************************************************************************************************
     'Function/Sub Name           : this_name()
@@ -895,41 +932,6 @@ Class FileSystemProxy
 
         Set PoParent = aoParent
     End Sub
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_selfAndAllItems()
-    'Overview                    : 自身とフォルダー内のアイテムの配列を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     alItemType             : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
-    'Return Value
-    '     当クラスのインスタンスの配列
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/17         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_selfAndAllItems( _
-        byVal alItemType _
-        )
-        this_selfAndAllItems = Null
-        If this_isInitial() Then Exit Function
-
-        Dim vRet : vRet = Array()
-        Dim boFlg : boFlg = (this_isFolder() Or this_hasItem(PeItemType("ALL")))
-        Select Case alItemType  
-            Case PeItemType("FILE_EXCLUDE_ARCHIVE")
-                If Not boFlg Then vRet=Array(Me)
-            Case PeItemType("FOLDER_INCLUDE_ARCHIVE")
-                If boFlg Then vRet=Array(Me)
-            Case Else
-                vRet=Array(Me)
-        End Select
-        
-        cf_pushA vRet, this_items(True, alItemType)
-        this_selfAndAllItems = vRet
-    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : this_size()
