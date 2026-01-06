@@ -32,7 +32,7 @@ Class FileSystemProxy
         Set PoParent = Nothing
         Set PeEntryType = new_DicOf( _
             Array( _
-                "ALL", 0 _
+                "ENTRY", 0 _
                 , "FILE", 2 _
                 , "FILE_EXCLUDING_ARCHIVE", 3 _
                 , "FOLDER", 4 _
@@ -99,7 +99,7 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get allEntries()
-    'Overview                    : 配下の全てのファイル、アーカイブ、フォルダーのリストを取得する
+    'Overview                    : 配下の全てのエントリー（ファイル、アーカイブ、フォルダー）のリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -112,12 +112,12 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allEntries()
-        allEntries = this_entries(True, PeEntryType("ALL"))
+        allEntries = this_entries(True, PeEntryType("ENTRY"))
     End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get allEntriesIncludingSelf()
-    'Overview                    : 自身を含む配下の全てのファイル、アーカイブ、フォルダーのリストを取得する
+    'Overview                    : 自身を含む配下の全てのエントリー（ファイル、アーカイブ、フォルダー）のリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -130,7 +130,7 @@ Class FileSystemProxy
     '2025/04/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allEntriesIncludingSelf()
-        allEntriesIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("ALL"))
+        allEntriesIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("ENTRY"))
     End Property
     
     '***************************************************************************************************
@@ -171,12 +171,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get baseName()
-    'Overview                    : ファイル／フォルダの拡張子を除いた名前を返す
+    'Overview                    : 拡張子を除いた名前を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの拡張子を除いた名前
+    '     拡張子を除いた名前
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -189,7 +189,7 @@ Class FileSystemProxy
 
     '***************************************************************************************************
     'Function/Sub Name           : Property Get containers()
-    'Overview                    : 配下のフォルダーとアーカイブのリストを取得する
+    'Overview                    : 配下のコンテナ（フォルダーかアーカイブ）のリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -207,12 +207,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get dateLastModified()
-    'Overview                    : ファイル／フォルダの最終更新日時を返す
+    'Overview                    : 最終更新日時を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの最終更新日時
+    '     最終更新日時
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -225,7 +225,7 @@ Class FileSystemProxy
 
     '***************************************************************************************************
     'Function/Sub Name           : Property Get entries()
-    'Overview                    : 配下のファイル、アーカイブ、フォルダーのリストを取得する
+    'Overview                    : 配下のエントリー（ファイル、アーカイブ、フォルダー）のリストを取得する
     'Detailed Description        : 工事中
     'Argument
     '     なし
@@ -238,17 +238,17 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get entries()
-        entries = this_entries(False, PeEntryType("ALL"))
+        entries = this_entries(False, PeEntryType("ENTRY"))
     End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get extension()
-    'Overview                    : ファイル／フォルダの拡張子を返す
+    'Overview                    : 拡張子を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの拡張子
+    '     拡張子
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -278,57 +278,57 @@ Class FileSystemProxy
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get hasFile()
-    'Overview                    : 配下にファイルを1つ以上持つか返す
+    'Function/Sub Name           : Property Get hasContainers()
+    'Overview                    : 配下にコンテナ（フォルダーかアーカイブ）を1つ以上持つか返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     配下にファイルを1つ以上持つか
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/04/26         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Public Property Get hasFile()
-        hasFile = this_hasItem(PeEntryType("FILE_EXCLUDING_ARCHIVE"))
-    End Property
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : Property Get hasFolder()
-    'Overview                    : 配下にファイルを1つ以上持つか返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     配下にファイルを1つ以上持つか
+    '     結果 True:配下にコンテナ（フォルダーかアーカイブ）を1つ以上持つ / False:持たない
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get hasFolder()
-        hasFolder = this_hasItem(PeEntryType("CONTAINER"))
+    Public Property Get hasContainers()
+        hasContainers = this_hasEntries(PeEntryType("CONTAINER"))
     End Property
     
     '***************************************************************************************************
-    'Function/Sub Name           : Property Get hasItem()
-    'Overview                    : 配下にアイテムを1つ以上持つか返す
+    'Function/Sub Name           : Property Get hasEntries()
+    'Overview                    : 配下にエントリー（ファイル、アーカイブ、フォルダー）を1つ以上持つか返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     配下にアイテムを1つ以上持つか
+    '     結果 True:配下にエントリー（ファイル、アーカイブ、フォルダー）を1つ以上持つ / False:持たない
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
-    Public Property Get hasItem()
-        hasItem = this_hasItem(PeEntryType("ALL"))
+    Public Property Get hasEntries()
+        hasEntries = this_hasEntries(PeEntryType("ENTRY"))
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get hasFilesExcludingArchives()
+    'Overview                    : 配下にアーカイブを除くファイルを1つ以上持つか返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     結果 True:配下にアーカイブを除くファイルを1つ以上持つ / False:持たない
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/04/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get hasFilesExcludingArchives()
+        hasFilesExcludingArchives = this_hasEntries(PeEntryType("FILE_EXCLUDING_ARCHIVE"))
     End Property
     
     '***************************************************************************************************
@@ -369,7 +369,7 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get isFolder()
-    'Overview                    : アイテムがフォルダであるかどうかを返す
+    'Overview                    : フォルダであるかどうかを返す
     'Detailed Description        : FolderItem2オブジェクトのIsFolder()ではなく
     '                              FileSystemObjectのFolderExists()と同じ
     'Argument
@@ -406,12 +406,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get name()
-    'Overview                    : ファイル／フォルダの名前を返す
+    'Overview                    : 名前を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの名前
+    '     名前
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -424,12 +424,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get parentFolder()
-    'Overview                    : ファイル／フォルダの親フォルダのフルパスを返す
+    'Overview                    : 親フォルダを返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの親フォルダの当クラスのインスタンス
+    '     親フォルダのインスタンス
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -442,12 +442,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get path()
-    'Overview                    : ファイル／フォルダのフルパスを返す
+    'Overview                    : フルパスを返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダのフルパス
+    '     フルパス
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -460,12 +460,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get size()
-    'Overview                    : ファイル／フォルダのサイズをバイト単位で返す
+    'Overview                    : サイズをバイト単位で返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダのサイズ（バイト単位）
+    '     バイト単位のサイズ
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -478,12 +478,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get toString()
-    'Overview                    : オブジェクトを文字列に変換する
+    'Overview                    : 当インスタンスの内容を文字列に変換する
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     変換した文字列
+    '     文字列
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -496,12 +496,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get type()
-    'Overview                    : ファイル／フォルダの種類を返す
+    'Overview                    : 種類を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの種類
+    '     種類
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -514,10 +514,10 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : of()
-    'Overview                    : ファイル／フォルダのパスを設定する
+    'Overview                    : エントリー（ファイル、アーカイブ、フォルダー）を設定する
     'Detailed Description        : 工事中
     'Argument
-    '     asPath                 : ファイル／フォルダのパス
+    '     asPath                 : エントリー（ファイル、アーカイブ、フォルダー）のパス
     'Return Value
     '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
@@ -562,7 +562,7 @@ Class FileSystemProxy
     'Overview                    : 自身とフォルダー内のエントリーの配列を返す
     'Detailed Description        : 工事中
     'Argument
-    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -578,7 +578,7 @@ Class FileSystemProxy
         If this_isInitial() Then Exit Function
 
         Dim vRet : vRet = Array()
-        Dim boFlg : boFlg = (this_isFolder() Or this_hasItem(PeEntryType("ALL")))
+        Dim boFlg : boFlg = (this_isFolder() Or this_hasEntries(PeEntryType("ENTRY")))
         Select Case alEntryType 
             Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
                 If Not boFlg Then vRet=Array(Me)
@@ -594,12 +594,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : this_baseName()
-    'Overview                    : ファイル／フォルダの拡張子を除いた名前を返す
+    'Overview                    : 拡張子を除いた名前を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの拡張子を除いた名前
+    '     拡張子を除いた名前
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -613,12 +613,12 @@ Class FileSystemProxy
    
     '***************************************************************************************************
     'Function/Sub Name           : this_dateLastModified()
-    'Overview                    : ファイル／フォルダの最終更新日時を返す
+    'Overview                    : 最終更新日時を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの最終更新日時
+    '     最終更新日時
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -636,7 +636,7 @@ Class FileSystemProxy
     'Detailed Description        : 工事中
     'Argument
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -653,7 +653,7 @@ Class FileSystemProxy
         If this_isInitial() Then Exit Function
 
         this_entries = Array()
-        If Not this_hasItem(PeEntryType("ALL")) Then Exit Function
+        If Not this_hasEntries(PeEntryType("ENTRY")) Then Exit Function
 
         If this_isFolder() Then
         'フォルダの場合
@@ -670,7 +670,7 @@ Class FileSystemProxy
     'Detailed Description        : フォルダの場合
     'Argument
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -709,7 +709,7 @@ Class FileSystemProxy
     'Detailed Description        : zipの場合
     'Argument
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -739,7 +739,7 @@ Class FileSystemProxy
     '     avAr                   : 取得したエントリーを格納する配列
     '     asPath                 : パス
     '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
-    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -771,7 +771,7 @@ Class FileSystemProxy
             Select Case alEntryType
                 Case PeEntryType("FILE_EXCLUDING_ARCHIVE"),PeEntryType("CONTAINER")
                     Dim boFlg : If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then boFlg=False Else boFlg=True
-                    If (oNewItem.isFolder Or oNewItem.hasItem)=boFlg Then cf_push avAr, oNewItem
+                    If (oNewItem.isFolder Or oNewItem.hasEntries)=boFlg Then cf_push avAr, oNewItem
                 Case Else
                     cf_push avAr, oNewItem
             End Select
@@ -782,12 +782,12 @@ Class FileSystemProxy
     
     '***************************************************************************************************
     'Function/Sub Name           : this_extension()
-    'Overview                    : ファイル／フォルダの拡張子を返す
+    'Overview                    : 拡張子を返す
     'Detailed Description        : 工事中
     'Argument
     '     なし
     'Return Value
-    '     ファイル／フォルダの拡張子
+    '     拡張子
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
@@ -800,26 +800,26 @@ Class FileSystemProxy
     End Function
     
     '***************************************************************************************************
-    'Function/Sub Name           : this_hasItem()
-    'Overview                    : 配下に引数で指定したアイテムを1つ以上持つか返す
+    'Function/Sub Name           : this_hasEntries()
+    'Overview                    : 配下に引数で指定したエントリー（ファイル、アーカイブ、フォルダー）を1つ以上持つか返す
     'Detailed Description        : 工事中
     'Argument
-    '     alEntryType            : Cl_FILE:ファイルのみ / Cl_FOLDER:フォルダーのみ / 左記以外:全て
+    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
-    '     配下にアイテムを1つ以上持つか
+    '     結果 True:配引数で指定したエントリーを1つ以上持つ / False:持たない
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/29         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_hasItem( _
+    Private Function this_hasEntries( _
         byVal alEntryType _
         )
-        this_hasItem = Null
+        this_hasEntries = Null
         If this_isInitial() Then Exit Function
 
-        this_hasItem = False
+        this_hasEntries = False
         Select Case alEntryType 
             Case PeEntryType("FILE_EXCLUDING_ARCHIVE"),PeEntryType("CONTAINER")
             '対象がファイルのみかフォルダーのみの場合
@@ -827,10 +827,10 @@ Class FileSystemProxy
                 '自身がフォルダの場合
                     If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
                     '対象がファイルのみの場合
-                        this_hasItem=(new_FolderOf(PsPath).Files.Count>0)
+                        this_hasEntries=(new_FolderOf(PsPath).Files.Count>0)
                     Else
                     '対象がフォルダーのみの場合
-                        this_hasItem=(new_FolderOf(PsPath).SubFolders.Count>0)
+                        this_hasEntries=(new_FolderOf(PsPath).SubFolders.Count>0)
                     End If
                 ElseIf PoFolderItem.IsFolder Then
                 '自身がzipの場合
@@ -838,145 +838,15 @@ Class FileSystemProxy
                     If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then boFlg=False Else boFlg=True
                     For Each oEle In PoFolderItem.GetFolder.Items
                         If oEle.IsFolder=boFlg Then
-                            this_hasItem=True
+                            this_hasEntries=True
                             Exit For
                         End If
                     Next
                 End If
             Case Else
             '上記以外の場合
-                If PoFolderItem.IsFolder Then this_hasItem=(PoFolderItem.GetFolder.Items.Count>0)
+                If PoFolderItem.IsFolder Then this_hasEntries=(PoFolderItem.GetFolder.Items.Count>0)
         End Select
-    End Function
-
-    '***************************************************************************************************
-    'Function/Sub Name           : this_name()
-    'Overview                    : ファイル／フォルダの名前を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     ファイル／フォルダの名前
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/15         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_name()
-        this_name = Null
-        If Not this_isInitial() Then this_name = new_Fso().GetFileName(PsPath)
-    End Function
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_parentFolder()
-    'Overview                    : ファイル／フォルダの親フォルダのフルパスを返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     ファイル／フォルダの親フォルダの当クラスのインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/15         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_parentFolder()
-        this_parentFolder = Null
-        If this_isInitial() Then Exit Function
-        If PoParent Is Nothing Then Set PoParent = new_FspOf(new_Fso().GetParentFolderName(PsPath))
-        Set this_parentFolder = PoParent
-    End Function
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_path()
-    'Overview                    : ファイル／フォルダのフルパスを返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     ファイル／フォルダのフルパス
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/15         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_path()
-        this_path = Null
-        If Not this_isInitial() Then this_path = PsPath
-    End Function
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_setParent()
-    'Overview                    : 親フォルダのインスタンスを設定する
-    'Detailed Description        : 工事中
-    'Argument
-    '     aoParent               : 親フォルダのインスタンス
-    'Return Value
-    '     自身のインスタンス
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/23         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Sub this_setParent( _
-        byRef aoParent _
-        , byVal asSource _
-        )
-        ast_argNotNothing PoFolderItem, asSource, "Please set the value before setting the parent folder."
-        ast_argsAreSame TypeName(Me), TypeName(aoParent), asSource, "This is not " & TypeName(Me) &"."
-        ast_argsAreSame new_Fso().GetParentFolderName(PsPath), aoParent.path, asSource, "This is not a parent folder."
-
-        Set PoParent = aoParent
-    End Sub
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_size()
-    'Overview                    : ファイル／フォルダのサイズを返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     ファイル／フォルダのサイズ（バイト単位）
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/15         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_size()
-        this_size = Null
-        If this_isInitial() Then Exit Function
-
-        If this_isFolder() Then
-        'フォルダの場合
-            this_size = new_FolderOf(PsPath).Size
-        Else
-        'フォルダ以外の場合
-            this_size = PoFolderItem.Size
-        End If
-    End Function
-    
-    '***************************************************************************************************
-    'Function/Sub Name           : this_type()
-    'Overview                    : ファイル／フォルダの種類を返す
-    'Detailed Description        : 工事中
-    'Argument
-    '     なし
-    'Return Value
-    '     ファイル／フォルダの種類
-    '---------------------------------------------------------------------------------------------------
-    'History
-    'Date               Name                     Reason for Changes
-    '----------         ----------------------   -------------------------------------------------------
-    '2025/03/15         Y.Fujii                  First edition
-    '***************************************************************************************************
-    Private Function this_type()
-        this_type = Null
-        If Not this_isInitial() Then this_type = PoFolderItem.Type
     End Function
     
     '***************************************************************************************************
@@ -1073,13 +943,73 @@ Class FileSystemProxy
         this_isLink = Null
         If Not this_isInitial() Then this_isLink = PoFolderItem.IsLink
     End Function
+
+    '***************************************************************************************************
+    'Function/Sub Name           : this_name()
+    'Overview                    : 名前を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     名前
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_name()
+        this_name = Null
+        If Not this_isInitial() Then this_name = new_Fso().GetFileName(PsPath)
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_parentFolder()
+    'Overview                    : 親フォルダのフルパスを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     親フォルダのインスタンス
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_parentFolder()
+        this_parentFolder = Null
+        If this_isInitial() Then Exit Function
+        If PoParent Is Nothing Then Set PoParent = new_FspOf(new_Fso().GetParentFolderName(PsPath))
+        Set this_parentFolder = PoParent
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_path()
+    'Overview                    : フルパスを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     フルパス
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_path()
+        this_path = Null
+        If Not this_isInitial() Then this_path = PsPath
+    End Function
     
     '***************************************************************************************************
     'Function/Sub Name           : this_setData()
     'Overview                    : データを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     asPath                 : ファイル／フォルダのパス
+    '     asPath                 : フルパス
+    '     asSource               : ソース
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -1130,11 +1060,38 @@ Class FileSystemProxy
     End Sub
     
     '***************************************************************************************************
-    'Function/Sub Name           : this_setPath()
-    'Overview                    : ファイル／フォルダのパスを設定する
+    'Function/Sub Name           : this_setParent()
+    'Overview                    : 親フォルダを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     asPath                 : ファイル／フォルダのパス
+    '     aoParent               : 親フォルダのインスタンス
+    '     asSource               : ソース
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/23         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_setParent( _
+        byRef aoParent _
+        , byVal asSource _
+        )
+        ast_argNotNothing PoFolderItem, asSource, "Please set the value before setting the parent folder."
+        ast_argsAreSame TypeName(Me), TypeName(aoParent), asSource, "This is not " & TypeName(Me) &"."
+        ast_argsAreSame new_Fso().GetParentFolderName(PsPath), aoParent.path, asSource, "This is not a parent folder."
+
+        Set PoParent = aoParent
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setPath()
+    'Overview                    : パスを設定する
+    'Detailed Description        : 工事中
+    'Argument
+    '     asPath                 : フルパス
+    '     asSource               : ソース
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -1149,5 +1106,51 @@ Class FileSystemProxy
         )
         PsPath = asPath
     End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_size()
+    'Overview                    : サイズを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     バイト単位のサイズ
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_size()
+        this_size = Null
+        If this_isInitial() Then Exit Function
+
+        If this_isFolder() Then
+        'フォルダの場合
+            this_size = new_FolderOf(PsPath).Size
+        Else
+        'フォルダ以外の場合
+            this_size = PoFolderItem.Size
+        End If
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_type()
+    'Overview                    : 種類を返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     種類
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2025/03/15         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_type()
+        this_type = Null
+        If Not this_isInitial() Then this_type = PoFolderItem.Type
+    End Function
 
 End Class

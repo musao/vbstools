@@ -19,8 +19,11 @@ Option Explicit
 Const MY_NAME = "test_FileProxy.vbs"
 Dim PsPathTempFolder
 
-Const Cl_FILE = 1
-Const Cl_FOLDER = 2
+Const Cl_ENTRY = 0
+Const Cl_FILE = 2
+Const Cl_FILE_EXCLUDING_ARCHIVE = 3
+Const Cl_FOLDER = 4
+Const Cl_CONTAINER = 5
 
 '###################################################################################################
 'SetUp()/TearDown()
@@ -51,18 +54,18 @@ End Sub
 '   .allFilesExcludingArchives
 '   .allFilesExcludingArchivesIncludingSelf
 '   .baseName
+'   .containers
 '   .dateLastModified
+'   .entries
 '   .extension
 '   .filesExcludingArchives
-'   .containers
-'   .hasFile
-'   .hasFolder
-'   .hasItem
+'   .hasContainers
+'   .hasEntries
+'   .hasFilesExcludingArchives
 '   .isBrowsable
 '   .isFileSystem
 '   .isFolder
 '   .isLink
-'   .entries
 '   .name
 '   .parentFolder
 '   .path
@@ -73,14 +76,14 @@ Sub Test_FileProxy_proeerties_initial
     dim tg,a,ao,e
     set ao = (new FileSystemProxy)
 
-    tg = "allFilesExcludingArchives"
-    e = Null
-    a = ao.allFilesExcludingArchives
-    AssertEqualWithMessage e, a, tg
-
     tg = "allContainers"
     e = Null
     a = ao.allContainers
+    AssertEqualWithMessage e, a, tg
+
+    tg = "allContainersIncludingSelf"
+    e = Null
+    a = ao.allContainersIncludingSelf
     AssertEqualWithMessage e, a, tg
 
     tg = "allEntries"
@@ -88,14 +91,39 @@ Sub Test_FileProxy_proeerties_initial
     a = ao.allEntries
     AssertEqualWithMessage e, a, tg
 
+    tg = "allEntriesIncludingSelf"
+    e = Null
+    a = ao.allEntriesIncludingSelf
+    AssertEqualWithMessage e, a, tg
+
+    tg = "allFilesExcludingArchives"
+    e = Null
+    a = ao.allFilesExcludingArchives
+    AssertEqualWithMessage e, a, tg
+
+    tg = "allFilesExcludingArchivesIncludingSelf"
+    e = Null
+    a = ao.allFilesExcludingArchivesIncludingSelf
+    AssertEqualWithMessage e, a, tg
+
     tg = "baseName"
     e = Null
     a = ao.baseName
     AssertEqualWithMessage e, a, tg
 
+    tg = "containers"
+    e = Null
+    a = ao.containers
+    AssertEqualWithMessage e, a, tg
+
     tg = "dateLastModified"
     e = Null
     a = ao.dateLastModified
+    AssertEqualWithMessage e, a, tg
+
+    tg = "entries"
+    e = Null
+    a = ao.entries
     AssertEqualWithMessage e, a, tg
 
     tg = "extension"
@@ -108,24 +136,19 @@ Sub Test_FileProxy_proeerties_initial
     a = ao.filesExcludingArchives
     AssertEqualWithMessage e, a, tg
 
-    tg = "containers"
+    tg = "hasContainers"
     e = Null
-    a = ao.containers
+    a = ao.hasContainers
     AssertEqualWithMessage e, a, tg
 
-    tg = "hasFile"
+    tg = "hasEntries"
     e = Null
-    a = ao.hasFile
+    a = ao.hasEntries
     AssertEqualWithMessage e, a, tg
 
-    tg = "hasFolder"
+    tg = "hasFilesExcludingArchives"
     e = Null
-    a = ao.hasFolder
-    AssertEqualWithMessage e, a, tg
-
-    tg = "hasItem"
-    e = Null
-    a = ao.hasItem
+    a = ao.hasFilesExcludingArchives
     AssertEqualWithMessage e, a, tg
 
     tg = "isBrowsable"
@@ -148,11 +171,6 @@ Sub Test_FileProxy_proeerties_initial
     a = ao.isLink
     AssertEqualWithMessage e, a, tg
 
-    tg = "entries"
-    e = Null
-    a = ao.entries
-    AssertEqualWithMessage e, a, tg
-
     tg = "name"
     e = Null
     a = ao.name
@@ -166,21 +184,6 @@ Sub Test_FileProxy_proeerties_initial
     tg = "path"
     e = Null
     a = ao.path
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allFilesExcludingArchivesIncludingSelf"
-    e = Null
-    a = ao.allFilesExcludingArchivesIncludingSelf
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allContainersIncludingSelf"
-    e = Null
-    a = ao.allContainersIncludingSelf
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allEntriesIncludingSelf"
-    e = Null
-    a = ao.allEntriesIncludingSelf
     AssertEqualWithMessage e, a, tg
 
     tg = "size"
@@ -200,48 +203,44 @@ Sub Test_FileProxy_proeerties_initial
 End Sub
 Sub Test_FileProxy_properties
     Dim data : data = createData()
-    Dim i,d,ao,obj,hasSomething
-    For i=0 To Ubound(data)
-        d = data(i)
-        Set ao = new FileSystemProxy : ao.of(d)
+    Dim cs,path,ao,obj,hasSomething
+    For cs=0 To Ubound(data)
+        path = data(cs)
+        Set ao = new FileSystemProxy : ao.of(path)
 
-        AssertEqualWithMessage d, ao, "i="&i&",Default"
-        assertFsProperties ao,d,i
-        AssertEqualWithMessage "<FileSystemProxy>"&d, ao.toString, "i="&i&",toString"
+        assertFsProperties ao,path,cs
+
+        assertFsEntries ao,path,cs
         
-        Set obj = getFolderItem2(d)
-
-        hasSomething=expectHasFile(obj)
-        AssertEqualWithMessage hasSomething, ao.hasFile, "i="&i&",hasFile"
-        If hasSomething Then
-            assertFsItems ao.filesExcludingArchives,d,i&".filesExcludingArchives",False,False,Cl_FILE
-        Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.filesExcludingArchives), "i="&i&",.filesExcludingArchives"
-        End If
-        assertFsItems ao.allFilesExcludingArchives,d,i&".allFilesExcludingArchives",False,True,Cl_FILE
-        assertFsItems ao.allFilesExcludingArchivesIncludingSelf,d,i&".allFilesExcludingArchivesIncludingSelf",True,True,Cl_FILE
-
-        hasSomething=expectHasFolder(obj)
-        AssertEqualWithMessage hasSomething, ao.hasFolder, "i="&i&",hasFolder"
-        If hasSomething Then
-            assertFsItems ao.containers,d,i&".filesExcludingArchives",False,False,Cl_FOLDER
-        Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.containers), "i="&i&",.containers"
-        End If
-        assertFsItems ao.allContainers,d,i&".allContainers",False,True,Cl_FOLDER
-        assertFsItems ao.allContainersIncludingSelf,d,i&".allContainersIncludingSelf",True,True,Cl_FOLDER
-
-        hasSomething=expectHasItem(obj)
-        AssertEqualWithMessage hasSomething, ao.hasItem, "i="&i&",hasItem"
-        If hasSomething Then
-            assertFsItems ao.entries,d,i&".entries",False,False,Empty
-            assertFsItems ao.allEntries,d,i&".allEntries",False,True,Empty
-        Else
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.entries), "i="&i&",.entries"
-            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.allEntries), "i="&i&",.allEntries"
- 
-       End If
-        assertFsItems ao.allEntriesIncludingSelf,d,i&".allEntriesIncludingSelf",True,True,Empty
+'        hasSomething=expectHasEntries(path,Cl_FILE_EXCLUDING_ARCHIVE)
+'        AssertEqualWithMessage hasSomething, ao.hasFilesExcludingArchives, "case="&cs&",hasFilesExcludingArchives"
+'        If hasSomething Then
+'            assertFsEntriesProc ao.filesExcludingArchives,path,cs&".filesExcludingArchives",False,False,Cl_FILE_EXCLUDING_ARCHIVE
+'        Else
+'            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.filesExcludingArchives), "case="&cs&",.filesExcludingArchives"
+'        End If
+'        assertFsEntriesProc ao.allFilesExcludingArchives,path,cs&".allFilesExcludingArchives",False,True,Cl_FILE_EXCLUDING_ARCHIVE
+'        assertFsEntriesProc ao.allFilesExcludingArchivesIncludingSelf,path,cs&".allFilesExcludingArchivesIncludingSelf",True,True,Cl_FILE_EXCLUDING_ARCHIVE
+'
+'        hasSomething=expectHasEntries(path,Cl_CONTAINER)
+'        AssertEqualWithMessage hasSomething, ao.hasContainers, "case="&cs&",hasContainers"
+'        If hasSomething Then
+'            assertFsEntriesProc ao.containers,path,cs&".containers",False,False,Cl_CONTAINER
+'        Else
+'            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.containers), "case="&cs&",.containers"
+'        End If
+'        assertFsEntriesProc ao.allContainers,path,cs&".allContainers",False,True,Cl_CONTAINER
+'        assertFsEntriesProc ao.allContainersIncludingSelf,path,cs&".allContainersIncludingSelf",True,True,Cl_CONTAINER
+'
+'        hasSomething=expectHasEntries(path,Cl_ENTRY)
+'        AssertEqualWithMessage hasSomething, ao.hasEntries, "case="&cs&",hasEntries"
+'        If hasSomething Then
+'            assertFsEntriesProc ao.entries,path,cs&".entries",False,False,Empty
+'        Else
+'            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.entries), "case="&cs&",.entries"
+'       End If
+'       assertFsEntriesProc ao.allEntries,path,cs&".allEntries",False,True,Empty
+'       assertFsEntriesProc ao.allEntriesIncludingSelf,path,cs&".allEntriesIncludingSelf",True,True,Empty
 
     Next
 End Sub
@@ -376,29 +375,49 @@ Function createData
 '    , Array( defTextFile()       , defShortCutFile()   , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ) _
 '    , Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ) _
 '    )
-    Dim i,cases
-    For Each i In defs
-        pusha cases,caseNormal(i)
+    Dim cs,cases
+    For Each cs In defs
+        pusha cases,caseNormal(cs)
     Next
-    For Each i In extractTargetForZip(defs)
-        pusha cases,caseZip(i)
+    For Each cs In extractTargetForZip(defs)
+        pusha cases,caseZip(cs)
     Next
     createData = caseToData(cases)
 End Function
+Function caseNormal(cs)
+    caseNormal=createFolderAt(PsPathTempFolder,cs)
+End Function
+Function caseZip(cs)
+    Dim flPath : flPath=createFolderAt(PsPathTempFolder,cs)
+    Dim ele,paths
+    For Each ele in getFolderItem2(flPath(0)).GetFolder.Items
+        push paths,ele.path
+    Next
+    
+    Dim zipPath : zipPath=getTempFilePath(PsPathTempFolder,"zip")
+    zip paths,zipPath
+    
+    Dim ret
+    For Each ele In flPath
+        push ret,Replace(ele,flPath(0),zipPath)
+    Next
+    caseZip=ret
+End Function
+
 Function extractTargetForZip(defs)
-    Dim i,ret : ret=Array()
-    For Each i In defs
-        If Not containEmpty(i) Then push ret,i
+    Dim cs,ret : ret=Array()
+    For Each cs In defs
+        If Not containEmpty(cs) Then push ret,cs
     Next
     extractTargetForZip=ret
 End Function
-Function containEmpty(target)
+Function containEmpty(cs)
     containEmpty=True
-    If isEmptyArray(target) Then Exit Function
-    If IsArray(target) Then
-        Dim i
-        For Each i In target
-            If containEmpty(i) Then Exit Function
+    If isEmptyArray(cs) Then Exit Function
+    If IsArray(cs) Then
+        Dim ele
+        For Each ele In cs
+            If containEmpty(ele) Then Exit Function
         Next
     End If
     containEmpty=False
@@ -409,9 +428,9 @@ Function isEmptyArray(ar)
     If Ubound(ar)<0 Then isEmptyArray=True
 End Function
 Function caseToData(cases)
-    Dim ret,ele
-    For Each ele In cases
-        pushA ret,ele
+    Dim ret,cs
+    For Each cs In cases
+        pushA ret,cs
     Next
     caseToData = ret
 End Function
@@ -424,25 +443,6 @@ Function createUrlShortCutFile
 End Function
 Function createTextFile
     createTextFile = createTextFileAt(PsPathTempFolder)
-End Function
-Function caseNormal(d)
-    caseNormal=createFolderAt(PsPathTempFolder,d)
-End Function
-Function caseZip(d)
-    Dim flPath : flPath=createFolderAt(PsPathTempFolder,d)
-    Dim i,paths
-    For Each i in getFolderItem2(flPath(0)).GetFolder.Items
-        push paths,i.path
-    Next
-    
-    Dim zipPath : zipPath=getTempFilePath(PsPathTempFolder,"zip")
-    zip paths,zipPath
-    
-    Dim ret
-    For Each i In flPath
-        push ret,Replace(i,flPath(0),zipPath)
-    Next
-    caseZip=ret
 End Function
 
 Function createShortCutFileAt(basePath)
@@ -516,42 +516,40 @@ Function defFolder(d)
 End Function
 
 'for verify the following properties
-'   .hasFile
-Function expectHasFile(obj)
-    Dim ret : ret = False
-    Dim path : path = obj.path
-    If fso.FolderExists(path) Then
-        ret=(fso.GetFolder(path).Files.Count>0)
-    ElseIf obj.IsFolder Then
-        Dim ele
-        For Each ele In obj.GetFolder.Items
-            ret = Not(ele.IsFolder)
-            If ret Then Exit For
-        Next
-    End If
-    expectHasFile=ret
-End Function
-'for verify the following properties
-'   .hasFolder
-Function expectHasFolder(obj)
-    Dim ret : ret = False
-    Dim path : path = obj.path
-    If fso.FolderExists(path) Then
-        ret=(fso.GetFolder(path).SubFolders.Count>0)
-    ElseIf obj.IsFolder Then
-        Dim ele
-        For Each ele In obj.GetFolder.Items
-            ret = ele.IsFolder
-            If ret Then Exit For
-        Next
-    End If
-    expectHasFolder=ret
-End Function
-'for verify the following properties
-'   .hasItem
-Function expectHasItem(obj)
-    expectHasItem = False
-    If obj.IsFolder Then expectHasItem = obj.GetFolder.Items.Count>0
+'   .hasContainers
+'   .hasEntries
+'   .hasFilesExcludingArchives
+Function expectHasEntries(path,entryType)
+    expectHasEntries = False
+    
+    Dim ret,obj,ele
+    Set obj = getFolderItem2(path)
+    ret = False
+        Select Case entryType
+        Case Cl_CONTAINER
+            If fso.FolderExists(path) Then
+                ret=(fso.GetFolder(path).SubFolders.Count>0)
+            ElseIf obj.IsFolder Then
+                For Each ele In obj.GetFolder.Items
+                    ret = ele.IsFolder
+                    If ret Then Exit For
+                Next
+            End If
+            expectHasEntries=ret
+        Case Cl_FILE_EXCLUDING_ARCHIVE
+            If fso.FolderExists(path) Then
+                ret=(fso.GetFolder(path).Files.Count>0)
+            ElseIf obj.IsFolder Then
+                For Each ele In obj.GetFolder.Items
+                    ret = Not(ele.IsFolder)
+                    If ret Then Exit For
+                Next
+            End If
+            expectHasEntries=ret
+        Case Else
+        'Cl_ENTRY or others
+            If obj.IsFolder Then expectHasEntries = obj.GetFolder.Items.Count>0
+    End Select
 End Function
 
 'to verify the following properties
@@ -562,56 +560,85 @@ End Function
 '   .isFileSystem
 '   .isFolder
 '   .isLink
-'   .entries
 '   .name
 '   .parentFolder
 '   .path
 '   .size
+'   .toString
 '   .type
-Sub assertFsProperties(target,path,comment)
-    Dim obj : obj = Null
-    
+Sub assertFsProperties(target,path,caseNo)
+    'èÄîı
+    Dim fi2, fo, flg
+    Set fi2 = getFolderItem2(path)
+    flg = True
     If fso.FolderExists(path) Then
-        Set obj=fso.GetFolder(path)
+        Set fo = fso.GetFolder(path)
     ElseIf fso.FileExists(path) Then
-        Set obj=fso.GetFile(path)
-    End IF
-    If Isnull(obj) Then
-        With getFolderItem2(path)
-            AssertEqualWithMessage .ModifyDate, target.dateLastModified, "comment="&comment&",dateLastModified"
-            AssertEqualWithMessage fso.GetFileName(path), target.name, "comment="&comment&",name"
-            AssertEqualWithMessage "FileSystemProxy", TypeName(target.parentFolder), "comment="&comment&",parentFolder object"
-            AssertEqualWithMessage fso.GetParentFolderName(path), target.parentFolder, "comment="&comment&",parentFolder"
-            AssertEqualWithMessage .Path, target.path, "comment="&comment&",path"
-            AssertEqualWithMessage .Size, target.size, "comment="&comment&",size"
-            AssertEqualWithMessage .Type, target.type, "comment="&comment&",type"
-        End With
+        Set fo = fso.GetFile(path)
     Else
-        With obj
-            AssertEqualWithMessage .DateLastModified, target.dateLastModified, "comment="&comment&",dateLastModified"
-            AssertEqualWithMessage .Name, target.name, "comment="&comment&",name"
-            AssertEqualWithMessage "FileSystemProxy", TypeName(target.parentFolder), "comment="&comment&",parentFolder object"
-            AssertEqualWithMessage .ParentFolder, target.parentFolder, "comment="&comment&",parentFolder"
-            AssertEqualWithMessage .Path, target.path, "comment="&comment&",path"
-            AssertEqualWithMessage .Size, target.size, "comment="&comment&",size"
-            AssertEqualWithMessage .Type, target.type, "comment="&comment&",type"
-        End With
-    End If
+        flg = False
+    End IF
 
-    Set obj = getFolderItem2(path)
-    With obj
-        AssertEqualWithMessage .IsBrowsable, target.isBrowsable, "comment="&comment&",isBrowsable"
-        AssertEqualWithMessage .IsFileSystem, target.isFileSystem, "comment="&comment&",isFileSystem"
-        AssertEqualWithMessage .IsLink, target.isLink, "comment="&comment&",isLink"
+    Dim expect
+    With target
+        '.baseName
+        expect = fso.GetBaseName(path)
+        AssertEqualWithMessage expect, .baseName              , "caseNo="&caseNo&"(baseName)"             &", path="&path
+        
+        '.dateLastModified
+        If flg Then expect = fo.DateLastModified Else expect = fi2.ModifyDate
+        AssertEqualWithMessage expect, .dateLastModified      , "caseNo="&caseNo&"(dateLastModified)"     &", path="&path
+        
+        '.extension
+        expect = fso.GetExtensionName(path)
+        AssertEqualWithMessage expect, .extension             , "caseNo="&caseNo&"(extension)"            &", path="&path
+        
+        '.isBrowsable
+        expect = fi2.IsBrowsable
+        AssertEqualWithMessage expect, .isBrowsable           , "caseNo="&caseNo&"(isBrowsable)"          &", path="&path
+        
+        '.isFileSystem
+        expect = fi2.IsFileSystem
+        AssertEqualWithMessage expect, .isFileSystem          , "caseNo="&caseNo&"(isFileSystem)"         &", path="&path
+        
+        '.isFolder
+        expect = fso.FolderExists(path)
+        AssertEqualWithMessage expect, .isFolder              , "caseNo="&caseNo&"(isFolder)"             &", path="&path
+        
+        '.isLink
+        expect = fi2.IsLink
+        AssertEqualWithMessage expect, .isLink                , "caseNo="&caseNo&"(isLink)"               &", path="&path
+        
+        '.name
+        If flg Then expect = fo.Name Else expect = fso.GetFileName(path)
+        AssertEqualWithMessage expect, .name                  , "caseNo="&caseNo&"(name)"                 &", path="&path
+        
+        '.parentFolder
+        expect = "FileSystemProxy"
+        AssertEqualWithMessage expect, TypeName(.parentFolder), "caseNo="&caseNo&"(parentFolder TypeName)"&", path="&path
+        If flg Then expect = fo.ParentFolder.Path Else expect = fso.GetParentFolderName(path)
+        AssertEqualWithMessage expect, .parentFolder.path     , "caseNo="&caseNo&"(parentFolder path)"    &", path="&path
+        
+        '.path,default
+        expect = path
+        AssertEqualWithMessage expect, .path                  , "caseNo="&caseNo&"(path)"                 &", path="&path
+        AssertEqualWithMessage expect, target                 , "caseNo="&caseNo&"(path default)"         &", path="&path
+        
+        '.size
+        If flg Then expect = fo.Size Else expect = fi2.Size
+        AssertEqualWithMessage expect, .size                  , "caseNo="&caseNo&"(size)"                 &", path="&path
+        
+        '.toString
+        expect = "<FileSystemProxy>"&path
+        AssertEqualWithMessage expect, .toString              , "caseNo="&caseNo&"(toString)"             &", path="&path
+        
+        '.type
+        If flg Then expect = fo.Type Else expect = fi2.Type
+        AssertEqualWithMessage expect, .type                  , "caseNo="&caseNo&"(type)"                 &", path="&path
     End With
 
-    With fso
-        AssertEqualWithMessage .FolderExists(path), target.isFolder, "comment="&comment&",isFolder"
-        AssertEqualWithMessage .GetBaseName(path), target.baseName, "comment="&comment&",baseName"
-        AssertEqualWithMessage .GetExtensionName(path), target.extension, "comment="&comment&",extension"
-    End With
-    
-    Set obj = Nothing
+    Set fo = Nothing
+    Set fi2 = Nothing
 End Sub
 'to verify the following properties
 '   .allContainers
@@ -620,62 +647,113 @@ End Sub
 '   .allEntriesIncludingSelf
 '   .allFilesExcludingArchives
 '   .allFilesExcludingArchivesIncludingSelf
-'   .filesExcludingArchives
 '   .containers
 '   .entries
-Sub assertFsItems(items,path,comment,self,recursive,itemType)
-    Dim dic : Set dic = dictionary
-    For Each i In items
-        If dic.Exists(i) Then AssertFailWithMessage "comment="&comment&",items Duplication!"
-        dic.Add i.path,False
+'   .filesExcludingArchives
+Sub assertFsEntries(target,path,cs)
+'    Dim hasSomething, a, text
+'
+'    For Each ele In Array(Cl_FILE_EXCLUDING_ARCHIVE, Cl_CONTAINER, Cl_ENTRY)
+'        hasSomething=expectHasEntries(path,ele)
+'
+'        Select Case ele
+'        Case Cl_FILE_EXCLUDING_ARCHIVE
+'            a = target.hasFilesExcludingArchives
+'            text = ",hasFilesExcludingArchives"
+'        Case Cl_CONTAINER
+'            a = target.hasContainers
+'            text = ",hasContainers"
+'        Case Cl_ENTRY
+'            a = target.hasEntries
+'            text = ",hasEntries"
+'        End Select
+'        AssertEqualWithMessage hasSomething, a, "case="&cs&text
+'    Next
+
+    Dim hasSomething
+    hasSomething=expectHasEntries(path,Cl_FILE_EXCLUDING_ARCHIVE)
+    AssertEqualWithMessage hasSomething, target.hasFilesExcludingArchives, "case="&cs&",hasFilesExcludingArchives"
+    If hasSomething Then
+        assertFsEntriesProc target.filesExcludingArchives,path,cs&".filesExcludingArchives",False,False,Cl_FILE_EXCLUDING_ARCHIVE
+    Else
+        AssertEqualWithMessage cf_toString(Array()), cf_toString(target.filesExcludingArchives), "case="&cs&",.filesExcludingArchives"
+    End If
+    assertFsEntriesProc target.allFilesExcludingArchives,path,cs&".allFilesExcludingArchives",False,True,Cl_FILE_EXCLUDING_ARCHIVE
+    assertFsEntriesProc target.allFilesExcludingArchivesIncludingSelf,path,cs&".allFilesExcludingArchivesIncludingSelf",True,True,Cl_FILE_EXCLUDING_ARCHIVE
+
+    hasSomething=expectHasEntries(path,Cl_CONTAINER)
+    AssertEqualWithMessage hasSomething, target.hasContainers, "case="&cs&",hasContainers"
+    If hasSomething Then
+        assertFsEntriesProc target.containers,path,cs&".containers",False,False,Cl_CONTAINER
+    Else
+        AssertEqualWithMessage cf_toString(Array()), cf_toString(target.containers), "case="&cs&",.containers"
+    End If
+    assertFsEntriesProc target.allContainers,path,cs&".allContainers",False,True,Cl_CONTAINER
+    assertFsEntriesProc target.allContainersIncludingSelf,path,cs&".allContainersIncludingSelf",True,True,Cl_CONTAINER
+    
+    hasSomething=expectHasEntries(path,Cl_ENTRY)
+    AssertEqualWithMessage hasSomething, target.hasEntries, "case="&cs&",hasEntries"
+    If hasSomething Then
+        assertFsEntriesProc target.entries,path,cs&".entries",False,False,Empty
+    Else
+        AssertEqualWithMessage cf_toString(Array()), cf_toString(target.entries), "case="&cs&",.entries"
+   End If
+   assertFsEntriesProc target.allEntries,path,cs&".allEntries",False,True,Empty
+   assertFsEntriesProc target.allEntriesIncludingSelf,path,cs&".allEntriesIncludingSelf",True,True,Empty
+End Sub
+Sub assertFsEntriesProc(entries,path,caseNo,self,recursive,entryType)
+    Dim ele, dic
+    Set dic = dictionary
+    For Each ele In entries
+        If dic.Exists(ele) Then AssertFailWithMessage "caseNo="&caseNo&", '"&ele&"' Entries Duplication!"
+        dic.Add ele.path,False
     Next
 
-    assertFsItemsEachItem path,comment,dic,self,recursive,itemType
+    assertFsEntriesProcEachEntry path,caseNo,dic,self,recursive,entryType
     
-    Dim i
-    For Each i In dic.Keys
-        If Not dic(i) Then AssertFailWithMessage "comment="&comment&", " & i & " Not Found !"
+    For Each ele In dic.Keys
+        If Not dic(ele) Then AssertFailWithMessage "caseNo="&caseNo&", '"&ele&"' Not Found !"
     Next
 
     AssertWithMessage True, "all ok"
     Set dic = Nothing
 End Sub
-Sub assertFsItemsEachItem(path,comment,dic,self,recursive,itemType)
-    If self Then existsItem path,comment,dic,itemType
-    Dim i
+Sub assertFsEntriesProcEachEntry(path,caseNo,dic,self,recursive,entryType)
+    If self Then existsEntry path,caseNo,dic,entryType
+    Dim ele
     If fso.FolderExists(path) Then
-        For Each i in fso.GetFolder(path).Files
-            existsItem i.path,comment,dic,itemType
+        For Each ele in fso.GetFolder(path).Files
+            existsEntry ele.path,caseNo,dic,entryType
         Next
-        For Each i in fso.GetFolder(path).SubFolders
-            existsItem i.path,comment,dic,itemType
-            If recursive Then assertFsItemsEachItem i.path,comment,dic,self,recursive,itemType
+        For Each ele in fso.GetFolder(path).SubFolders
+            existsEntry ele.path,caseNo,dic,entryType
+            If recursive Then assertFsEntriesProcEachEntry ele.path,caseNo,dic,self,recursive,entryType
         Next
     ElseIf getFolderItem2(path).IsFolder Then
-        For Each i in getFolderItem2(path).GetFolder.Items
-            existsItem i.path,comment,dic,itemType
-            If recursive And i.IsFolder Then
-                If i.GetFolder.Items.Count>0 Then assertFsItemsEachItem i.path,comment,dic,self,recursive,itemType
+        For Each ele in getFolderItem2(path).GetFolder.Items
+            existsEntry ele.path,caseNo,dic,entryType
+            If recursive And ele.IsFolder Then
+                If ele.GetFolder.Items.Count>0 Then assertFsEntriesProcEachEntry ele.path,caseNo,dic,self,recursive,entryType
             End If
         Next
     End If
 End Sub
-Sub existsItem(path,comment,dic,itemType)
+Sub existsEntry(path,caseNo,dic,entryType)
     Dim flg : flg = False
-    Dim sItemName : sItemName = "items"
-    Select Case itemType
-    Case Cl_FILE
-        sItemName = "filesExcludingArchives"
+    Dim sEntryName : sEntryName = "entries"
+    Select Case entryType
+    Case Cl_FILE_EXCLUDING_ARCHIVE
+        sEntryName = "filesExcludingArchives"
         If Not getFolderItem2(path).IsFolder Then flg = True
-    Case Cl_FOLDER
-        sItemName = "containers"
+    Case Cl_CONTAINER
+        sEntryName = "containers"
         If getFolderItem2(path).IsFolder Then flg = True
     Case Else
         flg = True
     End Select
     
     If flg Then
-        If Not dic.Exists(path) Then AssertFailWithMessage "comment="&comment&","&sItemName&" Not Exists " & path
+        If Not dic.Exists(path) Then AssertFailWithMessage "caseNo="&caseNo&","&sEntryName&" Not Exists " & path
         dic(path)=True
     End If
 End Sub
