@@ -203,45 +203,39 @@ Sub Test_FileProxy_proeerties_initial
 End Sub
 Sub Test_FileProxy_properties
     Dim data : data = createData()
-    Dim cs,path,ao,obj,hasSomething
+    Dim cs,path,ao
     For cs=0 To Ubound(data)
         path = data(cs)
         Set ao = new FileSystemProxy : ao.of(path)
 
+'       .baseName
+'       .dateLastModified
+'       .extension
+'       .isBrowsable
+'       .isFileSystem
+'       .isFolder
+'       .isLink
+'       .name
+'       .parentFolder
+'       .path
+'       .size
+'       .toString
+'       .type
         assertFsProperties ao,path,cs
 
+'       .allContainers
+'       .allContainersIncludingSelf
+'       .allEntries
+'       .allEntriesIncludingSelf
+'       .allFilesExcludingArchives
+'       .allFilesExcludingArchivesIncludingSelf
+'       .containers
+'       .entries
+'       .filesExcludingArchives
+'       .hasContainers
+'       .hasEntries
+'       .hasFilesExcludingArchives
         assertFsEntries ao,path,cs
-        
-'        hasSomething=expectHasEntries(path,Cl_FILE_EXCLUDING_ARCHIVE)
-'        AssertEqualWithMessage hasSomething, ao.hasFilesExcludingArchives, "case="&cs&",hasFilesExcludingArchives"
-'        If hasSomething Then
-'            assertFsEntriesProc ao.filesExcludingArchives,path,cs&".filesExcludingArchives",False,False,Cl_FILE_EXCLUDING_ARCHIVE
-'        Else
-'            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.filesExcludingArchives), "case="&cs&",.filesExcludingArchives"
-'        End If
-'        assertFsEntriesProc ao.allFilesExcludingArchives,path,cs&".allFilesExcludingArchives",False,True,Cl_FILE_EXCLUDING_ARCHIVE
-'        assertFsEntriesProc ao.allFilesExcludingArchivesIncludingSelf,path,cs&".allFilesExcludingArchivesIncludingSelf",True,True,Cl_FILE_EXCLUDING_ARCHIVE
-'
-'        hasSomething=expectHasEntries(path,Cl_CONTAINER)
-'        AssertEqualWithMessage hasSomething, ao.hasContainers, "case="&cs&",hasContainers"
-'        If hasSomething Then
-'            assertFsEntriesProc ao.containers,path,cs&".containers",False,False,Cl_CONTAINER
-'        Else
-'            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.containers), "case="&cs&",.containers"
-'        End If
-'        assertFsEntriesProc ao.allContainers,path,cs&".allContainers",False,True,Cl_CONTAINER
-'        assertFsEntriesProc ao.allContainersIncludingSelf,path,cs&".allContainersIncludingSelf",True,True,Cl_CONTAINER
-'
-'        hasSomething=expectHasEntries(path,Cl_ENTRY)
-'        AssertEqualWithMessage hasSomething, ao.hasEntries, "case="&cs&",hasEntries"
-'        If hasSomething Then
-'            assertFsEntriesProc ao.entries,path,cs&".entries",False,False,Empty
-'        Else
-'            AssertEqualWithMessage cf_toString(Array()), cf_toString(ao.entries), "case="&cs&",.entries"
-'       End If
-'       assertFsEntriesProc ao.allEntries,path,cs&".allEntries",False,True,Empty
-'       assertFsEntriesProc ao.allEntriesIncludingSelf,path,cs&".allEntriesIncludingSelf",True,True,Empty
-
     Next
 End Sub
 
@@ -650,56 +644,29 @@ End Sub
 '   .containers
 '   .entries
 '   .filesExcludingArchives
+'   .hasContainers
+'   .hasEntries
+'   .hasFilesExcludingArchives
 Sub assertFsEntries(target,path,cs)
-'    Dim hasSomething, a, text
-'
-'    For Each ele In Array(Cl_FILE_EXCLUDING_ARCHIVE, Cl_CONTAINER, Cl_ENTRY)
-'        hasSomething=expectHasEntries(path,ele)
-'
-'        Select Case ele
-'        Case Cl_FILE_EXCLUDING_ARCHIVE
-'            a = target.hasFilesExcludingArchives
-'            text = ",hasFilesExcludingArchives"
-'        Case Cl_CONTAINER
-'            a = target.hasContainers
-'            text = ",hasContainers"
-'        Case Cl_ENTRY
-'            a = target.hasEntries
-'            text = ",hasEntries"
-'        End Select
-'        AssertEqualWithMessage hasSomething, a, "case="&cs&text
-'    Next
+    Dim ele, tp, et, has, items, allItems, allItemsIncludingSelf, text
+    For Each ele In Array( _
+            dicOf(  Array("tp", "FilesExcludingArchives", "et", Cl_FILE_EXCLUDING_ARCHIVE, "has" ,target.hasFilesExcludingArchives, "items", target.filesExcludingArchives, "allItems", target.allFilesExcludingArchives, "allItemsIncludingSelf", target.allFilesExcludingArchivesIncludingSelf)) _
+            , dicOf(Array("tp", "Containers"            , "et", Cl_CONTAINER             , "has" ,target.hasContainers            , "items", target.containers            , "allItems", target.allContainers            , "allItemsIncludingSelf", target.allContainersIncludingSelf)) _
+            , dicOf(Array("tp", "Entries"               , "et", Cl_ENTRY                 , "has" ,target.hasEntries               , "items", target.entries               , "allItems", target.allEntries               , "allItemsIncludingSelf", target.allEntriesIncludingSelf)) _
+            )
+        tp = ele("tp")
+        et = ele("et")
+        has = ele("has")
+        items = ele("items")
+        allItems = ele("allItems")
+        allItemsIncludingSelf = ele("allItemsIncludingSelf")
+        text = "caseNo="&cs&"("&tp
 
-    Dim hasSomething
-    hasSomething=expectHasEntries(path,Cl_FILE_EXCLUDING_ARCHIVE)
-    AssertEqualWithMessage hasSomething, target.hasFilesExcludingArchives, "case="&cs&",hasFilesExcludingArchives"
-    If hasSomething Then
-        assertFsEntriesProc target.filesExcludingArchives,path,cs&".filesExcludingArchives",False,False,Cl_FILE_EXCLUDING_ARCHIVE
-    Else
-        AssertEqualWithMessage cf_toString(Array()), cf_toString(target.filesExcludingArchives), "case="&cs&",.filesExcludingArchives"
-    End If
-    assertFsEntriesProc target.allFilesExcludingArchives,path,cs&".allFilesExcludingArchives",False,True,Cl_FILE_EXCLUDING_ARCHIVE
-    assertFsEntriesProc target.allFilesExcludingArchivesIncludingSelf,path,cs&".allFilesExcludingArchivesIncludingSelf",True,True,Cl_FILE_EXCLUDING_ARCHIVE
-
-    hasSomething=expectHasEntries(path,Cl_CONTAINER)
-    AssertEqualWithMessage hasSomething, target.hasContainers, "case="&cs&",hasContainers"
-    If hasSomething Then
-        assertFsEntriesProc target.containers,path,cs&".containers",False,False,Cl_CONTAINER
-    Else
-        AssertEqualWithMessage cf_toString(Array()), cf_toString(target.containers), "case="&cs&",.containers"
-    End If
-    assertFsEntriesProc target.allContainers,path,cs&".allContainers",False,True,Cl_CONTAINER
-    assertFsEntriesProc target.allContainersIncludingSelf,path,cs&".allContainersIncludingSelf",True,True,Cl_CONTAINER
-    
-    hasSomething=expectHasEntries(path,Cl_ENTRY)
-    AssertEqualWithMessage hasSomething, target.hasEntries, "case="&cs&",hasEntries"
-    If hasSomething Then
-        assertFsEntriesProc target.entries,path,cs&".entries",False,False,Empty
-    Else
-        AssertEqualWithMessage cf_toString(Array()), cf_toString(target.entries), "case="&cs&",.entries"
-   End If
-   assertFsEntriesProc target.allEntries,path,cs&".allEntries",False,True,Empty
-   assertFsEntriesProc target.allEntriesIncludingSelf,path,cs&".allEntriesIncludingSelf",True,True,Empty
+        AssertEqualWithMessage expectHasEntries(path,et), has, text&",has)"
+        assertFsEntriesProc items                , path, text&",items)"                , False, False, et
+        assertFsEntriesProc allItems             , path, text&",allItems)"             , False, True , et
+        assertFsEntriesProc allItemsIncludingSelf, path, text&",allItemsIncludingSelf)", True , True , et
+    Next
 End Sub
 Sub assertFsEntriesProc(entries,path,caseNo,self,recursive,entryType)
     Dim ele, dic
@@ -769,6 +736,26 @@ Function shell
 End Function
 Function dictionary
     Set dictionary = CreateObject("Scripting.Dictionary")
+End Function
+Private Function dicOf( _
+    byVal avParams _
+    )
+    Dim oDict : Set oDict = dictionary()
+    
+    Dim vItem, vKey, boIsKey
+    boIsKey = True
+    For Each vItem In avParams
+        If boIsKey Then
+            vKey = vItem
+            oDict(vKey)= Empty
+        Else
+            oDict(vKey) = vItem
+        End If
+        boIsKey = Not boIsKey
+    Next
+    
+    Set dicOf = oDict
+    Set oDict = Nothing
 End Function
 Function getFolderItem2(path)
     Set getFolderItem2 = shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path))
