@@ -73,133 +73,40 @@ End Sub
 '   .toString
 '   .type
 Sub Test_FileProxy_proeerties_initial
-    dim tg,a,ao,e
-    set ao = (new FileSystemProxy)
-
-    tg = "allContainers"
-    e = Null
-    a = ao.allContainers
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allContainersIncludingSelf"
-    e = Null
-    a = ao.allContainersIncludingSelf
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allEntries"
-    e = Null
-    a = ao.allEntries
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allEntriesIncludingSelf"
-    e = Null
-    a = ao.allEntriesIncludingSelf
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allFilesExcludingArchives"
-    e = Null
-    a = ao.allFilesExcludingArchives
-    AssertEqualWithMessage e, a, tg
-
-    tg = "allFilesExcludingArchivesIncludingSelf"
-    e = Null
-    a = ao.allFilesExcludingArchivesIncludingSelf
-    AssertEqualWithMessage e, a, tg
-
-    tg = "baseName"
-    e = Null
-    a = ao.baseName
-    AssertEqualWithMessage e, a, tg
-
-    tg = "containers"
-    e = Null
-    a = ao.containers
-    AssertEqualWithMessage e, a, tg
-
-    tg = "dateLastModified"
-    e = Null
-    a = ao.dateLastModified
-    AssertEqualWithMessage e, a, tg
-
-    tg = "entries"
-    e = Null
-    a = ao.entries
-    AssertEqualWithMessage e, a, tg
-
-    tg = "extension"
-    e = Null
-    a = ao.extension
-    AssertEqualWithMessage e, a, tg
-
-    tg = "filesExcludingArchives"
-    e = Null
-    a = ao.filesExcludingArchives
-    AssertEqualWithMessage e, a, tg
-
-    tg = "hasContainers"
-    e = Null
-    a = ao.hasContainers
-    AssertEqualWithMessage e, a, tg
-
-    tg = "hasEntries"
-    e = Null
-    a = ao.hasEntries
-    AssertEqualWithMessage e, a, tg
-
-    tg = "hasFilesExcludingArchives"
-    e = Null
-    a = ao.hasFilesExcludingArchives
-    AssertEqualWithMessage e, a, tg
-
-    tg = "isBrowsable"
-    e = Null
-    a = ao.isBrowsable
-    AssertEqualWithMessage e, a, tg
-
-    tg = "isFileSystem"
-    e = Null
-    a = ao.isFileSystem
-    AssertEqualWithMessage e, a, tg
-
-    tg = "isFolder"
-    e = Null
-    a = ao.isFolder
-    AssertEqualWithMessage e, a, tg
-
-    tg = "isLink"
-    e = Null
-    a = ao.isLink
-    AssertEqualWithMessage e, a, tg
-
-    tg = "name"
-    e = Null
-    a = ao.name
-    AssertEqualWithMessage e, a, tg
-
-    tg = "parentFolder"
-    e = Null
-    a = ao.parentFolder
-    AssertEqualWithMessage e, a, tg
-
-    tg = "path"
-    e = Null
-    a = ao.path
-    AssertEqualWithMessage e, a, tg
-
-    tg = "size"
-    e = Null
-    a = ao.size
-    AssertEqualWithMessage e, a, tg
-
-    tg = "toString"
-    e = "<FileSystemProxy>"
-    a = ao.toString
-    AssertEqualWithMessage e, a, tg
-
-    tg = "type"
-    e = Null
-    a = ao.type
-    AssertEqualWithMessage e, a, tg
+    Dim ao : Set ao = (new FileSystemProxy)
+    Dim ele, target, expected, actual
+    For Each ele In Array( _
+            dicOf( Array(  "target","allContainers"                         ,"expected",Null               , "actual", ao.allContainers) ) _
+            , dicOf( Array("target","allContainersIncludingSelf"            ,"expected",Null               , "actual", ao.allContainersIncludingSelf) ) _
+            , dicOf( Array("target","allEntries"                            ,"expected",Null               , "actual", ao.allEntries) ) _
+            , dicOf( Array("target","allEntriesIncludingSelf"               ,"expected",Null               , "actual", ao.allEntriesIncludingSelf) ) _
+            , dicOf( Array("target","allFilesExcludingArchives"             ,"expected",Null               , "actual", ao.allFilesExcludingArchives) ) _
+            , dicOf( Array("target","allFilesExcludingArchivesIncludingSelf","expected",Null               , "actual", ao.allFilesExcludingArchivesIncludingSelf) ) _
+            , dicOf( Array("target","baseName"                              ,"expected",Null               , "actual", ao.baseName) ) _
+            , dicOf( Array("target","containers"                            ,"expected",Null               , "actual", ao.containers) ) _
+            , dicOf( Array("target","dateLastModified"                      ,"expected",Null               , "actual", ao.dateLastModified) ) _
+            , dicOf( Array("target","entries"                               ,"expected",Null               , "actual", ao.entries) ) _
+            , dicOf( Array("target","extension"                             ,"expected",Null               , "actual", ao.extension) ) _
+            , dicOf( Array("target","filesExcludingArchives"                ,"expected",Null               , "actual", ao.filesExcludingArchives) ) _
+            , dicOf( Array("target","hasContainers"                         ,"expected",Null               , "actual", ao.hasContainers) ) _
+            , dicOf( Array("target","hasEntries"                            ,"expected",Null               , "actual", ao.hasEntries) ) _
+            , dicOf( Array("target","hasFilesExcludingArchives"             ,"expected",Null               , "actual", ao.hasFilesExcludingArchives) ) _
+            , dicOf( Array("target","isBrowsable"                           ,"expected",Null               , "actual", ao.isBrowsable) ) _
+            , dicOf( Array("target","isFileSystem"                          ,"expected",Null               , "actual", ao.isFileSystem) ) _
+            , dicOf( Array("target","isFolder"                              ,"expected",Null               , "actual", ao.isFolder) ) _
+            , dicOf( Array("target","isLink"                                ,"expected",Null               , "actual", ao.isLink) ) _
+            , dicOf( Array("target","name"                                  ,"expected",Null               , "actual", ao.name) ) _
+            , dicOf( Array("target","parentFolder"                          ,"expected",Null               , "actual", ao.parentFolder) ) _
+            , dicOf( Array("target","path"                                  ,"expected",Null               , "actual", ao.path) ) _
+            , dicOf( Array("target","size"                                  ,"expected",Null               , "actual", ao.size) ) _
+            , dicOf( Array("target","toString"                              ,"expected","<FileSystemProxy>", "actual", ao.toString) ) _
+            , dicOf( Array("target","type"                                  ,"expected",Null               , "actual", ao.type) ) _
+    )
+        target = ele("target")
+        expected = ele("expected")
+        actual = ele("actual")
+        AssertEqualWithMessage expected, actual, target&"(initial)"
+    Next
 End Sub
 Sub Test_FileProxy_properties
     Dim data : data = createData()
@@ -560,7 +467,7 @@ End Function
 '   .size
 '   .toString
 '   .type
-Sub assertFsProperties(target,path,caseNo)
+Sub assertFsProperties(actualObj,path,caseNo)
     'èÄîı
     Dim fi2, fo, flg
     Set fi2 = getFolderItem2(path)
@@ -573,62 +480,51 @@ Sub assertFsProperties(target,path,caseNo)
         flg = False
     End IF
 
-    Dim expect
-    With target
-        '.baseName
-        expect = fso.GetBaseName(path)
-        AssertEqualWithMessage expect, .baseName              , "caseNo="&caseNo&"(baseName)"             &", path="&path
+    With actualObj
         
-        '.dateLastModified
-        If flg Then expect = fo.DateLastModified Else expect = fi2.ModifyDate
-        AssertEqualWithMessage expect, .dateLastModified      , "caseNo="&caseNo&"(dateLastModified)"     &", path="&path
+        Dim ele, target, expected, actual
+        For Each ele In Array( _
+                dicOf(Array(  "target", "baseName"             , "expected", fso.GetBaseName(path)     , "actual", .baseName)) _
+                , dicOf(Array("target", "extension"            , "expected", fso.GetExtensionName(path), "actual", .extension)) _
+                , dicOf(Array("target", "isBrowsable"          , "expected", fi2.IsBrowsable           , "actual", .isBrowsable)) _
+                , dicOf(Array("target", "isFileSystem"         , "expected", fi2.IsFileSystem          , "actual", .isFileSystem)) _
+                , dicOf(Array("target", "isFolder"             , "expected", fso.FolderExists(path)    , "actual", .isFolder)) _
+                , dicOf(Array("target", "isLink"               , "expected", fi2.IsLink                , "actual", .isLink)) _
+                , dicOf(Array("target", "parentFolder TypeName", "expected", "FileSystemProxy"         , "actual", TypeName(.parentFolder))) _
+                , dicOf(Array("target", "path"                 , "expected", path                      , "actual", .path)) _
+                , dicOf(Array("target", "default"              , "expected", path                      , "actual", actualObj)) _
+                , dicOf(Array("target", "toString"             , "expected", "<FileSystemProxy>"&path  , "actual", .toString)) _
+                )
+            target = ele("target")
+            expected = ele("expected")
+            If IsObject(ele("actual")) Then Set actual = ele("actual") Else actual = ele("actual")
+            AssertEqualWithMessage expected, actual, "caseNo="&caseNo&"("&target&")" &", path="&path
+        Next
         
-        '.extension
-        expect = fso.GetExtensionName(path)
-        AssertEqualWithMessage expect, .extension             , "caseNo="&caseNo&"(extension)"            &", path="&path
-        
-        '.isBrowsable
-        expect = fi2.IsBrowsable
-        AssertEqualWithMessage expect, .isBrowsable           , "caseNo="&caseNo&"(isBrowsable)"          &", path="&path
-        
-        '.isFileSystem
-        expect = fi2.IsFileSystem
-        AssertEqualWithMessage expect, .isFileSystem          , "caseNo="&caseNo&"(isFileSystem)"         &", path="&path
-        
-        '.isFolder
-        expect = fso.FolderExists(path)
-        AssertEqualWithMessage expect, .isFolder              , "caseNo="&caseNo&"(isFolder)"             &", path="&path
-        
-        '.isLink
-        expect = fi2.IsLink
-        AssertEqualWithMessage expect, .isLink                , "caseNo="&caseNo&"(isLink)"               &", path="&path
-        
-        '.name
-        If flg Then expect = fo.Name Else expect = fso.GetFileName(path)
-        AssertEqualWithMessage expect, .name                  , "caseNo="&caseNo&"(name)"                 &", path="&path
-        
-        '.parentFolder
-        expect = "FileSystemProxy"
-        AssertEqualWithMessage expect, TypeName(.parentFolder), "caseNo="&caseNo&"(parentFolder TypeName)"&", path="&path
-        If flg Then expect = fo.ParentFolder.Path Else expect = fso.GetParentFolderName(path)
-        AssertEqualWithMessage expect, .parentFolder.path     , "caseNo="&caseNo&"(parentFolder path)"    &", path="&path
-        
-        '.path,default
-        expect = path
-        AssertEqualWithMessage expect, .path                  , "caseNo="&caseNo&"(path)"                 &", path="&path
-        AssertEqualWithMessage expect, target                 , "caseNo="&caseNo&"(path default)"         &", path="&path
-        
-        '.size
-        If flg Then expect = fo.Size Else expect = fi2.Size
-        AssertEqualWithMessage expect, .size                  , "caseNo="&caseNo&"(size)"                 &", path="&path
-        
-        '.toString
-        expect = "<FileSystemProxy>"&path
-        AssertEqualWithMessage expect, .toString              , "caseNo="&caseNo&"(toString)"             &", path="&path
-        
-        '.type
-        If flg Then expect = fo.Type Else expect = fi2.Type
-        AssertEqualWithMessage expect, .type                  , "caseNo="&caseNo&"(type)"                 &", path="&path
+        Dim data
+        If flg Then
+            data = Array( _
+                dicOf(  Array("target","dateLastModified", "expected", fo.DateLastModified          , "actual", .dateLastModified)) _
+                , dicOf(Array("target","name"            , "expected", fo.Name                      , "actual", .name)) _
+                , dicOf(Array("target","parentFolder"    , "expected", fo.ParentFolder.path         , "actual", .parentFolder.path)) _
+                , dicOf(Array("target","size"            , "expected", fo.Size                      , "actual", .size)) _
+                , dicOf(Array("target","type"            , "expected", fo.Type                      , "actual", .type)) _
+                )
+        Else
+            data = Array( _
+                dicOf(  Array("target","dateLastModified", "expected", fi2.ModifyDate               , "actual", .dateLastModified)) _
+                , dicOf(Array("target","name"            , "expected", fso.GetFileName(path)        , "actual", .name)) _
+                , dicOf(Array("target","parentFolder"    , "expected", fso.GetParentFolderName(path), "actual", .parentFolder.path)) _
+                , dicOf(Array("target","size"            , "expected", fi2.Size                     , "actual", .size)) _
+                , dicOf(Array("target","type"            , "expected", fi2.Type                     , "actual", .type)) _
+                )
+        End If
+        For Each ele In data
+            target = ele("target")
+            expected = ele("expected")
+            actual = ele("actual")
+            AssertEqualWithMessage expected, actual, "caseNo="&caseNo&"("&target&")" &", path="&path
+        Next
     End With
 
     Set fo = Nothing
@@ -647,26 +543,28 @@ End Sub
 '   .hasContainers
 '   .hasEntries
 '   .hasFilesExcludingArchives
-Sub assertFsEntries(target,path,cs)
+Sub assertFsEntries(actualObj,path,cs)
     Dim ele, tp, et, has, items, allItems, allItemsIncludingSelf, text
-    For Each ele In Array( _
-            dicOf(  Array("tp", "FilesExcludingArchives", "et", Cl_FILE_EXCLUDING_ARCHIVE, "has" ,target.hasFilesExcludingArchives, "items", target.filesExcludingArchives, "allItems", target.allFilesExcludingArchives, "allItemsIncludingSelf", target.allFilesExcludingArchivesIncludingSelf)) _
-            , dicOf(Array("tp", "Containers"            , "et", Cl_CONTAINER             , "has" ,target.hasContainers            , "items", target.containers            , "allItems", target.allContainers            , "allItemsIncludingSelf", target.allContainersIncludingSelf)) _
-            , dicOf(Array("tp", "Entries"               , "et", Cl_ENTRY                 , "has" ,target.hasEntries               , "items", target.entries               , "allItems", target.allEntries               , "allItemsIncludingSelf", target.allEntriesIncludingSelf)) _
-            )
-        tp = ele("tp")
-        et = ele("et")
-        has = ele("has")
-        items = ele("items")
-        allItems = ele("allItems")
-        allItemsIncludingSelf = ele("allItemsIncludingSelf")
-        text = "caseNo="&cs&"("&tp
-
-        AssertEqualWithMessage expectHasEntries(path,et), has, text&",has)"
-        assertFsEntriesProc items                , path, text&",items)"                , False, False, et
-        assertFsEntriesProc allItems             , path, text&",allItems)"             , False, True , et
-        assertFsEntriesProc allItemsIncludingSelf, path, text&",allItemsIncludingSelf)", True , True , et
+    With actualObj
+        For Each ele In Array( _
+                dicOf(  Array("tp", "FilesExcludingArchives", "et", Cl_FILE_EXCLUDING_ARCHIVE, "has" ,.hasFilesExcludingArchives, "items", .filesExcludingArchives, "allItems", .allFilesExcludingArchives, "allItemsIncludingSelf", .allFilesExcludingArchivesIncludingSelf)) _
+                , dicOf(Array("tp", "Containers"            , "et", Cl_CONTAINER             , "has" ,.hasContainers            , "items", .containers            , "allItems", .allContainers            , "allItemsIncludingSelf", .allContainersIncludingSelf)) _
+                , dicOf(Array("tp", "Entries"               , "et", Cl_ENTRY                 , "has" ,.hasEntries               , "items", .entries               , "allItems", .allEntries               , "allItemsIncludingSelf", .allEntriesIncludingSelf)) _
+                )
+            tp = ele("tp")
+            et = ele("et")
+            has = ele("has")
+            items = ele("items")
+            allItems = ele("allItems")
+            allItemsIncludingSelf = ele("allItemsIncludingSelf")
+            text = "caseNo="&cs&"("&tp
+    
+            AssertEqualWithMessage expectHasEntries(path,et), has, text&",has)"
+            assertFsEntriesProc items                , path, text&",items)"                , False, False, et
+            assertFsEntriesProc allItems             , path, text&",allItems)"             , False, True , et
+            assertFsEntriesProc allItemsIncludingSelf, path, text&",allItemsIncludingSelf)", True , True , et
     Next
+    End With
 End Sub
 Sub assertFsEntriesProc(entries,path,caseNo,self,recursive,entryType)
     Dim ele, dic
@@ -679,7 +577,7 @@ Sub assertFsEntriesProc(entries,path,caseNo,self,recursive,entryType)
     assertFsEntriesProcEachEntry path,caseNo,dic,self,recursive,entryType
     
     For Each ele In dic.Keys
-        If Not dic(ele) Then AssertFailWithMessage "caseNo="&caseNo&", '"&ele&"' Not Found !"
+        If Not (dic(ele)=True) Then AssertFailWithMessage "caseNo="&caseNo&", '"&ele&"' Not Found !"
     Next
 
     AssertWithMessage True, "all ok"
@@ -749,7 +647,11 @@ Private Function dicOf( _
             vKey = vItem
             oDict(vKey)= Empty
         Else
-            oDict(vKey) = vItem
+            If IsObject(vItem) Then
+                Set oDict(vKey) = vItem
+            Else
+                oDict(vKey) = vItem
+            End If
         End If
         boIsKey = Not boIsKey
     Next
