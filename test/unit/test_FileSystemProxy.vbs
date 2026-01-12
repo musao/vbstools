@@ -18,23 +18,33 @@ Option Explicit
 
 Const MY_NAME = "test_FileProxy.vbs"
 Dim PsPathTempFolder
-
-Const Cl_ENTRY = 0
-Const Cl_FILE = 2
-Const Cl_FILE_EXCLUDING_ARCHIVE = 3
-Const Cl_FOLDER = 4
-Const Cl_CONTAINER = 5
-
+Dim PeEntryType : Set PeEntryType = dicOf( _
+    Array( _
+        "ENTRY", 0 _
+        , "FILE", 1 _
+        , "FILE_EXCLUDING_ARCHIVE", 2 _
+        , "FOLDER", 3 _
+        , "CONTAINER", 4 _
+    ) _
+)
+Dim PeDataType : Set PeDataType = dicOf( _
+    Array( _
+        "SHORTCUT_FILE", 0 _
+        , "URL_SHORTCUT_FILE", 1 _
+        , "TEXT_FILE", 2 _
+        , "FOLDER", 3 _
+    ) _
+)
 '###################################################################################################
 'SetUp()/TearDown()
 Sub SetUp()
     '実行スクリプト直下に当ファイル名で一時フォルダ作成
-    PsPathTempFolder = new_Fso().BuildPath(new_Fso().GetParentFolderName(WScript.ScriptFullName), MY_NAME)
-    If Not (new_Fso().FolderExists(PsPathTempFolder)) Then new_Fso().CreateFolder(PsPathTempFolder)
+    PsPathTempFolder = fso().BuildPath(fso().GetParentFolderName(WScript.ScriptFullName), MY_NAME)
+    If Not (fso().FolderExists(PsPathTempFolder)) Then fso().CreateFolder(PsPathTempFolder)
 End Sub
 Sub TearDown()
     '当テストで作成した一時フォルダを削除する
-    new_Fso().DeleteFolder PsPathTempFolder
+    fso().DeleteFolder PsPathTempFolder
 End Sub
 
 '###################################################################################################
@@ -231,6 +241,11 @@ End Sub
 'common
 Function createData
     Dim defs
+'    defs=Array( _
+'    Array( defShortCutFile()                         , defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ) _
+'    , Array( defShortCutFile()                         , defFolder("defFolder(defTextFile),defShortCutFile")                               , defFolder("defTextFile,defShortCutFile")        ) _
+'    )
+
     defs=Array( _
     Array() _
     , Array(                                             defFolder(Empty)                                                                                 ) _
@@ -283,7 +298,7 @@ Function createData
     For Each cs In extractTargetForZip(defs)
         pusha cases,caseZip(cs)
     Next
-    createData = caseToData(cases)
+    createData = cases
 End Function
 Function caseNormal(cs)
     caseNormal=createFolderAt(PsPathTempFolder,cs)
@@ -328,13 +343,6 @@ Function isEmptyArray(ar)
     If Not IsArray(ar) Then Exit Function
     If Ubound(ar)<0 Then isEmptyArray=True
 End Function
-Function caseToData(cases)
-    Dim ret,cs
-    For Each cs In cases
-        pushA ret,cs
-    Next
-    caseToData = ret
-End Function
 
 Function createShortCutFile
     createShortCutFile = createShortCutFileAt(PsPathTempFolder)
@@ -360,60 +368,64 @@ Function createTextFileAt(basePath)
     End With
     createTextFileAt = path
 End Function
+Function createSomeFileAt(tp, basePath)
+    Select Case tp
+    Case PeDataType("SHORTCUT_FILE")
+        createSomeFileAt = createShortCutFileAt(basePath)
+    Case PeDataType("URL_SHORTCUT_FILE")
+        createSomeFileAt = createUrlShortCutFileAt(basePath)
+    Case PeDataType("TEXT_FILE")
+        createSomeFileAt = createTextFileAt(basePath)
+    End Select
+End Function
 Function createEmptyFolderAt(basePath)
     Dim path : path = getTempFolderPath(basePath)
     fso.CreateFolder path
     createEmptyFolderAt=path
 End Function
 Function createFolderAt(basePath,content)
-    Dim contents
-    push contents,basePath
-    push contents,content
-    createFolderAt=createFolderAbout(contents)
-End Function
-Function createFolderAbout(contents)
-    Dim setting : Set setting = dictionary()
-    With setting
-        .Add "ShortCutFile",Array(GetRef("createShortCutFileAt"),False)
-        .Add "UrlShortCutFile",Array(GetRef("createUrlShortCutFileAt"),False)
-        .Add "TextFile",Array(GetRef("createTextFileAt"),False)
-        .Add "Folder",Array(GetRef("createFolderAbout"),True)
-    End With
-    Dim path : path = createEmptyFolderAt(contents(0))
-
-    Dim ret : push ret,path
-    Dim ele,ptn,pram
-    For Each ele In contents(1)
-        ptn=setting(ele(0))
-        If ptn(1) Then
-            pram=Array()
-            push pram,path
-            push pram,ele(1)
-            pushA ret,ptn(0)(pram)
+    Dim path : path = createEmptyFolderAt(basePath)
+    
+    Dim ret : push ret, path
+    Dim ele, tp, cnt
+    For Each ele In content
+        tp = ele(0)
+        If tp=PeDataType("FOLDER") Then
+            cnt = ele(1)
+            pushA ret, createFolderAt(path, cnt)
         Else
-            pushA ret,ptn(0)(path)
+            pushA ret, createSomeFileAt(tp, path)
         End If
     Next
-    createFolderAbout=ret
+    createFolderAt = ret
 End Function
 Function defShortCutFile
-    defShortCutFile = Array("ShortCutFile")
+    defShortCutFile = Array(PeDataType("SHORTCUT_FILE"))
 End Function
 Function defUrlShortCutFile
-    defUrlShortCutFile = Array("UrlShortCutFile")
+    defUrlShortCutFile = Array(PeDataType("URL_SHORTCUT_FILE"))
 End Function
 Function defTextFile
-    defTextFile = Array("TextFile")
+    defTextFile = Array(PeDataType("TEXT_FILE"))
 End Function
 Function defFolder(d)
     Dim pram : pram=Array()
     If Not IsEmpty(d) Then
-        Dim i
-        For Each i In Split(d,",")
-            push pram,GetRef(i)()
+        Dim ele,re,func,arg
+        Set re = reOf("([a-zA-Z0-9_]+)\(([^)]+)\)", "igm")
+        For Each ele In Split(d,",")
+            If re.Test(ele) Then
+                func = re.Replace(ele, "$1")
+                arg = re.Replace(ele, "$2")
+                If StrComp(arg, "Empty", vbTextCompare)=0 Then arg = Empty
+                push pram,GetRef(func)(arg)
+            Else
+                func = ele
+                push pram,GetRef(func)()
+            End If
         Next
     End If
-    defFolder = Array("Folder", pram)
+    defFolder = Array(PeDataType("FOLDER"), pram)
 End Function
 
 'for verify the following properties
@@ -427,7 +439,7 @@ Function expectHasEntries(path,entryType)
     Set obj = getFolderItem2(path)
     ret = False
         Select Case entryType
-        Case Cl_CONTAINER
+        Case PeEntryType("CONTAINER")
             If fso.FolderExists(path) Then
                 ret=(fso.GetFolder(path).SubFolders.Count>0)
             ElseIf obj.IsFolder Then
@@ -437,7 +449,7 @@ Function expectHasEntries(path,entryType)
                 Next
             End If
             expectHasEntries=ret
-        Case Cl_FILE_EXCLUDING_ARCHIVE
+        Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
             If fso.FolderExists(path) Then
                 ret=(fso.GetFolder(path).Files.Count>0)
             ElseIf obj.IsFolder Then
@@ -448,7 +460,7 @@ Function expectHasEntries(path,entryType)
             End If
             expectHasEntries=ret
         Case Else
-        'Cl_ENTRY or others
+        'PeEntryType("ENTRY") or others
             If obj.IsFolder Then expectHasEntries = obj.GetFolder.Items.Count>0
     End Select
 End Function
@@ -547,9 +559,9 @@ Sub assertFsEntries(actualObj,path,cs)
     Dim ele, tp, et, has, items, allItems, allItemsIncludingSelf, text
     With actualObj
         For Each ele In Array( _
-                dicOf(  Array("tp", "FilesExcludingArchives", "et", Cl_FILE_EXCLUDING_ARCHIVE, "has" ,.hasFilesExcludingArchives, "items", .filesExcludingArchives, "allItems", .allFilesExcludingArchives, "allItemsIncludingSelf", .allFilesExcludingArchivesIncludingSelf)) _
-                , dicOf(Array("tp", "Containers"            , "et", Cl_CONTAINER             , "has" ,.hasContainers            , "items", .containers            , "allItems", .allContainers            , "allItemsIncludingSelf", .allContainersIncludingSelf)) _
-                , dicOf(Array("tp", "Entries"               , "et", Cl_ENTRY                 , "has" ,.hasEntries               , "items", .entries               , "allItems", .allEntries               , "allItemsIncludingSelf", .allEntriesIncludingSelf)) _
+                dicOf(  Array("tp", "FilesExcludingArchives", "et", PeEntryType("FILE_EXCLUDING_ARCHIVE"), "has" ,.hasFilesExcludingArchives, "items", .filesExcludingArchives, "allItems", .allFilesExcludingArchives, "allItemsIncludingSelf", .allFilesExcludingArchivesIncludingSelf)) _
+                , dicOf(Array("tp", "Containers"            , "et", PeEntryType("CONTAINER")             , "has" ,.hasContainers            , "items", .containers            , "allItems", .allContainers            , "allItemsIncludingSelf", .allContainersIncludingSelf)) _
+                , dicOf(Array("tp", "Entries"               , "et", PeEntryType("ENTRY")                 , "has" ,.hasEntries               , "items", .entries               , "allItems", .allEntries               , "allItemsIncludingSelf", .allEntriesIncludingSelf)) _
                 )
             tp = ele("tp")
             et = ele("et")
@@ -607,10 +619,10 @@ Sub existsEntry(path,caseNo,dic,entryType)
     Dim flg : flg = False
     Dim sEntryName : sEntryName = "entries"
     Select Case entryType
-    Case Cl_FILE_EXCLUDING_ARCHIVE
+    Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
         sEntryName = "filesExcludingArchives"
         If Not getFolderItem2(path).IsFolder Then flg = True
-    Case Cl_CONTAINER
+    Case PeEntryType("CONTAINER")
         sEntryName = "containers"
         If getFolderItem2(path).IsFolder Then flg = True
     Case Else
@@ -635,7 +647,7 @@ End Function
 Function dictionary
     Set dictionary = CreateObject("Scripting.Dictionary")
 End Function
-Private Function dicOf( _
+Function dicOf( _
     byVal avParams _
     )
     Dim oDict : Set oDict = dictionary()
@@ -658,6 +670,20 @@ Private Function dicOf( _
     
     Set dicOf = oDict
     Set oDict = Nothing
+End Function
+Function reOf(pattern, opt)
+    Dim oRe, sOpts
+    
+    Set oRe = New RegExp
+    oRe.Pattern = pattern
+    
+    sOpts = LCase(opt)
+    If InStr(sOpts, "i") > 0 Then oRe.IgnoreCase = True
+    If InStr(sOpts, "g") > 0 Then oRe.Global = True
+    If InStr(sOpts, "m") > 0 Then oRe.Multiline = True
+    
+    Set reOf = oRe
+    Set oRe = Nothing
 End Function
 Function getFolderItem2(path)
     Set getFolderItem2 = shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path))
