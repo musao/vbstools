@@ -119,40 +119,43 @@ Sub Test_FileProxy_proeerties_initial
     Next
 End Sub
 Sub Test_FileProxy_properties
-    Dim data : data = createData()
-    Dim cs,path,ao
-    For cs=0 To Ubound(data)
-        path = data(cs)
-        Set ao = new FileSystemProxy : ao.of(path)
+    Dim ele,path,cs,cnt,ao
+    For Each ele In createData()
+        cnt=0
+        For Each path In ele("Paths")
+            cnt=cnt+1
+            cs = ele("Case")&"-"&cnt
+            Set ao = (new FileSystemProxy).of(path)
 
-'       .baseName
-'       .dateLastModified
-'       .extension
-'       .isBrowsable
-'       .isFileSystem
-'       .isFolder
-'       .isLink
-'       .name
-'       .parentFolder
-'       .path
-'       .size
-'       .toString
-'       .type
-        assertFsProperties ao,path,cs
+'           .baseName
+'           .dateLastModified
+'           .extension
+'           .isBrowsable
+'           .isFileSystem
+'           .isFolder
+'           .isLink
+'           .name
+'           .parentFolder
+'           .path
+'           .size
+'           .toString
+'           .type
+            assertFsProperties ao,path,cs
 
-'       .allContainers
-'       .allContainersIncludingSelf
-'       .allEntries
-'       .allEntriesIncludingSelf
-'       .allFilesExcludingArchives
-'       .allFilesExcludingArchivesIncludingSelf
-'       .containers
-'       .entries
-'       .filesExcludingArchives
-'       .hasContainers
-'       .hasEntries
-'       .hasFilesExcludingArchives
-        assertFsEntries ao,path,cs
+'           .allContainers
+'           .allContainersIncludingSelf
+'           .allEntries
+'           .allEntriesIncludingSelf
+'           .allFilesExcludingArchives
+'           .allFilesExcludingArchivesIncludingSelf
+'           .containers
+'           .entries
+'           .filesExcludingArchives
+'           .hasContainers
+'           .hasEntries
+'           .hasFilesExcludingArchives
+            assertFsEntries ao,path,cs
+        Next
     Next
 End Sub
 
@@ -240,23 +243,18 @@ End Sub
 '###################################################################################################
 'common
 Function createData
-    Dim defs
-'    defs=Array( _
-'    Array( defShortCutFile()                         , defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ) _
-'    , Array( defShortCutFile()                         , defFolder("defFolder(defTextFile),defShortCutFile")                               , defFolder("defTextFile,defShortCutFile")        ) _
-'    )
-
-    defs=Array( _
-    Array() _
-    , Array(                                             defFolder(Empty)                                                                                 ) _
-    , Array( defUrlShortCutFile()                      , defFolder("defTextFile")                                                                         ) _
-    , Array( defShortCutFile()   , defUrlShortCutFile(), defFolder("defTextFile,defShortCutFile")                                                         ) _
-    , Array(                                             defFolder(Empty)                               , defFolder(Empty)                                ) _
-    , Array( defTextFile()                             , defFolder(Empty)                               , defFolder("defShortCutFile")                    ) _
-    , Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ) _
-    , Array(                                             defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ) _
-    , Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ) _
-    , Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ) _
+    Dim cases
+    cases=Array( _
+    dicOf(  Array(  "Case", "1" , "Definition", Array() )) _
+    , dicOf(Array(  "Case", "2" , "Definition", Array(                                             defFolder(Empty)                                                                                 ))) _
+    , dicOf(Array(  "Case", "3" , "Definition", Array( defUrlShortCutFile()                      , defFolder("defTextFile")                                                                         ))) _
+    , dicOf(Array(  "Case", "4" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder("defTextFile,defShortCutFile")                                                         ))) _
+    , dicOf(Array(  "Case", "5" , "Definition", Array(                                             defFolder(Empty)                               , defFolder(Empty)                                ))) _
+    , dicOf(Array(  "Case", "6" , "Definition", Array( defTextFile()                             , defFolder(Empty)                               , defFolder("defShortCutFile")                    ))) _
+    , dicOf(Array(  "Case", "7" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ))) _
+    , dicOf(Array(  "Case", "8" , "Definition", Array(                                             defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ))) _
+    , dicOf(Array(  "Case", "9" , "Definition", Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ))) _
+    , dicOf(Array(  "Case", "10", "Definition", Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ))) _
     )
 'covers all patterns
 '    defs=Array( _
@@ -291,20 +289,20 @@ Function createData
 '    , Array( defTextFile()       , defShortCutFile()   , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ) _
 '    , Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ) _
 '    )
-    Dim cs,cases
-    For Each cs In defs
-        pusha cases,caseNormal(cs)
+    Dim cs,data
+    For Each cs In cases
+        pusha data, dicOf(Array("Case", cs("Case"), "Paths", caseNormal(cs("Definition"))))
     Next
-    For Each cs In extractTargetForZip(defs)
-        pusha cases,caseZip(cs)
+    For Each cs In extractTargetForZip(cases)
+        pusha data, dicOf(Array("Case", cs("Case"), "Paths", caseZip(cs("Definition"))))
     Next
-    createData = cases
+    createData = data
 End Function
-Function caseNormal(cs)
-    caseNormal=createFolderAt(PsPathTempFolder,cs)
+Function caseNormal(def)
+    caseNormal=createDataAt(PsPathTempFolder,def)
 End Function
-Function caseZip(cs)
-    Dim flPath : flPath=createFolderAt(PsPathTempFolder,cs)
+Function caseZip(def)
+    Dim flPath : flPath=createDataAt(PsPathTempFolder,def)
     Dim ele,paths
     For Each ele in getFolderItem2(flPath(0)).GetFolder.Items
         push paths,ele.path
@@ -320,19 +318,19 @@ Function caseZip(cs)
     caseZip=ret
 End Function
 
-Function extractTargetForZip(defs)
+Function extractTargetForZip(cases)
     Dim cs,ret : ret=Array()
-    For Each cs In defs
-        If Not containEmpty(cs) Then push ret,cs
+    For Each cs In cases
+        If Not containEmpty(cs("Definition")) Then push ret,cs
     Next
     extractTargetForZip=ret
 End Function
-Function containEmpty(cs)
+Function containEmpty(def)
     containEmpty=True
-    If isEmptyArray(cs) Then Exit Function
-    If IsArray(cs) Then
+    If isEmptyArray(def) Then Exit Function
+    If IsArray(def) Then
         Dim ele
-        For Each ele In cs
+        For Each ele In def
             If containEmpty(ele) Then Exit Function
         Next
     End If
@@ -383,7 +381,7 @@ Function createEmptyFolderAt(basePath)
     fso.CreateFolder path
     createEmptyFolderAt=path
 End Function
-Function createFolderAt(basePath,content)
+Function createDataAt(basePath,content)
     Dim path : path = createEmptyFolderAt(basePath)
     
     Dim ret : push ret, path
@@ -392,12 +390,12 @@ Function createFolderAt(basePath,content)
         tp = ele(0)
         If tp=PeDataType("FOLDER") Then
             cnt = ele(1)
-            pushA ret, createFolderAt(path, cnt)
+            pushA ret, createDataAt(path, cnt)
         Else
             pushA ret, createSomeFileAt(tp, path)
         End If
     Next
-    createFolderAt = ret
+    createDataAt = ret
 End Function
 Function defShortCutFile
     defShortCutFile = Array(PeDataType("SHORTCUT_FILE"))
