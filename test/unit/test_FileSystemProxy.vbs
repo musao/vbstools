@@ -16,7 +16,7 @@
 
 Option Explicit
 
-Const MY_NAME = "test_FileProxy.vbs"
+Const MY_NAME = "test_FileSystemProxy.vbs"
 Dim PsPathTempFolder
 Dim PeEntryType : Set PeEntryType = dicOf( _
     Array( _
@@ -33,6 +33,7 @@ Dim PeDataType : Set PeDataType = dicOf( _
         , "URL_SHORTCUT_FILE", 1 _
         , "TEXT_FILE", 2 _
         , "FOLDER", 3 _
+        , "ARCHIVE", 4 _
     ) _
 )
 '###################################################################################################
@@ -49,7 +50,7 @@ End Sub
 
 '###################################################################################################
 'FileSystemProxy
-Sub Test_FileProxy
+Sub Test_FileSystemProxy
     Dim a : Set a = new FileSystemProxy
     AssertEqualWithMessage 1, VarType(a), "VarType"
     AssertEqualWithMessage "FileSystemProxy", TypeName(a), "TypeName"
@@ -119,43 +120,40 @@ Sub Test_FileProxy_proeerties_initial
     Next
 End Sub
 Sub Test_FileProxy_properties
-    Dim ele,path,cs,cnt,ao
+    Dim ele,path,cs,ao
     For Each ele In createData()
-        cnt=0
-        For Each path In ele("Paths")
-            cnt=cnt+1
-            cs = ele("Case")&"-"&cnt
-            Set ao = (new FileSystemProxy).of(path)
+        path = ele("Path")
+        cs = ele("Case")
+        Set ao = (new FileSystemProxy).of(path)
 
-'           .baseName
-'           .dateLastModified
-'           .extension
-'           .isBrowsable
-'           .isFileSystem
-'           .isFolder
-'           .isLink
-'           .name
-'           .parentFolder
-'           .path
-'           .size
-'           .toString
-'           .type
-            assertFsProperties ao,path,cs
+'       .baseName
+'       .dateLastModified
+'       .extension
+'       .isBrowsable
+'       .isFileSystem
+'       .isFolder
+'       .isLink
+'       .name
+'       .parentFolder
+'       .path
+'       .size
+'       .toString
+'       .type
+        assertFsProperties ao,path,cs
 
-'           .allContainers
-'           .allContainersIncludingSelf
-'           .allEntries
-'           .allEntriesIncludingSelf
-'           .allFilesExcludingArchives
-'           .allFilesExcludingArchivesIncludingSelf
-'           .containers
-'           .entries
-'           .filesExcludingArchives
-'           .hasContainers
-'           .hasEntries
-'           .hasFilesExcludingArchives
-            assertFsEntries ao,path,cs
-        Next
+'       .allContainers
+'       .allContainersIncludingSelf
+'       .allEntries
+'       .allEntriesIncludingSelf
+'       .allFilesExcludingArchives
+'       .allFilesExcludingArchivesIncludingSelf
+'       .containers
+'       .entries
+'       .filesExcludingArchives
+'       .hasContainers
+'       .hasEntries
+'       .hasFilesExcludingArchives
+        assertFsEntries ao,path,cs
     Next
 End Sub
 
@@ -245,17 +243,34 @@ End Sub
 Function createData
     Dim cases
     cases=Array( _
-    dicOf(  Array(  "Case", "1" , "Definition", Array() )) _
-    , dicOf(Array(  "Case", "2" , "Definition", Array(                                             defFolder(Empty)                                                                                 ))) _
-    , dicOf(Array(  "Case", "3" , "Definition", Array( defUrlShortCutFile()                      , defFolder("defTextFile")                                                                         ))) _
-    , dicOf(Array(  "Case", "4" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder("defTextFile,defShortCutFile")                                                         ))) _
-    , dicOf(Array(  "Case", "5" , "Definition", Array(                                             defFolder(Empty)                               , defFolder(Empty)                                ))) _
-    , dicOf(Array(  "Case", "6" , "Definition", Array( defTextFile()                             , defFolder(Empty)                               , defFolder("defShortCutFile")                    ))) _
-    , dicOf(Array(  "Case", "7" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ))) _
-    , dicOf(Array(  "Case", "8" , "Definition", Array(                                             defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ))) _
-    , dicOf(Array(  "Case", "9" , "Definition", Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ))) _
-    , dicOf(Array(  "Case", "10", "Definition", Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ))) _
+    dicOf(  Array(  "Case", "1"  , "Definition", defShortCutFile()                                                     )) _
+    , dicOf(Array(  "Case", "2"  , "Definition", defUrlShortCutFile()                                                  )) _
+    , dicOf(Array(  "Case", "3"  , "Definition", defTextFile()                                                         )) _
+    , dicOf(Array(  "Case", "4"  , "Definition", defFolder(Empty)                                                      )) _
+    , dicOf(Array(  "Case", "5"  , "Definition", defFolder("defShortCutFile")                                          )) _
+    , dicOf(Array(  "Case", "6"  , "Definition", defFolder("defUrlShortCutFile")                                       )) _
+    , dicOf(Array(  "Case", "7"  , "Definition", defFolder("defTextFile")                                              )) _
+    , dicOf(Array(  "Case", "8"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile")                       )) _
+    , dicOf(Array(  "Case", "9"  , "Definition", defFolder("defUrlShortCutFile,defTextFile")                           )) _
+    , dicOf(Array(  "Case", "10" , "Definition", defFolder("defTextFile,defShortCutFile")                              )) _
+    , dicOf(Array(  "Case", "11" , "Definition", defFolder("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
+    , dicOf(Array(  "Case", "12" , "Definition", defFolder("defFolder(Empty)")                                         )) _
+    , dicOf(Array(  "Case", "13" , "Definition", defFolder("defFolder(Empty),defShortCutFile")                         )) _
+    , dicOf(Array(  "Case", "14" , "Definition", defFolder("defFolder(defShortCutFile),defTextFile")                   )) _
+    , dicOf(Array(  "Case", "15" , "Definition", defFolder("defFolder(defShortCutFile),defFolder(defUrlShortCutFile)") )) _
     )
+'    cases=Array( _
+'    dicOf(  Array(  "Case", "1" , "Definition", Array() )) _
+'    , dicOf(Array(  "Case", "2" , "Definition", Array(                                             defFolder(Empty)                                                                                 ))) _
+'    , dicOf(Array(  "Case", "3" , "Definition", Array( defUrlShortCutFile()                      , defFolder("defTextFile")                                                                         ))) _
+'    , dicOf(Array(  "Case", "4" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder("defTextFile,defShortCutFile")                                                         ))) _
+'    , dicOf(Array(  "Case", "5" , "Definition", Array(                                             defFolder(Empty)                               , defFolder(Empty)                                ))) _
+'    , dicOf(Array(  "Case", "6" , "Definition", Array( defTextFile()                             , defFolder(Empty)                               , defFolder("defShortCutFile")                    ))) _
+'    , dicOf(Array(  "Case", "7" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ))) _
+'    , dicOf(Array(  "Case", "8" , "Definition", Array(                                             defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ))) _
+'    , dicOf(Array(  "Case", "9" , "Definition", Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ))) _
+'    , dicOf(Array(  "Case", "10", "Definition", Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ))) _
+'    )
 'covers all patterns
 '    defs=Array( _
 '    Array() _
@@ -289,58 +304,63 @@ Function createData
 '    , Array( defTextFile()       , defShortCutFile()   , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ) _
 '    , Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ) _
 '    )
-    Dim cs,data
-    For Each cs In cases
-        pusha data, dicOf(Array("Case", cs("Case"), "Paths", caseNormal(cs("Definition"))))
+    Dim ele,data
+    For Each ele In cases
+        pusha data, dicOf(Array("Case", ele("Case"), "Path", caseNormal(ele)))
     Next
-    For Each cs In extractTargetForZip(cases)
-        pusha data, dicOf(Array("Case", cs("Case"), "Paths", caseZip(cs("Definition"))))
-    Next
+'    For Each cs In extractTargetForZip(cases)
+'        pusha data, dicOf(Array("Case", cs("Case"), "Paths", caseZip(cs("Definition"))))
+'    Next
     createData = data
+'inputbox "","",cf_toString(data)
 End Function
-Function caseNormal(def)
-    caseNormal=createDataAt(PsPathTempFolder,def)
-End Function
-Function caseZip(def)
-    Dim flPath : flPath=createDataAt(PsPathTempFolder,def)
-    Dim ele,paths
-    For Each ele in getFolderItem2(flPath(0)).GetFolder.Items
-        push paths,ele.path
-    Next
-    
-    Dim zipPath : zipPath=getTempFilePath(PsPathTempFolder,"zip")
-    zip paths,zipPath
-    
-    Dim ret
-    For Each ele In flPath
-        push ret,Replace(ele,flPath(0),zipPath)
-    Next
-    caseZip=ret
-End Function
+Function caseNormal(caze)
+    Dim targetPath, def
+    targetPath = createCaseFolder(caze("Case"))
+    def = caze("Definition")
 
-Function extractTargetForZip(cases)
-    Dim cs,ret : ret=Array()
-    For Each cs In cases
-        If Not containEmpty(cs("Definition")) Then push ret,cs
-    Next
-    extractTargetForZip=ret
+    caseNormal = createDataRecursive(targetPath, def)
 End Function
-Function containEmpty(def)
-    containEmpty=True
-    If isEmptyArray(def) Then Exit Function
-    If IsArray(def) Then
-        Dim ele
-        For Each ele In def
-            If containEmpty(ele) Then Exit Function
-        Next
-    End If
-    containEmpty=False
-End Function
-Function isEmptyArray(ar)
-    isEmptyArray=False
-    If Not IsArray(ar) Then Exit Function
-    If Ubound(ar)<0 Then isEmptyArray=True
-End Function
+'Function caseZip(def)
+'    Dim flPath : flPath=createDataAt(PsPathTempFolder,def)
+'    Dim ele,paths
+'    For Each ele in getFolderItem2(flPath(0)).GetFolder.Items
+'        push paths,ele.path
+'    Next
+'    
+'    Dim zipPath : zipPath=getTempFilePath(PsPathTempFolder,"zip")
+'    zip paths,zipPath
+'    
+'    Dim ret
+'    For Each ele In flPath
+'        push ret,Replace(ele,flPath(0),zipPath)
+'    Next
+'    caseZip=ret
+'End Function
+
+'Function extractTargetForZip(cases)
+'    Dim cs,ret : ret=Array()
+'    For Each cs In cases
+'        If Not containEmpty(cs("Definition")) Then push ret,cs
+'    Next
+'    extractTargetForZip=ret
+'End Function
+'Function containEmpty(def)
+'    containEmpty=True
+'    If isEmptyArray(def) Then Exit Function
+'    If IsArray(def) Then
+'        Dim ele
+'        For Each ele In def
+'            If containEmpty(ele) Then Exit Function
+'        Next
+'    End If
+'    containEmpty=False
+'End Function
+'Function isEmptyArray(ar)
+'    isEmptyArray=False
+'    If Not IsArray(ar) Then Exit Function
+'    If Ubound(ar)<0 Then isEmptyArray=True
+'End Function
 
 Function createShortCutFile
     createShortCutFile = createShortCutFileAt(PsPathTempFolder)
@@ -376,26 +396,35 @@ Function createSomeFileAt(tp, basePath)
         createSomeFileAt = createTextFileAt(basePath)
     End Select
 End Function
+Function createCaseFolder(cs)
+    Dim path : path = fso.BuildPath(PsPathTempFolder, "Case"&cs&"_"&getTempName())
+    fso.CreateFolder path
+    createCaseFolder=path
+End Function
 Function createEmptyFolderAt(basePath)
     Dim path : path = getTempFolderPath(basePath)
     fso.CreateFolder path
     createEmptyFolderAt=path
 End Function
-Function createDataAt(basePath,content)
-    Dim path : path = createEmptyFolderAt(basePath)
+Function createDataRecursive(targetPath,def)
+    If Ubound(def)<0 Then
+        Exit Function
+    End If
     
-    Dim ret : push ret, path
-    Dim ele, tp, cnt
-    For Each ele In content
-        tp = ele(0)
-        If tp=PeDataType("FOLDER") Then
-            cnt = ele(1)
-            pushA ret, createDataAt(path, cnt)
-        Else
-            pushA ret, createSomeFileAt(tp, path)
+    Dim tp, path
+    tp = def(0)
+    If tp=PeDataType("FOLDER") Then
+        path = createEmptyFolderAt(targetPath)
+        If Ubound(def)>0 Then
+            Dim ele
+            For Each ele In def(1)
+                createDataRecursive path, ele
+            Next
         End If
-    Next
-    createDataAt = ret
+    Else
+        path = createSomeFileAt(tp, targetPath)
+    End If
+    createDataRecursive = path
 End Function
 Function defShortCutFile
     defShortCutFile = Array(PeDataType("SHORTCUT_FILE"))
@@ -407,7 +436,13 @@ Function defTextFile
     defTextFile = Array(PeDataType("TEXT_FILE"))
 End Function
 Function defFolder(d)
-    Dim pram : pram=Array()
+    defFolder = defContainer(d,PeDataType("FOLDER"))
+End Function
+Function defArchive(d)
+    defArchive = defContainer(d,PeDataType("ARCHIVE"))
+End Function
+Function defContainer(d,tp)
+    Dim pram : pram = Array()
     If Not IsEmpty(d) Then
         Dim ele,re,func,arg
         Set re = reOf("([a-zA-Z0-9_]+)\(([^)]+)\)", "igm")
@@ -423,7 +458,7 @@ Function defFolder(d)
             End If
         Next
     End If
-    defFolder = Array(PeDataType("FOLDER"), pram)
+    defContainer = Array(tp, pram)
 End Function
 
 'for verify the following properties
@@ -711,7 +746,8 @@ Sub zip(paths,zpath)
     Dim cmd : cmd = _
         "powershell -NoProfile -ExecutionPolicy Unrestricted Compress-Archive" _
         & " -Path " & path _
-        & " -DestinationPath " & zpath
+        & " -DestinationPath " & zpath _
+        & " -CompressionLevel NoCompression "
     Call shell.Run(cmd, 0, True)
 End Sub
 Function wrapInQuotes(target)
