@@ -248,17 +248,39 @@ Function createData
     , dicOf(Array(  "Case", "3"  , "Definition", defTextFile()                                                         )) _
     , dicOf(Array(  "Case", "4"  , "Definition", defFolder(Empty)                                                      )) _
     , dicOf(Array(  "Case", "5"  , "Definition", defFolder("defShortCutFile")                                          )) _
-    , dicOf(Array(  "Case", "6"  , "Definition", defFolder("defUrlShortCutFile")                                       )) _
-    , dicOf(Array(  "Case", "7"  , "Definition", defFolder("defTextFile")                                              )) _
-    , dicOf(Array(  "Case", "8"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile")                       )) _
-    , dicOf(Array(  "Case", "9"  , "Definition", defFolder("defUrlShortCutFile,defTextFile")                           )) _
-    , dicOf(Array(  "Case", "10" , "Definition", defFolder("defTextFile,defShortCutFile")                              )) _
-    , dicOf(Array(  "Case", "11" , "Definition", defFolder("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
-    , dicOf(Array(  "Case", "12" , "Definition", defFolder("defFolder(Empty)")                                         )) _
-    , dicOf(Array(  "Case", "13" , "Definition", defFolder("defFolder(Empty),defShortCutFile")                         )) _
-    , dicOf(Array(  "Case", "14" , "Definition", defFolder("defFolder(defShortCutFile),defTextFile")                   )) _
-    , dicOf(Array(  "Case", "15" , "Definition", defFolder("defFolder(defShortCutFile),defFolder(defUrlShortCutFile)") )) _
+    , dicOf(Array(  "Case", "6"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile")                       )) _
+    , dicOf(Array(  "Case", "7"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
+    , dicOf(Array(  "Case", "8"  , "Definition", defFolder("defFolder(Empty)")                                         )) _
+    , dicOf(Array(  "Case", "9"  , "Definition", defFolder("defFolder(Empty),defShortCutFile")                         )) _
+    , dicOf(Array(  "Case", "10" , "Definition", defFolder("defFolder(defShortCutFile),defTextFile")                   )) _
+    , dicOf(Array(  "Case", "12" , "Definition", defFolder("defFolder(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
+    , dicOf(Array(  "Case", "13" , "Definition", defArchive("defShortCutFile")                                          )) _
+    , dicOf(Array(  "Case", "14" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile")                       )) _
+    , dicOf(Array(  "Case", "15" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
+    , dicOf(Array(  "Case", "16" , "Definition", defArchive("defFolder(defShortCutFile),defTextFile")                   )) _
+    , dicOf(Array(  "Case", "17" , "Definition", defArchive("defFolder(defShortCutFile),defArchive(defUrlShortCutFile)") )) _
+    , dicOf(Array(  "Case", "18" , "Definition", defArchive("defArchive(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
     )
+'    cases=Array( _
+'    dicOf(  Array(  "Case", "1"  , "Definition", defShortCutFile()                                                     )) _
+'    , dicOf(Array(  "Case", "2"  , "Definition", defUrlShortCutFile()                                                  )) _
+'    , dicOf(Array(  "Case", "3"  , "Definition", defTextFile()                                                         )) _
+'    , dicOf(Array(  "Case", "4"  , "Definition", defFolder(Empty)                                                      )) _
+'    , dicOf(Array(  "Case", "5"  , "Definition", defFolder("defShortCutFile")                                          )) _
+'    , dicOf(Array(  "Case", "6"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile")                       )) _
+'    , dicOf(Array(  "Case", "7"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
+'    , dicOf(Array(  "Case", "8"  , "Definition", defFolder("defFolder(Empty)")                                         )) _
+'    , dicOf(Array(  "Case", "9"  , "Definition", defFolder("defFolder(Empty),defShortCutFile")                         )) _
+'    , dicOf(Array(  "Case", "10" , "Definition", defFolder("defFolder(defShortCutFile),defTextFile")                   )) _
+'    , dicOf(Array(  "Case", "11" , "Definition", defFolder("defFolder(defShortCutFile),defArchive(defUrlShortCutFile)") )) _
+'    , dicOf(Array(  "Case", "12" , "Definition", defFolder("defFolder(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
+'    , dicOf(Array(  "Case", "13" , "Definition", defArchive("defShortCutFile")                                          )) _
+'    , dicOf(Array(  "Case", "14" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile")                       )) _
+'    , dicOf(Array(  "Case", "15" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
+'    , dicOf(Array(  "Case", "16" , "Definition", defArchive("defFolder(defShortCutFile),defTextFile")                   )) _
+'    , dicOf(Array(  "Case", "17" , "Definition", defArchive("defFolder(defShortCutFile),defArchive(defUrlShortCutFile)") )) _
+'    , dicOf(Array(  "Case", "18" , "Definition", defArchive("defArchive(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
+'    )
 '    cases=Array( _
 '    dicOf(  Array(  "Case", "1" , "Definition", Array() )) _
 '    , dicOf(Array(  "Case", "2" , "Definition", Array(                                             defFolder(Empty)                                                                                 ))) _
@@ -308,9 +330,6 @@ Function createData
     For Each ele In cases
         pusha data, dicOf(Array("Case", ele("Case"), "Path", caseNormal(ele)))
     Next
-'    For Each cs In extractTargetForZip(cases)
-'        pusha data, dicOf(Array("Case", cs("Case"), "Paths", caseZip(cs("Definition"))))
-'    Next
     createData = data
 'inputbox "","",cf_toString(data)
 End Function
@@ -321,46 +340,6 @@ Function caseNormal(caze)
 
     caseNormal = createDataRecursive(targetPath, def)
 End Function
-'Function caseZip(def)
-'    Dim flPath : flPath=createDataAt(PsPathTempFolder,def)
-'    Dim ele,paths
-'    For Each ele in getFolderItem2(flPath(0)).GetFolder.Items
-'        push paths,ele.path
-'    Next
-'    
-'    Dim zipPath : zipPath=getTempFilePath(PsPathTempFolder,"zip")
-'    zip paths,zipPath
-'    
-'    Dim ret
-'    For Each ele In flPath
-'        push ret,Replace(ele,flPath(0),zipPath)
-'    Next
-'    caseZip=ret
-'End Function
-
-'Function extractTargetForZip(cases)
-'    Dim cs,ret : ret=Array()
-'    For Each cs In cases
-'        If Not containEmpty(cs("Definition")) Then push ret,cs
-'    Next
-'    extractTargetForZip=ret
-'End Function
-'Function containEmpty(def)
-'    containEmpty=True
-'    If isEmptyArray(def) Then Exit Function
-'    If IsArray(def) Then
-'        Dim ele
-'        For Each ele In def
-'            If containEmpty(ele) Then Exit Function
-'        Next
-'    End If
-'    containEmpty=False
-'End Function
-'Function isEmptyArray(ar)
-'    isEmptyArray=False
-'    If Not IsArray(ar) Then Exit Function
-'    If Ubound(ar)<0 Then isEmptyArray=True
-'End Function
 
 Function createShortCutFile
     createShortCutFile = createShortCutFileAt(PsPathTempFolder)
@@ -413,7 +392,8 @@ Function createDataRecursive(targetPath,def)
     
     Dim tp, path
     tp = def(0)
-    If tp=PeDataType("FOLDER") Then
+    Select Case tp
+    Case PeDataType("FOLDER"), PeDataType("ARCHIVE")
         path = createEmptyFolderAt(targetPath)
         If Ubound(def)>0 Then
             Dim ele
@@ -421,9 +401,20 @@ Function createDataRecursive(targetPath,def)
                 createDataRecursive path, ele
             Next
         End If
-    Else
+
+        If tp=PeDataType("ARCHIVE") Then
+            Dim zipPath : zipPath=getTempFilePath(fso.GetParentFolderName(path),"zip")
+            Dim paths
+            For Each ele in getFolderItem2(path).GetFolder.Items
+                push paths,ele.path
+            Next
+            zip paths,zipPath
+            fso.DeleteFolder path
+            path = zipPath
+        End If
+    Case Else
         path = createSomeFileAt(tp, targetPath)
-    End If
+    End Select
     createDataRecursive = path
 End Function
 Function defShortCutFile
@@ -445,8 +436,8 @@ Function defContainer(d,tp)
     Dim pram : pram = Array()
     If Not IsEmpty(d) Then
         Dim ele,re,func,arg
-        Set re = reOf("([a-zA-Z0-9_]+)\(([^)]+)\)", "igm")
-        For Each ele In Split(d,",")
+        Set re = reOf("([a-zA-Z0-9_]+)\((.+)\)", "igm")
+        For Each ele In splitOuterArgs(d)
             If re.Test(ele) Then
                 func = re.Replace(ele, "$1")
                 arg = re.Replace(ele, "$2")
@@ -760,6 +751,34 @@ Function createShortCutCommon(basePath,extension,target)
         .Save
     End With
     createShortCutCommon = path
+End Function
+Function splitOuterArgs(argString)
+    Dim currentArg, depth, i, char, ret, flg
+    currentArg = ""
+    depth = 0
+    For i = 1 To Len(argString)
+        char = Mid(argString, i, 1)
+
+        flg = False
+        If char = "(" Then
+            depth = depth + 1
+        ElseIf char = ")" Then
+            depth = depth - 1
+        ElseIf char = "," And depth = 0 Then
+            ' 一番外側のカンマを発見：ここまでの文字列を保存
+            push ret, Trim(currentArg)
+            flg = True
+        End If
+
+        currentArg = currentArg & char
+        If flg Then currentArg = ""
+    Next
+    
+    ' 最後の引数を追加
+    If Len(currentArg)>0 Then push ret, Trim(currentArg)
+    
+    ' 配列として返す
+    splitOuterArgs = ret
 End Function
 
 Sub push(arr,ele)
