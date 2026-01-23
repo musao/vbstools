@@ -153,25 +153,33 @@ Sub Test_FileProxy_properties_fs
 End Sub
 Sub Test_FileProxy_properties_list
     Dim cases
-'    cases=Array( _
-'    dicOf(Array("Case", "3", "Definition", defFolder( "defFolder(defShortCutFile,defUrlShortCutFile),defArchive(defTextFile,defShortCutFile)       ,defUrlShortCutFile") )) _
-'    )
     cases=Array( _
-    dicOf(  Array("Case", "1", "Definition", defShortCutFile() )) _
-    , dicOf(Array("Case", "2", "Definition", defFolder(Empty)  )) _
-    , dicOf(Array("Case", "4", "Definition", defArchive("defFolder(defUrlShortCutFile,defTextFile)    ,defArchive(defShortCutFile,defUrlShortCutFile),defTextFile")        )) _
-    , dicOf(Array("Case", "5", "Definition", defFolder( "defFolder(defFolder(defFolder(defFolder(defFolder(defShortCutFile)))))")                                          )) _
-    , dicOf(Array("Case", "6", "Definition", defArchive("defArchive(defArchive(defArchive(defArchive(defArchive(defUrlShortCutFile)))))")                                  )) _
+    dicOf(  Array("Case", "1-1"    , "Definition", defShortCutFile() )) _
+    , dicOf(Array("Case", "1-2-3-3", "Definition", defFolder( "defArchive(defArchive(defUrlShortCutFile))") )) _
+    , dicOf(Array("Case", "2-2"    , "Definition", defArchive("defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
     )
-'inputbox "","",cf_toString(createData(cases))
+'All Cases
 '    cases=Array( _
-'    dicOf(  Array("Case", "1", "Definition", defShortCutFile() )) _
-'    , dicOf(Array("Case", "2", "Definition", defFolder(Empty)  )) _
-'    , dicOf(Array("Case", "3", "Definition", defFolder( "defFolder(defShortCutFile,defUrlShortCutFile),defArchive(defTextFile,defShortCutFile)       ,defUrlShortCutFile") )) _
-'    , dicOf(Array("Case", "4", "Definition", defArchive("defFolder(defUrlShortCutFile,defTextFile)    ,defArchive(defShortCutFile,defUrlShortCutFile),defTextFile")        )) _
-'    , dicOf(Array("Case", "5", "Definition", defFolder( "defFolder(defFolder(defFolder(defFolder(defFolder(defShortCutFile)))))")                                          )) _
-'    , dicOf(Array("Case", "6", "Definition", defArchive("defArchive(defArchive(defArchive(defArchive(defArchive(defUrlShortCutFile)))))")                                  )) _
+'    dicOf(  Array("Case", "1-1"    , "Definition", defShortCutFile() )) _
+'    , dicOf(Array("Case", "1-2-1"  , "Definition", defFolder( "defUrlShortCutFile") )) _
+'    , dicOf(Array("Case", "1-2-2-1", "Definition", defFolder( "defFolder( defTextFile)") )) _
+'    , dicOf(Array("Case", "1-2-2-2", "Definition", defFolder( "defFolder( defFolder( defShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-2-2-3", "Definition", defFolder( "defFolder( defArchive(defUrlShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-2-3-1", "Definition", defFolder( "defArchive(defTextFile)") )) _
+'    , dicOf(Array("Case", "1-2-3-2", "Definition", defFolder( "defArchive(defFolder( defShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-2-3-3", "Definition", defFolder( "defArchive(defArchive(defUrlShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-2-4"  , "Definition", defFolder( Empty) )) _
+'    , dicOf(Array("Case", "1-3-1"  , "Definition", defArchive("defTextFile") )) _
+'    , dicOf(Array("Case", "1-3-2-1", "Definition", defArchive("defFolder( defShortCutFile)") )) _
+'    , dicOf(Array("Case", "1-3-2-2", "Definition", defArchive("defFolder( defFolder( defUrlShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-3-2-3", "Definition", defArchive("defFolder( defArchive(defTextFile))") )) _
+'    , dicOf(Array("Case", "1-3-3-1", "Definition", defArchive("defArchive(defShortCutFile)") )) _
+'    , dicOf(Array("Case", "1-3-3-2", "Definition", defArchive("defArchive(defFolder( defUrlShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-3-3-3", "Definition", defArchive("defArchive(defArchive(defTextFile))") )) _
+'    , dicOf(Array("Case", "2-1"    , "Definition", defFolder( "defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
+'    , dicOf(Array("Case", "2-2"    , "Definition", defArchive("defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
 '    )
+'inputbox "","",cf_toString(createData(cases))
 Dim ele,path,caze,ao
     For Each ele In createData(cases)
         path = ele("Path")
@@ -398,43 +406,6 @@ Function createTextFile
     createTextFile = createTextFileAt(PsPathTempFolder)
 End Function
 
-'for verify the following properties
-'   .hasContainers
-'   .hasEntries
-'   .hasFilesExcludingArchives
-Function expectHasEntries(path,entryType)
-    expectHasEntries = False
-    
-    Dim ret,obj,ele
-    Set obj = getFolderItem2(path)
-    ret = False
-        Select Case entryType
-        Case PeEntryType("CONTAINER")
-            If fso.FolderExists(path) Then
-                ret=(fso.GetFolder(path).SubFolders.Count>0)
-            ElseIf obj.IsFolder Then
-                For Each ele In obj.GetFolder.Items
-                    ret = ele.IsFolder
-                    If ret Then Exit For
-                Next
-            End If
-            expectHasEntries=ret
-        Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
-            If fso.FolderExists(path) Then
-                ret=(fso.GetFolder(path).Files.Count>0)
-            ElseIf obj.IsFolder Then
-                For Each ele In obj.GetFolder.Items
-                    ret = Not(ele.IsFolder)
-                    If ret Then Exit For
-                Next
-            End If
-            expectHasEntries=ret
-        Case Else
-        'PeEntryType("ENTRY") or others
-            If obj.IsFolder Then expectHasEntries = obj.GetFolder.Items.Count>0
-    End Select
-End Function
-
 'to verify the following properties
 '   .baseName
 '   .dateLastModified
@@ -526,37 +497,73 @@ End Sub
 '   .hasEntries
 '   .hasFilesExcludingArchives
 Sub assertFsEntries(actualObj,path,caze)
-    Dim ele, tp, et, has, items, allItems, allItemsIncludingSelf, caseName
+    Dim ele, methodType, entryType, has, items, allItems, allItemsIncludingSelf, caseName
     With actualObj
         For Each ele In Array( _
-                dicOf(  Array("tp", "FilesExcludingArchives", "et", PeEntryType("FILE_EXCLUDING_ARCHIVE"), "has" ,.hasFilesExcludingArchives, "items", .filesExcludingArchives, "allItems", .allFilesExcludingArchives, "allItemsIncludingSelf", .allFilesExcludingArchivesIncludingSelf)) _
-                , dicOf(Array("tp", "Containers"            , "et", PeEntryType("CONTAINER")             , "has" ,.hasContainers            , "items", .containers            , "allItems", .allContainers            , "allItemsIncludingSelf", .allContainersIncludingSelf)) _
-                , dicOf(Array("tp", "Entries"               , "et", PeEntryType("ENTRY")                 , "has" ,.hasEntries               , "items", .entries               , "allItems", .allEntries               , "allItemsIncludingSelf", .allEntriesIncludingSelf)) _
+                dicOf(  Array("mt", "FilesExcludingArchives", "et", PeEntryType("FILE_EXCLUDING_ARCHIVE"), "has" ,.hasFilesExcludingArchives, "items", .filesExcludingArchives, "allItems", .allFilesExcludingArchives, "allItemsIncludingSelf", .allFilesExcludingArchivesIncludingSelf)) _
+                , dicOf(Array("mt", "Containers"            , "et", PeEntryType("CONTAINER")             , "has" ,.hasContainers            , "items", .containers            , "allItems", .allContainers            , "allItemsIncludingSelf", .allContainersIncludingSelf)) _
+                , dicOf(Array("mt", "Entries"               , "et", PeEntryType("ENTRY")                 , "has" ,.hasEntries               , "items", .entries               , "allItems", .allEntries               , "allItemsIncludingSelf", .allEntriesIncludingSelf)) _
                 )
-            tp = ele("tp")
-            et = ele("et")
+            methodType = ele("mt")
+            entryType = ele("et")
             has = ele("has")
             items = ele("items")
             allItems = ele("allItems")
             allItemsIncludingSelf = ele("allItemsIncludingSelf")
-            caseName = caze&"("&tp
-
-            AssertEqualWithMessage expectHasEntries(path,et), has, caseName&",has)"
-            assertFsEntriesProc items                , path, caseName&",items)"                , False, False, et
-            assertFsEntriesProc allItems             , path, caseName&",allItems)"             , False, True , et
-            assertFsEntriesProc allItemsIncludingSelf, path, caseName&",allItemsIncludingSelf)", True , True , et
+            caseName = caze&"("&methodType
+            AssertEqualWithMessage expectHasEntries(entryType, path), has, caseName&",has)"
+            assertFsEntriesProc entryType, path, items                , caseName&",items)"                , False, False
+            assertFsEntriesProc entryType, path, allItems             , caseName&",allItems)"             , False, True
+            assertFsEntriesProc entryType, path, allItemsIncludingSelf, caseName&",allItemsIncludingSelf)", True , True
     Next
     End With
 End Sub
-Sub assertFsEntriesProc(entries,path,caseName,self,recursive,entryType)
+
+'for verify the following properties
+'   .hasContainers
+'   .hasEntries
+'   .hasFilesExcludingArchives
+Function expectHasEntries(entryType, path)
+    expectHasEntries = False
+    
+    Dim ret,obj,ele
+    Set obj = getFolderItem2(path)
+    ret = False
+        Select Case entryType
+        Case PeEntryType("CONTAINER")
+            If fso.FolderExists(path) Then
+                ret=(fso.GetFolder(path).SubFolders.Count>0)
+            ElseIf obj.IsFolder Then
+                For Each ele In obj.GetFolder.Items
+                    ret = ele.IsFolder
+                    If ret Then Exit For
+                Next
+            End If
+            expectHasEntries=ret
+        Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
+            If fso.FolderExists(path) Then
+                ret=(fso.GetFolder(path).Files.Count>0)
+            ElseIf obj.IsFolder Then
+                For Each ele In obj.GetFolder.Items
+                    ret = Not(ele.IsFolder)
+                    If ret Then Exit For
+                Next
+            End If
+            expectHasEntries=ret
+        Case Else
+        'PeEntryType("ENTRY") or others
+            If obj.IsFolder Then expectHasEntries = obj.GetFolder.Items.Count>0
+    End Select
+End Function
+Sub assertFsEntriesProc(entryType, path, entries, caseName, includeSelf, recursive)
     Dim ele, dic
     Set dic = dictionary
     For Each ele In entries
         If dic.Exists(ele) Then AssertFailWithMessage "caseName="&caseName&", '"&ele&"' Entries Duplication!"
         dic.Add ele.path,False
     Next
-
-    assertFsEntriesProcEachEntry path,caseName,dic,self,recursive,entryType
+    
+    assertFsEntriesProcEachEntry entryType, path, dic, caseName, includeSelf, recursive
     
     For Each ele In dic.Keys
         If Not (dic(ele)=True) Then AssertFailWithMessage "caseName="&caseName&", '"&ele&"' Not Found !"
@@ -565,27 +572,34 @@ Sub assertFsEntriesProc(entries,path,caseName,self,recursive,entryType)
     AssertWithMessage True, "all ok"
     Set dic = Nothing
 End Sub
-Sub assertFsEntriesProcEachEntry(path,caseName,dic,self,recursive,entryType)
-    If self Then existsEntry path,caseName,dic,entryType
+Sub assertFsEntriesProcEachEntry(entryType, path, dic, caseName, includeSelf, recursive)
+    If includeSelf Then existsEntry entryType, path, dic, caseName
     Dim ele
     If fso.FolderExists(path) Then
         For Each ele in fso.GetFolder(path).Files
-            existsEntry ele.path,caseName,dic,entryType
-        Next
-        For Each ele in fso.GetFolder(path).SubFolders
-            existsEntry ele.path,caseName,dic,entryType
-            If recursive Then assertFsEntriesProcEachEntry ele.path,caseName,dic,self,recursive,entryType
-        Next
-    ElseIf getFolderItem2(path).IsFolder Then
-        For Each ele in getFolderItem2(path).GetFolder.Items
-            existsEntry ele.path,caseName,dic,entryType
-            If recursive And ele.IsFolder Then
-                If ele.GetFolder.Items.Count>0 Then assertFsEntriesProcEachEntry ele.path,caseName,dic,self,recursive,entryType
+            existsEntry entryType, ele.path, dic, caseName
+            If recursive And isShellFolder(ele.path) Then
+                assertFsEntriesProcEachEntryArchive entryType, ele.path, dic, caseName, includeSelf, recursive
             End If
         Next
+        For Each ele in fso.GetFolder(path).SubFolders
+            existsEntry entryType, ele.path, dic, caseName
+            If recursive Then assertFsEntriesProcEachEntry entryType, ele.path, dic, caseName, includeSelf, recursive
+        Next
+    ElseIf getFolderItem2(path).IsFolder Then
+        assertFsEntriesProcEachEntryArchive entryType, path, dic, caseName, includeSelf, recursive
     End If
 End Sub
-Sub existsEntry(path,caseName,dic,entryType)
+Sub assertFsEntriesProcEachEntryArchive(entryType, path, dic, caseName, includeSelf, recursive)
+    Dim ele
+    For Each ele in getFolderItem2(path).GetFolder.Items
+        existsEntry entryType, ele.path, dic, caseName
+        If recursive And ele.IsFolder Then
+            If ele.GetFolder.Items.Count>0 Then assertFsEntriesProcEachEntry entryType, ele.path, dic, caseName, includeSelf, recursive
+        End If
+    Next
+End Sub
+Sub existsEntry(entryType, path, dic, caseName)
     Dim flg : flg = False
     Dim sEntryName : sEntryName = "entries"
     Select Case entryType
@@ -604,6 +618,15 @@ Sub existsEntry(path,caseName,dic,entryType)
         dic(path)=True
     End If
 End Sub
+Function isShellFolder(path)
+    isShellFolder = False
+    Dim obj
+    On Error Resume Next
+    Set obj = shellApp.Namespace(path)
+    If Err.Number=0 Then isShellFolder = True
+    On Error Goto 0
+    Set obj = Nothing
+End Function
 
 Function fso
     Set fso = CreateObject("Scripting.FileSystemObject")
@@ -760,101 +783,3 @@ End Sub
 ' mode: Visual-Basic
 ' indent-tabs-mode: nil
 ' End:
-
-
-
-
-
-'Function createData
-'    Dim cases
-'    cases=Array( _
-'    dicOf(  Array(  "Case", "1"  , "Definition", defShortCutFile()                                                     )) _
-'    , dicOf(Array(  "Case", "2"  , "Definition", defUrlShortCutFile()                                                  )) _
-'    , dicOf(Array(  "Case", "3"  , "Definition", defTextFile()                                                         )) _
-'    , dicOf(Array(  "Case", "4"  , "Definition", defFolder(Empty)                                                      )) _
-'    , dicOf(Array(  "Case", "5"  , "Definition", defFolder("defShortCutFile")                                          )) _
-'    , dicOf(Array(  "Case", "6"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile")                       )) _
-'    , dicOf(Array(  "Case", "7"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
-'    , dicOf(Array(  "Case", "8"  , "Definition", defFolder("defFolder(Empty)")                                         )) _
-'    , dicOf(Array(  "Case", "9"  , "Definition", defFolder("defFolder(Empty),defShortCutFile")                         )) _
-'    , dicOf(Array(  "Case", "10" , "Definition", defFolder("defFolder(defShortCutFile),defTextFile")                   )) _
-'    , dicOf(Array(  "Case", "12" , "Definition", defFolder("defFolder(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
-'    , dicOf(Array(  "Case", "13" , "Definition", defArchive("defShortCutFile")                                          )) _
-'    , dicOf(Array(  "Case", "14" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile")                       )) _
-'    , dicOf(Array(  "Case", "15" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
-'    , dicOf(Array(  "Case", "16" , "Definition", defArchive("defFolder(defShortCutFile),defTextFile")                   )) _
-'    , dicOf(Array(  "Case", "17" , "Definition", defArchive("defFolder(defShortCutFile),defArchive(defUrlShortCutFile)") )) _
-'    , dicOf(Array(  "Case", "18" , "Definition", defArchive("defArchive(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
-'    )
-''    cases=Array( _
-''    dicOf(  Array(  "Case", "1"  , "Definition", defShortCutFile()                                                     )) _
-''    , dicOf(Array(  "Case", "2"  , "Definition", defUrlShortCutFile()                                                  )) _
-''    , dicOf(Array(  "Case", "3"  , "Definition", defTextFile()                                                         )) _
-''    , dicOf(Array(  "Case", "4"  , "Definition", defFolder(Empty)                                                      )) _
-''    , dicOf(Array(  "Case", "5"  , "Definition", defFolder("defShortCutFile")                                          )) _
-''    , dicOf(Array(  "Case", "6"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile")                       )) _
-''    , dicOf(Array(  "Case", "7"  , "Definition", defFolder("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
-''    , dicOf(Array(  "Case", "8"  , "Definition", defFolder("defFolder(Empty)")                                         )) _
-''    , dicOf(Array(  "Case", "9"  , "Definition", defFolder("defFolder(Empty),defShortCutFile")                         )) _
-''    , dicOf(Array(  "Case", "10" , "Definition", defFolder("defFolder(defShortCutFile),defTextFile")                   )) _
-''    , dicOf(Array(  "Case", "11" , "Definition", defFolder("defFolder(defShortCutFile),defArchive(defUrlShortCutFile)") )) _
-''    , dicOf(Array(  "Case", "12" , "Definition", defFolder("defFolder(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
-''    , dicOf(Array(  "Case", "13" , "Definition", defArchive("defShortCutFile")                                          )) _
-''    , dicOf(Array(  "Case", "14" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile")                       )) _
-''    , dicOf(Array(  "Case", "15" , "Definition", defArchive("defShortCutFile,defUrlShortCutFile,defTextFile")           )) _
-''    , dicOf(Array(  "Case", "16" , "Definition", defArchive("defFolder(defShortCutFile),defTextFile")                   )) _
-''    , dicOf(Array(  "Case", "17" , "Definition", defArchive("defFolder(defShortCutFile),defArchive(defUrlShortCutFile)") )) _
-''    , dicOf(Array(  "Case", "18" , "Definition", defArchive("defArchive(defFolder(defShortCutFile),defUrlShortCutFile),defTextFile")   )) _
-''    )
-''    cases=Array( _
-''    dicOf(  Array(  "Case", "1" , "Definition", Array() )) _
-''    , dicOf(Array(  "Case", "2" , "Definition", Array(                                             defFolder(Empty)                                                                                 ))) _
-''    , dicOf(Array(  "Case", "3" , "Definition", Array( defUrlShortCutFile()                      , defFolder("defTextFile")                                                                         ))) _
-''    , dicOf(Array(  "Case", "4" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder("defTextFile,defShortCutFile")                                                         ))) _
-''    , dicOf(Array(  "Case", "5" , "Definition", Array(                                             defFolder(Empty)                               , defFolder(Empty)                                ))) _
-''    , dicOf(Array(  "Case", "6" , "Definition", Array( defTextFile()                             , defFolder(Empty)                               , defFolder("defShortCutFile")                    ))) _
-''    , dicOf(Array(  "Case", "7" , "Definition", Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ))) _
-''    , dicOf(Array(  "Case", "8" , "Definition", Array(                                             defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ))) _
-''    , dicOf(Array(  "Case", "9" , "Definition", Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ))) _
-''    , dicOf(Array(  "Case", "10", "Definition", Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ))) _
-''    )
-''covers all patterns
-''    defs=Array( _
-''    Array() _
-''    , Array(                                             defFolder(Empty)                                                                                 ) _
-''    , Array(                                             defFolder("defShortCutFile")                                                                     ) _
-''    , Array(                                             defFolder("defUrlShortCutFile,defTextFile")                                                      ) _
-''    , Array(                                             defFolder(Empty)                               , defFolder(Empty)                                ) _
-''    , Array(                                             defFolder(Empty)                               , defFolder("defTextFile")                        ) _
-''    , Array(                                             defFolder(Empty)                               , defFolder("defShortCutFile,defUrlShortCutFile") ) _
-''    , Array(                                             defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ) _
-''    , Array(                                             defFolder("defTextFile")                       , defFolder("defShortCutFile,defUrlShortCutFile") ) _
-''    , Array(                                             defFolder("defUrlShortCutFile,defTextFile")    , defFolder("defShortCutFile,defUrlShortCutFile") ) _
-''    , Array( defTextFile()                                                                                                                                ) _
-''    , Array( defShortCutFile()                         , defFolder(Empty)                                                                                 ) _
-''    , Array( defUrlShortCutFile()                      , defFolder("defTextFile")                                                                         ) _
-''    , Array( defShortCutFile()                         , defFolder("defUrlShortCutFile,defTextFile")                                                      ) _
-''    , Array( defUrlShortCutFile()                      , defFolder(Empty)                               , defFolder(Empty)                                ) _
-''    , Array( defTextFile()                             , defFolder(Empty)                               , defFolder("defShortCutFile")                    ) _
-''    , Array( defShortCutFile()                         , defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ) _
-''    , Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile")                        ) _
-''    , Array( defShortCutFile()                         , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ) _
-''    , Array( defShortCutFile()                         , defFolder("defUrlShortCutFile,defTextFile")    , defFolder("defShortCutFile,defUrlShortCutFile") ) _
-''    , Array( defTextFile()       , defShortCutFile()                                                                                                      ) _
-''    , Array( defUrlShortCutFile(), defTextFile()       , defFolder(Empty)                                                                                 ) _
-''    , Array( defTextFile()       , defShortCutFile()   , defFolder("defUrlShortCutFile")                                                                  ) _
-''    , Array( defShortCutFile()   , defUrlShortCutFile(), defFolder("defTextFile,defShortCutFile")                                                         ) _
-''    , Array( defUrlShortCutFile(), defTextFile()       , defFolder(Empty)                               , defFolder(Empty)                                ) _
-''    , Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile")                        ) _
-''    , Array( defShortCutFile()   , defUrlShortCutFile(), defFolder(Empty)                               , defFolder("defTextFile,defShortCutFile")        ) _
-''    , Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile")                   , defFolder("defUrlShortCutFile")                 ) _
-''    , Array( defTextFile()       , defShortCutFile()   , defFolder("defUrlShortCutFile")                , defFolder("defTextFile,defShortCutFile")        ) _
-''    , Array( defUrlShortCutFile(), defTextFile()       , defFolder("defShortCutFile,defUrlShortCutFile"), defFolder("defTextFile,defShortCutFile")        ) _
-''    )
-'    Dim ele,data
-'    For Each ele In cases
-'        pusha data, dicOf(Array("Case", ele("Case"), "Path", caseNormal(ele)))
-'    Next
-'    createData = data
-''inputbox "","",cf_toString(data)
-'End Function
