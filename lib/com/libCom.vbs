@@ -1709,7 +1709,7 @@ Private Function new_FolderItem2Of( _
     byVal asPath _
     )
     With new_Fso()
-        Set new_FolderItem2Of = new_ShellApp().Namespace(.GetParentFolderName(asPath)).Items().Item(.GetFileName(asPath))
+        Set new_FolderItem2Of = new_ShellApp().Namespace(.GetParentFolderName(asPath)).ParseName(.GetFileName(asPath))
     End With
 End Function
 
