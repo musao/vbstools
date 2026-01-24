@@ -58,6 +58,7 @@ End Sub
 
 '###################################################################################################
 'FileSystemProxy.<properties>_initial
+'   .actualPath
 '   .allContainers
 '   .allContainersIncludingSelf
 '   .allEntries
@@ -87,7 +88,8 @@ Sub Test_FileProxy_proeerties_initial
     Dim ao : Set ao = (new FileSystemProxy)
     Dim ele, target, expected, actual
     For Each ele In Array( _
-            dicOf( Array(  "target","allContainers"                         ,"expected",Null               , "actual", ao.allContainers) ) _
+            dicOf( Array(  "target","actualPath"                            ,"expected",Null               , "actual", ao.actualPath) ) _
+            , dicOf( Array("target","allContainers"                         ,"expected",Null               , "actual", ao.allContainers) ) _
             , dicOf( Array("target","allContainersIncludingSelf"            ,"expected",Null               , "actual", ao.allContainersIncludingSelf) ) _
             , dicOf( Array("target","allEntries"                            ,"expected",Null               , "actual", ao.allEntries) ) _
             , dicOf( Array("target","allEntriesIncludingSelf"               ,"expected",Null               , "actual", ao.allEntriesIncludingSelf) ) _
@@ -135,6 +137,7 @@ Sub Test_FileProxy_properties_fs
         caze = ele("Case")
         Set ao = (new FileSystemProxy).of(path)
 
+'       .actualPath
 '       .baseName
 '       .dateLastModified
 '       .extension
@@ -153,6 +156,14 @@ Sub Test_FileProxy_properties_fs
 End Sub
 Sub Test_FileProxy_properties_list
     Dim cases
+'    cases=Array( _
+'    dicOf(  Array("Case", "1-2-3-3", "Definition", defFolder( "defArchive(defArchive(defUrlShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-3-2-3", "Definition", defArchive("defFolder( defArchive(defTextFile))") )) _
+'    , dicOf(Array("Case", "1-3-3-1", "Definition", defArchive("defArchive(defShortCutFile)") )) _
+'    , dicOf(Array("Case", "1-3-3-2", "Definition", defArchive("defArchive(defFolder( defUrlShortCutFile))") )) _
+'    , dicOf(Array("Case", "1-3-3-3", "Definition", defArchive("defArchive(defArchive(defTextFile))") )) _
+'    , dicOf(Array("Case", "2-2"    , "Definition", defArchive("defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
+'    )
     cases=Array( _
     dicOf(  Array("Case", "1-1"    , "Definition", defShortCutFile() )) _
     , dicOf(Array("Case", "1-2-3-3", "Definition", defFolder( "defArchive(defArchive(defUrlShortCutFile))") )) _
@@ -260,6 +271,7 @@ Sub Test_FileProxy_setParent_Err_Initial
 
     AssertEqualWithMessage "FileSystemProxy+setParent()", Err.Source, "Err.Source"
     AssertEqualWithMessage "Please set the value before setting the parent folder.", Err.Description, "Err.Description"
+    On Error GoTo 0
 End Sub
 Sub Test_FileProxy_setParent_Err_NotFileSystemProxy
     On Error Resume Next
@@ -270,6 +282,7 @@ Sub Test_FileProxy_setParent_Err_NotFileSystemProxy
 
     AssertEqualWithMessage "FileSystemProxy+setParent()", Err.Source, "Err.Source"
     AssertEqualWithMessage "This is not FileSystemProxy.", Err.Description, "Err.Description"
+    On Error GoTo 0
 End Sub
 Sub Test_FileProxy_setParent_Err_NotPrentFolder
     On Error Resume Next
@@ -280,8 +293,50 @@ Sub Test_FileProxy_setParent_Err_NotPrentFolder
 
     AssertEqualWithMessage "FileSystemProxy+setParent()", Err.Source, "Err.Source"
     AssertEqualWithMessage "This is not a parent folder.", Err.Description, "Err.Description"
+    On Error GoTo 0
 End Sub
 
+'###################################################################################################
+'FileSystemProxy.setVirtualPath()
+Sub Test_FileProxy_setVirtualPath
+    Dim p,v,a,e
+    v="C:\hoge\fuga\piyo.java"
+    p = WScript.ScriptFullName
+    Set a = (new FileSystemProxy).of(p)
+
+    AssertEqualWithMessage p, a.actualPath, "before set virtualPath actualPath"
+    AssertEqualWithMessage p, a.path, "before set virtualPath path"
+    AssertEqualWithMessage fso.GetBaseName(p), a.baseName, "before set virtualPath baseName"
+    AssertEqualWithMessage fso.GetExtensionName(p), a.extension, "before set virtualPath extension"
+    AssertEqualWithMessage fso.GetFileName(p), a.name, "before set virtualPath name"
+
+    a.setVirtualPath(v)
+
+    AssertEqualWithMessage p, a.actualPath, "ater set virtualPath actualPath"
+    AssertEqualWithMessage v, a.path, "after set virtualPath path"
+    AssertEqualWithMessage fso.GetBaseName(v), a.baseName, "after set virtualPath baseName"
+    AssertEqualWithMessage fso.GetExtensionName(v), a.extension, "after set virtualPath extension"
+    AssertEqualWithMessage fso.GetFileName(v), a.name, "after set virtualPath name"
+
+    a.setVirtualPath("")
+
+    AssertEqualWithMessage p, a.actualPath, "after clear virtualPath actualPath"
+    AssertEqualWithMessage p, a.path, "after clear virtualPath path"
+    AssertEqualWithMessage fso.GetBaseName(p), a.baseName, "after clear virtualPath baseName"
+    AssertEqualWithMessage fso.GetExtensionName(p), a.extension, "after clear virtualPath extension"
+    AssertEqualWithMessage fso.GetFileName(p), a.name, "after clear virtualPath name"
+End Sub
+Sub Test_FileProxy_setVirtualPath_Err_Initial
+    On Error Resume Next
+    Dim p,v,a
+    v="C:\hoge\fuga\piyo.java"
+    p = WScript.ScriptFullName
+    Call (new FileSystemProxy).setVirtualPath(v)
+
+    AssertEqualWithMessage "FileSystemProxy+setVirtualPath()", Err.Source, "Err.Source"
+    AssertEqualWithMessage "Please set the value before setting the virtual path.", Err.Description, "Err.Description"
+    On Error GoTo 0
+End Sub
 
 '###################################################################################################
 'common
@@ -407,6 +462,7 @@ Function createTextFile
 End Function
 
 'to verify the following properties
+'   .actualPath
 '   .baseName
 '   .dateLastModified
 '   .extension
@@ -437,7 +493,8 @@ Sub assertFsProperties(actualObj,path,caze)
         
         Dim ele, target, expected, actual
         For Each ele In Array( _
-                dicOf(Array(  "target", "baseName"             , "expected", fso.GetBaseName(path)     , "actual", .baseName)) _
+                dicOf(Array(  "target", "actualPath"           , "expected", path                      , "actual", .actualPath)) _
+                , dicOf(Array("target", "baseName"             , "expected", fso.GetBaseName(path)     , "actual", .baseName)) _
                 , dicOf(Array("target", "extension"            , "expected", fso.GetExtensionName(path), "actual", .extension)) _
                 , dicOf(Array("target", "isBrowsable"          , "expected", fi2.IsBrowsable           , "actual", .isBrowsable)) _
                 , dicOf(Array("target", "isFileSystem"         , "expected", fi2.IsFileSystem          , "actual", .isFileSystem)) _
@@ -555,7 +612,7 @@ Function expectHasEntries(entryType, path)
             If obj.IsFolder Then expectHasEntries = obj.GetFolder.Items.Count>0
     End Select
 End Function
-Sub assertFsEntriesProc(entryType, path, entries, caseName, includeSelf, recursive)
+Sub assertFsEntriesProc(entryType, path, entries, caseName, includingSelf, recursive)
     Dim ele, dic
     Set dic = dictionary
     For Each ele In entries
@@ -563,7 +620,7 @@ Sub assertFsEntriesProc(entryType, path, entries, caseName, includeSelf, recursi
         dic.Add ele.path,False
     Next
     
-    assertFsEntriesProcEachEntry entryType, path, dic, caseName, includeSelf, recursive
+    assertFsEntriesProcEachEntry entryType, path, dic, caseName, includingSelf, recursive
     
     For Each ele In dic.Keys
         If Not (dic(ele)=True) Then AssertFailWithMessage "caseName="&caseName&", '"&ele&"' Not Found !"
@@ -572,30 +629,30 @@ Sub assertFsEntriesProc(entryType, path, entries, caseName, includeSelf, recursi
     AssertWithMessage True, "all ok"
     Set dic = Nothing
 End Sub
-Sub assertFsEntriesProcEachEntry(entryType, path, dic, caseName, includeSelf, recursive)
-    If includeSelf Then existsEntry entryType, path, dic, caseName
+Sub assertFsEntriesProcEachEntry(entryType, path, dic, caseName, includingSelf, recursive)
+    If includingSelf Then existsEntry entryType, path, dic, caseName
     Dim ele
     If fso.FolderExists(path) Then
         For Each ele in fso.GetFolder(path).Files
             existsEntry entryType, ele.path, dic, caseName
             If recursive And isShellFolder(ele.path) Then
-                assertFsEntriesProcEachEntryArchive entryType, ele.path, dic, caseName, includeSelf, recursive
+                assertFsEntriesProcEachEntryArchive entryType, ele.path, dic, caseName, includingSelf, recursive
             End If
         Next
         For Each ele in fso.GetFolder(path).SubFolders
             existsEntry entryType, ele.path, dic, caseName
-            If recursive Then assertFsEntriesProcEachEntry entryType, ele.path, dic, caseName, includeSelf, recursive
+            If recursive Then assertFsEntriesProcEachEntry entryType, ele.path, dic, caseName, includingSelf, recursive
         Next
     ElseIf getFolderItem2(path).IsFolder Then
-        assertFsEntriesProcEachEntryArchive entryType, path, dic, caseName, includeSelf, recursive
+        assertFsEntriesProcEachEntryArchive entryType, path, dic, caseName, includingSelf, recursive
     End If
 End Sub
-Sub assertFsEntriesProcEachEntryArchive(entryType, path, dic, caseName, includeSelf, recursive)
+Sub assertFsEntriesProcEachEntryArchive(entryType, path, dic, caseName, includingSelf, recursive)
     Dim ele
     For Each ele in getFolderItem2(path).GetFolder.Items
         existsEntry entryType, ele.path, dic, caseName
         If recursive And ele.IsFolder Then
-            If ele.GetFolder.Items.Count>0 Then assertFsEntriesProcEachEntry entryType, ele.path, dic, caseName, includeSelf, recursive
+            If ele.GetFolder.Items.Count>0 Then assertFsEntriesProcEachEntry entryType, ele.path, dic, caseName, includingSelf, recursive
         End If
     Next
 End Sub
@@ -679,7 +736,9 @@ Function reOf(pattern, opt)
     Set oRe = Nothing
 End Function
 Function getFolderItem2(path)
-    Set getFolderItem2 = shellApp.Namespace(fso.GetParentFolderName(path)).Items().Item(fso.GetFileName(path))
+    With fso
+        Set getFolderItem2 = shellApp.Namespace(.GetParentFolderName(path)).ParseName(.GetFileName(path))
+    End With
 End Function
 Function getTempFilePath(parent,extention)
     getTempFilePath = fso.BuildPath(parent, getTempFile(extention))

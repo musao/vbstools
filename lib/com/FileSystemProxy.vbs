@@ -10,7 +10,7 @@
 '***************************************************************************************************
 Class FileSystemProxy
     'クラス内変数、定数
-    Private PoFolderItem, PoParent, PsPath, PeEntryType
+    Private PoFolderItem, PoFolder, PoParent, PsActualPath, PsVirtualPath, PeEntryType, PePathType
     
     '***************************************************************************************************
     'Function/Sub Name           : Class_Initialize()
@@ -27,8 +27,10 @@ Class FileSystemProxy
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub Class_Initialize()
-        PsPath = vbNullString
+        PsActualPath = vbNullString
+        PsVirtualPath = vbNullString
         Set PoFolderItem = Nothing
+        Set PoFolder = Nothing
         Set PoParent = Nothing
         Set PeEntryType = new_DicOf( _
             Array( _
@@ -37,6 +39,12 @@ Class FileSystemProxy
                 , "FILE_EXCLUDING_ARCHIVE", 3 _
                 , "FOLDER", 4 _
                 , "CONTAINER", 5 _
+            ) _
+        )
+        Set PePathType = new_DicOf( _
+            Array( _
+                "ACTUAL", 0 _
+                , "VIRTUAL", 1 _
             ) _
         )
     End Sub
@@ -57,9 +65,29 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Sub Class_Terminate()
         Set PoFolderItem = Nothing
+        Set PoFolder = Nothing
         Set PoParent = Nothing
         Set PeEntryType = Nothing
+        Set PePathType = Nothing
     End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get actualPath()
+    'Overview                    : 仮想でない実際のフルパスを返す
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     仮想でない実際のフルパス
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/24         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get actualPath()
+        actualPath = this_path(PePathType("ACTUAL"))
+    End Property
     
     '***************************************************************************************************
     'Function/Sub Name           : Property Get allContainers()
@@ -76,7 +104,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allContainers()
-        allContainers = this_entries(True, PeEntryType("CONTAINER"))
+        allContainers = this_entries(PeEntryType("CONTAINER"), False, True)
     End Property
     
     '***************************************************************************************************
@@ -94,7 +122,7 @@ Class FileSystemProxy
     '2025/04/25         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allContainersIncludingSelf()
-        allContainersIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("CONTAINER"))
+        allContainersIncludingSelf = this_entries(PeEntryType("CONTAINER"), True, True)
     End Property
     
     '***************************************************************************************************
@@ -112,7 +140,7 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allEntries()
-        allEntries = this_entries(True, PeEntryType("ENTRY"))
+        allEntries = this_entries(PeEntryType("ENTRY"), False, True)
     End Property
     
     '***************************************************************************************************
@@ -130,7 +158,7 @@ Class FileSystemProxy
     '2025/04/17         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allEntriesIncludingSelf()
-        allEntriesIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("ENTRY"))
+        allEntriesIncludingSelf = this_entries(PeEntryType("ENTRY"), True, True)
     End Property
     
     '***************************************************************************************************
@@ -148,7 +176,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allFilesExcludingArchives()
-        allFilesExcludingArchives = this_entries(True, PeEntryType("FILE_EXCLUDING_ARCHIVE"))
+        allFilesExcludingArchives = this_entries(PeEntryType("FILE_EXCLUDING_ARCHIVE"), False, True)
     End Property
     
     '***************************************************************************************************
@@ -166,7 +194,7 @@ Class FileSystemProxy
     '2025/04/25         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get allFilesExcludingArchivesIncludingSelf()
-        allFilesExcludingArchivesIncludingSelf = this_allEntriesIncludingSelf(PeEntryType("FILE_EXCLUDING_ARCHIVE"))
+        allFilesExcludingArchivesIncludingSelf = this_entries(PeEntryType("FILE_EXCLUDING_ARCHIVE"), True, True)
     End Property
     
     '***************************************************************************************************
@@ -202,7 +230,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get containers()
-        containers = this_entries(False, PeEntryType("CONTAINER"))
+        containers = this_entries(PeEntryType("CONTAINER"), False, False)
     End Property
     
     '***************************************************************************************************
@@ -238,7 +266,7 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get entries()
-        entries = this_entries(False, PeEntryType("ENTRY"))
+        entries = this_entries(PeEntryType("ENTRY"), False, False)
     End Property
     
     '***************************************************************************************************
@@ -274,7 +302,7 @@ Class FileSystemProxy
     '2025/04/27         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get filesExcludingArchives()
-        filesExcludingArchives = this_entries(False, PeEntryType("FILE_EXCLUDING_ARCHIVE"))
+        filesExcludingArchives = this_entries(PeEntryType("FILE_EXCLUDING_ARCHIVE"), False, False)
     End Property
     
     '***************************************************************************************************
@@ -455,7 +483,7 @@ Class FileSystemProxy
     '2023/11/26         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Default Property Get path()
-        path = this_path()
+        path = this_path(PePathType("VIRTUAL"))
     End Property
     
     '***************************************************************************************************
@@ -491,7 +519,7 @@ Class FileSystemProxy
     '2025/03/16         Y.Fujii                  First edition
     '***************************************************************************************************
     Public Property Get toString()
-        toString = "<"&TypeName(Me)&">"&this_path()
+        toString = "<"&TypeName(Me)&">"&this_path(PePathType("VIRTUAL"))
     End Property
     
     '***************************************************************************************************
@@ -553,44 +581,30 @@ Class FileSystemProxy
         this_setParent aoParent, TypeName(Me)&"+setParent()"
         Set setParent = Me
     End Function
-
-
-
     
     '***************************************************************************************************
-    'Function/Sub Name           : this_allEntriesIncludingSelf()
-    'Overview                    : 自身とフォルダー内のエントリーの配列を返す
+    'Function/Sub Name           : setVirtualPath()
+    'Overview                    : 仮想パスを設定する
     'Detailed Description        : 工事中
     'Argument
-    '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
+    '     asVirtualPath          : 仮想パス
     'Return Value
-    '     当クラスのインスタンスの配列
+    '     自身のインスタンス
     '---------------------------------------------------------------------------------------------------
     'History
     'Date               Name                     Reason for Changes
     '----------         ----------------------   -------------------------------------------------------
-    '2025/04/17         Y.Fujii                  First edition
+    '2026/01/24         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_allEntriesIncludingSelf( _
-        byVal alEntryType _
+    Public Function setVirtualPath( _
+        byVal asVirtualPath _
         )
-        this_allEntriesIncludingSelf = Null
-        If this_isInitial() Then Exit Function
-
-        Dim vRet : vRet = Array()
-        Dim boFlg : boFlg = (this_isFolder() Or this_hasEntries(PeEntryType("ENTRY")))
-        Select Case alEntryType 
-            Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
-                If Not boFlg Then vRet=Array(Me)
-            Case PeEntryType("CONTAINER")
-                If boFlg Then vRet=Array(Me)
-            Case Else
-                vRet=Array(Me)
-        End Select
-        
-        cf_pushA vRet, this_entries(True, alEntryType)
-        this_allEntriesIncludingSelf = vRet
+        this_setVirtualPath asVirtualPath, TypeName(Me)&"+setVirtualPath()"
+        Set setVirtualPath = Me
     End Function
+
+
+
     
     '***************************************************************************************************
     'Function/Sub Name           : this_baseName()
@@ -608,7 +622,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_baseName()
         this_baseName = Null
-        If Not this_isInitial() Then this_baseName = new_Fso().GetBaseName(PsPath)
+        If Not this_isInitial() Then this_baseName = new_Fso().GetBaseName(PsVirtualPath)
     End Function
    
     '***************************************************************************************************
@@ -635,8 +649,9 @@ Class FileSystemProxy
     'Overview                    : フォルダー内のエントリーの配列を返す
     'Detailed Description        : 工事中
     'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
     '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
+    '     aboIncludingSelf       : True:自身を含める / False:自身を含めない
+    '     aboRecursive           : True:再帰処理する / False:再帰処理しない
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -646,22 +661,39 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_entries( _
-        byVal aboRecursiveFlg _
-        , byVal alEntryType _
+        byVal alEntryType _
+        , byVal aboIncludingSelf _
+        , byVal aboRecursive _
         )
         this_entries = Null
         If this_isInitial() Then Exit Function
+        
+        Dim vRet, boHasEntries
+        vRet = Array()
+        boHasEntries = this_hasEntries(PeEntryType("ENTRY"))
 
-        this_entries = Array()
-        If Not this_hasEntries(PeEntryType("ENTRY")) Then Exit Function
+        If aboIncludingSelf Then
+            Dim boFlg : boFlg = (this_isFolder() Or boHasEntries)
+            Select Case alEntryType 
+                Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
+                    If Not boFlg Then vRet=Array(Me)
+                Case PeEntryType("CONTAINER")
+                    If boFlg Then vRet=Array(Me)
+                Case Else
+                    vRet=Array(Me)
+            End Select
+        End If
+        this_entries = vRet
+        If Not boHasEntries Then Exit Function
 
         If this_isFolder() Then
         'フォルダの場合
-            this_entries = this_entriesForFolder(aboRecursiveFlg, alEntryType)
+            pushA vRet, this_entriesForFolder(alEntryType, aboRecursive)
         Else
         'zipの場合
-            this_entries = this_entriesForZip(aboRecursiveFlg, alEntryType)
+            pushA vRet, this_entriesForZip(alEntryType, aboRecursive)
         End If
+        this_entries = vRet
     End Function
 
     '***************************************************************************************************
@@ -669,8 +701,8 @@ Class FileSystemProxy
     'Overview                    : フォルダー内のエントリーの配列を返す
     'Detailed Description        : フォルダの場合
     'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
     '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
+    '     aboRecursive           : True:再帰処理する / False:再帰処理しない
     'Return Value
     '     当クラスのインスタンスの配列
     '---------------------------------------------------------------------------------------------------
@@ -680,21 +712,21 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_entriesForFolder( _
-        byVal aboRecursiveFlg _
-        , byVal alEntryType _
+        byVal alEntryType _
+        , byVal aboRecursive _
         )
         Dim oEle,vRet()
-        With new_FolderOf(PsPath)
+        With PoFolder
             'ファイルの取得
             For Each oEle In .Files
-                this_entriesGetEntries vRet,oEle.Path,aboRecursiveFlg,alEntryType
+                this_entriesGetEntries alEntryType, aboRecursive, oEle.Path, vRet
             Next
             
             'フォルダの取得
-            If aboRecursiveFlg Or alEntryType<>PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
+            If aboRecursive Or alEntryType<>PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
             '再帰処理するかファイルのみ対象以外フォルダを取得する
                 For Each oEle In .SubFolders
-                    this_entriesGetEntries vRet,oEle.Path,aboRecursiveFlg,alEntryType
+                    this_entriesGetEntries alEntryType, aboRecursive, oEle.Path, vRet
                 Next
             End If
         End With
@@ -708,7 +740,7 @@ Class FileSystemProxy
     'Overview                    : アーカイブ内のエントリーの配列を返す
     'Detailed Description        : zipの場合
     'Argument
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
+    '     aboRecursive           : True:再帰処理する / False:再帰処理しない
     '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
     'Return Value
     '     当クラスのインスタンスの配列
@@ -719,12 +751,12 @@ Class FileSystemProxy
     '2025/03/20         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Function this_entriesForZip( _
-        byVal aboRecursiveFlg _
-        , byVal alEntryType _
+        byVal alEntryType _
+        , byVal aboRecursive _
         )
         Dim oEle,vRet()
         For Each oEle In PoFolderItem.GetFolder.Items
-            this_entriesGetEntries vRet,oEle.Path,aboRecursiveFlg,alEntryType
+            this_entriesGetEntries alEntryType, aboRecursive, oEle.Path, vRet
         Next
 
         this_entriesForZip = vRet
@@ -736,10 +768,10 @@ Class FileSystemProxy
     'Overview                    : エントリーを取得する
     'Detailed Description        : 再帰処理する場合は下位のエントリーも取得する
     'Argument
-    '     avAr                   : 取得したエントリーを格納する配列
-    '     asPath                 : パス
-    '     aboRecursiveFlg        : True:再帰処理する / False:再帰処理しない
     '     alEntryType            : エントリー（ファイル、アーカイブ、フォルダーなど）の種類
+    '     aboRecursive           : True:再帰処理する / False:再帰処理しない
+    '     asPath                 : パス
+    '     avAr                   : 取得したエントリーを格納する配列
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -749,14 +781,14 @@ Class FileSystemProxy
     '2025/03/23         Y.Fujii                  First edition
     '***************************************************************************************************
     Private Sub this_entriesGetEntries( _
-        byRef avAr _
+        byVal alEntryType _
+        , byVal aboRecursive _
         , byVal asPath _
-        , byVal aboRecursiveFlg _
-        , byVal alEntryType _
+        , byRef avAr _
         )
         Dim oNewItem : Set oNewItem = new_FspOf(asPath).setParent(Me)
 
-        If aboRecursiveFlg Then
+        If aboRecursive Then
         '再帰処理する場合
             Select Case alEntryType
                 Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
@@ -796,7 +828,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_extension()
         this_extension = Null
-        If Not this_isInitial() Then this_extension = new_Fso().GetExtensionName(PsPath)
+        If Not this_isInitial() Then this_extension = new_Fso().GetExtensionName(PsVirtualPath)
     End Function
     
     '***************************************************************************************************
@@ -827,10 +859,10 @@ Class FileSystemProxy
                 '自身がフォルダの場合
                     If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
                     '対象がファイルのみの場合
-                        this_hasEntries=(new_FolderOf(PsPath).Files.Count>0)
+                        this_hasEntries=(PoFolder.Files.Count>0)
                     Else
                     '対象がフォルダーのみの場合
-                        this_hasEntries=(new_FolderOf(PsPath).SubFolders.Count>0)
+                        this_hasEntries=(PoFolder.SubFolders.Count>0)
                     End If
                 ElseIf PoFolderItem.IsFolder Then
                 '自身がzipの場合
@@ -904,7 +936,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_isFolder()
         this_isFolder = Null
-        If Not this_isInitial() Then this_isFolder = new_Fso().FolderExists(PsPath)
+        If Not this_isInitial() Then this_isFolder = new_Fso().FolderExists(PsActualPath)
     End Function
 
     '***************************************************************************************************
@@ -960,7 +992,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_name()
         this_name = Null
-        If Not this_isInitial() Then this_name = new_Fso().GetFileName(PsPath)
+        If Not this_isInitial() Then this_name = new_Fso().GetFileName(PsVirtualPath)
     End Function
     
     '***************************************************************************************************
@@ -980,7 +1012,7 @@ Class FileSystemProxy
     Private Function this_parentFolder()
         this_parentFolder = Null
         If this_isInitial() Then Exit Function
-        If PoParent Is Nothing Then Set PoParent = new_FspOf(new_Fso().GetParentFolderName(PsPath))
+        If PoParent Is Nothing Then Set PoParent = new_FspOf(new_Fso().GetParentFolderName(PsActualPath))
         Set this_parentFolder = PoParent
     End Function
     
@@ -989,7 +1021,7 @@ Class FileSystemProxy
     'Overview                    : フルパスを返す
     'Detailed Description        : 工事中
     'Argument
-    '     なし
+    '     asPathType             : パスの種類（実パス、仮想パス）
     'Return Value
     '     フルパス
     '---------------------------------------------------------------------------------------------------
@@ -998,9 +1030,17 @@ Class FileSystemProxy
     '----------         ----------------------   -------------------------------------------------------
     '2025/03/15         Y.Fujii                  First edition
     '***************************************************************************************************
-    Private Function this_path()
+    Private Function this_path( _
+        byVal asPathType _
+        )
         this_path = Null
-        If Not this_isInitial() Then this_path = PsPath
+        If this_isInitial() Then Exit Function
+        
+        If asPathType=PePathType("ACTUAL") Then
+            this_path = PsActualPath
+        Else
+            this_path = PsVirtualPath
+        End If
     End Function
     
     '***************************************************************************************************
@@ -1022,18 +1062,19 @@ Class FileSystemProxy
         byVal asPath _
         , byVal asSource _
         )
-        ast_argNothing PoFolderItem , asSource, "Because it is an immutable variable, its value cannot be changed."
+        ast_argTrue this_isInitial() , asSource, "Because it is an immutable variable, its value cannot be changed."
 
         Dim oFolderItem : Set oFolderItem = Nothing
-        On Error Resume Next
-        Set oFolderItem = new_FolderItem2Of(asPath)
-        On Error Goto 0
-        ast_argNotNothing oFolderItem , asSource, "invalid argument. " & cf_toString(asPath)
-
-        If oFolderItem Is Nothing Then Exit Sub
+        With fw_try(Getref("new_FolderItem2Of"), asPath)
+            If .isErr() Then
+                ast_argNotNothing oFolderItem , asSource, "invalid argument. " & cf_toString(asPath)
+            Else
+                Set oFolderItem = .returnValue
+            End If
+        End With
 
         this_setFolderItem oFolderItem, asSource
-        this_setPath asPath, asSource
+        this_setPath asPath
     End Sub
     
     '***************************************************************************************************
@@ -1078,9 +1119,9 @@ Class FileSystemProxy
         byRef aoParent _
         , byVal asSource _
         )
-        ast_argNotNothing PoFolderItem, asSource, "Please set the value before setting the parent folder."
+        ast_argFalse this_isInitial() , asSource, "Please set the value before setting the parent folder."
         ast_argsAreSame TypeName(Me), TypeName(aoParent), asSource, "This is not " & TypeName(Me) &"."
-        ast_argsAreSame new_Fso().GetParentFolderName(PsPath), aoParent.path, asSource, "This is not a parent folder."
+        ast_argsAreSame new_Fso().GetParentFolderName(PsActualPath), aoParent.path, asSource, "This is not a parent folder."
 
         Set PoParent = aoParent
     End Sub
@@ -1088,10 +1129,9 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : this_setPath()
     'Overview                    : パスを設定する
-    'Detailed Description        : 工事中
+    'Detailed Description        : 仮想パスにも同じパスを設定する
     'Argument
     '     asPath                 : フルパス
-    '     asSource               : ソース
     'Return Value
     '     なし
     '---------------------------------------------------------------------------------------------------
@@ -1102,9 +1142,37 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Sub this_setPath( _
         byVal asPath _
+        )
+        PsActualPath = asPath
+        PsVirtualPath = asPath
+        If this_isFolder() Then Set PoFolder = new_FolderOf(PsActualPath)
+    End Sub
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_setVirtualPath()
+    'Overview                    : 仮想パスを設定する
+    'Detailed Description        : 仮想パスが空文字の場合は実パスを設定する
+    'Argument
+    '     asVirtualPath          : 仮想パス
+    '     asSource               : ソース
+    'Return Value
+    '     なし
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/24         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Sub this_setVirtualPath( _
+        byVal asVirtualPath _
         , byVal asSource _
         )
-        PsPath = asPath
+        ast_argFalse this_isInitial() , asSource, "Please set the value before setting the virtual path."
+        If asVirtualPath="" Then
+            PsVirtualPath = PsActualPath
+        Else
+            PsVirtualPath = asVirtualPath
+        End If
     End Sub
     
     '***************************************************************************************************
@@ -1127,7 +1195,7 @@ Class FileSystemProxy
 
         If this_isFolder() Then
         'フォルダの場合
-            this_size = new_FolderOf(PsPath).Size
+            this_size = PoFolder.Size
         Else
         'フォルダ以外の場合
             this_size = PoFolderItem.Size
