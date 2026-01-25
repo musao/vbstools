@@ -74,7 +74,10 @@ End Sub
 '   .hasContainers
 '   .hasEntries
 '   .hasFilesExcludingArchives
+'   .isArchive
 '   .isBrowsable
+'   .isContainer
+'   .isFile
 '   .isFileSystem
 '   .isFolder
 '   .isLink
@@ -104,7 +107,10 @@ Sub Test_FileProxy_proeerties_initial
             , dicOf( Array("target","hasContainers"                         ,"expected",Null               , "actual", ao.hasContainers) ) _
             , dicOf( Array("target","hasEntries"                            ,"expected",Null               , "actual", ao.hasEntries) ) _
             , dicOf( Array("target","hasFilesExcludingArchives"             ,"expected",Null               , "actual", ao.hasFilesExcludingArchives) ) _
+            , dicOf( Array("target","isArchive"                             ,"expected",Null               , "actual", ao.isArchive) ) _
             , dicOf( Array("target","isBrowsable"                           ,"expected",Null               , "actual", ao.isBrowsable) ) _
+            , dicOf( Array("target","isContainer"                           ,"expected",Null               , "actual", ao.isContainer) ) _
+            , dicOf( Array("target","isFile"                                ,"expected",Null               , "actual", ao.isFile) ) _
             , dicOf( Array("target","isFileSystem"                          ,"expected",Null               , "actual", ao.isFileSystem) ) _
             , dicOf( Array("target","isFolder"                              ,"expected",Null               , "actual", ao.isFolder) ) _
             , dicOf( Array("target","isLink"                                ,"expected",Null               , "actual", ao.isLink) ) _
@@ -141,7 +147,10 @@ Sub Test_FileProxy_properties_fs
 '       .baseName
 '       .dateLastModified
 '       .extension
+'       .isArchive
 '       .isBrowsable
+'       .isContainer
+'       .isFile
 '       .isFileSystem
 '       .isFolder
 '       .isLink
@@ -466,7 +475,10 @@ End Function
 '   .baseName
 '   .dateLastModified
 '   .extension
+'   .isArchive
 '   .isBrowsable
+'   .isContainer
+'   .isFile
 '   .isFileSystem
 '   .isFolder
 '   .isLink
@@ -496,9 +508,12 @@ Sub assertFsProperties(actualObj,path,caze)
                 dicOf(Array(  "target", "actualPath"           , "expected", path                      , "actual", .actualPath)) _
                 , dicOf(Array("target", "baseName"             , "expected", fso.GetBaseName(path)     , "actual", .baseName)) _
                 , dicOf(Array("target", "extension"            , "expected", fso.GetExtensionName(path), "actual", .extension)) _
+                , dicOf(Array("target", "isArchive"            , "expected", expectIsArchive(path)     , "actual", .isArchive)) _
                 , dicOf(Array("target", "isBrowsable"          , "expected", fi2.IsBrowsable           , "actual", .isBrowsable)) _
+                , dicOf(Array("target", "isContainer"          , "expected", expectIsContainer(path)   , "actual", .isContainer)) _
+                , dicOf(Array("target", "isFile"               , "expected", (Not fi2.IsFolder)        , "actual", .isFile)) _
                 , dicOf(Array("target", "isFileSystem"         , "expected", fi2.IsFileSystem          , "actual", .isFileSystem)) _
-                , dicOf(Array("target", "isFolder"             , "expected", fso.FolderExists(path)    , "actual", .isFolder)) _
+                , dicOf(Array("target", "isFolder"             , "expected", expectIsFolder(path)      , "actual", .isFolder)) _
                 , dicOf(Array("target", "isLink"               , "expected", fi2.IsLink                , "actual", .isLink)) _
                 , dicOf(Array("target", "parentFolder TypeName", "expected", "FileSystemProxy"         , "actual", TypeName(.parentFolder))) _
                 , dicOf(Array("target", "path"                 , "expected", path                      , "actual", .path)) _
@@ -540,6 +555,30 @@ Sub assertFsProperties(actualObj,path,caze)
     Set fo = Nothing
     Set fi2 = Nothing
 End Sub
+Function expectIsArchive(path)
+    With getFolderItem2(path)
+        If .IsFileSystem Then
+            expectIsArchive = False
+            If (Not fso.FolderExists(path)) And .IsFolder Then
+                expectIsArchive = True
+            End If
+        Else
+            expectIsArchive = (LCase(new_Fso().GetExtensionName(path)) = "zip")
+        End If
+    End With
+End Function
+Function expectIsContainer(path)
+    expectIsContainer = getFolderItem2(path).IsFolder Or (LCase(new_Fso().GetExtensionName(path)) = "zip")
+End Function
+Function expectIsFolder(path)
+    With getFolderItem2(path)
+        If .IsFileSystem Then
+            expectIsFolder = fso.FolderExists(path)
+        Else
+            expectIsFolder = .IsFolder
+        End If
+    End With
+End Function
 'to verify the following properties
 '   .allContainers
 '   .allContainersIncludingSelf

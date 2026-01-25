@@ -360,6 +360,27 @@ Class FileSystemProxy
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get isArchive()
+    'Overview                    : アーカイブかどうかを返す
+    'Detailed Description        : ファイルシステムの場合
+    '                                Folderでないのにファイルシステムでない場合FolderItemのisFolderがTrueならアーカイブと判断する
+    '                              ファイルシステムでない場合
+    '                                拡張子がzipの場合アーカイブと判断する
+    'Argument
+    '     なし
+    'Return Value
+    '     アーカイブかどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get isArchive()
+        isArchive = this_isArchive()
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get isBrowsable()
     'Overview                    : ブラウザーまたはWindowsエクスプローラーフレーム内でアイテムをホストできるかどうかを返す
     'Detailed Description        : https://learn.microsoft.com/ja-jp/windows/win32/shell/folderitem
@@ -375,6 +396,43 @@ Class FileSystemProxy
     '***************************************************************************************************
     Public Property Get isBrowsable()
         isBrowsable = this_isBrowsable()
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get isContainer()
+    'Overview                    : コンテナ（フォルダーまたはアーカイブ）かどうかを返す
+    'Detailed Description        : FolderItemのisFolderがTrueまたは拡張子がzipの場合、
+    '                              コンテナ（フォルダーまたはアーカイブ）と判断する
+    'Argument
+    '     なし
+    'Return Value
+    '     コンテナかどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get isContainer()
+        isContainer = this_isContainer()
+    End Property
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : Property Get isFile()
+    'Overview                    : ファイル（アーカイブを含む）かどうかを返す
+    'Detailed Description        : FolderItemのisFolderがFalseの場合、ファイル（アーカイブを含む）と判断する
+    'Argument
+    '     なし
+    'Return Value
+    '     ファイル（アーカイブを含む）かどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get isFile()
+        isFile = this_isFile()
     End Property
     
     '***************************************************************************************************
@@ -398,8 +456,8 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : Property Get isFolder()
     'Overview                    : フォルダであるかどうかを返す
-    'Detailed Description        : FolderItem2オブジェクトのIsFolder()ではなく
-    '                              FileSystemObjectのFolderExists()と同じ
+    'Detailed Description        : ファイルシステムの場合はFileSystemObjectのFolderExists()と同じ
+    '                              ファイルシステムでない場合FolderItemのisFolder()と同じ
     'Argument
     '     なし
     'Return Value
@@ -673,7 +731,7 @@ Class FileSystemProxy
         boHasEntries = this_hasEntries(PeEntryType("ENTRY"))
 
         If aboIncludingSelf Then
-            Dim boFlg : boFlg = (this_isFolder() Or boHasEntries)
+            Dim boFlg : boFlg = (this_existsFolder() Or boHasEntries)
             Select Case alEntryType 
                 Case PeEntryType("FILE_EXCLUDING_ARCHIVE")
                     If Not boFlg Then vRet=Array(Me)
@@ -686,7 +744,7 @@ Class FileSystemProxy
         this_entries = vRet
         If Not boHasEntries Then Exit Function
 
-        If this_isFolder() Then
+        If this_existsFolder() Then
         'フォルダの場合
             pushA vRet, this_entriesForFolder(alEntryType, aboRecursive)
         Else
@@ -813,6 +871,25 @@ Class FileSystemProxy
     End Sub
     
     '***************************************************************************************************
+    'Function/Sub Name           : this_existsFolder()
+    'Overview                    : 自身がファイルシステム上のフォルダであるかどうかを返す
+    'Detailed Description        : FileSystemObjectのFolderExists()と同じ
+    'Argument
+    '     なし
+    'Return Value
+    '     自身がファイルシステム上のフォルダであるかどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_existsFolder()
+        this_existsFolder = Null
+        If Not this_isInitial() Then this_existsFolder = new_Fso().FolderExists(PsActualPath)
+    End Function
+    
+    '***************************************************************************************************
     'Function/Sub Name           : this_extension()
     'Overview                    : 拡張子を返す
     'Detailed Description        : 工事中
@@ -855,7 +932,7 @@ Class FileSystemProxy
         Select Case alEntryType 
             Case PeEntryType("FILE_EXCLUDING_ARCHIVE"),PeEntryType("CONTAINER")
             '対象がファイルのみかフォルダーのみの場合
-                If this_isFolder() Then
+                If this_existsFolder() Then
                 '自身がフォルダの場合
                     If alEntryType=PeEntryType("FILE_EXCLUDING_ARCHIVE") Then
                     '対象がファイルのみの場合
@@ -882,6 +959,36 @@ Class FileSystemProxy
     End Function
     
     '***************************************************************************************************
+    'Function/Sub Name           : this_isArchive()
+    'Overview                    : アーカイブかどうかを返す
+    'Detailed Description        : ファイルシステムの場合
+    '                                Folderでないのにファイルシステムでない場合FolderItemのisFolderがTrueならアーカイブと判断する
+    '                              ファイルシステムでない場合
+    '                                拡張子がzipの場合アーカイブと判断する
+    'Argument
+    '     なし
+    'Return Value
+    '     アーカイブかどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_isArchive()
+        this_isArchive = Null
+        If this_isInitial() Then Exit Function
+        If this_isFileSystem() Then
+        'ファイルシステムの場合、FolderでなくFolderItemのisFolderがTrueならアーカイブと判断する
+            this_isArchive = False
+            If Not this_existsFolder() And PoFolderItem.IsFolder Then this_isArchive = True
+        Else
+        'ファイルシステムでない場合、拡張子で判断する
+            this_isArchive = cf_isSame(LCase(this_extension), "zip")
+        End If
+    End Function
+    
+    '***************************************************************************************************
     'Function/Sub Name           : this_isBrowsable()
     'Overview                    : ブラウザーまたはWindowsエクスプローラーフレーム内でアイテムをホストできるかどうかを返す
     'Detailed Description        : https://learn.microsoft.com/ja-jp/windows/win32/shell/folderitem
@@ -898,6 +1005,47 @@ Class FileSystemProxy
     Private Function this_isBrowsable()
         this_isBrowsable = Null
         If Not this_isInitial() Then this_isBrowsable = PoFolderItem.IsBrowsable
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_isContainer()
+    'Overview                    : コンテナ（フォルダーまたはアーカイブ）かどうかを返す
+    'Detailed Description        : FolderItemのisFolderがTrueまたは拡張子がzipの場合、
+    '                              コンテナ（フォルダーまたはアーカイブ）と判断する
+    'Argument
+    '     なし
+    'Return Value
+    '     コンテナかどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_isContainer()
+        this_isContainer = Null
+        If this_isInitial() Then Exit Function
+        this_isContainer = PoFolderItem.IsFolder Or cf_isSame(LCase(this_extension), "zip")
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_isFile()
+    'Overview                    : ファイル（アーカイブを含む）かどうかを返す
+    'Detailed Description        : FolderItemのisFolderがFalseの場合、ファイル（アーカイブを含む）と判断する
+    'Argument
+    '     なし
+    'Return Value
+    '     ファイル（アーカイブを含む）かどうか
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/25         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_isFile()
+        this_isFile = Null
+        If this_isInitial() Then Exit Function
+        this_isFile = Not PoFolderItem.IsFolder
     End Function
     
     '***************************************************************************************************
@@ -922,8 +1070,8 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : this_isFolder()
     'Overview                    : アイテムがフォルダであるかどうかを返す
-    'Detailed Description        : FolderItem2オブジェクトのIsFolder()ではなく
-    '                              FileSystemObjectのFolderExists()と同じ
+    'Detailed Description        : ファイルシステムの場合はFileSystemObjectのFolderExists()と同じ
+    '                              ファイルシステムでない場合FolderItemのisFolder()と同じ
     'Argument
     '     なし
     'Return Value
@@ -936,7 +1084,14 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_isFolder()
         this_isFolder = Null
-        If Not this_isInitial() Then this_isFolder = new_Fso().FolderExists(PsActualPath)
+        If this_isInitial() Then Exit Function
+        If this_isFileSystem() Then
+        'ファイルシステムの場合
+            this_isFolder = this_existsFolder()
+        Else
+        'ファイルシステムでない場合
+            this_isFolder = PoFolderItem.IsFolder
+        End If
     End Function
 
     '***************************************************************************************************
@@ -1145,7 +1300,7 @@ Class FileSystemProxy
         )
         PsActualPath = asPath
         PsVirtualPath = asPath
-        If this_isFolder() Then Set PoFolder = new_FolderOf(PsActualPath)
+        If this_existsFolder() Then Set PoFolder = new_FolderOf(PsActualPath)
     End Sub
     
     '***************************************************************************************************
@@ -1193,7 +1348,7 @@ Class FileSystemProxy
         this_size = Null
         If this_isInitial() Then Exit Function
 
-        If this_isFolder() Then
+        If this_existsFolder() Then
         'フォルダの場合
             this_size = PoFolder.Size
         Else
