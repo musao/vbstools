@@ -563,6 +563,24 @@ Class FileSystemProxy
     End Property
     
     '***************************************************************************************************
+    'Function/Sub Name           : Property Get toJson()
+    'Overview                    : 当インスタンスの内容をjson型の文字列に変換する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     json型の文字列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Property Get toJson()
+        toJson = this_toJson()
+    End Property
+    
+    '***************************************************************************************************
     'Function/Sub Name           : Property Get toString()
     'Overview                    : 当インスタンスの内容を文字列に変換する
     'Detailed Description        : 工事中
@@ -1045,7 +1063,7 @@ Class FileSystemProxy
     Private Function this_isFile()
         this_isFile = Null
         If this_isInitial() Then Exit Function
-        this_isFile = Not PoFolderItem.IsFolder
+        this_isFile = Not this_isFolder()
     End Function
     
     '***************************************************************************************************
@@ -1355,6 +1373,50 @@ Class FileSystemProxy
         'フォルダ以外の場合
             this_size = PoFolderItem.Size
         End If
+    End Function
+    
+    '***************************************************************************************************
+    'Function/Sub Name           : this_toJson()
+    'Overview                    : 当インスタンスの内容をjson型の文字列に変換する
+    'Detailed Description        : 工事中
+    'Argument
+    '     なし
+    'Return Value
+    '     json型の文字列
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/26         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Private Function this_toJson()
+        this_toJson = "{" & _
+            cf_buildKeyPair("actualPath"               , actualPath()               ) & "," & _
+            cf_buildKeyPair("baseName"                 , baseName()                 ) & "," & _
+            cf_buildKeyPair("dateLastModified"         , dateLastModified()         ) & "," & _
+            cf_buildKeyPair("extension"                , extension()                ) & "," & _
+            cf_buildKeyPair("hasContainers"            , hasContainers()            ) & "," & _
+            cf_buildKeyPair("hasEntries"               , hasEntries()               ) & "," & _
+            cf_buildKeyPair("hasFilesExcludingArchives", hasFilesExcludingArchives()) & "," & _
+            cf_buildKeyPair("isArchive"                , isArchive()                ) & "," & _
+            cf_buildKeyPair("isBrowsable"              , isBrowsable()              ) & "," & _
+            cf_buildKeyPair("isContainer"              , isContainer()              ) & "," & _
+            cf_buildKeyPair("isFile"                   , isFile()                   ) & "," & _
+            cf_buildKeyPair("isFileSystem"             , isFileSystem()             ) & "," & _
+            cf_buildKeyPair("isFolder"                 , isFolder()                 ) & "," & _
+            cf_buildKeyPair("isLink"                   , isLink()                   ) & "," & _
+            cf_buildKeyPair("name"                     , name()                     ) & ","
+        
+        Dim sParentFolder : sParentFolder=null
+        If Not this_isInitial() Then sParentFolder = parentFolder().path
+        this_toJson = this_toJson & _
+            cf_buildKeyPair("parentFolder"             , sParentFolder              ) & ","
+        
+        this_toJson = this_toJson & _
+            cf_buildKeyPair("path"                     , path()                     ) & "," & _
+            cf_buildKeyPair("size"                     , size()                     ) & "," & _
+            cf_buildKeyPair("type"                     , [type]()                   ) & _
+        "}"
     End Function
     
     '***************************************************************************************************

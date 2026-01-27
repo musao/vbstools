@@ -130,49 +130,56 @@ End Sub
 Sub Test_FileProxy_properties_fs
     Dim cases
     cases=Array( _
-    dicOf(  Array("Case", "1", "Definition", defShortCutFile()             )) _
-    , dicOf(Array("Case", "2", "Definition", defUrlShortCutFile()          )) _
-    , dicOf(Array("Case", "3", "Definition", defTextFile()                 )) _
-    , dicOf(Array("Case", "4", "Definition", defFolder(Empty)              )) _
-    , dicOf(Array("Case", "5", "Definition", defFolder("defShortCutFile")  )) _
-    , dicOf(Array("Case", "6", "Definition", defArchive("defShortCutFile") )) _
+    dicOf(  Array("Case", "1-1", "Definition", defShortCutFile()                                                        )) _
+    , dicOf(Array("Case", "1-2", "Definition", defUrlShortCutFile()                                                     )) _
+    , dicOf(Array("Case", "1-3", "Definition", defTextFile()                                                            )) _
+    , dicOf(Array("Case", "1-4", "Definition", defFolder(Empty)                                                         )) _
+    , dicOf(Array("Case", "1-5", "Definition", defFolder( "defShortCutFile")                                            )) _
+    , dicOf(Array("Case", "1-6", "Definition", defArchive("defShortCutFile")                                            )) _
+    , dicOf(Array("Case", "2-1", "Definition", defFolder( "defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
     )
-    Dim ele,path,caze,ao
-    For Each ele In createData(cases)
-        path = ele("Path")
+'    cases=Array( _
+'    dicOf(  Array("Case", "1-1", "Definition", defShortCutFile()                                                        )) _
+'    , dicOf(Array("Case", "1-2", "Definition", defUrlShortCutFile()                                                     )) _
+'    , dicOf(Array("Case", "1-3", "Definition", defTextFile()                                                            )) _
+'    , dicOf(Array("Case", "1-4", "Definition", defFolder(Empty)                                                         )) _
+'    , dicOf(Array("Case", "1-5", "Definition", defFolder( "defShortCutFile")                                            )) _
+'    , dicOf(Array("Case", "1-6", "Definition", defArchive("defShortCutFile")                                            )) _
+'    , dicOf(Array("Case", "2-1", "Definition", defFolder( "defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
+'    , dicOf(Array("Case", "2-2", "Definition", defArchive("defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
+'    )
+    Dim ele,paths,path,caze,ao,cnt
+    For Each ele In createData(cases, True)
+        paths = ele("Path")
         caze = ele("Case")
-        Set ao = (new FileSystemProxy).of(path)
-
-'       .actualPath
-'       .baseName
-'       .dateLastModified
-'       .extension
-'       .isArchive
-'       .isBrowsable
-'       .isContainer
-'       .isFile
-'       .isFileSystem
-'       .isFolder
-'       .isLink
-'       .name
-'       .parentFolder
-'       .path
-'       .size
-'       .toString
-'       .type
-        assertFsProperties ao,path,caze
+        cnt = 0
+        For Each path In paths
+            cnt = cnt + 1
+            Set ao = (new FileSystemProxy).of(path)
+    
+'           .actualPath
+'           .baseName
+'           .dateLastModified
+'           .extension
+'           .isArchive
+'           .isBrowsable
+'           .isContainer
+'           .isFile
+'           .isFileSystem
+'           .isFolder
+'           .isLink
+'           .name
+'           .parentFolder
+'           .path
+'           .size
+'           .toString
+'           .type
+            assertFsProperties ao,path,caze&"-"&cnt
+        Next
     Next
 End Sub
 Sub Test_FileProxy_properties_list
     Dim cases
-'    cases=Array( _
-'    dicOf(  Array("Case", "1-2-3-3", "Definition", defFolder( "defArchive(defArchive(defUrlShortCutFile))") )) _
-'    , dicOf(Array("Case", "1-3-2-3", "Definition", defArchive("defFolder( defArchive(defTextFile))") )) _
-'    , dicOf(Array("Case", "1-3-3-1", "Definition", defArchive("defArchive(defShortCutFile)") )) _
-'    , dicOf(Array("Case", "1-3-3-2", "Definition", defArchive("defArchive(defFolder( defUrlShortCutFile))") )) _
-'    , dicOf(Array("Case", "1-3-3-3", "Definition", defArchive("defArchive(defArchive(defTextFile))") )) _
-'    , dicOf(Array("Case", "2-2"    , "Definition", defArchive("defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
-'    )
     cases=Array( _
     dicOf(  Array("Case", "1-1"    , "Definition", defShortCutFile() )) _
     , dicOf(Array("Case", "1-2-3-3", "Definition", defFolder( "defArchive(defArchive(defUrlShortCutFile))") )) _
@@ -201,7 +208,8 @@ Sub Test_FileProxy_properties_list
 '    )
 'inputbox "","",cf_toString(createData(cases))
 Dim ele,path,caze,ao
-    For Each ele In createData(cases)
+    For Each ele In createData(cases, False)
+'    For Each ele In createData(cases)
         path = ele("Path")
         caze = ele("Case")
         Set ao = (new FileSystemProxy).of(path)
@@ -384,10 +392,11 @@ Function defContainer(d,tp)
     defContainer = Array(tp, pram)
 End Function
 
-Function createData(cases)
-    Dim ele,data
+Function createData(cases, pathFlg)
+    Dim ele,data,folderPath
     For Each ele In cases
-        pusha data, dicOf(Array("Case", ele("Case"), "Path", createDataRecursive(createCaseFolder(ele("Case")), ele("Definition"))))
+        folderPath = createCaseFolder(ele("Case"))
+        push data, dicOf(Array("Case", ele("Case"), "Path", createDataRecursive(folderPath, ele("Definition"), pathFlg)))
     Next
     createData = data
 End Function
@@ -397,20 +406,21 @@ Function createCaseFolder(caseName)
     fso.CreateFolder path
     createCaseFolder=path
 End Function
-Function createDataRecursive(targetPath,def)
+Function createDataRecursive(targetPath, def, pathFlg)
     If Ubound(def)<0 Then
         Exit Function
     End If
     
-    Dim tp, path
+    Dim tp, path, childPaths
     tp = def(0)
+    childPaths = Array()
     Select Case tp
     Case PeDataType("FOLDER"), PeDataType("ARCHIVE")
         path = createEmptyFolderAt(targetPath)
         If Ubound(def)>0 Then
             Dim ele
             For Each ele In def(1)
-                createDataRecursive path, ele
+                pushA childPaths, createDataRecursive(path, ele, pathFlg)
             Next
         End If
 
@@ -422,12 +432,25 @@ Function createDataRecursive(targetPath,def)
             Next
             zip paths,zipPath
             fso.DeleteFolder path
+            
+            Dim tmp : tmp = childPaths
+            childPaths = Array()
+            For Each ele In tmp
+                pushA childPaths, replace(ele, path, zipPath)
+            Next
+            
             path = zipPath
         End If
     Case Else
         path = createSomeFileAt(tp, targetPath)
     End Select
-    createDataRecursive = path
+    If pathFlg Then
+        Dim ret : ret = Array(path)
+        pushA ret, childPaths
+        createDataRecursive = ret
+    Else
+        createDataRecursive = path
+    End If
 End Function
 Function createEmptyFolderAt(basePath)
     Dim path : path = getTempFolderPath(basePath)
@@ -511,7 +534,7 @@ Sub assertFsProperties(actualObj,path,caze)
                 , dicOf(Array("target", "isArchive"            , "expected", expectIsArchive(path)     , "actual", .isArchive)) _
                 , dicOf(Array("target", "isBrowsable"          , "expected", fi2.IsBrowsable           , "actual", .isBrowsable)) _
                 , dicOf(Array("target", "isContainer"          , "expected", expectIsContainer(path)   , "actual", .isContainer)) _
-                , dicOf(Array("target", "isFile"               , "expected", (Not fi2.IsFolder)        , "actual", .isFile)) _
+                , dicOf(Array("target", "isFile"               , "expected", expectIsFile(path)        , "actual", .isFile)) _
                 , dicOf(Array("target", "isFileSystem"         , "expected", fi2.IsFileSystem          , "actual", .isFileSystem)) _
                 , dicOf(Array("target", "isFolder"             , "expected", expectIsFolder(path)      , "actual", .isFolder)) _
                 , dicOf(Array("target", "isLink"               , "expected", fi2.IsLink                , "actual", .isLink)) _
@@ -569,6 +592,9 @@ Function expectIsArchive(path)
 End Function
 Function expectIsContainer(path)
     expectIsContainer = getFolderItem2(path).IsFolder Or (LCase(new_Fso().GetExtensionName(path)) = "zip")
+End Function
+Function expectIsFile(path)
+    expectIsFile = Not expectIsFolder(path)
 End Function
 Function expectIsFolder(path)
     With getFolderItem2(path)

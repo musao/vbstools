@@ -431,6 +431,48 @@ Private Sub cf_swap( _
 End Sub
 
 '***************************************************************************************************
+'Function/Sub Name           : cf_buildKeyPair()
+'Overview                    : キーと値をペアにする
+'Detailed Description        : func_CfToJson()に委譲する
+'Argument
+'     asKey                  : キー
+'     avValue                : 値
+'Return Value
+'     キーと値をペアにsしたJSON型文字列
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_buildKeyPair( _
+    byVal asKey _
+    , byRef avValue _
+    )
+    cf_buildKeyPair = fs_wrapInQuotes(asKey) & ":" & func_CfToJson(avValue)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_json()
+'Overview                    : 引数の内容をJSON型文字列で表示する
+'Detailed Description        : func_CfToJson()に委譲する
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     JSON型文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_toJson( _
+    byRef avTgt _
+    )
+    cf_toJson = func_CfToJson(avTgt)
+End Function
+
+'***************************************************************************************************
 'Function/Sub Name           : cf_toString()
 'Overview                    : 引数の内容を文字列で表示する
 'Detailed Description        : func_CfToString()に委譲する
@@ -450,6 +492,127 @@ Private Function cf_toString( _
     cf_toString = func_CfToString(avTgt)
 End Function
 
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToJson()
+'Overview                    : 引数の内容をJSON型文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     JSON型文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToJson( _
+    byRef avTgt _
+    )
+    If IsObject(avTgt) Then
+        func_CfToJson = func_CfToJsonObject(avTgt)
+        Exit Function
+    End If
+
+    Dim sRet : sRet = ""
+    Select Case VarType(avTgt)
+        Case vbEmpty, vbNull, vbError
+            sRet = "null"
+        Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbByte
+            sRet = avTgt
+        Case vbBoolean
+            sRet = "false"
+            If avTgt Then sRet = "true"
+        Case Else
+            If IsArray(avTgt) Then
+                sRet = func_CfToJsonArray(avTgt)
+            Else
+                sRet = fs_wrapInQuotes(CStr(avTgt))
+            End If
+    End Select
+    func_CfToJson = sRet
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToJsonArray()
+'Overview                    : 配列の内容をJSON型文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     JSON型文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToJsonArray( _
+    byRef avTgt _
+    )
+    Dim vRet, oEle
+    For Each oEle In avTgt
+        cf_push vRet, func_CfToJson(oEle)
+    Next
+    func_CfToJsonArray = "[" & Join(vRet, ",") & "]"
+    Set oEle = Nothing
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToJsonObject()
+'Overview                    : オブジェクトの内容をJSON型文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     JSON型文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToJsonObject( _
+    byRef avTgt _
+    )
+    func_CfToJsonObject = ""
+
+    If cf_isSame(TypeName(avTgt),"Dictionary") Then
+        func_CfToJsonObject = func_CfToJsonObjectDictionary(avTgt)
+        Exit Function
+    End If
+
+    Dim sTmp
+    On Error Resume Next
+    sTmp = avTgt.toJson()
+    If Err.Number=0 Then func_CfToJsonObject = sTmp
+    On Error Goto 0
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : func_CfToJsonObjectDictionary()
+'Overview                    : ディクショナリの内容をJSON文字列で表示する
+'Detailed Description        : 工事中
+'Argument
+'     avTgt                  : 対象
+'Return Value
+'     JSON文字列に変換した引数の内容
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/27         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function func_CfToJsonObjectDictionary( _
+    byRef avTgt _
+    )
+    Dim sKey, vRet
+    For Each sKey In avTgt.Keys
+        cf_push vRet, cf_buildKeyPair(sKey, avTgt(sKey))
+'        cf_push vRet, fs_wrapInQuotes(sKey) & ":" & func_CfToJson(avTgt(sKey))
+    Next
+    func_CfToJsonObjectDictionary = "{" & Join(vRet, ",") & "}"
+End Function
 
 '***************************************************************************************************
 'Function/Sub Name           : func_CfToString()
