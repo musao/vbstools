@@ -747,7 +747,6 @@ Class FileSystemProxy
         Dim vRet, boHasEntries
         vRet = Array()
         boHasEntries = this_hasEntries(PeEntryType("ENTRY"))
-
         If aboIncludingSelf Then
             Dim boFlg : boFlg = (this_existsFolder() Or boHasEntries)
             Select Case alEntryType 
@@ -759,16 +758,18 @@ Class FileSystemProxy
                     vRet=Array(Me)
             End Select
         End If
+
         this_entries = vRet
         If Not boHasEntries Then Exit Function
 
         If this_existsFolder() Then
         'ÉtÉHÉãÉ_ÇÃèÍçá
-            pushA vRet, this_entriesForFolder(alEntryType, aboRecursive)
+            cf_pushA vRet, this_entriesForFolder(alEntryType, aboRecursive)
         Else
         'zipÇÃèÍçá
-            pushA vRet, this_entriesForZip(alEntryType, aboRecursive)
+            cf_pushA vRet, this_entriesForZip(alEntryType, aboRecursive)
         End If
+
         this_entries = vRet
     End Function
 
@@ -806,7 +807,7 @@ Class FileSystemProxy
                 Next
             End If
         End With
-
+        
         this_entriesForFolder = vRet
         Set oEle = Nothing
     End Function
