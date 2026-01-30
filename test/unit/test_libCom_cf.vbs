@@ -645,6 +645,32 @@ Sub Test_cf_toString_Array_Empty
 End Sub
 
 '###################################################################################################
+'cf_toJson()
+Sub Test_cf_toJson
+    Dim i, actual, expected
+    For Each i In Array( _
+            new_DicOf(Array(  "Case", "1"   , "input", new_DicOf(Array("foo","bar")), "expected", "{"&Chr(34)&"foo"&Chr(34)&":"&Chr(34)&"bar"&Chr(34)&"}" )) _
+            , new_DicOf(Array("Case", "2"   , "input", Empty                        , "expected", Chr(34)&"null"&Chr(34)                                  )) _
+            , new_DicOf(Array("Case", "3"   , "input", null                         , "expected", Chr(34)&"null"&Chr(34)                                  )) _
+            , new_DicOf(Array("Case", "5"   , "input", CInt(0)                      , "expected", 0                                                       )) _
+            , new_DicOf(Array("Case", "6"   , "input", CLng(-100000)                , "expected", -100000                                                 )) _
+            , new_DicOf(Array("Case", "8"   , "input", CSng(-1.1)                   , "expected", -1.1                                                    )) _
+            , new_DicOf(Array("Case", "9"   , "input", CDbl(1.12345678901234)       , "expected", 1.12345678901234                                        )) _
+            , new_DicOf(Array("Case", "10"  , "input", CCur(1000.12)                , "expected", 1000.12                                                 )) _
+            , new_DicOf(Array("Case", "11"  , "input", CByte(1)                     , "expected", 1                                                       )) _
+            , new_DicOf(Array("Case", "12-1", "input", True                         , "expected", Chr(34)&"true"&Chr(34)                                  )) _
+            , new_DicOf(Array("Case", "12-2", "input", False                        , "expected", Chr(34)&"false"&Chr(34)                                 )) _
+            , new_DicOf(Array("Case", "13"  , "input", Array("hoge",1)              , "expected", "["&Chr(34)&"hoge"&Chr(34)&",1]"                        )) _
+            , new_DicOf(Array("Case", "14-1", "input", "abcdefg"                    , "expected", Chr(34)&"abcdefg"&Chr(34)                               )) _
+            , new_DicOf(Array("Case", "14-2", "input", CDate("2024-01-31 15:45:30") , "expected", Chr(34)&"2024/01/31 15:45:30"&Chr(34)                   )) _
+            )
+        actual = cf_toJson(i("input"))
+        expected = i("expected")
+        AssertEqualWithMessage expected, actual, "Case=" & i("Case")
+    Next
+End Sub
+
+'###################################################################################################
 'common
 Sub assertAllElements(e,a)
     AssertEqualWithMessage Ubound(e), Ubound(a), "Ubound"

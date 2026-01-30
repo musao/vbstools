@@ -517,17 +517,26 @@ Private Function func_CfToJson( _
     Dim sRet : sRet = ""
     Select Case VarType(avTgt)
         Case vbEmpty, vbNull, vbError
-            sRet = "null"
+            sRet = fs_wrapInQuotes("null")
         Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbByte
             sRet = avTgt
         Case vbBoolean
             sRet = "false"
             If avTgt Then sRet = "true"
+            sRet = fs_wrapInQuotes(sRet)
         Case Else
             If IsArray(avTgt) Then
                 sRet = func_CfToJsonArray(avTgt)
             Else
-                sRet = fs_wrapInQuotes(CStr(avTgt))
+                Dim i, sVal
+                sVal = CStr(avTgt)
+                For Each i In Array( _
+                        Array("\", "\\") _
+                        , Array(Chr(34), "\"&Chr(34)) _
+                        )
+                    sVal = Replace(sVal, i(0), i(1))
+                Next
+                sRet = fs_wrapInQuotes(sVal)
             End If
     End Select
     func_CfToJson = sRet

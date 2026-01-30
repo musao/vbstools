@@ -686,6 +686,25 @@ Class ArrayList
     End Function
 
     '***************************************************************************************************
+    'Function/Sub Name           : toJson()
+    'Overview                    : オブジェクトの内容をJSON文字列で表示する
+    'Detailed Description        : cf_toString()準拠
+    'Argument
+    '     なし
+    'Return Value
+    '     JSON文字列に変換したオブジェクトの内容
+    '---------------------------------------------------------------------------------------------------
+    'History
+    'Date               Name                     Reason for Changes
+    '----------         ----------------------   -------------------------------------------------------
+    '2026/01/28         Y.Fujii                  First edition
+    '***************************************************************************************************
+    Public Function toJson( _
+        )
+        toJson = cf_toJson(this_toArray(True))
+    End Function
+
+    '***************************************************************************************************
     'Function/Sub Name           : toString()
     'Overview                    : オブジェクトの内容を文字列で表示する
     'Detailed Description        : cf_toString()準拠

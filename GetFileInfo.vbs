@@ -191,8 +191,8 @@ Private Sub this_makeReport( _
 
     'レポートの作成
     With new_HtmlOf("html")
-        .addContent this_makeReportHtmlHeader()
-        .addContent this_makeReportHtmlBody(aoParams)
+        .addContent this_makeReportHtmlHeader(aoParams)
+        .addContent this_makeReportHtmlBody()
     
         '★ログ出力
         this_logger Array(logType.INFO, "this_makeReport()", "Before reportfile output.")
@@ -215,7 +215,7 @@ End Sub
 'Overview                    : 結果HTMLのheadタグ内の編集
 'Detailed Description        : 工事中
 'Argument
-'     なし
+'     aoParams               : パラメータ格納用オブジェクト
 'Return Value
 '     HTML生成クラスのheadタグオブジェクト
 '---------------------------------------------------------------------------------------------------
@@ -225,6 +225,7 @@ End Sub
 '2023/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function this_makeReportHtmlHeader( _
+    byRef aoParams _
     )
     
     Dim oStyle : Set oStyle = _
@@ -268,13 +269,50 @@ Private Function this_makeReportHtmlHeader( _
             .addProperty("border-bottom", "1px solid #E0E1E3") _
             .addProperty("border-right", "1px solid #E0E1E3") _
             .addProperty("white-space", "nowrap")
+        
+        .addContent new_CssOf(".text-right") _
+            .addProperty("text-align", "right") _
     End With
+
+    Dim oScriptData : Set oScriptData = _
+        new_HtmlOf("script") _
+            .addAttribute("id", "user-data") _
+            .addAttribute("type", "application/json") _
+            .addContent(aoParams("List").toJson())
+
+    Dim oScriptJs : Set oScriptJs = _
+        new_HtmlOf("script") _
+            .addAttribute("defer", Empty) _
+            .addContent( _
+                  "document.addEventListener('DOMContentLoaded', () => {" & vbNewLine _
+                & "  const users = JSON.parse(document.getElementById('user-data').textContent);" & vbNewLine _
+                & "  const tbody = document.querySelector('.table01 tbody');" & vbNewLine _
+                & "" & vbNewLine _
+                & "  users.forEach((user, index) => {" & vbNewLine _
+                & "    const tr = document.createElement('tr');" & vbNewLine _
+                & "    tr.innerHTML = `" & vbNewLine _
+                & "      <th>${index + 1}</th>" & vbNewLine _
+                & "      <td>${user.name}</td>" & vbNewLine _
+                & "      <td>${user.path}</td>" & vbNewLine _
+                & "      <td>${user.parentFolder}</td>" & vbNewLine _
+                & "      <td class='text-right'>${user.dateLastModified}</td>" & vbNewLine _
+                & "      <td class='text-right'>${Number(user.size).toLocaleString()}</td>" & vbNewLine _
+                & "      <td>${user.type}</td>" & vbNewLine _
+                & "    `;" & vbNewLine _
+                & "    tbody.appendChild(tr);" & vbNewLine _
+                & "  });" & vbNewLine _
+                & "});" & vbNewLine _
+            )
 
     Dim oHead : Set oHead = new_HtmlOf("head")
     oHead.addContent oStyle
+    oHead.addContent oScriptData
+    oHead.addContent oScriptJs
 
     Set this_makeReportHtmlHeader = oHead
     Set oStyle = Nothing
+    Set oScriptData = Nothing
+    Set oScriptJs = Nothing
     Set oHead = Nothing
 End Function
 
@@ -284,7 +322,7 @@ End Function
 'Overview                    : 結果HTMLのbodyタグ内の編集
 'Detailed Description        : 工事中
 'Argument
-'     aoParams               : パラメータ格納用オブジェクト
+'     なし
 'Return Value
 '     HTML生成クラスのbodyタグオブジェクト
 '---------------------------------------------------------------------------------------------------
@@ -294,43 +332,21 @@ End Function
 '2023/11/12         Y.Fujii                  First edition
 '***************************************************************************************************
 Private Function this_makeReportHtmlBody( _
-    byRef aoParams _
     )
-    'パラメータ格納用汎用オブジェクト
-    Dim oList : Set oList = aoParams.Item("List").slice(0,Null)
-    
-    'thead
     Dim oTr : Set oTr = new_HtmlOf("tr")
     oTr.addContent new_HtmlOf("th").addContent("Seq")
-    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
     oTr.addContent new_HtmlOf("th").addContent("Name")
     oTr.addContent new_HtmlOf("th").addContent("Path")
     oTr.addContent new_HtmlOf("th").addContent("ParentFolder")
+    oTr.addContent new_HtmlOf("th").addContent("DateLastModified")
     oTr.addContent new_HtmlOf("th").addContent("Size")
     oTr.addContent new_HtmlOf("th").addContent("Type")
     Dim oThead : Set oThead = new_HtmlOf("thead")
     oThead.addContent oTr
 
-    'tbody
-    Dim oTbody : Set oTbody = new_HtmlOf("tbody")
-    Dim lSeq : lSeq=1
-    Do While oList.length>0
-        Set oTr = new_HtmlOf("tr")
-        With oList.shift
-            oTr.addContent new_HtmlOf("th").addContent(lSeq)
-            oTr.addContent new_HtmlOf("td").addContent(.DateLastModified)
-            oTr.addContent new_HtmlOf("td").addContent(.Name)
-            oTr.addContent new_HtmlOf("td").addContent(.Path)
-            oTr.addContent new_HtmlOf("td").addContent(.ParentFolder)
-            oTr.addContent new_HtmlOf("td").addContent(.Size)
-            oTr.addContent new_HtmlOf("td").addContent(.Type)
-        End With
-        oTbody.addContent oTr
-        lSeq = lSeq+1
-    Loop
     Dim oTable : Set oTable = new_HtmlOf("table").addAttribute("class", "table01")
     oTable.addContent oThead
-    oTable.addContent oTbody
+    oTable.addContent new_HtmlOf("tbody")
 
     Dim oDiv : Set oDiv = new_HtmlOf("div").addAttribute("class", "table_wrap")
     oDiv.addContent oTable
@@ -339,12 +355,11 @@ Private Function this_makeReportHtmlBody( _
     oBody.addContent oDiv
 
     Set this_makeReportHtmlBody = oBody
+    Set oBody = Nothing
+    Set oDiv = Nothing
     Set oTr = Nothing
     Set oThead = Nothing
-    Set oTbody = Nothing
     Set oTable = Nothing
-    Set oBody = Nothing
-    Set oList = Nothing
 End Function
 
 '***************************************************************************************************

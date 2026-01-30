@@ -356,13 +356,29 @@ Class HtmlGenerator
     Private Function this_htmlEntityReference( _
         byRef asTarget _
         )
-        Dim vSettings : vSettings = Array( _
-            Array("&", "&amp;") _
-            , Array("'", "&#39;") _
-            , Array("""", "&quot;") _
-            , Array("<", "&lt;") _
-            , Array(">", "&gt;") _
-            )
+        Dim vSettings
+        Select Case LCase(PoTagInfo("element"))
+        Case "script"
+            vSettings = Array( _
+                Array("</script>", "<\/script>") _
+                )
+        Case "style"
+            vSettings = Array( _
+                Array("</style>", "<\/style>") _
+                )
+        Case "textarea"
+            vSettings = Array( _
+                Array("</textarea>", "<\/textarea>") _
+                )
+        Case Else
+            vSettings = Array( _
+                Array("&", "&amp;") _
+                , Array("'", "&#39;") _
+                , Array("""", "&quot;") _
+                , Array("<", "&lt;") _
+                , Array(">", "&gt;") _
+                )
+        End Select
         Dim sTarget : sTarget = asTarget
         Dim i
         For Each i In vSettings
