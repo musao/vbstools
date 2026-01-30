@@ -379,12 +379,7 @@ Class HtmlGenerator
                 , Array(">", "&gt;") _
                 )
         End Select
-        Dim sTarget : sTarget = asTarget
-        Dim i
-        For Each i In vSettings
-            sTarget = Replace(sTarget, i(0), i(1))
-        Next
-        this_htmlEntityReference = sTarget
+        this_htmlEntityReference = cf_multiReplace(asTarget, vSettings)
     End Function
 
 End Class

@@ -46,6 +46,42 @@ Sub Test_cf_bindAt_Object
 End Sub
 
 '###################################################################################################
+'cf_buildKeyPair()
+Sub Test_cf_buildKeyPair
+    Dim i, actual, expected
+    For Each i In Array( _
+            new_DicOf(Array(  "Case", "1", "input", new_DicOf(Array("key", "hoge" , "value", 3          )), "expected", Chr(34)&"hoge"  &Chr(34)&":"&"3"                          )) _
+            , new_DicOf(Array("Case", "2", "input", new_DicOf(Array("key", "\hoge", "value", "2026/1/30")), "expected", Chr(34)&"\\hoge"&Chr(34)&":"&Chr(34)&"2026\/1\/30"&Chr(34))) _
+            )
+        actual = cf_buildKeyPair(i("input")("key"), i("input")("value"))
+        expected = i("expected")
+        AssertEqualWithMessage expected, actual, "Case=" & i("Case")
+    Next
+End Sub
+
+'###################################################################################################
+'cf_escapeForJson()
+Sub Test_cf_escapeForJson
+    Dim i, actual, expected
+    For Each i In Array( _
+            new_DicOf(Array(  "Case", "1"  , "input",         "a"        &"bc"        , "expected", Chr(34)                &"a"                &"bc"                &Chr(34))) _
+            , new_DicOf(Array("Case", "2-1", "input", Chr(92)&"a"        &"bc"        , "expected", Chr(34)&Chr(92)&Chr(92)&"a"                &"bc"                &Chr(34))) _
+            , new_DicOf(Array("Case", "2-2", "input",         "a"        &"bc"&Chr(34), "expected", Chr(34)                &"a"                &"bc"&Chr(92)&Chr(34)&Chr(34))) _
+            , new_DicOf(Array("Case", "2-3", "input",         "a"&Chr(47)&"bc"        , "expected", Chr(34)                &"a"&Chr(92)&Chr(47)&"bc"                &Chr(34))) _
+            , new_DicOf(Array("Case", "2-4", "input", Chr(8) &"a"        &"bc"        , "expected", Chr(34)&Chr(92)&"b"    &"a"                &"bc"                &Chr(34))) _
+            , new_DicOf(Array("Case", "2-5", "input",         "a"        &"bc"&Chr(12), "expected", Chr(34)                &"a"                &"bc"&Chr(92)&"f"    &Chr(34))) _
+            , new_DicOf(Array("Case", "2-6", "input",         "a"&Chr(10)&"bc"        , "expected", Chr(34)                &"a"&Chr(92)&"n"    &"bc"                &Chr(34))) _
+            , new_DicOf(Array("Case", "2-7", "input",         "a"        &"bc"&Chr(13), "expected", Chr(34)                &"a"                &"bc"&Chr(92)&"r"    &Chr(34))) _
+            , new_DicOf(Array("Case", "2-8", "input",         "a"&Chr(9) &"bc"        , "expected", Chr(34)                &"a"&Chr(92)&"t"    &"bc"                &Chr(34))) _
+            , new_DicOf(Array("Case", "3"  , "input", Chr(92)&"a"&Chr(47)&"bc"&Chr(34), "expected", Chr(34)&Chr(92)&Chr(92)&"a"&Chr(92)&Chr(47)&"bc"&Chr(92)&Chr(34)&Chr(34))) _
+            )
+        actual = cf_escapeForJson(i("input"))
+        expected = i("expected")
+        AssertEqualWithMessage expected, actual, "Case=" & i("Case")
+    Next
+End Sub
+
+'###################################################################################################
 'cf_fillChar()
 Sub Test_cf_fillChar
     Dim data, caseName : caseName = "fillChar_normal_"
@@ -495,6 +531,21 @@ Sub Test_cf_swap
 End Sub
 
 '###################################################################################################
+'cf_multiReplace()
+Sub Test_cf_multiReplace
+    Dim i, actual, expected
+    For Each i In Array( _
+            new_DicOf(Array(  "Case", "1", "input", new_DicOf(Array("target", "abcdefg", "replaceDefs", Array()))                             , "expected", "abcdefg" )) _
+            , new_DicOf(Array("Case", "2", "input", new_DicOf(Array("target", "abcdefg", "replaceDefs", Array(Array("a","y"))))               , "expected", "ybcdefg" )) _
+            , new_DicOf(Array("Case", "3", "input", new_DicOf(Array("target", "abcdefg", "replaceDefs", Array(Array("a","y"),Array("g","z")))), "expected", "ybcdefz" )) _
+            )
+        actual = cf_multiReplace(i("input")("target"), i("input")("replaceDefs"))
+        expected = i("expected")
+        AssertEqualWithMessage expected, actual, "Case=" & i("Case")
+    Next
+End Sub
+
+'###################################################################################################
 'cf_toString()
 Sub Test_cf_toString_Empty
     Dim a,d,e
@@ -662,7 +713,7 @@ Sub Test_cf_toJson
             , new_DicOf(Array("Case", "12-2", "input", False                        , "expected", Chr(34)&"false"&Chr(34)                                 )) _
             , new_DicOf(Array("Case", "13"  , "input", Array("hoge",1)              , "expected", "["&Chr(34)&"hoge"&Chr(34)&",1]"                        )) _
             , new_DicOf(Array("Case", "14-1", "input", "abcdefg"                    , "expected", Chr(34)&"abcdefg"&Chr(34)                               )) _
-            , new_DicOf(Array("Case", "14-2", "input", CDate("2024-01-31 15:45:30") , "expected", Chr(34)&"2024/01/31 15:45:30"&Chr(34)                   )) _
+            , new_DicOf(Array("Case", "14-2", "input", CDate("2024-01-31 15:45:30") , "expected", Chr(34)&"2024\/01\/31 15:45:30"&Chr(34)                 )) _
             )
         actual = cf_toJson(i("input"))
         expected = i("expected")

@@ -432,8 +432,8 @@ End Sub
 
 '***************************************************************************************************
 'Function/Sub Name           : cf_buildKeyPair()
-'Overview                    : キーと値をペアにする
-'Detailed Description        : func_CfToJson()に委譲する
+'Overview                    : JSONのキーと値をペアにする
+'Detailed Description        : 工事中
 'Argument
 '     asKey                  : キー
 '     avValue                : 値
@@ -449,7 +449,75 @@ Private Function cf_buildKeyPair( _
     byVal asKey _
     , byRef avValue _
     )
-    cf_buildKeyPair = fs_wrapInQuotes(asKey) & ":" & func_CfToJson(avValue)
+    cf_buildKeyPair = cf_escapeForJson(asKey) & ":" & func_CfToJson(avValue)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_escapeForJson()
+'Overview                    : JSON用に引用符とエスケープ付与する
+'Detailed Description        : 工事中
+'Argument
+'     asTgt                  : 対象
+'Return Value
+'     JSON用に引用符とエスケープ付与した文字列
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/30         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_escapeForJson( _
+    byVal asTgt _
+    )
+    Dim vDef
+    '置換定義
+    ' \　→　\\
+    ' "　→　\"
+    ' /　→　\/
+    ' BS　→　\b
+    ' FF　→　\f
+    ' LF　→　\n
+    ' CR　→　\r
+    ' TAB →　\t
+    vDef = Array( _
+        Array(  Chr(92), Chr(92) & Chr(92)) _
+        , Array(Chr(34), Chr(92) & Chr(34)) _
+        , Array(Chr(47), Chr(92) & Chr(47)) _
+        , Array(Chr(8) , Chr(92) & "b") _
+        , Array(Chr(12), Chr(92) & "f") _
+        , Array(Chr(10), Chr(92) & "n") _
+        , Array(Chr(13), Chr(92) & "r") _
+        , Array(Chr(9) , Chr(92) & "t") _
+        )
+    cf_escapeForJson = Chr(34) & cf_multiReplace(asTgt, vDef) & Chr(34)
+End Function
+
+'***************************************************************************************************
+'Function/Sub Name           : cf_multiReplace()
+'Overview                    : 複数の置換定義に従い文字列を変換する
+'Detailed Description        : 工事中
+'Argument
+'     asTarget               : 対象
+'     avReplaceDefs          : 置換定義（次の形式）
+'                                Array(Array(targetString,replacementString),Array(),,,)
+'Return Value
+'     置換後の文字列
+'---------------------------------------------------------------------------------------------------
+'History
+'Date               Name                     Reason for Changes
+'----------         ----------------------   -------------------------------------------------------
+'2026/01/30         Y.Fujii                  First edition
+'***************************************************************************************************
+Private Function cf_multiReplace( _
+    byVal asTarget _
+    , byRef avReplaceDefs _
+    )
+    Dim sTarget : sTarget = asTarget
+    Dim i
+    For Each i In avReplaceDefs
+        sTarget = Replace(sTarget, i(0), i(1))
+    Next
+    cf_multiReplace = sTarget
 End Function
 
 '***************************************************************************************************
@@ -517,26 +585,18 @@ Private Function func_CfToJson( _
     Dim sRet : sRet = ""
     Select Case VarType(avTgt)
         Case vbEmpty, vbNull, vbError
-            sRet = fs_wrapInQuotes("null")
+            sRet = cf_escapeForJson("null")
         Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbByte
             sRet = avTgt
         Case vbBoolean
             sRet = "false"
             If avTgt Then sRet = "true"
-            sRet = fs_wrapInQuotes(sRet)
+            sRet = cf_escapeForJson(sRet)
         Case Else
             If IsArray(avTgt) Then
                 sRet = func_CfToJsonArray(avTgt)
             Else
-                Dim i, sVal
-                sVal = CStr(avTgt)
-                For Each i In Array( _
-                        Array("\", "\\") _
-                        , Array(Chr(34), "\"&Chr(34)) _
-                        )
-                    sVal = Replace(sVal, i(0), i(1))
-                Next
-                sRet = fs_wrapInQuotes(sVal)
+                sRet = cf_escapeForJson(CStr(avTgt))
             End If
     End Select
     func_CfToJson = sRet
@@ -618,7 +678,6 @@ Private Function func_CfToJsonObjectDictionary( _
     Dim sKey, vRet
     For Each sKey In avTgt.Keys
         cf_push vRet, cf_buildKeyPair(sKey, avTgt(sKey))
-'        cf_push vRet, fs_wrapInQuotes(sKey) & ":" & func_CfToJson(avTgt(sKey))
     Next
     func_CfToJsonObjectDictionary = "{" & Join(vRet, ",") & "}"
 End Function
