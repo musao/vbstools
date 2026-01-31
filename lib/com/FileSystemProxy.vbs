@@ -1029,7 +1029,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : this_isContainer()
     'Overview                    : コンテナ（フォルダーまたはアーカイブ）かどうかを返す
-    'Detailed Description        : FolderItemのisFolderがTrueまたは拡張子がzipの場合、
+    'Detailed Description        : FolderItemのIsFolderがTrueまたは拡張子がzipの場合、
     '                              コンテナ（フォルダーまたはアーカイブ）と判断する
     'Argument
     '     なし
@@ -1050,7 +1050,7 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : this_isFile()
     'Overview                    : ファイル（アーカイブを含む）かどうかを返す
-    'Detailed Description        : FolderItemのisFolderがFalseの場合、ファイル（アーカイブを含む）と判断する
+    'Detailed Description        : this_isFolder()の否定
     'Argument
     '     なし
     'Return Value
@@ -1134,7 +1134,8 @@ Class FileSystemProxy
     '***************************************************************************************************
     'Function/Sub Name           : this_isLink()
     'Overview                    : 項目がショートカットであるかどうかを返す
-    'Detailed Description        : https://learn.microsoft.com/ja-jp/windows/win32/shell/folderitem
+    'Detailed Description        : FolderItemのIsLinkがTrueまたは拡張子がlnkの場合、
+    '                              ショートカットと判断する
     'Argument
     '     なし
     'Return Value
@@ -1147,7 +1148,8 @@ Class FileSystemProxy
     '***************************************************************************************************
     Private Function this_isLink()
         this_isLink = Null
-        If Not this_isInitial() Then this_isLink = PoFolderItem.IsLink
+        If this_isInitial() Then Exit Function
+        this_isLink = PoFolderItem.IsLink Or cf_isSame(LCase(this_extension), "lnk")
     End Function
 
     '***************************************************************************************************

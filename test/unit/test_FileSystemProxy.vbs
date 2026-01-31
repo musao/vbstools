@@ -206,10 +206,9 @@ Sub Test_FileProxy_properties_list
 '    , dicOf(Array("Case", "2-1"    , "Definition", defFolder( "defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
 '    , dicOf(Array("Case", "2-2"    , "Definition", defArchive("defTextFile,defFolder(defTextFile),defArchive(defTextFile)") )) _
 '    )
-'inputbox "","",cf_toString(createData(cases))
+'inputbox "","",cf_toString(createData(cases, False))
 Dim ele,path,caze,ao
     For Each ele In createData(cases, False)
-'    For Each ele In createData(cases)
         path = ele("Path")
         caze = ele("Case")
         Set ao = (new FileSystemProxy).of(path)
@@ -537,7 +536,7 @@ Sub assertFsProperties(actualObj,path,caze)
                 , dicOf(Array("target", "isFile"               , "expected", expectIsFile(path)        , "actual", .isFile)) _
                 , dicOf(Array("target", "isFileSystem"         , "expected", fi2.IsFileSystem          , "actual", .isFileSystem)) _
                 , dicOf(Array("target", "isFolder"             , "expected", expectIsFolder(path)      , "actual", .isFolder)) _
-                , dicOf(Array("target", "isLink"               , "expected", fi2.IsLink                , "actual", .isLink)) _
+                , dicOf(Array("target", "isLink"               , "expected", expectIsLink(path)        , "actual", .isLink)) _
                 , dicOf(Array("target", "parentFolder TypeName", "expected", "FileSystemProxy"         , "actual", TypeName(.parentFolder))) _
                 , dicOf(Array("target", "path"                 , "expected", path                      , "actual", .path)) _
                 , dicOf(Array("target", "default"              , "expected", path                      , "actual", actualObj)) _
@@ -604,6 +603,9 @@ Function expectIsFolder(path)
             expectIsFolder = .IsFolder
         End If
     End With
+End Function
+Function expectIsLink(path)
+    expectIsLink = getFolderItem2(path).IsLink Or (LCase(new_Fso().GetExtensionName(path)) = "lnk")
 End Function
 'to verify the following properties
 '   .allContainers
